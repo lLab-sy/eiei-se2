@@ -1,0 +1,22 @@
+{
+  "name": "professional-network-for-creative-talent-backend",
+  "version": "1.0.0",
+  "description": "express-backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "author": "eiei-Group13",
+  "license": "ISC",
+  "dependencies": {
+    "dot": "^1.1.3",
+    "dotenv": "^16.4.7",
+    "env": "^0.0.2",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
