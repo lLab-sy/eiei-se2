@@ -9,7 +9,7 @@ connectDB(); //use db
 const app=express()
 
 //Routes files
-const posts =require('./routes/post')
+const posts =require('./routes/posts')
 
 
 //Mount Path

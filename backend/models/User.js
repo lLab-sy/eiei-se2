@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // Define the base User schema
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
-    required: true,
+    required: [true, "Please add a name"],
     trim: true,
   },
   password: {
@@ -45,6 +47,10 @@ const userSchema = new mongoose.Schema({
     enum: ['producer', 'production professional', 'admin'],
     required: true,
   },
+  profile_picture:{
+    type:Buffer,
+    required: true
+  }
 }, { discriminatorKey: 'role', timestamps: true });
 
 // Export the base User model
