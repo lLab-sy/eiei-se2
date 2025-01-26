@@ -1,37 +1,34 @@
 const mongoose = require('mongoose');
 
-const HospitalSchema = new mongoose.Schema({
-    name:{
+const PostSchema = new mongoose.Schema({
+    postname:{
         type: String,
         required:[true,'Please add a name'],
-        unique:true,
         trim:true,
         maxlength:[50,'Name can not be more than 50 characters']
     },
-    address:{
+    postdescription:{
         type:String,
-        required:[true,'Please add an address']
+        required:[true,'Please add a description']
     },
-    district:{
-        type:String,
-        required:[true,'Please add a district']
+    postimage:{ 
+        type: [Buffer], // Updated for array of images (buffers)
+        required: [true, 'Please add at least one image'],
     },
-    province:{
+    postmediatype:{
+        type:Buffer,
+        required:[true,'Please add a postmedia type'] //array of images
+    },
+    postProjectRole:{
         type: String,
-        require:[true,'Please add a province']
+        enum: ['actor', 'cameraman', 'editor','vtuber'], //mark
+        required: true,
     },
-    postalcode:{
-        type:String,
-        require:[true,'Please add a postal code'],
-        maxlength:[5,'Postal code can not be more than 5 characters']
-    },
-    tel:{
-        type:String
-    },
-    region:{
-        type:String,
-        required:[true,'Please add a region']
-    }
+    postStatus:{
+        type: String,
+        enum: ['created', 'in-progress', 'success','delete'], //mark
+        required: true,
+    } 
 });
 
-module.exports=mongoose.model('Hospital',HospitalSchema);
+module.exports=mongoose.model('Postz',PostSchema);

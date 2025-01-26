@@ -1,9 +1,9 @@
 const express = require('express')
-const { getPosts,getPost,postPost,putPost,deletePost } = require('../controller/posts');
+const { getPosts,getPostHistoryByID,getPostByID,createPost,updatePost,deletePost } = require('../controller/posts');
 
 const router=express.Router()
 
  
-router.route('/').get(getPosts).post(postPost)
-router.route('/:id').get(getPost).put(putPost).delete(deletePost)
+router.route('/').get(getPosts).post(createPost)
+router.route('/:id').get(getPostHistoryByID).get(getPostByID).put(updatePost).delete(deletePost)
 module.exports=router; //ให้ server.js เรียกใช้

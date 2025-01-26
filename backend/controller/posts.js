@@ -11,19 +11,26 @@ exports .getPosts=async (req,res,next)=>{
 //@route GET /api/v1/Posts
 ///:id
 //@access Public
-exports .getPost=async (req,res,next)=>{
+exports .getPostByID=async (req,res,next)=>{
+ 
+}
+//@desc Get Post For History findManyBy(userID,postStatus)
+//@route GET /api/v1/Posts
+///:id
+//@access Public
+exports .getPostHistoryByID=async (req,res,next)=>{
  
 }
 //@desc Post hospital
 //@route POST /api/v1/Posts
 //@access Private
-exports .postPost= async (req,res,next)=>{
+exports .createPost= async (req,res,next)=>{
  
 }
 //@desc Update hospital
 //@route PUT /api/v1/Posts
 //@access Private
-exports .putPost= async (req,res,next)=>{
+exports .updatePost= async (req,res,next)=>{
  
 }
 //@desc Delete hospital
