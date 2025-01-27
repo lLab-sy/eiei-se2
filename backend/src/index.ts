@@ -3,7 +3,7 @@ import connectDB from './config/db';
 import testRoutes from './routes/testRoutes';
 import morgan from 'morgan';
 import helmet from "helmet";
-// import cors from "cors";
+import cors from "cors";
 import setupSwagger from './config/swagger';
 import dotenv from 'dotenv';
 
@@ -20,7 +20,7 @@ connectDB();
 // Middleware
 app.use(morgan('common'));
 app.use(helmet());
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
