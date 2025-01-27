@@ -1,4 +1,4 @@
-import Test from '../models/testModel';
+import Test, { ITest } from '../models/testModel';
 
 class TestRepository {
     public async getAllTests() {
@@ -9,7 +9,7 @@ class TestRepository {
         }
     }
 
-    public async createTest(testData: { name: string }) {
+    public async createTest(testData: ITest) {
         try {
             const test = new Test(testData);
             return await test.save();
