@@ -1,9 +1,9 @@
-import NavBar from '@/components/NavBar';
-import Banner from '@/components/Banner';
-import ShortKeyList from '@/components/ShortKeyList';
-import MovieList from '@/components/MovieList';
-import ProfessionalList from '@/components/ProfessionalList';
-import Footer from '@/components/Footer';
+import NavBar from "@/components/NavBar";
+import Banner from "@/components/Banner";
+import ShortKeyList from "@/components/ShortKeyList";
+import MovieList from "@/components/MovieList";
+import ProfessionalList from "@/components/ProfessionalList";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
