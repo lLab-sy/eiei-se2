@@ -19,7 +19,7 @@ const categories: Category[] = [
 const ShortKeyList: FC = () => {
   return (
     <div className="container mx-auto py-4 sm:py-6 md:py-8 px-4">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 md:gap-6 text-gray-600">
         {categories.map((category, index) => (
           <Link 
             href={category.href} 

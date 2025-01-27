@@ -23,7 +23,7 @@ const movies: Movie[] = [
 const MovieList: FC = () => {
   return (
     <section className="container mx-auto py-4 sm:py-6 md:py-8 px-4">
-      <div className="flex justify-between items-center mb-4 sm:mb-6">
+      <div className="flex justify-between items-center mb-4 sm:mb-6 text-gray-600">
         <h2 className="text-xl sm:text-2xl font-bold">Movie</h2>
         <Link href="/movies" className="text-blue-600 hover:text-blue-800 text-sm sm:text-base">
           See more ...
