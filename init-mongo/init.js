@@ -5,8 +5,8 @@ const testMedia = {
 }
 
 const init = () => {
-  db.createCollection("media_type");
-  db["media_type"].insertOne(testMedia);
+  db.createCollection("mediaType");
+  db["mediaType"].insertOne(testMedia);
 };
   
 init();
