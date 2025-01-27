@@ -16,7 +16,7 @@ const PostSchema = new mongoose.Schema({
         required: [true, 'Please add at least one image'],
     },
     postmediatype:{
-        type:Buffer,
+        type:String,
         required:[true,'Please add a postmedia type'] //array of images
     },
     postProjectRole:{
@@ -24,11 +24,11 @@ const PostSchema = new mongoose.Schema({
         enum: ['actor', 'cameraman', 'editor','vtuber'], //mark
         required: true,
     },
-    postStatus:{
+    poststatus:{
         type: String,
         enum: ['created', 'in-progress', 'success','delete'], //mark
         required: true,
     } 
 });
 
-module.exports=mongoose.model('Postz',PostSchema);
+module.exports = mongoose.model('Post', PostSchema);
