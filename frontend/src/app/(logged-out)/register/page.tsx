@@ -24,6 +24,8 @@ import Link from "next/link";
 import { RadioGroup } from "@radix-ui/react-radio-group";
 import { RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Toast } from "@/components/ui/toast";
+import { toast, useToast } from "@/hooks/use-toast";
 
 const formSchema = z
   .object({
@@ -64,15 +66,21 @@ export default function RegisterPage() {
       confirmPassword: "",
     },
   });
+  const { toast } = useToast()
   const handleSubmit = async (data: z.infer<formFields>) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log(`Form Complete ${data.option}`);
+    toast({
+        variant: 'default',
+        title: 'Sign Up',
+        description: "Sign Up Successful"
+    })
   };
   return (
     <main className="flex justify-center items-center min-h-screen bg-slate-200">
       <Card className="w-[400px] shadow-lg">
         <CardHeader className='relative'>
-        <div className='absolute right-[-23%] top-2'>
+        {/* <div className='absolute right-[-23%] top-2'>
               <div className="w-[150px] flex">
                 <svg height={50} width={50} xmlns="http://www.w3.org/2000/svg">
                   <circle r={22.5} cx={25} cy={25} fill="blue" />
@@ -103,9 +111,9 @@ export default function RegisterPage() {
                 </svg>
                 
               </div>
-          </div>
+          </div> */}
           <CardTitle className="flex justify-center relative">
-            <span>SignUp</span>
+            <span>SignUp to EiEi</span>
             
           </CardTitle>
         </CardHeader>
@@ -162,7 +170,10 @@ export default function RegisterPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <div className="">
+                      <div className="text-sm">
+                        <div className='h-[30px] flex items-center'>
+                            Select your role
+                        </div>
                         <RadioGroup
                           onValueChange={field.onChange}
                           value={field.value}
