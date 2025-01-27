@@ -1,13 +1,12 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-interface ITest extends Document {
-    id: string;
-    name: string;
+export interface ITest extends Document {
+    nameNa: string;
 }
 
-const testSchema = new Schema<ITest>({
-    name: { type: String, required: true },
+export const testSchema = new Schema<ITest>({
+    nameNa: { type: String, required: true },
 });
 
-const Test = mongoose.model<ITest>('Media_type', testSchema);
+const Test = mongoose.model<ITest>('bananaType', testSchema, 'bananaTypes');
 export default Test;
