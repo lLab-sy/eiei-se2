@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-const dbURI = 'mongodb://root:rootpassword@localhost:7007/';
+const dbURI = 'mongodb://root:rootpassword@localhost:7007/eiei?authSource=admin';
 
 const connectDB = async () => {
     try {
@@ -12,6 +12,3 @@ const connectDB = async () => {
 };
 
 export default connectDB;
-// mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-//   .then(() => console.log('Connected to MongoDB'))
-//   .catch(error => console.error('MongoDB connection error:', error));

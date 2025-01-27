@@ -11,7 +11,7 @@ const options = {
       description: 'This is a sample API for a eiei project.',
     },
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts'], // Path to your API docs (add your controller and route files)
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/dtos/*.ts'], // Path to your API docs (add your controller and route files)
 };
 
 const swaggerSpec = swaggerJSDoc(options);
