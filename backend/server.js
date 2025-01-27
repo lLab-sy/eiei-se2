@@ -1,7 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const connectDB= require('./config/db') //เรียกใช้ db
-
+const path = require('path') //https://expressjs.com/en/starter/static-files.html 
 //Load env vars
 dotenv.config({path:'./config/config.env'})
 connectDB(); //use db
@@ -12,11 +12,14 @@ const cors = require("cors");
 const posts =require('./routes/posts')
 const users =require('./routes/auth')
 
+
+app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(cors({
     origin: process.env.FRONT_END, //frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],  
     credentials: true,  
 }));
+
 //Mount Path
 app.use(express.json({ limit: '50mb' })); // Increase the limit to 50MB //body parser มาก่อน use api นะ!!!
 app.use('/api/v1/posts',posts)

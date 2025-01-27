@@ -1,5 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
+ 
+
+ //Didn't use for now
 const PostSchema = new mongoose.Schema({
     postname:{
         type: String,
@@ -12,7 +16,7 @@ const PostSchema = new mongoose.Schema({
         required:[true,'Please add a description']
     },
     postimage:{ 
-        type: String, // Updated for array of images (buffers)
+        type: [Buffer], // Updated for array of images (buffers)
         required: [true, 'Please add at least one image'],
     },
     postmediatype:{
@@ -31,4 +35,7 @@ const PostSchema = new mongoose.Schema({
     } 
 });
 
-module.exports = mongoose.model('Post', PostSchema);
+
+// module.exports = mongoose.model('Car', CarSchema);  
+ const Post= mongoose.models.Post || mongoose.model("Post",PostSchema);
+ export default Post

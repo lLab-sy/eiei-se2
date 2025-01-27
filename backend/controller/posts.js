@@ -1,6 +1,8 @@
 //Put Model file
 const Post= require('../models/Post');
-
+ 
+    
+ 
 //@desc Get all Posts
 //@route GET /api/v1/Posts
 //@access Public
@@ -60,46 +62,19 @@ exports .getPostHistoryByID=async (req,res,next)=>{ //Can't use for now
 //     }
 // }
 exports.createPost = async (req, res, next) => {
-    try {
-        const { file, postname, postdescription, postmediatype, postProjectRole, poststatus } = req.body;
+    try{
+        const post = await Post.create({
+            postname: req.body.postname,
+            postdescription: req.body.postdescription,
+            postimage: req.file.filename,
+            postmediatype: req.body.postmediatype,
+            postProjectRole: req.body.postProjectRole,
+            poststatus: req.body.poststatus
 
-        // If there's a file, decode it from base64 and save it to disk
-        if (file) {
-            const buffer = Buffer.from(file, "base64"); // Decode the base64 file
-            // const filePath = path.join(__dirname, "..", "uploads", `${Date.now()}.jpg`); // File path
-            // fs.writeFileSync(filePath, buffer); // Save the file to disk
-
-            // Optionally, you can store the file path or URL in your database
-            // req.body.filePath = filePath; // You can store the file path in the database
-
-            const post = await Post.create({
-                postname,
-                postdescription,
-                buffer,
-                postmediatype,
-                postProjectRole,
-                poststatus,
-                // filePath: req.body.filePath || null, // Store file path if present
-            });
-            res.status(201).json({ success: true, data: post });
-        }
-
-        // Create the post with the remaining data
-        // const post = await Post.create({
-        //     postname,
-        //     postdescription,
-        //     buffer,
-        //     postmediatype,
-        //     postProjectRole,
-        //     poststatus,
-        //     // filePath: req.body.filePath || null, // Store file path if present
-        // });
-
-        // res.status(201).json({ success: true, data: post });
-
-    } catch (error) {
-        console.error("Error creating post:", error);
-        res.status(400).json({ success: false, text: "Post creation failed" });
+        })
+        res.status(201).json({success:true,data:post})
+    }catch(err){
+        res.status(400).json({success:false,text:err})
     }
 };
 //@desc Update hospital
