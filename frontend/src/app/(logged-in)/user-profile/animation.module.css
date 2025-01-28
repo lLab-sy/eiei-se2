@@ -1,0 +1,25 @@
+
+.divLine::after {
+    
+    transition: transform .4s ease;
+}
+
+/* .divLine:hover::after {
+    transform: scaleX(1);
+} */
+
+
+.divLines::after {
+    
+    transition: transform .4s ease;
+}
+
+/* .divLines:hover::after {
+    transform: scaleX(1);
+} */
+
+
+/* cursor-pointer after:bg-blue-200 after:content-[''] after:w-[58%] after:h-[3px] after:absolute after:bottom-[-60%] after:left-[43%] */
+
+
+/* after:bg-blue-200 after:content-[''] after:w-[30%] after:h-[3px] after:absolute after:bottom-[-60%] after:left-0 */
