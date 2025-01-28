@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import connectDB from './config/db';
 import testRoutes from './routes/testRoutes';
+import authRoutes from './routes/authRoutes';
 import morgan from 'morgan';
 import helmet from "helmet";
 import cors from "cors";
@@ -35,6 +36,7 @@ setupSwagger(app);
 
 // Routes
 app.use('/api', testRoutes);
+app.use('/api/auth', authRoutes);
 
 // Server
 app.listen(port, () => {
