@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { FC } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { FC } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface Movie {
   title: string;
@@ -11,13 +11,13 @@ interface Movie {
 }
 
 const movies: Movie[] = [
-  { title: 'Fast Feel Love', image: '/api/placeholder/300/200', id: '1' },
-  { title: 'Haunted Universities', image: '/api/placeholder/300/200', id: '2' },
-  { title: 'Friend Zone', image: '/api/placeholder/300/200', id: '3' },
-  { title: 'Shadow & Bone', image: '/api/placeholder/300/200', id: '4' },
-  { title: 'Gladiator', image: '/api/placeholder/300/200', id: '5' },
-  { title: 'JURASSIC PARK', image: '/api/placeholder/300/200', id: '6' },
-  { title: 'Titanic', image: '/api/placeholder/300/200', id: '7' }
+  { title: "Fast Feel Love", image: "/api/placeholder/300/200", id: "1" },
+  { title: "Haunted Universities", image: "/api/placeholder/300/200", id: "2" },
+  { title: "Friend Zone", image: "/api/placeholder/300/200", id: "3" },
+  { title: "Shadow & Bone", image: "/api/placeholder/300/200", id: "4" },
+  { title: "Gladiator", image: "/api/placeholder/300/200", id: "5" },
+  { title: "JURASSIC PARK", image: "/api/placeholder/300/200", id: "6" },
+  { title: "Titanic", image: "/api/placeholder/300/200", id: "7" },
 ];
 
 const MovieList: FC = () => {
@@ -25,7 +25,10 @@ const MovieList: FC = () => {
     <section className="container mx-auto py-4 sm:py-6 md:py-8 px-4">
       <div className="flex justify-between items-center mb-4 sm:mb-6 text-gray-600">
         <h2 className="text-xl sm:text-2xl font-bold">Movie</h2>
-        <Link href="/movies" className="text-blue-600 hover:text-blue-800 text-sm sm:text-base">
+        <Link
+          href="/movies"
+          className="text-blue-600 hover:text-blue-800 text-sm sm:text-base"
+        >
           See more ...
         </Link>
       </div>
@@ -34,8 +37,8 @@ const MovieList: FC = () => {
         {movies.map((movie) => (
           <Link href={`/movie/${movie.id}`} key={movie.id} className="group">
             <div className="relative aspect-video rounded-lg overflow-hidden">
-              <Image 
-                src={movie.image} 
+              <Image
+                src={movie.image}
                 alt={movie.title}
                 fill
                 className="object-cover transform group-hover:scale-105 transition-transform duration-300"

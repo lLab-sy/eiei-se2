@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { FC } from 'react';
+import Image from "next/image";
+import { FC } from "react";
 
 interface BannerProps {
   title?: string;
   imageUrl?: string;
 }
 
-const Banner: FC<BannerProps> = ({ 
+const Banner: FC<BannerProps> = ({
   title = "ON Recruiting",
-  imageUrl = "/api/placeholder/1200/400"
+  imageUrl = "/api/placeholder/1200/400",
 }) => {
   return (
     <div className="relative h-48 sm:h-64 md:h-96 bg-gradient-to-r from-blue-600 to-purple-600">
-      <Image 
+      <Image
         src={imageUrl}
         alt={title}
         fill
