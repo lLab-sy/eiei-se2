@@ -17,8 +17,8 @@ export interface IUser extends Document {
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt: Date;
-  getSignedJwtToken(): string;
-  matchPassword(enteredPassword: string): Promise<boolean>;
+  //getSignedJwtToken(): string;
+  //matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 // User Schema Definition
@@ -112,5 +112,6 @@ UserSchema.methods.matchPassword = async function (enteredPassword: string): Pro
 };
 */
 
-const User = mongoose.model<IUser>('User', UserSchema);
+const User = mongoose.model<IUser>('User', UserSchema, 'users');
 export default User;
+export { UserSchema };
