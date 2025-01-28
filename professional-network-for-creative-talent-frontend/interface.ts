@@ -6,3 +6,18 @@ export interface PostData {
     poststatus: string;
     file: string;  // Base64 encoded file data
 }
+
+export interface Project {
+    id: number;
+    postName: string;
+    postDescription:string;
+    postImages:string;
+    postMediaType:string;
+    postProjectRole:string;
+    postStatus:string;
+    startDate: string
+    endDate: string;
+
+    producer: string; //AuthMe
+  }
+  
