@@ -1,10 +1,10 @@
-version: '3.9'
+version: '3.8'
 
 services:
+  # MongoDB Service
   mongodb:
     image: mongo:8
-    restart: always
-    container_name: mongodb-eiei
+    container_name: mongodbe-eiei
     ports:
       - "${MONGO_PORT}:27017"
     environment:
