@@ -1,5 +1,9 @@
 import mongoose from 'mongoose'
-const dbURI = 'mongodb://root:rootpassword@localhost:7007/eiei?authSource=admin';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const dbURI = process.env.MONGO_URI || ""
 
 const connectDB = async () => {
     try {
