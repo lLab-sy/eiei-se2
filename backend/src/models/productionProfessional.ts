@@ -3,10 +3,10 @@ import { IUser, UserSchema } from './user';
 
 // Define the interface for ProductionProfessional, extending IUser
 export interface IProductionProfessional extends IUser {
-  occupation: string;
-  skill: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
-  experience: number; // Years of experience
-  rating: number; // Rating out of 5
+  occupation?: string;
+  skill?: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
+  experience?: number; // Years of experience
+  rating?: number; // Rating out of 5
 }
 
 // Define the schema for ProductionProfessional, inheriting from UserSchema

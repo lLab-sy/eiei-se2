@@ -2,21 +2,22 @@ import mongoose, { Schema, Document } from 'mongoose';
 //import bcrypt from 'bcryptjs';
 //import jwt from 'jsonwebtoken';
 
-// Interface for User Document
+// Interface for User Document: require are name, password, role; which user must input at registration. 
 export interface IUser extends Document {
   name: string;
-  email: string;
+  email?: string;
   role: 'producer' | 'production professional' | 'admin';
   password: string;
-  firstName: string;
+  firstName?: string;
   middleName?: string;
-  lastName: string;
+  lastName?: string;
   phoneNumber?: string;
   gender?: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
+  billingAccount?: string;
   profileImage?: string;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
-  createdAt: Date;
+  createdAt?: Date;
   //getSignedJwtToken(): string;
   //matchPassword(enteredPassword: string): Promise<boolean>;
 }
@@ -30,7 +31,8 @@ const UserSchema: Schema = new Schema({
   },
   email: {
     type: String,
-    required: [true, 'Please add an email'],
+    //required: [true, 'Please add an email'],
+    //unique: true,
     match: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       'Please add a valid email',
@@ -76,6 +78,9 @@ const UserSchema: Schema = new Schema({
     type: String,
     enum: ['Male', 'Female', 'Other', 'Prefer not to say'],
   },
+  billingAccount: {
+    type: String,
+  },
   profileImage: {
     type: String,
   },
@@ -88,7 +93,7 @@ const UserSchema: Schema = new Schema({
 });
 
 //Below is the logic for authen, I don't know that should we use it now or later.
-//So I will comment them until we need to use the logic below, feel free to uncomment if you want to use it.
+//So I will comment them until we need to use the logic below, feel free to use it if you want.
 /*
 // Encrypt password before saving the user
 UserSchema.pre<IUser>('save', async function (next) {
