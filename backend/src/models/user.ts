@@ -23,7 +23,7 @@ export interface IUser extends Document {
 }
 
 // User Schema Definition
-const UserSchema: Schema = new Schema({
+export const UserSchema: Schema = new Schema({
   username: {
     type: String,
     unique: true,
@@ -120,4 +120,4 @@ UserSchema.methods.matchPassword = async function (enteredPassword: string): Pro
 
 const User = mongoose.model<IUser>('User', UserSchema, 'users');
 export default User;
-export { UserSchema };
+//export { UserSchema };
