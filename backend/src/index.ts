@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import connectDB from './config/db';
 import testRoutes from './routes/testRoutes';
+import postRoutes from "./routes/postRoutes"
 import authRoutes from './routes/authRoutes';
 import morgan from 'morgan';
 import helmet from "helmet";
@@ -36,6 +37,7 @@ setupSwagger(app);
 
 // Routes
 app.use('/api', testRoutes);
+app.use('/api/v1',postRoutes);
 app.use('/api/auth', authRoutes);
 
 // Server
