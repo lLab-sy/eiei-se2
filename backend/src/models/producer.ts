@@ -1,15 +1,39 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { UserSchema } from './user';
+import mongoose, { Schema, Document } from "mongoose";
+import { IUser, UserSchema } from "./user";
 
-// Define the Producer schema by extending the User schema
-const ProducerSchema = new Schema({
-  ...UserSchema.obj, // Inherit fields from User schema
+// Define the interface for ProductionProfessional, extending IUser
+export interface IProducer extends IUser {
+  company?: string;
+  paymentType?: "qrCode" | "creditDebit";
+  nameOnCard?: string; //for Credit/Debit
+  cardNumber?: string; //for Credit/Debit
+}
+
+// Define the schema for Producer, inheriting from UserSchema
+const ProducerSchema: Schema<IProducer> = new Schema({
   company: {
     type: String,
-    //required: [true, 'Please add a company name'],
     trim: true,
+  },
+  paymentType: {
+    type: String,
+    enum: ["qrCode", "creditDebit"],
+  },
+  nameOnCard: {
+    type: String,
+  },
+  cardNumber: {
+    type: String,
   },
 });
 
-// Export the Producer model
-export default mongoose.model('Producer', ProducerSchema, 'producers');
+// Attach the UserSchema as the base schema
+ProducerSchema.add(UserSchema);
+
+// Export the model
+const Producer = mongoose.model<IProducer>(
+  "Producer",
+  ProducerSchema,
+  "producers"
+);
+export default Producer;

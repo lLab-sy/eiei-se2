@@ -12,8 +12,8 @@ export interface IUser extends Document {
   middleName?: string;
   lastName?: string;
   phoneNumber?: string;
-  gender?: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
-  billingAccount?: string;
+  gender?: 'Male' | 'Female' | 'Non-Binary' | 'Other';
+  bankAccount?: string;
   profileImage?: string;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
@@ -77,9 +77,9 @@ const UserSchema: Schema = new Schema({
   },
   gender: {
     type: String,
-    enum: ['Male', 'Female', 'Other', 'Prefer not to say'],
+    enum: ['Male', 'Female', 'Non-Binary', 'Other'],
   },
-  billingAccount: {
+  bankAccount: {
     type: String,
   },
   profileImage: {
