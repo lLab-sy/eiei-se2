@@ -85,8 +85,7 @@ export default function UserPage() {
       lastName: "default",
       password: "1234567890!",
       confirmPassword: "1234567890!",
-      payment_type: 'QR_Code',
-
+      payment_type: "QR_Code",
     },
   });
   /*
@@ -96,19 +95,19 @@ export default function UserPage() {
   */
   const [isEdit, setIsEdit] = useState(false);
   const [click, setClick] = useState(true);
-  const { toast } = useToast()
+  const { toast } = useToast();
   // redux to dispatch changes
   const [paymentState, setPaymentState] = useState("");
   const handleSubmit = async () => {
     //dispatch to update each case or change only display to none else hidden
     console.log(form.getValues());
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     toast({
-      variant: 'default',
-      title: 'Edit Profile',
-      description: 'Edit Profile Successful'
-    })
-    setIsEdit(false)
+      variant: "default",
+      title: "Edit Profile",
+      description: "Edit Profile Successful",
+    });
+    setIsEdit(false);
   };
   const [img, setImageState] = useState({
     image: "",
@@ -125,19 +124,19 @@ export default function UserPage() {
   };
   return (
     <main className="font-serif min-h-screen flex bg-blue-400 relative items-center justify-center">
-      <div className="flex justify-around w-[40%] h-[60vh]">
-        <Card className="w-[400px] border border-black flex flex-col">
+      <div className="flex justify-around w-[60%] h-[650px]">
+        <Card className="w-[400px] flex flex-col">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <div className="text-xl font-serif font-bold flex justify-center h-[50px] items-center">
+            <div className="text-2xl font-serif font-bold flex justify-center h-[50px] items-center">
               Name
             </div>
             {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
               <Image src={} alt=''/>
             </div> */}
-            <Avatar className="size-40">
+            <Avatar className="size-60">
               <AvatarImage src={img.image} alt="" />
               <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
             </Avatar>
@@ -157,18 +156,18 @@ export default function UserPage() {
             <CardTitle>Edit Profile</CardTitle>
           </CardHeader>
           <CardContent className=" flex flex-col relative h-full">
-            <div className="flex flex-row w-[60%] relative justify-between">
+            <div className="flex flex-row w-[60%] justify-between">
               <Link
                 href={""}
                 onClick={() => setClick(true)}
-                className={` ${styles.divLine} hover:after:scale-x-100 after:bg-blue-200 after:content-[''] after:w-[27%] after:h-[3px] after:absolute after:bottom-[-60%] after:left-0 ${click ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={` ${styles.divLine} text-nowrap  hover:after:scale-x-100 after:bg-blue-200 after:content-[''] after:w-[70px] after:h-[3px] after:absolute  after:left-[5%] after:top-[6%] ${click ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 User Info
               </Link>
               <Link
                 href={""}
                 onClick={() => setClick(false)}
-                className={`${styles.divLines} hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[58%] after:h-[3px] after:absolute after:bottom-[-60%] after:left-[47%] ${!click ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={`${styles.divLines} text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[150px] after:h-[3px] after:absolute after:left-[31%] after:top-[6%] ${!click ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 Billing Information
               </Link>
@@ -315,23 +314,25 @@ export default function UserPage() {
                         </FormItem>
                       )}
                     />
-                    <FormItem className="flex flex-col w-[100%] pt-[10%] justify-center">
+                    <FormItem className={`pt-5 flex flex-row items-baseline w-[100%] ${!isEdit ? 'justify-end' : 'justify-between'}`}>
                       <Button
-                        variant={`${isEdit ? "destructive" : "default"}`}
-                        type="reset"
-                        onClick={() => setIsEdit(!isEdit)}
-                      >
-                        {isEdit ? "Cancel" : "Edit"}
-                      </Button>
-                    </FormItem>
-                    <FormItem className="flex pt-[5%] flex-col w-[100%]">
-                      <Button
-                        className={`${isEdit ? "" : "hidden"} text-white bg-green-400 hover:bg-green-500`}
+                        className={`${isEdit ? "" : "hidden"} w-[30%] text-white bg-green-400 hover:bg-green-500`}
                         type="submit"
                       >
                         Update Info
                       </Button>
+                      <Button
+                        variant={`${isEdit ? "destructive" : "default"}`}
+                        type="reset"
+                        onClick={() => setIsEdit(!isEdit)}
+                        className={` w-[30%]`}
+                      >
+                        {isEdit ? "Cancel" : "Edit"}
+                      </Button>
                     </FormItem>
+                    {/* <FormItem className="flex pt-[5%] flex-col w-[100%]">
+                      
+                    </FormItem> */}
                   </div>
                   <div className={`${click ? "hidden" : ""} w-[100%] `}>
                     <FormField
