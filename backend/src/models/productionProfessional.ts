@@ -9,7 +9,7 @@ export interface IProductionProfessional extends IUser {
   rating?: number; // Rating out of 5
 }
 
-// Define the schema for ProductionProfessional, inheriting from UserSchema
+// Define the schema for ProductionProfessional, inheriting from userSchema
 export const productionProfessionalSchema = new Schema<IProductionProfessional>({
   occupation: {
     type: String,
@@ -29,7 +29,7 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
   },
 });
 
-// Attach the UserSchema as the base schema
+// Attach the userSchema as the base schema
 productionProfessionalSchema.add(userSchema);
 
 // Export the model
