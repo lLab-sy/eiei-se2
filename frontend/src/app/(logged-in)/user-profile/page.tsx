@@ -29,53 +29,64 @@ import styles from "./animation.module.css";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
 
 //missing
 //sort position form error
 //upload photo functionality
 // reponsive
 
-const formSchema = z.object({
-  username: z
+const formSchema = z
+  .object({
+    firstName: z.string().optional(),
+    middleName: z.string().optional(),
+    lastName: z.string().optional(),
+    email: z.string().email().max(100, ""),
+    phone: z
       .string()
-      .min(15, "Username must contain at least 15 characters")
-      .max(50, "Username must contain at most 50 characters")
-      .regex(new RegExp("^[^0-9]*$"), "Username must not contain number"),
-  email: z.string().email().max(100, ""),
-  phone: z
-    .string()
-    .length(10, "Phone Number must contain exactly to 10 characters"),
-  gender: z.enum(["Male", "Female", "Non-Binary", "Other"]).optional(),
-  bank_account: z.string(),
-  payment_type: z.enum(["Credit/Debit", "QR_Code"], {
-    required_error: "Select Your Payment Type",
-  }),
-  card_name: z.string().optional(),
-  card_number: z.string().optional(),
-  password: z
-    .string()
-    .min(8, "Password must contain at least 8 characters")
-    .max(20, "Password must contain at most 20 characters")
-    .regex(new RegExp(".*[ -/:-@[-`{-~].*"), {
-      message: "Password should contain at least one special characters",
+      .length(10, "Phone Number must contain exactly to 10 characters"),
+    gender: z.enum(["Male", "Female", "Non-Binary", "Other"]).optional(),
+    bank_account: z.string(),
+    payment_type: z.enum(["Credit/Debit", "QR_Code"], {
+      required_error: "Select Your Payment Type",
     }),
-  confirmPassword: z.string(),
-  
-
-});
+    card_name: z.string().optional(),
+    card_number: z.string().optional(),
+    password: z
+      .string()
+      .min(8, "Password must contain at least 8 characters")
+      .max(20, "Password must contain at most 20 characters")
+      .regex(new RegExp(".*[ -/:-@[-`{-~].*"), {
+        message: "Password should contain at least one special characters",
+      }),
+    confirmPassword: z.string(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.password != val.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirmPassword"],
+        message: "Password do not match",
+      });
+    }
+  });
 type formType = typeof formSchema;
 export default function UserPage() {
   const form = useForm<z.infer<formType>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      phone: "",
-      bank_account: "",
-      card_name: "",
-      card_number: "",
-      username: '',
-      password: '',
-      confirmPassword: '',
+      email: "test@test.com",
+      phone: "1234567890",
+      bank_account: "default",
+      card_name: "default",
+      card_number: "default",
+      firstName: "default",
+      middleName: "default",
+      lastName: "default",
+      password: "1234567890!",
+      confirmPassword: "1234567890!",
+      payment_type: 'QR_Code',
+
     },
   });
   /*
@@ -83,30 +94,39 @@ export default function UserPage() {
 
   use axios to post into database return it back and use that image to show
   */
+  const [isEdit, setIsEdit] = useState(false);
   const [click, setClick] = useState(true);
+  const { toast } = useToast()
   // redux to dispatch changes
   const [paymentState, setPaymentState] = useState("");
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     //dispatch to update each case or change only display to none else hidden
     console.log(form.getValues());
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    toast({
+      variant: 'default',
+      title: 'Edit Profile',
+      description: 'Edit Profile Successful'
+    })
+    setIsEdit(false)
   };
   const [img, setImageState] = useState({
-    image:''
-  })
+    image: "",
+  });
 
-  const onImageChange = (e:any) => {
-    if(e.target.files && e.target.files[0]){
+  const onImageChange = (e: any) => {
+    if (e.target.files && e.target.files[0]) {
       // setImgState(e.target.files[0])
       setImageState({
-        image: URL.createObjectURL(e.target.files[0])
-      })
+        image: URL.createObjectURL(e.target.files[0]),
+      });
       // console.log(e.target.files)
     }
-  }
+  };
   return (
     <main className="font-serif min-h-screen flex bg-blue-400 relative items-center justify-center">
-      <div className="flex justify-around w-[70%] h-[60vh]">
-        <Card className="w-[400px]">
+      <div className="flex justify-around w-[40%] h-[60vh]">
+        <Card className="w-[400px] border border-black flex flex-col">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
           </CardHeader>
@@ -117,8 +137,8 @@ export default function UserPage() {
             {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
               <Image src={} alt=''/>
             </div> */}
-            <Avatar className='size-40'>
-              <AvatarImage src={img.image} alt=''/>
+            <Avatar className="size-40">
+              <AvatarImage src={img.image} alt="" />
               <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
             </Avatar>
             <div className="w-[100%] flex justify-center">
@@ -132,7 +152,7 @@ export default function UserPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="w-[500px] relative">
+        <Card className=" relative w-[500px] flex flex-col">
           <CardHeader className="">
             <CardTitle>Edit Profile</CardTitle>
           </CardHeader>
@@ -141,7 +161,7 @@ export default function UserPage() {
               <Link
                 href={""}
                 onClick={() => setClick(true)}
-                className={`${styles.divLine} hover:after:scale-x-100 after:bg-blue-200 after:content-[''] after:w-[27%] after:h-[3px] after:absolute after:bottom-[-60%] after:left-0 ${click ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={` ${styles.divLine} hover:after:scale-x-100 after:bg-blue-200 after:content-[''] after:w-[27%] after:h-[3px] after:absolute after:bottom-[-60%] after:left-0 ${click ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 User Info
               </Link>
@@ -166,16 +186,45 @@ export default function UserPage() {
                   <div
                     className={`${click ? "" : "hidden"} flex flex-row w-[100%] flex-wrap justify-between `}
                   >
-                    <FormField name='username' control={form.control} render={({field}) => (
-                      <FormItem className="w-[40%]">
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="text" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                    )}/>
-                    
+                    <FormField
+                      name="firstName"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem className="w-[40%]">
+                          <FormLabel className="">First Name</FormLabel>
+                          <FormControl>
+                            <Input disabled={!isEdit} {...field} type="text" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="middleName"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem className="w-[40%]">
+                          <FormLabel className="">Middle Name</FormLabel>
+                          <FormControl>
+                            <Input disabled={!isEdit} {...field} type="text" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="lastName"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem className="w-[40%]">
+                          <FormLabel className="">Last Name</FormLabel>
+                          <FormControl>
+                            <Input disabled={!isEdit} {...field} type="text" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField
                       control={form.control}
                       name="email"
@@ -183,7 +232,7 @@ export default function UserPage() {
                         <FormItem className="w-[40%]">
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input {...field} type="text" />
+                            <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -196,7 +245,7 @@ export default function UserPage() {
                         <FormItem className="w-[40%]">
                           <FormLabel>Phone Number</FormLabel>
                           <FormControl>
-                            <Input {...field} type="text" />
+                            <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -213,7 +262,7 @@ export default function UserPage() {
                               onValueChange={field.onChange}
                               value={field.value}
                             >
-                              <SelectTrigger className="">
+                              <SelectTrigger disabled={!isEdit} className="">
                                 <SelectValue placeholder="Select Your Gender" />
                               </SelectTrigger>
                               <SelectContent>
@@ -232,26 +281,56 @@ export default function UserPage() {
                         </FormItem>
                       )}
                     />
-                    <FormField name="password" control={form.control} render={({field}) => (
-                      <FormItem className=" w-[40%]">
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type='text' {...field}/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}/>
-                    <FormField name="confirmPassword" control={form.control} render={({field}) => (
-                      <FormItem className=" w-[40%]">
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input type='text' {...field}/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}/>
-                    <FormItem className="flex flex-col w-[100%] h-[100px] justify-center">
-                      <Button type="submit">Update Info</Button>
+                    <FormField
+                      name="password"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem className=" w-[40%]">
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={!isEdit}
+                              type="password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="confirmPassword"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem className=" w-[40%]">
+                          <FormLabel>Confirm Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={!isEdit}
+                              type="password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormItem className="flex flex-col w-[100%] pt-[10%] justify-center">
+                      <Button
+                        variant={`${isEdit ? "destructive" : "default"}`}
+                        type="reset"
+                        onClick={() => setIsEdit(!isEdit)}
+                      >
+                        {isEdit ? "Cancel" : "Edit"}
+                      </Button>
+                    </FormItem>
+                    <FormItem className="flex pt-[5%] flex-col w-[100%]">
+                      <Button
+                        className={`${isEdit ? "" : "hidden"} text-white bg-green-400 hover:bg-green-500`}
+                        type="submit"
+                      >
+                        Update Info
+                      </Button>
                     </FormItem>
                   </div>
                   <div className={`${click ? "hidden" : ""} w-[100%] `}>
@@ -262,7 +341,7 @@ export default function UserPage() {
                         <FormItem>
                           <FormLabel>Bank Account</FormLabel>
                           <FormControl>
-                            <Input type="text" {...field} />
+                            <Input disabled={!isEdit} type="text" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -277,6 +356,7 @@ export default function UserPage() {
                           <FormLabel>Default Payment Type</FormLabel>
                           <FormControl>
                             <Select
+                              disabled={!isEdit}
                               value={field.value}
                               onValueChange={(e) => {
                                 field.onChange(e);
@@ -285,7 +365,7 @@ export default function UserPage() {
 
                               // {...form.register("payment_type")}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger disabled={!isEdit}>
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                               <SelectContent>
@@ -313,7 +393,11 @@ export default function UserPage() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Name on card</FormLabel>
-                              <Input type="text" />
+                              <Input
+                                disabled={!isEdit}
+                                {...field}
+                                type="text"
+                              />
                             </FormItem>
                           )}
                         />
@@ -323,7 +407,11 @@ export default function UserPage() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Card Number</FormLabel>
-                              <Input type="text" />
+                              <Input
+                                disabled={!isEdit}
+                                {...field}
+                                type="text"
+                              />
                             </FormItem>
                           )}
                         />
