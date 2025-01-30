@@ -1,18 +1,18 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 //import bcrypt from 'bcryptjs';
 //import jwt from 'jsonwebtoken';
 
-// Interface for User Document: require are name, password, role; which user must input at registration. 
+// Interface for User Document: require are name, password, role; which user must input at registration.
 export interface IUser extends Document {
-  name: string;
+  username: string;
   email?: string;
-  role: 'producer' | 'production professional' | 'admin';
+  role: "producer" | "production professional" | "admin";
   password: string;
   firstName?: string;
   middleName?: string;
   lastName?: string;
   phoneNumber?: string;
-  gender?: 'Male' | 'Female' | 'Non-Binary' | 'Other';
+  gender?: "Male" | "Female" | "Non-Binary" | "Other";
   bankAccount?: string;
   profileImage?: string;
   resetPasswordToken?: string;
@@ -24,10 +24,10 @@ export interface IUser extends Document {
 
 // User Schema Definition
 const UserSchema: Schema = new Schema({
-  name: {
+  username: {
     type: String,
     unique: true,
-    required: [true, 'Please add a name'],
+    required: [true, "Please add a name"],
   },
   email: {
     type: String,
@@ -36,23 +36,23 @@ const UserSchema: Schema = new Schema({
     sparse: true,
     match: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      'Please add a valid email',
+      "Please add a valid email",
     ],
   },
   role: {
     type: String,
-    enum: ['producer', 'production professional', 'admin'],
+    enum: ["producer", "production professional", "admin"],
     required: true,
   },
   password: {
     type: String,
-    required: [true, 'Please add a password'],
+    required: [true, "Please add a password"],
     minlength: 8,
     validate: {
       validator: function (value: string) {
         return /[!@#$%^&*(),.?":{}|<>+-]/.test(value);
       },
-      message: 'Password must contain at least one special symbol.',
+      message: "Password must contain at least one special symbol.",
     },
     select: false,
   },
@@ -72,12 +72,12 @@ const UserSchema: Schema = new Schema({
     type: String,
     match: [
       /^\+?[0-9]{10,15}$/,
-      'Phone number must contain only digits and be between 10 and 15 characters long.',
+      "Phone number must contain only digits and be between 10 and 15 characters long.",
     ],
   },
   gender: {
     type: String,
-    enum: ['Male', 'Female', 'Non-Binary', 'Other'],
+    enum: ["Male", "Female", "Non-Binary", "Other"],
   },
   bankAccount: {
     type: String,
@@ -118,6 +118,6 @@ UserSchema.methods.matchPassword = async function (enteredPassword: string): Pro
 };
 */
 
-const User = mongoose.model<IUser>('User', UserSchema, 'users');
+const User = mongoose.model<IUser>("User", UserSchema, "users");
 export default User;
 export { UserSchema };
