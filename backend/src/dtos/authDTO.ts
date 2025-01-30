@@ -1,14 +1,10 @@
-export class RegisterDTO {
-    constructor(
-        public username: string,
-        public password: string,
-        public role: string
-    ) {}
+export interface RegisterDTO{
+    username: string;
+    password: string;
+    role: "producer" | "production professional" | "admin";
 }
 
-export class LoginDTO {
-    constructor(
-        public username: string,
-        public password: string,
-    ) {}
+export interface LoginDTO{
+    username: string;
+    password: string;
 }

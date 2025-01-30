@@ -1,16 +1,37 @@
-import User from '../models/userModel';
+import User,{ IUser } from '../models/userModel';
+
+//change to similar to test using input as I user
 
 class UserRepository {
-    async createUser(data:{ username: string, password: string, role: string}) {
-        return await User.create(data);
+    async createUser(userData:IUser) {
+        try{
+            const user = new User(userData);
+            return await user.save();
+        } catch (err){
+            throw new Error('Error create user in repository: ' + err);
+        }
+        
     }
 
     async findUserByUsername(username: string){
-        return await User.findOne({username});
+        try{
+            const user = await User.findOne({username});
+            return user;
+        } catch(err){
+            throw new Error('Error finding user by username from repository: ' + err);
+        }      
     }
     
     async loginUser(username: string){
-        return await User.findOne({username}).select("password");
+        try{
+            const user = await User.findOne({username}).select("password");
+            if(!user){
+                throw new Error("Invalid username or password")
+            }
+            return user;
+        } catch(err){
+            throw new Error('Error logging in user in repository: ' + err);
+        }
     }
 }
 

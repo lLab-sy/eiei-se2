@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import authService from '../services/authService';
 import { RegisterDTO, LoginDTO } from '../dtos/authDTO';
+import { sendResponse } from '../utils/responseHelper';
 // import jwt from 'jsonwebtoken'
 
 // @desc Create User account
@@ -8,22 +9,20 @@ import { RegisterDTO, LoginDTO } from '../dtos/authDTO';
 // @access Public
 export const createUser = async (req: Request, res: Response ) => {
     try {
-        const { username, password, role }: RegisterDTO = req.body;
+        const data: RegisterDTO = req.body;
 
-        if (!username || !password || !role) {
-            res.status(400).json({ success: false, msg: "Please provide all required fields." });
+        if (!data.username || !data.password || !data.role) {
+            sendResponse(res, 'error', null, "Please provide all required fields.");
             return;
         }
 
-        const user = await authService.registerUser(username, password, role);
-
-        res.status(201).json({ success: true, data: user });
+        const user = await authService.registerUser(data);
+        sendResponse(res, 'success', user, 'Register successful.');
     } catch (err) {
-        console.error("Error in registerUser:", err);
-        
+        // console.error("Error in registerUser:", err);       
         const errorMessage = (err as Error).message || "Internal server error.";
 
-        res.status(500).json({ success: false, msg: errorMessage });
+        sendResponse(res, 'error', err, errorMessage);
     }
 };
 
@@ -32,18 +31,18 @@ export const createUser = async (req: Request, res: Response ) => {
 // @access Public
 export const loginUser = async (req: Request, res: Response) => {
     try {
-        const { username, password }: LoginDTO = req.body;
+        const data: LoginDTO = req.body;
 
-        if(!username || !password){
-            res.status(400).json({ success: false, msg: "Please provide all required fields." });
+        if(!data.username || !data.password){
+            sendResponse(res, 'error', null, "Please provide all required fields.");
             return;
         }
 
-        const result = await authService.loginUser(username, password);
-        res.status(200).json({ success: true, msg: "Login successful.", data: result });
+        const result = await authService.loginUser(data);
+        sendResponse(res, 'success', result, 'Login successful');
     } catch (err) {
         const errorMessage = (err as Error).message || "Internal server error.";
         
-        res.status(400).json({ success: false, msg: errorMessage});
+        sendResponse(res, 'error', null, errorMessage);
     }
 };

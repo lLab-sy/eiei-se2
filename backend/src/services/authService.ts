@@ -1,32 +1,48 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import userRepository from '../repositories/userRepository';
+import { RegisterDTO, LoginDTO } from '../dtos/authDTO';
+import User from '../models/userModel'
 
 class AuthService {
-    async registerUser(username: string, password: string, role: string) {
-        const existingUser = await userRepository.findUserByUsername(username);
-        if(existingUser) throw new Error("Username already exists.");
+    async registerUser(data:RegisterDTO) {
+        try{
+            const existingUser = await userRepository.findUserByUsername(data.username);
+            if(existingUser) throw new Error("Username already exists.");
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        return await userRepository.createUser({username, password: hashedPassword, role});
+            const hashedPassword = await bcrypt.hash(data.password, 10);
+            const userModel = new User({
+                username: data.username,
+                password: hashedPassword,
+                role: data.role
+            });
+            return await userRepository.createUser(userModel);
+        } catch (error) {
+            throw new Error('Error in service layer: ' + error);
+        }
+        
     }
 
-    async loginUser(username: string, inPassword:string){
-        const user = await userRepository.loginUser(username);
-        if(!user) throw new Error("Invalid username of password.");
-        
-        const isMatch = await bcrypt.compare(inPassword, user.password);
-        if(!isMatch) throw new Error("Invalid username or password.");
+    async loginUser(data:LoginDTO){
+        try{
+            const user = await userRepository.loginUser(data.username);
+            if(!user) throw new Error("Invalid username of password.");
+            
+            const isMatch = await bcrypt.compare(data.password, user.password);
+            if(!isMatch) throw new Error("Invalid username or password.");
 
-        //remove password
-        const {password, ...userWithoutPassword} = user.toObject();
-        // const token = jwt.sign(
-        //     { userId: user._id, username: user.username, role: user.role},
-        //     process.env.JWT_SECRET || 'secret_key',
-        //     { expiresIn: '1h'}
-        // );
-        // return {user, token};
-        return userWithoutPassword;
+            //remove password
+            const {password, ...userWithoutPassword} = user.toObject();
+            // const token = jwt.sign(
+            //     { userId: user._id, username: user.username, role: user.role},
+            //     process.env.JWT_SECRET || 'secret_key',
+            //     { expiresIn: '1h'}
+            // );
+            // return {user, token};
+            return userWithoutPassword;
+        } catch (error) {
+            throw new Error('Error in service layer: ' + error);
+        }
     }
 }
 
