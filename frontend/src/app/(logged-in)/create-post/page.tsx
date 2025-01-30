@@ -2,20 +2,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -35,9 +33,13 @@ const optionSchema = z.object({
 });
 
 const formSchema = z.object({
+  projname: z
+  .string()
+  .min(4, { message: "Project name must be at least 4 characters."})
+  .max(100, { message: "Project name must not exceed 100 characters."}),
   description: z
     .string()
-    .min(10, { message: "Description must be at least 10 characters." })
+    .min(50, { message: "Description must be at least 50 characters." })
     .max(1000, { message: "Description must not exceed 1000 characters." }),
   //mock type, roles -> will need API to be updatable
   type: z.enum(["media", "short", "drama", "ads"], {
@@ -62,7 +64,9 @@ export default function CreatePostPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      projname: "",
       description: "",
+      type: "media"
     },
   });
 
@@ -86,13 +90,28 @@ export default function CreatePostPage() {
               >
                 <FormField
                   control={form.control}
+                  name="projname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Help Required"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Project Description</FormLabel>
                       <FormControl>
                         <Textarea
-                          className="field-sizing-fixed"
                           placeholder="I'm making a short film."
                           {...field}
                         />
