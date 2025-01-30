@@ -8,6 +8,10 @@ class UserRepository {
     async findUserByUsername(username: string){
         return await User.findOne({username});
     }
+    
+    async loginUser(username: string){
+        return await User.findOne({username}).select("password");
+    }
 }
 
 export default new UserRepository();
