@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { IUser, UserSchema } from './user';
+import mongoose, { Document, Schema } from "mongoose";
+import { IUser, userSchema } from './user';
 
 // Define the interface for ProductionProfessional, extending IUser
 export interface IProductionProfessional extends IUser {
@@ -10,32 +10,28 @@ export interface IProductionProfessional extends IUser {
 }
 
 // Define the schema for ProductionProfessional, inheriting from UserSchema
-const ProductionProfessionalSchema: Schema<IProductionProfessional> = new Schema({
+export const productionProfessionalSchema = new Schema<IProductionProfessional>({
   occupation: {
     type: String,
-    //required: true,
     trim: true,
   },
   skill: {
     type: [String],
-    //required: true,
   },
   experience: {
     type: Number,
-    //required: true,
     min: 0, // Minimum 0 years of experience
   },
   rating: {
     type: Number,
-    //required: true,
     min: 0,
     max: 5, // Rating is between 0 and 5
   },
 });
 
 // Attach the UserSchema as the base schema
-ProductionProfessionalSchema.add(UserSchema);
+productionProfessionalSchema.add(userSchema);
 
 // Export the model
-const ProductionProfessional = mongoose.model<IProductionProfessional>('ProductionProfessional', ProductionProfessionalSchema, 'productionProfessionals');
+const ProductionProfessional = mongoose.model<IProductionProfessional>('productionProfessional', productionProfessionalSchema, 'productionProfessionals');
 export default ProductionProfessional;

@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { IUser, UserSchema } from "./user";
+import mongoose, { Document, Schema } from "mongoose";
+import { IUser, userSchema } from "./user";
 
 // Define the interface for ProductionProfessional, extending IUser
 export interface IProducer extends IUser {
@@ -10,7 +10,7 @@ export interface IProducer extends IUser {
 }
 
 // Define the schema for Producer, inheriting from UserSchema
-const ProducerSchema: Schema<IProducer> = new Schema({
+export const producerSchema = new Schema<IProducer>({
   company: {
     type: String,
     trim: true,
@@ -28,12 +28,8 @@ const ProducerSchema: Schema<IProducer> = new Schema({
 });
 
 // Attach the UserSchema as the base schema
-ProducerSchema.add(UserSchema);
+producerSchema.add(userSchema);
 
 // Export the model
-const Producer = mongoose.model<IProducer>(
-  "Producer",
-  ProducerSchema,
-  "producers"
-);
+const Producer = mongoose.model<IProducer>("producer", producerSchema, "producers");
 export default Producer;

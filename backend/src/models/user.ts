@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 //import bcrypt from 'bcryptjs';
 //import jwt from 'jsonwebtoken';
 
@@ -23,7 +23,7 @@ export interface IUser extends Document {
 }
 
 // User Schema Definition
-const UserSchema: Schema = new Schema({
+export const userSchema = new Schema<IUser>({
   username: {
     type: String,
     unique: true,
@@ -93,6 +93,9 @@ const UserSchema: Schema = new Schema({
   },
 });
 
+const User = mongoose.model<IUser>("user", userSchema, "users");
+export default User;
+
 //Below is the logic for authen, I don't know that should we use it now or later.
 //So I will comment them until we need to use the logic below, feel free to use it if you want.
 /*
@@ -118,6 +121,3 @@ UserSchema.methods.matchPassword = async function (enteredPassword: string): Pro
 };
 */
 
-const User = mongoose.model<IUser>("User", UserSchema, "users");
-export default User;
-export { UserSchema };
