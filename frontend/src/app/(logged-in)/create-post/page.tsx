@@ -24,7 +24,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 //Multiselect: https://shadcnui-expansions.typeart.cc/docs/multiple-selector
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
-import { useState } from "react";
+// import { useState } from "react";
+// import { useRouter } from "next/navigation"; //for renavigation after finishing
 
 const optionSchema = z.object({
   label: z.string(),
@@ -33,12 +34,14 @@ const optionSchema = z.object({
 });
 
 const formSchema = z.object({
-  projname: z
-  .string()
-  .min(4, { message: "Project name must be at least 4 characters."})
-  .max(100, { message: "Project name must not exceed 100 characters."}),
+  postname: z
+    .string()
+    .trim() //prevent case of PURELY whitespace
+    .min(4, { message: "Project name must be at least 4 characters." })
+    .max(100, { message: "Project name must not exceed 100 characters." }),
   description: z
     .string()
+    .trim() //prevent case of PURELY whitespace
     .min(50, { message: "Description must be at least 50 characters." })
     .max(1000, { message: "Description must not exceed 1000 characters." }),
   //mock type, roles -> will need API to be updatable
@@ -49,6 +52,7 @@ const formSchema = z.object({
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
+//mock options -> will need API to be updatable
 const OPTIONS: Option[] = [
   { label: "Producer", value: "producer" },
   { label: "Camera Operator", value: "camera operator" },
@@ -64,16 +68,25 @@ export default function CreatePostPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      projname: "",
+      postname: "",
       description: "",
-      type: "media"
+      type: "media",
     },
   });
-
-  const [loading, setLoading] = useState(false);
+  /*  TODO: wait for the need to use renavigate
+  const router = useRouter(); */
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(JSON.stringify(values));
+    const postData = {
+      roles: values.roles.map((obj) => obj.value),
+      postname: values.postname,
+      type: values.type,
+      desc: values.description,
+    };
+    console.log(postData);
+    console.log(JSON.stringify(postData));
+    /*  TODO: await for API to finish then renavigate
+    router.push(`/my-post`); */
   }
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
@@ -90,15 +103,12 @@ export default function CreatePostPage() {
               >
                 <FormField
                   control={form.control}
-                  name="projname"
+                  name="postname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Project name</FormLabel>
+                      <FormLabel>Post name</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Help Required"
-                          {...field}
-                        />
+                        <Input placeholder="Help Required" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,23 +165,6 @@ export default function CreatePostPage() {
                     <FormItem>
                       <FormLabel>Role Requirement</FormLabel>
                       <FormControl>
-                        {/* <Select onValueChange={field.onChange} value={field.value}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Choose roles required for your project"/>
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectItem value='producer'>Producer</SelectItem>
-                                  <SelectItem value='camera operator'>Camera Operator</SelectItem>
-                                  <SelectItem value='director'>Director</SelectItem>
-                                  <SelectItem value='cinematographer'>Cinematographer</SelectItem>
-                                  <SelectItem value='editor'>Editor</SelectItem>
-                                  <SelectItem value='sound mixer'>Sound Mixer</SelectItem>
-                                  <SelectItem value='prop master'>Prop Master</SelectItem>
-                                  <SelectItem value='audio technician'>Audio Technician</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select> */}
                         <MultipleSelector
                           {...field}
                           defaultOptions={OPTIONS}
@@ -187,6 +180,7 @@ export default function CreatePostPage() {
                       <FormMessage />
                     </FormItem>
                   )}
+                  // still lacking picture but uncertain if needed
                 />
                 <Button type="submit">Create Post</Button>
               </form>
