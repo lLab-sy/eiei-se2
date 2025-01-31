@@ -12,4 +12,11 @@ export default [
   }},
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  {ignores: [
+    "node_modules/", // Ignore node_modules
+    "dist/",         // Ignore build output folder
+    "coverage/",     // Ignore test coverage reports
+    "src/temp-files/", // Ignore a specific directory
+    "src/ignore-this-file.ts" // Ignore a specific file
+  ],}
 ];
