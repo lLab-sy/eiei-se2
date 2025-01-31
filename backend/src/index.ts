@@ -39,9 +39,7 @@ setupSwagger(app);
 
 // Routes
 app.use('/api', testRoutes);
-app.use('/api/v1',postRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/v1',postRoutes,postRoleRoutes);
 app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes);
 
 // Server

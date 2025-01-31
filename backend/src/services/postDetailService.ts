@@ -53,10 +53,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
       // map to model before pass it to repository
       const postDetailModel = new PostDetail({
         postId: postDetailData.postId.toString(),
-        CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
-          RoleID: candidate.RoleID.toString(),
-          CandidateID: candidate.CandidateID,
-        })),
+        CandidateDetail: []
       });
       return await postDetailRepository.createPostDetail(postDetailModel);
     } catch (error) {
