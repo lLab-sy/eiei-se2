@@ -32,6 +32,7 @@ class AuthService {
             if(!isMatch) throw new Error("Invalid username or password.");
 
             //remove password
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const {password, ...userWithoutPassword} = user.toObject();
             // const token = jwt.sign(
             //     { userId: user._id, username: user.username, role: user.role},
