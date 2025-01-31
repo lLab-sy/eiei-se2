@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import Post, { IPost } from '../models/postModel';
 import { PostDTO } from '../dtos/postDTO';
+import PostDetail from '../models/postDetail';
 
 class PostRepository {
     public async getAllPosts() {
@@ -28,7 +29,17 @@ class PostRepository {
     public async createPost(postData: IPost) {
         try {
             const post = new Post(postData);
-            return await post.save();
+            const result= await post.save();
+
+
+            const postDetailData = new PostDetail({
+                postId: result._id, 
+                CandidateDetail: [],
+              });
+
+            const result2= await postDetailData.save();
+  
+            return result
         } catch (error) {
             throw new Error('Error creating post in repository: ' + error);
         }

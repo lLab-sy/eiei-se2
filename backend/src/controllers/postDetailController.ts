@@ -42,6 +42,24 @@ class PostDetailController {
       sendResponse(res, 'error', err, 'Failed to updated postDetails at controller');
     }
   };
+  async updatePostDetailAddCandidate(req: Request, res: Response): Promise<void> {
+    try {
+      const postDetailId = req.params.id
+      const postDetails = await postDetailService.updatePostDetailAddCandidate(req.body,postDetailId);
+      sendResponse(res, 'success', postDetails, 'Successfully updated add candidate');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to updated postDetails at controller');
+    }
+  };
+  async updatePostDetailDeleteCandidate(req: Request, res: Response): Promise<void> {
+    try {
+      const postDetailId = req.params.id
+      const postDetails = await postDetailService.updatePostDetailDeleteCandidate(req.body,postDetailId);
+      sendResponse(res, 'success', postDetails, 'Successfully updated delete candidate');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to updated postDetails at controller');
+    }
+  };
 
   async deletePostDetail(req: Request, res: Response): Promise<void> {
     try {

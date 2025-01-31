@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import PostDetail, { IPostDetail } from '../models/postDetail';
 import { PostDetailDTO } from '../dtos/postDetailDTO';
+import { PostDTO } from '../dtos/postDTO';
 
 class PostDetailRepository {
     public async getAllPostDetails() { //MayBeNotUsed
@@ -34,7 +35,7 @@ class PostDetailRepository {
         }
     }
 
-    public async updatePost(postDetailData: PostDetailDTO,id:string) {
+    public async updatePostDetail(postDetailData: PostDetailDTO,id:string) {
         try {
             console.log(postDetailData)
             const objectId = new ObjectId(id);
@@ -42,6 +43,50 @@ class PostDetailRepository {
             const updatedPost = await PostDetail.findOneAndUpdate(
                 { _id: objectId},  
                 { $set: postDetailData },  
+              );
+            console.log("response",updatedPost)
+            return updatedPost;
+        } catch (error) {
+            throw new Error('Error updating post in repository: ' + error);
+        }
+    }
+
+    public async updatePostDetailSP(postDetailData: PostDTO,id:string) {
+        try {
+            console.log(postDetailData)
+            const objectId = new ObjectId(id);
+            console.log(objectId)
+            const updatedPost = await PostDetail.findOneAndUpdate(
+                { _id: objectId},  
+                { $set: postDetailData },  
+              );
+            console.log("response",updatedPost)
+            return updatedPost;
+        } catch (error) {
+            throw new Error('Error updating post in repository: ' + error);
+        }
+    }
+
+    public async updateAddCandidate(postDetailData: PostDetailDTO,id:string) {
+        try {
+            const objectId = new ObjectId(id);
+            const updatedPost = await PostDetail.findOneAndUpdate(
+                { _id: objectId},  
+                { $addToSet: postDetailData },  
+              );
+            console.log("response",updatedPost)
+            return updatedPost;
+        } catch (error) {
+            throw new Error('Error updating post in repository: ' + error);
+        }
+    }
+
+    public async updatedeleteCandidate(postDetailData: PostDetailDTO,id:string) {
+        try {
+            const objectId = new ObjectId(id);
+            const updatedPost = await PostDetail.findOneAndUpdate(
+                { _id: objectId},  
+                { $pull: postDetailData },  
               );
             console.log("response",updatedPost)
             return updatedPost;

@@ -30,8 +30,10 @@ const router = Router();
  *             properties:
  *               RoleID:
  *                 type: string
+ *                 description: The role ID associated with the candidate
  *               CandidateID:
  *                 type: string
+ *                 description: The candidate's unique ID
  */
 
 /**
@@ -162,5 +164,79 @@ router.put('/postDetails/:id', postDetailController.updatePostDetail);
  *         description: Server error
  */
 router.delete('/postDetails/:id', postDetailController.deletePostDetail);
+
+/**
+ * @swagger
+ * /api/v1/postDetails/add/{id}:
+ *   put:
+ *     summary: Add a candidate to the post detail
+ *     tags: [PostDetail]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post detail
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - RoleID
+ *               - CandidateID
+ *             properties:
+ *               RoleID:
+ *                 type: string
+ *                 description: The role ID associated with the candidate
+ *               CandidateID:
+ *                 type: string
+ *                 description: The candidate's unique ID
+ *     responses:
+ *       200:
+ *         description: Candidate added successfully
+ *       404:
+ *         description: Post detail not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/postDetails/add/:id', postDetailController.updatePostDetailAddCandidate);
+
+/**
+ * @swagger
+ * /api/v1/postDetails/delete/{id}:
+ *   put:
+ *     summary: Remove a candidate from the post detail
+ *     tags: [PostDetail]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post detail
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - CandidateID
+ *             properties:
+ *               CandidateID:
+ *                 type: string
+ *                 description: The candidate's unique ID to remove
+ *     responses:
+ *       200:
+ *         description: Candidate removed successfully
+ *       404:
+ *         description: Post detail not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/postDetails/delete/:id', postDetailController.updatePostDetailDeleteCandidate);
 
 export default router;
