@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-// import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import userRepository from '../repositories/userRepository';
 import { RegisterDTO, LoginDTO } from '../dtos/authDTO';
 import User from '../models/userModel'
@@ -34,13 +34,13 @@ class AuthService {
             //remove password
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const {password, ...userWithoutPassword} = user.toObject();
-            // const token = jwt.sign(
-            //     { userId: user._id, username: user.username, role: user.role},
-            //     process.env.JWT_SECRET || 'secret_key',
-            //     { expiresIn: '1h'}
-            // );
-            // return {user, token};
-            return userWithoutPassword;
+            const token = jwt.sign(
+                 { userId: user._id, username: user.username, role: user.role},
+                 process.env.JWT_SECRET || 'secret_key',
+                 { expiresIn: '1h'}
+             );
+             return {userWithoutPassword, token};
+            //return userWithoutPassword;
         } catch (error) {
             throw new Error('Error in service layer: ' + error);
         }
