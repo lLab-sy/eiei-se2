@@ -19,9 +19,9 @@ const router = Router();
  *       required:
  *         - postName
  *         - postDescription
- *         - postImage
+ *         - postImages
  *         - postMediaType
- *         - postProjectRole
+ *         - postProjectRoles
  *         - postStatus
  *         - startDate
  *         - endDate
@@ -34,19 +34,23 @@ const router = Router();
  *           type: string
  *           description: The description of the post
  *           maxLength: 500
- *         postImage:
- *           type: string
- *           description: The image URL of the post
+ *         postImages:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: An array of image URLs for the post
  *         postMediaType:
  *           type: string
  *           description: The media type of the post
- *         postProjectRole:
- *           type: string
- *           enum: [actor, cameraman, editor, vtuber]
- *           description: The role in the project associated with the post
+ *         postProjectRoles:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [actor, cameraman, editor, vtuber]
+ *           description: The roles associated with the post
  *         postStatus:
  *           type: string
- *           enum: [created, in-progress, success, delete]
+ *           enum: [created, in-progress, success, cancel]
  *           description: The status of the post
  *         startDate:
  *           type: string

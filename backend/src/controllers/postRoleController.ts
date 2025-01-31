@@ -24,6 +24,7 @@ class PostRoleController {
   async createPostRole(req: Request, res: Response): Promise<void> {
     try {
       const posts = await postRoleService.createPostRole(req.body);
+      console.log(posts)
       sendResponse(res, 'success', posts, 'Successfully created post');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to created post role');

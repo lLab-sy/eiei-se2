@@ -10,20 +10,20 @@ class PostService {
         //console.log("Fetched posts:", posts); // Check the structure of the fetched posts
 
         const result = posts.map((post) => {
-            const startDate = post.startDate ? new Date(post.startDate.toString()) : new Date();
-            const endDate = post.endDate ? new Date(post.endDate.toString()) : new Date();
+            const startDate = new Date(post.startDate.toString()) 
+            const endDate =  new Date(post.endDate.toString()) 
 
-            // console.log("Start Date:", startDate);
-            // console.log("End Date:", endDate);
+     
 
             return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
-                postImage: post.postImage as string,
+                postImages: post.postImages as [string],
                 postMediaType: post.postMediaType as string,
-                postProjectRole: post.postProjectRole as 'actor' | 'cameraman' | 'editor' | 'vtuber',
-                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'delete',
+                postProjectRoles: post.postProjectRoles as [string],
+                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                // postDetailID: post.postDetailID.toString() as string,
                 startDate: startDate,
                 endDate: endDate,
             });
@@ -44,21 +44,22 @@ async getPost(id:string): Promise<PostDTO|null> {
       //console.log("Fetched posts:", posts); // Check the structure of the fetched posts
       if (post!=null){
           const result = new PostDTO({
-              id: post.id.toString(),
-              postName: post.postName as string,
-              postDescription: post.postDescription as string,
-              postImage: post.postImage as string,
-              postMediaType: post.postMediaType as string,
-              postProjectRole: post.postProjectRole as 'actor' | 'cameraman' | 'editor' | 'vtuber',
-              postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'delete',
-              startDate: post.startDate ? new Date(post.startDate.toString()) : new Date(),
-              endDate: post.endDate ? new Date(post.endDate.toString()) : new Date(),
+            id: post.id.toString(),
+            postName: post.postName as string,
+            postDescription: post.postDescription as string,
+            postImages: post.postImages as [string],
+            postMediaType: post.postMediaType as string,
+            postProjectRoles: post.postProjectRoles as [string],
+            postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+            // postDetailID: post.postDetailID.toString() as string,
+            startDate: new Date(post.startDate.toString()) ,
+            endDate: new Date(post.endDate.toString()) ,
           });
           return result; 
       }else{
           return null
       }
-      // console.log(result, "Mapped Posts");
+     
       
       
   } catch (error) {
@@ -73,9 +74,9 @@ async getPost(id:string): Promise<PostDTO|null> {
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
-        postImage: postData.postImage,
+        postImages: postData.postImages,
         postMediaType:postData.postMediaType,
-        postProjectRole: postData.postProjectRole,
+        postProjectRole: postData.postProjectRoles,
         postStatus: postData.postStatus,
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
@@ -92,9 +93,9 @@ async getPost(id:string): Promise<PostDTO|null> {
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
-        postImage: postData.postImage,
+        postImage: postData.postImages,
         postMediaType:postData.postMediaType,
-        postProjectRole: postData.postProjectRole,
+        postProjectRole: postData.postProjectRoles,
         postStatus: postData.postStatus,
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
@@ -112,9 +113,9 @@ async getPost(id:string): Promise<PostDTO|null> {
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
-        postImage: postData.postImage,
+        postImage: postData.postImages,
         postMediaType:postData.postMediaType,
-        postProjectRole: postData.postProjectRole,
+        postProjectRole: postData.postProjectRoles,
         postStatus: postData.postStatus,
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
