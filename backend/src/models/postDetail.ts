@@ -7,7 +7,7 @@ export interface IPostDetail extends Document {
     postId: mongoose.Schema.Types.ObjectId
     CandidateDetail: Array<{
         RoleID: mongoose.Schema.Types.ObjectId
-        CandidateID: mongoose.Schema.Types.ObjectId
+        CandidateID: string
     }>;
     // OfferDetail: Array<{  //Next Sprint
     //     RoleID: mongoose.Schema.Types.ObjectId
@@ -28,10 +28,14 @@ const postDetailSchema = new Schema<IPostDetail>({
             required: true,
         },
         CandidateID: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Candidate', // Reference to the Candidate model
+            type: String,
             required: true,
         }
+        // CandidateID: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: 'Candidate', // Reference to the Candidate model
+        //     required: true,
+        // }
     }],
     // OfferDetail: [{ //Next Sprint
     //     RoleID: {

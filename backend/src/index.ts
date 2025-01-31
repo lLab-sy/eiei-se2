@@ -3,6 +3,8 @@ import connectDB from './config/db';
 import testRoutes from './routes/testRoutes';
 import postRoutes from "./routes/postRoutes"
 import authRoutes from './routes/authRoutes';
+import postRoleRoutes from "./routes/postRoleRoutes"
+import postDetailRoutes from "./routes/postDetailRoutes"
 import morgan from 'morgan';
 import helmet from "helmet";
 import cors from "cors";
@@ -40,6 +42,7 @@ app.use('/api', testRoutes);
 app.use('/api/v1',postRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/v1',postRoutes,postRoleRoutes);
+app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes);
 
 // Server
 app.listen(port, () => {
