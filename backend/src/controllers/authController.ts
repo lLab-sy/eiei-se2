@@ -4,45 +4,47 @@ import { RegisterDTO, LoginDTO } from '../dtos/authDTO';
 import { sendResponse } from '../utils/responseHelper';
 // import jwt from 'jsonwebtoken'
 
-// @desc Create User account
-// @route POST /register
-// @access Public
-export const createUser = async (req: Request, res: Response ) => {
-    try {
-        const data: RegisterDTO = req.body;
-
-        if (!data.username || !data.password || !data.role) {
-            sendResponse(res, 'error', null, "Please provide all required fields.");
-            return;
+class AuthController{
+    async createUser(req: Request, res: Response ): Promise<void>{
+        try {
+            const data: RegisterDTO = req.body;
+    
+            if (!data.username || !data.password || !data.role) {
+                sendResponse(res, 'error', null, "Please provide all required fields.");
+                return;
+            }
+    
+            const user = await authService.registerUser(data);
+            if(!user){
+                sendResponse(res, 'error', null, "Username already exists.");
+                return;
+            }
+            sendResponse(res, 'success', user, 'Register successful.');
+        } catch (err) {
+            // console.error("Error in registerUser:", err);       
+            const errorMessage = (err as Error).message || "Internal server error.";
+    
+            sendResponse(res, 'error', err, errorMessage);
         }
+    };
 
-        const user = await authService.registerUser(data);
-        sendResponse(res, 'success', user, 'Register successful.');
-    } catch (err) {
-        // console.error("Error in registerUser:", err);       
-        const errorMessage = (err as Error).message || "Internal server error.";
-
-        sendResponse(res, 'error', err, errorMessage);
-    }
-};
-
-// @desc User Login
-// @route POST /login
-// @access Public
-export const loginUser = async (req: Request, res: Response) => {
-    try {
-        const data: LoginDTO = req.body;
-
-        if(!data.username || !data.password){
-            sendResponse(res, 'error', null, "Please provide all required fields.");
-            return;
+    async loginUser(req: Request, res: Response): Promise<void>{
+        try {
+            const data: LoginDTO = req.body;
+    
+            if(!data.username || !data.password){
+                sendResponse(res, 'error', null, "Please provide all required fields.");
+                return;
+            }
+    
+            const result = await authService.loginUser(data);
+            sendResponse(res, 'success', result, 'Login successful');
+        } catch (err) {
+            const errorMessage = (err as Error).message || "Internal server error.";
+            
+            sendResponse(res, 'error', null, errorMessage);
         }
+    };
+}
 
-        const result = await authService.loginUser(data);
-        sendResponse(res, 'success', result, 'Login successful');
-    } catch (err) {
-        const errorMessage = (err as Error).message || "Internal server error.";
-        
-        sendResponse(res, 'error', null, errorMessage);
-    }
-};
+export default new AuthController();
