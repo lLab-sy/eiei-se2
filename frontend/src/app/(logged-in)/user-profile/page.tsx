@@ -1,6 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -144,7 +150,7 @@ export default function UserPage() {
               <Input
                 id="picture"
                 type="file"
-                className="mt-5 bg-black w-[50%]  after:content-['Upload'] cursor-pointer after:text-white after:text-xl after:absolute relative after:left-[50%] after:translate-x-[-50%] after:translate-y-[-50%] after:top-[50%]"
+                className="mt-5  bg-black w-[50%]  after:content-['Upload'] cursor-pointer after:text-white after:text-xl after:absolute relative after:left-[50%] after:translate-x-[-50%] after:translate-y-[-50%] after:top-[50%]"
                 placeholder="Upload New Photo"
                 onChange={onImageChange}
               />
@@ -176,14 +182,14 @@ export default function UserPage() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="h-[80%]"
+                className="h-[60%]"
               >
                 <fieldset
                   disabled={form.formState.isSubmitting}
                   className="h-[100%] flex items-start"
                 >
                   <div
-                    className={`${click ? "" : "hidden"} flex flex-row w-[100%] flex-wrap justify-between `}
+                    className={`${click ? "" : "hidden"} h-full flex flex-row space-y-0 w-[100%] flex-wrap  justify-between `}
                   >
                     <FormField
                       name="firstName"
@@ -194,7 +200,7 @@ export default function UserPage() {
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
-                          <FormMessage  />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -233,7 +239,7 @@ export default function UserPage() {
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
-                          <FormMessage className='md:text-xs text-sm' />
+                          <FormMessage className="md:text-xs text-sm" />
                         </FormItem>
                       )}
                     />
@@ -246,7 +252,7 @@ export default function UserPage() {
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
-                          <FormMessage className='md:text-xs text-sm' />
+                          <FormMessage className="md:text-xs text-sm" />
                         </FormItem>
                       )}
                     />
@@ -276,7 +282,7 @@ export default function UserPage() {
                               </SelectContent>
                             </Select>
                           </FormControl>
-                          <FormMessage className='md:text-xs text-sm' />
+                          <FormMessage className="md:text-xs text-sm" />
                         </FormItem>
                       )}
                     />
@@ -293,7 +299,7 @@ export default function UserPage() {
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage className='md:text-xs text-sm' />
+                          <FormMessage className="md:text-xs text-sm" />
                         </FormItem>
                       )}
                     />
@@ -314,10 +320,13 @@ export default function UserPage() {
                         </FormItem>
                       )}
                     />
-                    <FormItem className={`pt-5 flex flex-row items-baseline w-[100%] ${!isEdit ? 'justify-end' : 'justify-between'}`}>
+                    <div
+                      className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
+                    >
                       <Button
-                        className={`${isEdit ? "" : "hidden"} w-[30%] text-white bg-green-400 hover:bg-green-500`}
+                        className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-green-400 hover:bg-green-500`}
                         type="submit"
+                        onSubmit={form.handleSubmit(handleSubmit)}
                       >
                         Update Info
                       </Button>
@@ -329,12 +338,14 @@ export default function UserPage() {
                       >
                         {isEdit ? "Cancel" : "Edit"}
                       </Button>
-                    </FormItem>
+                    </div>
                     {/* <FormItem className="flex pt-[5%] flex-col w-[100%]">
                       
                     </FormItem> */}
                   </div>
-                  <div className={`${click ? "hidden" : ""} w-[100%] `}>
+                  <div
+                    className={`${click ? "hidden" : ""} w-[100%] flex flex-col justify-start h-full`}
+                  >
                     <FormField
                       name="bank_account"
                       control={form.control}
@@ -420,6 +431,25 @@ export default function UserPage() {
                     ) : (
                       <div></div>
                     )}
+                    <div
+                      className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
+                    >
+                      <Button
+                        className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-green-400 hover:bg-green-500`}
+                        type="submit"
+                        onSubmit={form.handleSubmit(handleSubmit)}
+                      >
+                        Update Info
+                      </Button>
+                      <Button
+                        variant={`${isEdit ? "destructive" : "default"}`}
+                        type="reset"
+                        onClick={() => setIsEdit(!isEdit)}
+                        className={` w-[30%]`}
+                      >
+                        {isEdit ? "Cancel" : "Edit"}
+                      </Button>
+                    </div>
                   </div>
                 </fieldset>
               </form>
