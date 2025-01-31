@@ -58,6 +58,7 @@ const formSchema = z
 
 type formFields = typeof formSchema;
 export default function RegisterPage() {
+  // console.log('process',process.env.NEXT_PUBLIC_BASE_URL)
   const form = useForm<z.infer<formFields>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
