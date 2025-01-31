@@ -24,7 +24,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 //Multiselect: https://shadcnui-expansions.typeart.cc/docs/multiple-selector
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
-// import { useState } from "react";
+import { useState } from "react";
+import Image from "next/image";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
 
 const optionSchema = z.object({
@@ -82,20 +83,35 @@ export default function CreatePostPage() {
       postname: values.postname,
       type: values.type,
       desc: values.description,
+      image: img.image
     };
+    const formdata = new FormData();
     console.log(postData);
     console.log(JSON.stringify(postData));
     /*  TODO: await for API to finish then renavigate
     router.push(`/my-post`); */
   }
+  const [img,setImg] = useState({image:""});
+  const onImgChange = (e:any) => {
+    console.log(e.target.files)
+    console.log(e.target.files.length)
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      if (file.size > 2048*2048){
+        return
+      }
+      setImg({ image: URL.createObjectURL(file)})
+    }
+  }
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
-      <div className="flex flex-wrap w-[70%] h-[500px] my-4">
+      <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] h-[500px] my-4">
         <Card className="w-[100%]">
           <CardHeader>
             <CardTitle>Create Post</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col py-5 w-full">
+          <div className="flex flex-row">
+          <CardContent className="flex flex-col py-5 w-[60%]">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -186,6 +202,25 @@ export default function CreatePostPage() {
               </form>
             </Form>
           </CardContent>
+          <CardContent className="w-[40%]">
+            <CardTitle className="text-sm">Your Post Picture</CardTitle>
+            <div>
+                <Image src={img.image ? img.image:"/image/logo.png"} 
+                alt="Post Image Here" 
+                width={parent.innerWidth}
+                height={parent.innerHeight}
+                className="max-h-48 object-scale-down" 
+                priority
+                placeholder= "empty"/>
+              <Input 
+                type="file"
+                className="file:text-mainyellow-light file:font-medium bg-mainblue my-5 cursor-pointer hover:bg-mainblue-light text-white"
+                placeholder= "Your post picture"
+                onChange={onImgChange}
+                />
+            </div>
+          </CardContent>
+          </div>
         </Card>
       </div>
     </div>
