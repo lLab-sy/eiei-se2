@@ -155,7 +155,7 @@ export default function UserPage() {
           <CardHeader className="">
             <CardTitle>Edit Profile</CardTitle>
           </CardHeader>
-          <CardContent className=" flex flex-col relative h-full">
+          <CardContent className="w-[500px] flex flex-col relative h-full">
             <div className="flex flex-row w-[60%] justify-between">
               <Link
                 href={""}
@@ -167,7 +167,7 @@ export default function UserPage() {
               <Link
                 href={""}
                 onClick={() => setClick(false)}
-                className={`${styles.divLines} text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[150px] after:h-[3px] after:absolute after:left-[31%] after:top-[6%] ${!click ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[150px] after:h-[3px] after:absolute after:left-[31%] after:top-[6%] ${!click ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 Billing Information
               </Link>
@@ -194,7 +194,7 @@ export default function UserPage() {
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage  />
                         </FormItem>
                       )}
                     />
@@ -233,7 +233,7 @@ export default function UserPage() {
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className='md:text-xs text-sm' />
                         </FormItem>
                       )}
                     />
@@ -246,7 +246,7 @@ export default function UserPage() {
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className='md:text-xs text-sm' />
                         </FormItem>
                       )}
                     />
@@ -276,7 +276,7 @@ export default function UserPage() {
                               </SelectContent>
                             </Select>
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className='md:text-xs text-sm' />
                         </FormItem>
                       )}
                     />
@@ -293,7 +293,7 @@ export default function UserPage() {
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className='md:text-xs text-sm' />
                         </FormItem>
                       )}
                     />

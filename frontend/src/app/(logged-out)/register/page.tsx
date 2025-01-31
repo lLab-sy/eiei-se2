@@ -24,8 +24,8 @@ import Link from "next/link";
 import { RadioGroup } from "@radix-ui/react-radio-group";
 import { RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Toast } from "@/components/ui/toast";
-import { toast, useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { createUser } from "./action";
 
 const formSchema = z
   .object({
@@ -42,7 +42,7 @@ const formSchema = z
         message: "Password should contain at least one special characters",
       }),
     confirmPassword: z.string(),
-    option: z.enum(["Producer", "Professional"], {
+    option: z.enum(["producer", "production professional"], {
       required_error: "You need to select your role",
     }),
   })
@@ -64,17 +64,37 @@ export default function RegisterPage() {
       username: "",
       password: "",
       confirmPassword: "",
+      option: 'producer'
     },
   });
   const { toast } = useToast()
   const handleSubmit = async (data: z.infer<formFields>) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(`Form Complete ${data.option}`);
-    toast({
-        variant: 'default',
-        title: 'Sign Up',
-        description: "Sign Up Successful"
-    })
+    const params = {
+      username : data.username,
+      password: data.password,
+      role : data.option
+    }
+
+    const res = await createUser(params)
+    
+    if(res.data.status == 'error'){
+      toast({
+        variant: "destructive",
+        title: "Sign Up Failed",
+        description: res.data.message ?? "Failed to sign up"
+      })
+    }
+    else{
+      toast({
+          variant: 'default',
+          title: 'Sign Up',
+          description: "Sign Up Successful"
+      })
+      form.resetField('password')
+      form.resetField('confirmPassword')
+      form.resetField('username')
+      form.setValue('option', 'producer')
+    }
   };
   return (
     <main className="flex justify-center items-center min-h-screen bg-slate-200">
@@ -113,18 +133,19 @@ export default function RegisterPage() {
               </div>
           </div> */}
           <CardTitle className="flex justify-center relative">
-            <span>SignUp to EiEi</span>
+            <span>Sign up to EiEi</span>
             
           </CardTitle>
         </CardHeader>
         <CardContent className="">
-          <fieldset disabled={form.formState.isSubmitting}>
+          
           <Form {...form}>
             <form
               action=""
               className="flex flex-col"
               onSubmit={form.handleSubmit(handleSubmit)}
             >
+              <fieldset disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="username"
@@ -182,7 +203,7 @@ export default function RegisterPage() {
                           <div className="flex items-center gap-2">
                             <RadioGroupItem
                               id="radio-producer"
-                              value="Producer"
+                              value="producer"
                             />
                             <Label htmlFor="radio-producer">Producer</Label>
                           </div>
@@ -190,7 +211,7 @@ export default function RegisterPage() {
                           <div className=" flex items-center gap-2">
                             <RadioGroupItem
                               id="radio-professional"
-                              value="Professional"
+                              value="production professional"
                             />
                             <Label htmlFor="radio-professional">
                               Professional
@@ -205,9 +226,10 @@ export default function RegisterPage() {
                 )}
               />
               <Button type="submit">Register</Button>
+              </fieldset>
             </form>
           </Form>
-          </fieldset>
+          
           
         </CardContent>
         <CardFooter className="flex flex-col">
