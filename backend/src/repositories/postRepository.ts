@@ -1,6 +1,5 @@
-import { Types } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import Post, { IPost } from '../models/postModel';
+import Post, { IPost, PostSearchQuery, PostSearchRequestModel } from '../models/postModel';
 import { PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 
@@ -48,8 +47,8 @@ class PostRepository {
                 CandidateDetail: [],
               });
 
-            const result2= await postDetailData.save();
-            console.log(result2)
+            await postDetailData.save();
+  
             return result
         } catch (error) {
             throw new Error('Error creating post in repository: ' + error);
@@ -87,6 +86,37 @@ class PostRepository {
             return post;
         } catch (error) {
             throw new Error('Error deleting post in repository: ' + error);
+        }
+    }
+
+    public async searchPost(postSearchReq: PostSearchRequestModel){
+        try {
+            const { searchText, postMediaTypes, roleRequirments, limit, page } = postSearchReq;
+            // PostSearchQuery from postModel
+            const query: PostSearchQuery = {};
+            
+            // search query param
+            if (searchText) query.$text = { $search: searchText };
+            if (postMediaTypes?.length) query.postMediaType = { $in: postMediaTypes };
+            if (roleRequirments?.length) query.postProjectRoles = { $all: roleRequirments };
+            
+            const projection = searchText 
+            ? { score: { $meta: "textScore" } } // If using text search, include score
+            : {}; // Otherwise, don't include textScore
+            
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            // Perform the search
+            const results = await Post.find(query, projection)
+            .sort(searchText ? { score: { $meta: "textScsore" } } : {})
+            .skip(skip)
+            .limit(pageSize);
+            return results
+        } catch (error) {
+            throw new Error('Error search post in repository: ' + error);
         }
     }
 }
