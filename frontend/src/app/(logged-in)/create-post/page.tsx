@@ -26,6 +26,9 @@ import { useForm } from "react-hook-form";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { useState } from "react";
 import Image from "next/image";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Label } from "@/components/ui/label";
+import { X } from "lucide-react";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
 
 const optionSchema = z.object({
@@ -53,7 +56,7 @@ const formSchema = z.object({
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
-//mock options -> will need API to be updatable
+//mock options -> will use API in later stage
 const OPTIONS: Option[] = [
   { label: "Producer", value: "producer" },
   { label: "Camera Operator", value: "camera operator" },
@@ -79,36 +82,40 @@ export default function CreatePostPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const postData = {
-      roles: values.roles.map((obj) => obj.value),
-      postname: values.postname,
-      type: values.type,
-      desc: values.description,
-      image: img.image
+      postProjectRoles: values.roles.map((obj) => obj.value),
+      postName: values.postname,
+      postMediaType: values.type,
+      postDescription: values.description,
+      image: img
     };
-    const formdata = new FormData();
+    //const formdata = new FormData();
     console.log(postData);
     console.log(JSON.stringify(postData));
     /*  TODO: await for API to finish then renavigate
     router.push(`/my-post`); */
   }
-  const [img,setImg] = useState({image:""});
+  const [img,setImg] = useState<string[]>([]);
+  const [mostRecentImg, setMostRecentImg] = useState<string>("")
   const onImgChange = (e:any) => {
-    console.log(e.target.files)
-    console.log(e.target.files.length)
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      if (file.size > 2048*2048){
-        return
-      }
-      setImg({ image: URL.createObjectURL(file)})
+      const files: File[] = Array.from(e.target.files)
+      const filenames = files.map((file)=>URL.createObjectURL(file))
+      setMostRecentImg(filenames[filenames.length-1])
+      const newImg = [...img,...filenames]
+      setImg(newImg)
     }
+  }
+  const removeImg = (imgSrc:string) => {
+    setImg(img.filter((img)=>img !== imgSrc))
+    if (mostRecentImg === imgSrc) 
+      setMostRecentImg(img[img.length-2])
   }
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
-      <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] h-[500px] my-4">
+      <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18">
         <Card className="w-[100%]">
           <CardHeader>
-            <CardTitle>Create Post</CardTitle>
+            <CardTitle className="justify-center flex">Create Post</CardTitle>
           </CardHeader>
           <div className="flex flex-row">
           <CardContent className="flex flex-col py-5 w-[60%]">
@@ -202,22 +209,73 @@ export default function CreatePostPage() {
               </form>
             </Form>
           </CardContent>
-          <CardContent className="w-[40%]">
+          <CardContent className="w-[40%] py-5">
             <CardTitle className="text-sm">Your Post Picture</CardTitle>
-            <div>
-                <Image src={img.image ? img.image:"/image/logo.png"} 
+            <div className="flex flex-col items-center">
+              <div className="h-1/2">
+              {img.length !== 0 ? (
+                  <Image src={mostRecentImg} 
+                    alt="Post Image Here" 
+                    width={parent.innerWidth}
+                    height={parent.innerHeight}
+                    className="max-h-48 object-scale-down aspect-square" 
+                    priority
+                    placeholder= "empty"/>
+              ):(
+                <Image src="/image/logo.png"
                 alt="Post Image Here" 
                 width={parent.innerWidth}
                 height={parent.innerHeight}
                 className="max-h-48 object-scale-down" 
                 priority
                 placeholder= "empty"/>
+              )}
+              </div>
               <Input 
                 type="file"
                 className="file:text-mainyellow-light file:font-medium bg-mainblue my-5 cursor-pointer hover:bg-mainblue-light text-white"
                 placeholder= "Your post picture"
                 onChange={onImgChange}
+                multiple
                 />
+              <div className="w-[80%] justify-center flex">
+                <Carousel>
+                  <CarouselContent>
+                    {img.length !== 0 ?(img.map((imgSrc)=> 
+                        (
+                        <CarouselItem key={imgSrc} className="relative pt-1 justify-center inline-flex flex-col group">
+                          <Image src={imgSrc} 
+                            alt="Post Image Here" 
+                            width={parent.innerWidth}
+                            height={parent.innerHeight}
+                            className="max-h-48 object-contain aspect-square cursor-pointer bg-maingrey " 
+                            priority
+                            placeholder= "empty"
+                            onClick={()=>
+                              setMostRecentImg(imgSrc)
+                            }/>
+                            <X className="absolute top-1 right-1 hidden group-hover:block
+                           bg-mainblue-lightest cursor-pointer"
+                           onClick = {()=>removeImg(imgSrc)} />
+                        </CarouselItem>
+                        )
+                      )
+                    ):(
+                        <CarouselItem key={"/image/logo.png"} className="pt-1">
+                          <Image src="/image/logo.png"
+                            alt="Post Image Here" 
+                            width={parent.innerWidth}
+                            height={parent.innerHeight}
+                            className="max-h-48 object-scale-down" 
+                            placeholder= "empty"/>
+                        </CarouselItem>)
+                    }
+                  </CarouselContent>
+                  <Label>Total item: {img.length}</Label>
+                  <CarouselPrevious/>
+                  <CarouselNext/>
+                </Carousel>
+              </div>
             </div>
           </CardContent>
           </div>
