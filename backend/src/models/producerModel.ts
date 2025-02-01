@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { IUser, userSchema } from "./user";
+import { IUser, userSchema } from "./userModel";
 
 // Define the interface for Producer, extending IUser
 export interface IProducer extends IUser {

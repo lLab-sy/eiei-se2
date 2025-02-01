@@ -1,60 +1,67 @@
-import mongoose, { Schema, Document } from 'mongoose';
-//import bcrypt from 'bcryptjs';
-//import jwt from 'jsonwebtoken';
+import mongoose, { Document, Schema } from "mongoose";
 
-// Interface for User Document: require are name, password, role; which user must input at registration. 
+// Interface for User Document: require are name, password, role; which user must input at registration.
 export interface IUser extends Document {
   username: string;
-  email?: string;
-  role: 'producer' | 'production professional' | 'admin';
   password: string;
+  role: "producer" | "production professional" | "admin";
+  email?: string;
   firstName?: string;
   middleName?: string;
   lastName?: string;
   phoneNumber?: string;
-  gender?: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
-  billingAccount?: string;
+  gender?: "Male" | "Female" | "Non-Binary" | "Other";
+  bankAccount?: IBankAccount;
   profileImage?: string;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
-  //getSignedJwtToken(): string;
-  //matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
+export interface IBankAccount extends Document {
+  bankName?: string;
+  accountHolderName?: string;
+  accountNumber?: string;
+}
+
+export const BankAccountSchema = new Schema<IBankAccount>({
+  bankName: { type: String,},
+  accountHolderName: { type: String,},
+  accountNumber: { type: String,},
+});
+
 // User Schema Definition
-const UserSchema: Schema = new Schema({
+export const userSchema = new Schema<IUser>({
   username: {
     type: String,
     unique: true,
-    required: [true, 'Please add a name'],
-  },
-  email: {
-    type: String,
-    //required: [true, 'Please add an email'],
-    unique: true,
-    sparse: true,
-    match: [
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      'Please add a valid email',
-    ],
-  },
-  role: {
-    type: String,
-    enum: ['producer', 'production professional', 'admin'],
-    required: true,
+    required: [true, "Please add a name"],
   },
   password: {
     type: String,
-    required: [true, 'Please add a password'],
+    required: [true, "Please add a password"],
     minlength: 8,
     validate: {
       validator: function (value: string) {
         return /[!@#$%^&*(),.?":{}|<>+-]/.test(value);
       },
-      message: 'Password must contain at least one special symbol.',
+      message: "Password must contain at least one special symbol.",
     },
     select: false,
+  },
+  role: {
+    type: String,
+    enum: ["producer", "production professional", "admin"],
+    required: true,
+  },
+  email: {
+    type: String,
+    unique: true,
+    sparse: true,
+    match: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      "Please add a valid email",
+    ],
   },
   firstName: {
     type: String,
@@ -72,15 +79,15 @@ const UserSchema: Schema = new Schema({
     type: String,
     match: [
       /^\+?[0-9]{10,15}$/,
-      'Phone number must contain only digits and be between 10 and 15 characters long.',
+      "Phone number must contain only digits and be between 10 and 15 characters long.",
     ],
   },
   gender: {
     type: String,
-    enum: ['Male', 'Female', 'Other', 'Prefer not to say'],
+    enum: ["Male", "Female", "Non-Binary", "Other"],
   },
-  billingAccount: {
-    type: String,
+  bankAccount: {
+    type: BankAccountSchema,
   },
   profileImage: {
     type: String,
@@ -93,31 +100,5 @@ const UserSchema: Schema = new Schema({
   },
 });
 
-//Below is the logic for authen, I don't know that should we use it now or later.
-//So I will comment them until we need to use the logic below, feel free to use it if you want.
-/*
-// Encrypt password before saving the user
-UserSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password')) {
-    next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
-
-// Generate JWT Token
-UserSchema.methods.getSignedJwtToken = function (): string {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET || 'secret', {
-    expiresIn: process.env.JWT_EXPIRE || '1d',
-  });
-};
-
-// Match user entered password to hashed password in the database
-UserSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
-*/
-
-const User = mongoose.model<IUser>('User', UserSchema, 'users');
+const User = mongoose.model<IUser>("user", userSchema, "users");
 export default User;
-export { UserSchema };
