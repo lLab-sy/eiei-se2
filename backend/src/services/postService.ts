@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
-import { PostDTO} from '../dtos/postDTO';
-import Post from '../models/postModel';
+import { PostDTO, PostSearchRequestDTO } from '../dtos/postDTO';
+import Post, { PostSearchRequestModel } from '../models/postModel';
 
 class PostService {
 
@@ -100,7 +100,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
       });
-      const res=await postRepository.updatePost(postData,id);
+      await postRepository.updatePost(postData,id);
       return postModel;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -120,12 +120,40 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
       });
-      const res=await postRepository.deletePost(postData,id);
+      await postRepository.deletePost(postData,id);
       return postModel;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
     }
   }
+
+  async searchPost(postSearchReq: PostSearchRequestDTO): Promise<PostDTO[]|null> {
+    try {
+      const postM: PostSearchRequestModel = postSearchReq
+
+      const res = await postRepository.searchPost(postM);
+      return res.map((post) => {
+        const startDate = new Date(post.startDate.toString()) 
+        const endDate =  new Date(post.endDate.toString()) 
+        
+        return new PostDTO({
+        id: post.id.toString(),
+        postName: post.postName as string,
+        postDescription: post.postDescription as string,
+        postImages: post.postImages as [string],
+        postMediaType: post.postMediaType as string,
+        postProjectRoles: post.postProjectRoles as [string],
+        postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+        // postDetailID: post.postDetailID.toString() as string,
+        startDate: startDate,
+        endDate: endDate,
+      })})
+
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+
 }
 
 // Export an instance of the service
