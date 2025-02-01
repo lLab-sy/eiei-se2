@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
+import { PostSearchRequestDTO } from '../dtos/postDTO';
 
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
@@ -13,6 +14,7 @@ class PostController {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
   };
+  
   async getPost(req: Request, res: Response): Promise<void> {
     try {
       const postId = req.params.id
@@ -60,6 +62,27 @@ class PostController {
       sendResponse(res, 'success', posts, 'Successfully deleted posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to deleted posts at controller');
+    }
+  };
+
+  async searchPost(req: Request, res: Response): Promise<void> {
+    try {
+      // make sure postMediaTypes and roleRequirments are string[] or undefined
+      const postMediaTypes = req.query.postMediaTypes as string[]
+      const roleRequirments = req.query.roleRequirments as string[]
+
+      const postSearchReqDTO: PostSearchRequestDTO = {
+        page: Number(req.query.page),
+        limit: Number(req.query.limit),
+        searchText: req.query.searchText? req.query.searchText as string: '',
+        postMediaTypes: Array.isArray(postMediaTypes)?postMediaTypes: postMediaTypes? [postMediaTypes]: postMediaTypes,
+        roleRequirments: Array.isArray(roleRequirments)?roleRequirments: roleRequirments? [roleRequirments]: roleRequirments
+      }
+
+      const posts = await postService.searchPost(postSearchReqDTO);
+      sendResponse(res, 'success', posts, 'Successfully search posts');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
     }
   };
 }
