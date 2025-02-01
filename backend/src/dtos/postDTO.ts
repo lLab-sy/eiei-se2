@@ -135,7 +135,7 @@
 // }
 
 
-import { IsString, IsNotEmpty, MaxLength, IsEnum, IsDate, IsArray, ArrayNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsEnum, IsDate, IsArray, ArrayNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PostDTO {
@@ -198,4 +198,30 @@ export class PostDTO {
     constructor(init?: Partial<PostDTO>) {
         Object.assign(this, init);
     }
+}
+
+export class PostSearchRequestDTO {
+    @ApiProperty({ description: 'The name of the post or project detail', type: String })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100, { message: 'searchText cannot be more than 100 characters' })
+    searchText!: string;
+
+    @ApiProperty({ description: 'The media type of the post', type: [String] })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypes!: string[];
+
+    @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
+    @IsArray()
+    @IsString({ each: true })  // Ensures that each item in the array is a string
+    roleRequirments!: string[];
+
+    @ApiProperty({ description: 'The number of post per page' })
+    @IsNumber()  
+    limit!: number;
+
+    @ApiProperty({ description: 'The current page' })
+    @IsNumber() 
+    page!: number;
 }
