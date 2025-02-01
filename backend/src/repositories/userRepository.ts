@@ -24,7 +24,7 @@ class UserRepository {
     
     async loginUser(username: string){
         try{
-            const user = await User.findOne({username}).select("password");
+            const user = await User.findOne({username}).select("_id username role password");
             if(!user){
                 throw new Error("Invalid username or password")
             }
