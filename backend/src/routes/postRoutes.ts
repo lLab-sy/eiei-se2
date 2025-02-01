@@ -66,6 +66,59 @@ const router = Router();
  *           description: The end date of the post
  */
 
+
+/**
+ * @swagger
+ * /api/v1/posts/search:
+ *   get:
+ *     summary: Search posts US4-2
+ *     tags: [Post]
+ *     parameters:
+ *       - in: query
+ *         name: searchText
+ *         schema:
+ *           type: string
+ *         description: The name of the post or project detail
+ *       - in: query
+ *         name: postMediaTypes
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: The media type of the post
+ *       - in: query
+ *         name: roleRequirments
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: The roles in the project associated with the post
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of posts per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The current page number
+ *     responses:
+ *       200:
+ *         description: The retrieved posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/PostDTO"
+ *       404:
+ *         description: Posts not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/search', postController.searchPost);
+
 /**
  * @swagger
  * /api/v1/posts:
