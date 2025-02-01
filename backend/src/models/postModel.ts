@@ -68,5 +68,23 @@ export const postSchema = new Schema<IPost>({
     { timestamps: true } // Adds createdAt and updatedAt fields
 );
 
+// Create a text index on specific fields
+postSchema.index({ postName: 'text', postDescription: 'text' });
+
 const Post = mongoose.model<IPost>('postType', postSchema, 'postTypes');
 export default Post;
+
+//  for post search query
+export interface PostSearchQuery {
+    $text?: { $search: string };
+    postMediaType?: { $in: string[] };
+    postProjectRoles?: { $all: string[] };
+}
+
+export interface PostSearchRequestModel {
+    searchText?: string;
+    postMediaTypes?: string[];
+    roleRequirments?: string[];
+    limit?: number;
+    page?: number;
+}
