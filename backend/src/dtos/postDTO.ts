@@ -169,7 +169,7 @@ export class PostDTO {
 
     @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
     @IsArray()
-    @IsString({ each: true })  // Ensures that each item in the array is a string
+    @IsString({ each: true }) 
     postProjectRoles!: string[];
 
     @ApiProperty({ description: 'The status of the post', enum: ['created', 'in-progress', 'success', 'cancel'] })
@@ -189,6 +189,11 @@ export class PostDTO {
     @IsString()
     @IsNotEmpty()
     postDetailID!: string;  // This is the reference to the PostDetail model
+
+    @ApiProperty({ description: 'The user ID which is a reference to the User model', type: String })
+    @IsString()
+    @IsNotEmpty()
+    userID!: string;  // This is the reference to the PostDetail model
 
     constructor(init?: Partial<PostDTO>) {
         Object.assign(this, init);
