@@ -104,10 +104,11 @@ async getPost(id:string): Promise<PostDTO|null> {
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
-        postImage: postData.postImages,
+        postImages: postData.postImages,
         postMediaType:postData.postMediaType,
         postProjectRoles: postData.postProjectRoles,
         postStatus: postData.postStatus,
+        userID: postData.userID,
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
       });
