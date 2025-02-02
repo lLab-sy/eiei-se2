@@ -22,6 +22,7 @@ const router = Router();
  *         - postImages
  *         - postMediaType
  *         - postProjectRoles
+ *         - userID
  *         - postStatus
  *         - startDate
  *         - endDate
@@ -48,6 +49,9 @@ const router = Router();
  *             type: string
  *             enum: [actor, cameraman, editor, vtuber]
  *           description: The roles associated with the post
+ *         userID:
+ *           type: string
+ *           description: The user belong this post
  *         postStatus:
  *           type: string
  *           enum: [created, in-progress, success, cancel]

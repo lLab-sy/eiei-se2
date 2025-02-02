@@ -26,6 +26,8 @@ class PostController {
   
   async createPost(req: Request, res: Response): Promise<void> {
     try {
+      console.log(req.body)
+      console.log("...............")
       const posts = await postService.createPost(req.body);
       sendResponse(res, 'success', posts, 'Successfully created posts');
     } catch (err) {

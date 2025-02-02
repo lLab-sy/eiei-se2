@@ -1,6 +1,7 @@
 import postRepository from '../repositories/postRepository';
 import { PostDTO} from '../dtos/postDTO';
 import Post from '../models/postModel';
+import mongoose from 'mongoose';
 
 class PostService {
 
@@ -21,9 +22,13 @@ class PostService {
                 postDescription: post.postDescription as string,
                 postImages: post.postImages as [string],
                 postMediaType: post.postMediaType as string,
-                postProjectRoles: post.postProjectRoles as [string],
+                postProjectRoles: post.postProjectRoles.map(eachRole=>(
+                  eachRole.toString()
+                )) as [string],
+                // postProjectRoles: post.postProjectRoles as [string],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 // postDetailID: post.postDetailID.toString() as string,
+                userID: post.userID.toString() as string,
                 startDate: startDate,
                 endDate: endDate,
             });
@@ -49,9 +54,12 @@ async getPost(id:string): Promise<PostDTO|null> {
             postDescription: post.postDescription as string,
             postImages: post.postImages as [string],
             postMediaType: post.postMediaType as string,
-            postProjectRoles: post.postProjectRoles as [string],
+            postProjectRoles: post.postProjectRoles.map(eachRole=>(
+              eachRole.toString()
+            )) as [string],
             postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
             // postDetailID: post.postDetailID.toString() as string,
+            userID: post.userID.toString() as string,
             startDate: new Date(post.startDate.toString()) ,
             endDate: new Date(post.endDate.toString()) ,
           });
@@ -71,16 +79,19 @@ async getPost(id:string): Promise<PostDTO|null> {
   async createPost(postData: PostDTO) {
     try {
       // map to model before pass it to repository
+      console.log(postData.postProjectRoles)
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
         postImages: postData.postImages,
         postMediaType:postData.postMediaType,
-        postProjectRole: postData.postProjectRoles,
+        postProjectRoles: postData.postProjectRoles,
         postStatus: postData.postStatus,
+        userID: postData.userID,
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
       });
+      console.log(postModel)
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -95,7 +106,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         postDescription: postData.postDescription,
         postImage: postData.postImages,
         postMediaType:postData.postMediaType,
-        postProjectRole: postData.postProjectRoles,
+        postProjectRoles: postData.postProjectRoles,
         postStatus: postData.postStatus,
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
