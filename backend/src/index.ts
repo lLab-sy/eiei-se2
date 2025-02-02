@@ -5,6 +5,7 @@ import postRoutes from "./routes/postRoutes"
 import authRoutes from './routes/authRoutes';
 import postRoleRoutes from "./routes/postRoleRoutes"
 import postDetailRoutes from "./routes/postDetailRoutes"
+import userRoutes from './routes/userRoutes'
 import morgan from 'morgan';
 import helmet from "helmet";
 import cors from "cors";
@@ -41,7 +42,7 @@ setupSwagger(app);
 app.use('/api', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes);
-
+app.use('/api/users', userRoutes)
 // Server
 app.listen(port, () => {
   console.log('Server running on http://localhost:'+port);
