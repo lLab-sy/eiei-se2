@@ -7,14 +7,10 @@ class PostService {
   async getAllPosts(): Promise<PostDTO[]> {
     try {
         const posts = await postRepository.getAllPosts();
-        //console.log("Fetched posts:", posts); // Check the structure of the fetched posts
-
+  
         const result = posts.map((post) => {
             const startDate = new Date(post.startDate.toString()) 
             const endDate =  new Date(post.endDate.toString()) 
-
-     
-
             return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
@@ -28,7 +24,7 @@ class PostService {
                 endDate: endDate,
             });
         });
-        // console.log(result, "Mapped Posts");
+ 
         return result;
     } catch (error) {
         console.error('Error in service layer:', error);
@@ -59,8 +55,6 @@ async getPost(id:string): Promise<PostDTO|null> {
       }else{
           return null
       }
-     
-      
       
   } catch (error) {
       console.error('Error in service layer:', error);
@@ -68,9 +62,39 @@ async getPost(id:string): Promise<PostDTO|null> {
   }
 }
 
+  async getPostsbyUser(id:string): Promise<PostDTO[]|null> {
+    try {
+      const posts = await postRepository.getPostsByUser(id);
+      if(posts){
+        const result = posts.map((post) => {
+          const startDate = new Date(post.startDate.toString()) 
+          const endDate =  new Date(post.endDate.toString()) 
+          return new PostDTO({
+              id: post.id.toString(),
+              postName: post.postName as string,
+              postDescription: post.postDescription as string,
+              postImages: post.postImages as [string],
+              postMediaType: post.postMediaType as string,
+              postProjectRoles: post.postProjectRoles as [string],
+              postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+              // postDetailID: post.postDetailID.toString() as string,
+              startDate: startDate,
+              endDate: endDate,
+            });
+        })
+        return result;
+      }
+        return null 
+    }catch (error) {
+          console.error('Error in service layer:', error);
+          throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+
   async createPost(postData: PostDTO) {
     try {
-      // map to model before pass it to repository
+      
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
