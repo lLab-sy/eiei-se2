@@ -5,11 +5,12 @@ export interface IPost extends Document {
     postDescription:string;
     postImages: string[];
     postMediaType:string;
-    postProjectRoles: string[];
+    postProjectRoles: mongoose.Schema.Types.ObjectId[]; // Updated type
     postStatus:'created'| 'in-progress'| 'success'|'cancel';
     startDate: Date;
     endDate: Date;
     postDetailID: mongoose.Schema.Types.ObjectId;
+    userID: mongoose.Schema.Types.ObjectId;
 }
 
 export const postSchema = new Schema<IPost>({
@@ -33,11 +34,13 @@ export const postSchema = new Schema<IPost>({
         type: String,
         required: [true, 'Post media type is required'],
     },
-    postProjectRoles: {
-        type: [String], // Now supports multiple roles
+    postProjectRoles: 
+        {
+         type: [mongoose.Schema.Types.ObjectId],
+        ref: 'postRoleType', // Reference to the Role model
         required: true,
-        default: [], // Ensures it's always an array
-    },
+        }
+    ,
     postStatus: {
         type: String,
         enum: ['created', 'in-progress', 'success', 'delete'],
@@ -45,16 +48,21 @@ export const postSchema = new Schema<IPost>({
     },
     startDate: {
         type: Date,
-        required: [true, 'Start date is required'],
+        // required: [true, 'Start date is required'],
     },
     endDate: {
         type: Date,
-        required: [true, 'End date is required'],
+        // required: [true, 'End date is required'],
     },
     postDetailID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'PostDetail',  // Reference to PostDetail model
         // required: [true, 'Post detail ID is required'],
+    },
+    userID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',  // Reference to User model
+        required: [true]
     }
 },
     { timestamps: true } // Adds createdAt and updatedAt fields
