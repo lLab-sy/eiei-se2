@@ -14,6 +14,17 @@ class PostRepository {
             throw new Error('Error fetching posts from repository: ' + error);
         }
     }
+    public async getPostsByUser(id:string) {
+        try {
+             const posts= await Post.find(
+                 {userID:id}
+             );
+             console.log('Posts from database:', posts);
+             return posts
+        } catch (error) {
+            throw new Error('Error fetching posts from repository: ' + error);
+        }
+    }
 
     public async getPost(id:string) {
         try {
