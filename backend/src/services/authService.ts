@@ -26,7 +26,7 @@ class AuthService {
   async loginUser(data: LoginDTO) {
     try {
       const user = await userRepository.loginUser(data.username);
-      console.log(`user: ${user}`);
+      //console.log(`user: ${user}`);
       if (!user) throw new Error("Invalid username of password.");
 
       const isMatch = await bcrypt.compare(data.password, user.password);
