@@ -38,6 +38,12 @@ class AuthController{
             }
     
             const result = await authService.loginUser(data);
+            res.cookie('token', result.token, {
+                httpOnly: true, // protect accessing token from JavaScript in browser
+                maxAge: 3600000, // 1 hour
+                secure: process.env.NODE_ENV === 'production', // use HTTPS in production
+                sameSite: 'strict', // protect CSRF attacks
+            });
             sendResponse(res, 'success', result, 'Login successful');
         } catch (err) {
             const errorMessage = (err as Error).message || "Internal server error.";
