@@ -9,6 +9,11 @@ export interface LoginDTO{
     password: string;
 }
 
+export interface ReturnRegisterDTO{
+    username: string;
+    role: "producer" | "production professional" | "admin";
+}
+
 export interface ReturnLoginDTO {
     token: string;
     user: {
