@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userRepository from "../repositories/userRepository";
-import { RegisterDTO, LoginDTO, ReturnLoginDTO } from "../dtos/authDTO";
+import { RegisterDTO, ReturnRegisterDTO, LoginDTO, ReturnLoginDTO } from "../dtos/authDTO";
 import { User } from "../models/userModel";
 import { Types } from "mongoose";
 
@@ -17,7 +17,13 @@ class AuthService {
         password: hashedPassword,
         role: data.role,
       });
-      return await userRepository.createUser(userModel);
+      const user = await userRepository.createUser(userModel);
+      
+      const returnRegisterUser: ReturnRegisterDTO = {
+        username: user.username,
+        role: user.role
+      }
+      return returnRegisterUser
     } catch (error) {
       throw new Error("Error in service layer: " + error);
     }
@@ -32,8 +38,6 @@ class AuthService {
       const isMatch = await bcrypt.compare(data.password, user.password);
       if (!isMatch) throw new Error("Password is not correct.");
 
-      //remove password
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       // Convert _id to string safely
       const userId = (user._id as Types.ObjectId).toString();
       

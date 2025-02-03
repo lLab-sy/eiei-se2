@@ -4,13 +4,32 @@ import { RegisterDTO, LoginDTO } from '../dtos/authDTO';
 import { sendResponse } from '../utils/responseHelper';
 // import jwt from 'jsonwebtoken'
 
+function validatePassword(password: string): boolean {
+    // Regex for checking if the password contains at least one special character
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>+-]/;
+  
+    if (!specialCharRegex.test(password)) {
+      throw new Error("Password must contain at least one special character.");
+    }
+  
+    // You can add additional checks here (like length, etc.)
+    return true;
+}
+
 class AuthController{
     async createUser(req: Request, res: Response ): Promise<void>{
         try {
             const data: RegisterDTO = req.body;
+
+            validatePassword(data.password);
     
             if (!data.username || !data.password || !data.role) {
                 sendResponse(res, 'error', null, "Please provide all required fields.");
+                return;
+            }
+
+            if(data.password.length < 8){
+                sendResponse(res, 'error', null, "Password should be a minimum of 8 characters.");
                 return;
             }
     
