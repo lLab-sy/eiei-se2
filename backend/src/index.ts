@@ -11,6 +11,7 @@ import cors from "cors";
 import setupSwagger from './config/swagger';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import userRoutes from './routes/userRoutes'
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ setupSwagger(app);
 app.use('/api', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes);
+app.use('/api/users', userRoutes)
 
 // Server
 app.listen(port, () => {

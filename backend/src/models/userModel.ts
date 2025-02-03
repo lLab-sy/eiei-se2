@@ -169,6 +169,6 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
   }],
 });
 
-export const ProductionProfessional = User.discriminator<IProductionProfessional>("productionProfessional", productionProfessionalSchema); // <-- Discriminator
+export const ProductionProfessional = User.discriminator<IProductionProfessional>("production professional", productionProfessionalSchema); // <-- Discriminator
 
 //export default {User, Producer, ProductionProfessional};
