@@ -1,4 +1,4 @@
-import User,{ IUser } from '../models/userModel';
+import {User, IUser } from '../models/userModel';
 
 //change to similar to test using input as I user
 
