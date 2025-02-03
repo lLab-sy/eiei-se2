@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userRepository from "../repositories/userRepository";
 import { RegisterDTO, LoginDTO, ReturnLoginDTO } from "../dtos/authDTO";
-import User from "../models/userModel";
+import { User } from "../models/userModel";
 import { Types } from "mongoose";
 
 class AuthService {

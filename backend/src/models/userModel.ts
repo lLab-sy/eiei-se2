@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+// Common user fields
 // Interface for User Document: require are name, password, role; which user must input at registration.
 export interface IUser extends Document {
   username: string;
@@ -22,6 +23,25 @@ export interface IBankAccount extends Document {
   bankName?: string;
   accountHolderName?: string;
   accountNumber?: string;
+}
+
+// Producer-specific fields
+export interface IProducer extends IUser {
+  company?: string;
+  paymentType?: "qrCode" | "creditDebit";
+  nameOnCard?: string; //for Credit/Debit
+  cardNumber?: string; //for Credit/Debit
+}
+
+// ProductionProfessional-specific fields
+export interface IProductionProfessional extends IUser {
+  occupation?: string;
+  skill?: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
+  experience?: number; // Years of experience
+  rating?: Array<{
+    ratingScore?: number
+    comment?: string
+  }>;
 }
 
 export const BankAccountSchema = new Schema<IBankAccount>({
@@ -98,7 +118,57 @@ export const userSchema = new Schema<IUser>({
     type: Date,
     default: Date.now,
   },
+},{ discriminatorKey: "role", timestamps: true } // <-- Discriminator Key
+);
+
+//Base Model
+export const User = mongoose.model<IUser>("user", userSchema);
+
+// Producer Schema
+export const producerSchema = new Schema<IProducer>({
+  company: {
+    type: String,
+    trim: true,
+  },
+  paymentType: {
+    type: String,
+    enum: ["qrCode", "creditDebit"],
+  },
+  nameOnCard: {
+    type: String,
+  },
+  cardNumber: {
+    type: String,
+  },
 });
 
-const User = mongoose.model<IUser>("user", userSchema, "users");
-export default User;
+export const Producer = User.discriminator<IProducer>("producer", producerSchema); // <-- Discriminator
+
+// Production Professional Schema
+export const productionProfessionalSchema = new Schema<IProductionProfessional>({
+  occupation: {
+    type: String,
+    trim: true,
+  },
+  skill: {
+    type: [String],
+  },
+  experience: {
+    type: Number,
+    min: 0, // Minimum 0 years of experience
+  },
+  rating: [{
+    ratingScore: {
+      type: Number,
+      min: 0,
+      max: 5, // Rating is between 0 and 5
+    },
+    comment: {
+      type: String,
+    },
+  }],
+});
+
+export const ProductionProfessional = User.discriminator<IProductionProfessional>("productionProfessional", productionProfessionalSchema); // <-- Discriminator
+
+//export default {User, Producer, ProductionProfessional};
