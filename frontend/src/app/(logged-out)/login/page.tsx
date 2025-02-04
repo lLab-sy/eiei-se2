@@ -48,7 +48,7 @@ export default function LoginPage() {
       password: "",
     },
   });
-  
+
   const { toast } = useToast();
 
   const handleSubmit = async (data: FormFields) => {
@@ -102,10 +102,7 @@ export default function LoginPage() {
                     </FormItem>
                   )}
                 />
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                >
+                <Button type="submit" className="w-full">
                   Login
                 </Button>
               </form>
