@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import PostDetail, { IPostDetail } from '../models/postDetail';
 import { PostDetailDTO } from '../dtos/postDetailDTO';
 import { PostDTO } from '../dtos/postDTO';
+import Post from '../models/postModel';
 
 class PostDetailRepository {
     public async getAllPostDetails() { //MayBeNotUsed
@@ -108,6 +109,29 @@ class PostDetailRepository {
             throw new Error('Error deleting post detail in repository: ' + error);
         }
     }
+
+    public async findProductionProfessionalByID(user_id: string) {
+        try {
+            const postDetails = await PostDetail.find(
+                { "CandidateDetail.userID": user_id },
+                { postId: 1, _id: 0 } // Select only postId
+            );
+    
+            const postIDs = postDetails.map(post => post.postId);
+    
+            if (postIDs.length === 0) {
+                return []; 
+            }
+    
+
+            const posts = await Post.find({ _id: { $in: postIDs } });
+    
+            return posts; // Return full post details
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            throw error;
+        }
+    } 
 }
 
 export default new PostDetailRepository();

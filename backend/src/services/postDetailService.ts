@@ -2,6 +2,7 @@ import postDetailRepository from '../repositories/postDetailRepository';
 import { PostDetailDTO } from '../dtos/postDetailDTO';
 import postDetail from '../models/postDetail';
 import PostDetail from '../models/postDetail';
+import { PostDTO } from '../dtos/postDTO';
 
 class PostDetailService {
 
@@ -26,7 +27,6 @@ class PostDetailService {
         throw new Error('Error in service layer: ' + error);
     }
 }
-
 
 async getPostDetail(id: string): Promise<PostDetailDTO | null> {
     try {
@@ -128,7 +128,40 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
       throw new Error('Error in service layer: ' + error);
     }
   }
+  async getProductionProfessionalPosts(id:string){
+   try {
+         const posts = await postDetailRepository.findProductionProfessionalByID(id);
+         if(posts){
+           const result = posts.map((post) => {
+             const startDate = new Date(post.startDate.toString()) 
+             const endDate =  new Date(post.endDate.toString()) 
+             return new PostDTO({
+               id: post.id.toString(),
+               postName: post.postName as string,
+               postDescription: post.postDescription as string,
+               postImages: post.postImages as [string],
+               postMediaType: post.postMediaType as string,
+               postProjectRoles: post.postProjectRoles.map(eachRole=>(
+                 eachRole.toString()
+               )) as [string],
+               // postProjectRoles: post.postProjectRoles as [string],
+               postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+               // postDetailID: post.postDetailID.toString() as string,
+               userID: post.userID.toString() as string,
+               startDate: startDate,
+               endDate: endDate,
+               });
+           })
+           return result;
+         }
+           return null 
+       }catch (error) {
+             console.error('Error in service layer:', error);
+             throw new Error('Error in service layer: ' + error);
+       }
+    }
 }
+
 
 // Export an instance of the service
 export default new PostDetailService();
