@@ -4,8 +4,7 @@ import React from "react";
 
 import Footer from "@/components/Footer";
 // import SearchBar from "@/components/SearchBar";
-// import FilterButton from "@/components/FilterButton";
-// import Pagination from "@/components/Pagination";
+import Pagination from "@/components/Pagination";
 import NavBar from "@/components/NavBar";
 import PostCrad from "@/components/PostCard";
 
@@ -15,8 +14,8 @@ const PAGE_SIZE = 32;
 const posts = Array.from({ length: 259 }, (_, index) => ({
   title: `Post ${index + 1}`,
   role: ["Editor", "Videographer"],
-  description: "This is post description",
-  mediaType: "Video Production.",
+  description: "This is post description.",
+  mediaType: "Video Production",
   price: `฿${(Math.random() * 10000 + 1000).toFixed(0)}`,
   imageUrl: "https://via.placeholder.com/150"
 }));
@@ -81,11 +80,11 @@ const ProfessionalsPage = () => {
 
       {/* Pagination */}
       <div className="pb-6">
-        {/* <Pagination
+        <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-        /> */}
+        />
       </div>
       
       
