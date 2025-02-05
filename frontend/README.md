@@ -5,7 +5,7 @@ src
 ├──app
 ├──components
 ├──hooks
-└──libs
+└──lib
 
 ```
 
