@@ -30,6 +30,8 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import uploadImage from "@/hooks/upload-image";
+import createPost from "@/hooks/create-post";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
 
 const optionSchema = z.object({
@@ -81,19 +83,49 @@ export default function CreatePostPage() {
   /*  TODO: wait for the need to use renavigate
   const router = useRouter(); */
   const { toast } = useToast();
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit (values: z.infer<typeof formSchema>) {
+    const imageList = img.map((img)=>(img.imgFile))
+    // const response = await uploadImage({imageFiles : imageList, token : ''})
+    // if (response === null) {
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Image uploading failed",
+    //     description: "Please try again.",
+    //   })
+    //   return
+    // }
+    // const postImage: string[] = response.data
+
+    //mock image
+    const postImage = imageList.map((img)=>(URL.createObjectURL(img)))
+
     const postData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
       postDescription: values.description,
-      postImages: img.map((img)=>(img.imgFile))
+      postImages: postImage
     };
-    //const formdata = new FormData();
     console.log(postData);
     console.log(JSON.stringify(postData));
-    /*  TODO: await for API to finish then renavigate
-    router.push(`/my-post`); */
+
+
+    // const postCreateResponse = await createPost({postData: postData, token: ''})
+    // if (postCreateResponse === null) {
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Image uploading failed",
+    //     description: "Please try again.",
+    //   })
+    //   return
+    // }
+    // toast({
+    //   variant: "default",
+    //   title: "Successful post creation",
+    //   description: "Redirecting you...",
+    // })
+    // TODO: await for API to finish then renavigate
+    // router.push(`/my-post`); 
   }
 
   interface imagePair {
