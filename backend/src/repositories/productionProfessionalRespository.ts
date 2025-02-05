@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
-import { IProductionProfessional, ProductionProfessional } from "../models/userModel";
+import { IProductionProfessional, ProductionProfessional, searchProductionProfessionalResponse, searchReqModel } from "../models/userModel";
+import { PipelineStage } from "mongoose";
 
 
 class ProductionProfessionalRespository {
@@ -21,9 +22,94 @@ class ProductionProfessionalRespository {
             return updatedUser
         }
         catch(err){
-            throw new Error('Cannot Update this user')
+            throw new Error('Cannot Update this user: ' + err)
         }
     }
+
+    async searchProductionProfessional(searchReqModel: searchReqModel): Promise<searchProductionProfessionalResponse> {
+        try {
+            const matchStage: PipelineStage[] = [];
+            
+            console.log(searchReqModel)
+            
+            if (searchReqModel.searchText) {
+                // full-text search only available in atlas sad T^T
+                // matchStage.push(
+                //     { 
+                //         $match: { 
+                //             $text: { $search: searchReqModel.searchText } 
+                //         } 
+                //     },
+                //     {
+                //         $addFields: { score: { $meta: "textScore" } }
+                //     }
+                // );
+
+                // regex search
+                matchStage.push({
+                    $match: {
+                        $or: [
+                            { firstName: { $regex: searchReqModel.searchText, $options: "i" } },
+                            { middleName: { $regex: searchReqModel.searchText, $options: "i" } },
+                            { lastName: { $regex: searchReqModel.searchText, $options: "i" } },
+                            { skill: { $regex: searchReqModel.searchText, $options: "i" } },
+                        ]
+                    }
+                });
+            }
+
+            
+    
+            if (searchReqModel.minExperience !== undefined || searchReqModel.maxExperience !== undefined) {
+                const experienceFilter: Record<string, number> = {};
+                if (searchReqModel.minExperience !== undefined) {
+                    experienceFilter.$gte = searchReqModel.minExperience;
+                }
+                if (searchReqModel.maxExperience !== undefined) {
+                    experienceFilter.$lte = searchReqModel.maxExperience;
+                }
+                matchStage.push({ $match: { experience: experienceFilter } });
+            }
+    
+            if (searchReqModel.minRating !== undefined) {
+                matchStage.push(
+                    { $unwind: "$rating" },
+                    { 
+                        $group: {
+                            _id: "$_id",
+                            avgRating: { $avg: "$rating.ratingScore" },
+                            doc: { $first: "$$ROOT" }
+                        }
+                    },
+                    { $replaceRoot: { newRoot: { $mergeObjects: ["$doc", { avgRating: "$avgRating" }] } } },
+                    { $match: { avgRating: { $gte: searchReqModel.minRating } } }
+                );
+            }
+    
+            const page = searchReqModel.page || 1;
+            const limit = searchReqModel.limit || 10;
+            const skip = (page - 1) * limit;
+    
+            const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
+            const totalItemsResult = await ProductionProfessional.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+    
+            matchStage.push({ $sort: { score: -1 } }, { $skip: skip }, { $limit: limit });
+    
+            const results: IProductionProfessional[] = await ProductionProfessional.aggregate(matchStage);
+
+            const response: searchProductionProfessionalResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            return response
+        } catch (err) {
+            throw new Error('Error searching production professional: ' + err);
+        }
+    }
+    
+
+
 }
 
 export default new ProductionProfessionalRespository()
