@@ -169,6 +169,26 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
   }],
 });
 
+// for full-text search
+// productionProfessionalSchema.index({firstName: 'text', middleName: 'text', lastName: 'text', skill: 'text'})
+
+// for regex search
+productionProfessionalSchema.index({firstName: 1, middleName: 1, lastName: 1, skill: 1})
+
 export const ProductionProfessional = User.discriminator<IProductionProfessional>("production professional", productionProfessionalSchema); // <-- Discriminator
 
 //export default {User, Producer, ProductionProfessional};
+
+export interface searchReqModel {
+  searchText?: string;
+  minExperience?: number;
+  maxExperience?: number;
+  minRating?: number;
+  limit: number;
+  page: number;
+}
+
+export interface searchProductionProfessionalResponse {
+  data: IProductionProfessional[];
+  totalItems: number;
+}

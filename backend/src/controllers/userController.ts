@@ -1,3 +1,4 @@
+import { searchReqDTO } from "../dtos/userDTO";
 import userService from "../services/userService";
 import { sendResponse } from "../utils/responseHelper";
 import { Request, Response } from 'express';
@@ -46,6 +47,30 @@ class UserController {
         }catch(err){
             console.log(err)
             sendResponse(res, 'error', 'Failed to update User')
+        }
+    }
+
+    async search(req: Request, res: Response): Promise<void>  {
+        try {
+            const minExperience = req.query.minExperience ? Number(req.query.minExperience): undefined
+            const maxExperience = req.query.maxExperience ? Number(req.query.maxExperience): undefined
+            const minRating = req.query.minRating ? Number(req.query.minRating): undefined
+            const limit = req.query.limit ? Number(req.query.limit): 10
+            const page = req.query.page ? Number(req.query.page): 1
+
+            const searchParams: searchReqDTO = {
+                searchText: req.query.searchText as string,
+                minExperience: minExperience,
+                maxExperience: maxExperience,
+                minRating: minRating,
+                limit: limit,
+                page: page,
+            }
+
+            const result = await userService.searchProductionProfessional(searchParams);
+            sendResponse(res, 'success', result)
+        } catch (error) {
+            sendResponse(res, 'error', error)
         }
     }
 }

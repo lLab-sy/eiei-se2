@@ -168,4 +168,50 @@ const router = Router()
  */
 router.put('/update-user/:id', userController.updateUser)
 
+/**
+ * @swagger
+ * /api/users/search:
+ *   get:
+ *     summary: Search for production professionals
+ *     tags: [User]
+ *     description: Retrieve a list of production professionals based on search criteria.
+ *     parameters:
+ *       - in: query
+ *         name: searchText
+ *         schema:
+ *           type: string
+ *         description: Text to search for in professional names and skills.
+ *       - in: query
+ *         name: minExperience
+ *         schema:
+ *           type: number
+ *         description: Minimum years of experience.
+ *       - in: query
+ *         name: maxExperience
+ *         schema:
+ *           type: number
+ *         description: Maximum years of experience.
+ *       - in: query
+ *         name: minRating
+ *         schema:
+ *           type: number
+ *         description: Minimum average rating.
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *         description: Number of results per page.
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *         description: Page number for pagination.
+ *     responses:
+ *       200:
+ *         description: A list of production professionals and pagination metadata.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get("/search", userController.search);
+
 export default router

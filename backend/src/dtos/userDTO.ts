@@ -61,3 +61,12 @@ export class UserDTO {
   @IsString()
   profileImage?: string;
 }
+
+export interface searchReqDTO {
+  searchText?: string;
+  minExperience?: number;
+  maxExperience?: number;
+  minRating?: number;
+  limit: number;
+  page: number;
+}
