@@ -45,7 +45,9 @@ class PostDetailController {
   async updatePostDetailAddCandidate(req: Request, res: Response): Promise<void> {
     try {
       const postDetailId = req.params.id
+      console.log(postDetailId)
       const postDetails = await postDetailService.updatePostDetailAddCandidate(req.body,postDetailId);
+      console.log("Hello")
       sendResponse(res, 'success', postDetails, 'Successfully updated add candidate');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to updated postDetails at controller');

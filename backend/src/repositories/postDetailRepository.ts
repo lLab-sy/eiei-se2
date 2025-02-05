@@ -73,7 +73,7 @@ class PostDetailRepository {
             const objectId = new ObjectId(id);
             const updatedPost = await PostDetail.findOneAndUpdate(
                 { _id: objectId},  
-                { $addToSet: postDetailData },  
+                { $push: {CandidateDetail:postDetailData} },  
               );
             console.log("response",updatedPost)
             return updatedPost;
@@ -87,7 +87,7 @@ class PostDetailRepository {
             const objectId = new ObjectId(id);
             const updatedPost = await PostDetail.findOneAndUpdate(
                 { _id: objectId},  
-                { $pull: postDetailData },  
+                { $pull: {CandidateDetail:postDetailData} },  
               );
             console.log("response",updatedPost)
             return updatedPost;

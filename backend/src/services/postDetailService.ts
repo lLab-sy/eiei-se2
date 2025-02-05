@@ -81,15 +81,18 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
   async updatePostDetailAddCandidate(postDetailData: PostDetailDTO,id: string){
     try {
       // map to model before pass it to repository
-      const postDetailModel = new PostDetail({
-        postId: postDetailData.postId.toString(),
-        CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
-          RoleID: candidate.RoleID.toString(),
-          CandidateID: candidate.CandidateID,
-        })),
-    });
+      console.log("Get in to add can func")
+      // const postDetailModel = new PostDetail({
+      //   postId: postDetailData.postId.toString(),
+      //   CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
+      //     RoleID: candidate.RoleID.toString(),
+      //     CandidateID: candidate.CandidateID,
+      //   })),
+    // });
+      // console.log(postDetailModel)
+      // console.log(postDetailData)
       const res=await postDetailRepository.updateAddCandidate(postDetailData,id);
-      return postDetailModel;
+      return res;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
     }
@@ -98,15 +101,15 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
   async updatePostDetailDeleteCandidate(postDetailData: PostDetailDTO,id: string){
     try {
       // map to model before pass it to repository
-      const postDetailModel = new PostDetail({
-        postId: postDetailData.postId.toString(),
-        CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
-          RoleID: candidate.RoleID.toString(),
-          CandidateID: candidate.CandidateID,
-        })),
-    });
+    //   const postDetailModel = new PostDetail({
+    //     postId: postDetailData.postId.toString(),
+    //     CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
+    //       RoleID: candidate.RoleID.toString(),
+    //       CandidateID: candidate.CandidateID,
+    //     })),
+    // });
       const res=await postDetailRepository.updatedeleteCandidate(postDetailData,id);
-      return postDetailModel;
+      return res;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
     }
