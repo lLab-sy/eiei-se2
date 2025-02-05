@@ -29,6 +29,7 @@ import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
 
 const optionSchema = z.object({
@@ -79,14 +80,14 @@ export default function CreatePostPage() {
   });
   /*  TODO: wait for the need to use renavigate
   const router = useRouter(); */
-
+  const { toast } = useToast();
   function onSubmit(values: z.infer<typeof formSchema>) {
     const postData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
       postDescription: values.description,
-      image: img
+      postImages: img.map((img)=>(img.imgFile))
     };
     //const formdata = new FormData();
     console.log(postData);
@@ -94,21 +95,54 @@ export default function CreatePostPage() {
     /*  TODO: await for API to finish then renavigate
     router.push(`/my-post`); */
   }
-  const [img,setImg] = useState<string[]>([]);
+
+  interface imagePair {
+    imgSrc: string
+    imgFile: File
+  }
+
+  const [img,setImg] = useState<imagePair[]>([]);
   const [mostRecentImg, setMostRecentImg] = useState<string>("")
+
   const onImgChange = (e:any) => {
     if (e.target.files && e.target.files[0]) {
       const files: File[] = Array.from(e.target.files)
-      const filenames = files.map((file)=>URL.createObjectURL(file))
-      setMostRecentImg(filenames[filenames.length-1])
+      if (files.length + img.length > 3){
+        toast({
+          variant: "destructive",
+          title: "Picture count limit",
+          description: "Sorry, only up to 3 pictures are allowed.",
+        })
+        return
+      }
+      const oversizedFiles: string[] = [];
+      const filenames: imagePair[] = files.filter((file)=>{
+        if (file.size > 8388608) {
+          oversizedFiles.push(file.name+file.type)
+          return false
+        }
+        return true
+      })
+      .map((file)=>{return {
+        imgSrc: URL.createObjectURL(file), 
+        imgFile: file} as imagePair})
+      if (oversizedFiles.length > 0){
+        toast({
+          variant: "destructive",
+          title: "Picture size limit",
+          description: `Sorry, only up to 8MB pictures are allowed. ${oversizedFiles.length >2 ? '':oversizedFiles.join(",")}`,
+        })
+      }
+      setMostRecentImg(filenames[filenames.length-1].imgSrc)
       const newImg = [...img,...filenames]
       setImg(newImg)
     }
   }
   const removeImg = (imgSrc:string) => {
-    setImg(img.filter((img)=>img !== imgSrc))
-    if (mostRecentImg === imgSrc) 
-      setMostRecentImg(img[img.length-2])
+    setImg(img.filter((img)=>img.imgSrc !== imgSrc))
+    console.log(img.length)
+    if (mostRecentImg === imgSrc && img.length > 1) 
+      setMostRecentImg(img[img.length-2].imgSrc)
   }
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
@@ -233,18 +267,20 @@ export default function CreatePostPage() {
               </div>
               <Input 
                 type="file"
+                accept="image/*"
                 className="file:text-mainyellow-light file:font-medium bg-mainblue my-5 cursor-pointer hover:bg-mainblue-light text-white"
                 placeholder= "Your post picture"
                 onChange={onImgChange}
                 multiple
+                disabled = {img.length >= 3 ? true : false}
                 />
               <div className="w-[80%] justify-center flex">
                 <Carousel>
                   <CarouselContent>
-                    {img.length !== 0 ?(img.map((imgSrc)=> 
+                    {img.length !== 0 ?(img.map((img)=> 
                         (
-                        <CarouselItem key={imgSrc} className="relative pt-1 justify-center inline-flex flex-col group">
-                          <Image src={imgSrc} 
+                        <CarouselItem key={img.imgSrc} className="relative pt-1 justify-center inline-flex flex-col group">
+                          <Image src={img.imgSrc} 
                             alt="Post Image Here" 
                             width={parent.innerWidth}
                             height={parent.innerHeight}
@@ -252,11 +288,11 @@ export default function CreatePostPage() {
                             priority
                             placeholder= "empty"
                             onClick={()=>
-                              setMostRecentImg(imgSrc)
+                              setMostRecentImg(img.imgSrc)
                             }/>
                             <X className="absolute top-1 right-1 hidden group-hover:block
                            bg-mainblue-lightest cursor-pointer"
-                           onClick = {()=>removeImg(imgSrc)} />
+                           onClick = {()=>removeImg(img.imgSrc)} />
                         </CarouselItem>
                         )
                       )
