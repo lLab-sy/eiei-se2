@@ -1,15 +1,32 @@
 "use client";
 
-import { Menu, X, User, FileText, Gift, Settings, LogOut } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn } from "lucide-react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {useSession} from 'next-auth/react'
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { setUser } from "@/redux/user/user.slice";
 
-const NavBar = () => {
+
+const NavBar = (session: any) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  // const {data: session, status} = useSession()
+  const dispatch = useDispatch<AppDispatch>()
+  const user: any = useSelector<RootState>(state => state.user)
+  // console.log('session', session)
+  console.log('session',session.session)
+  useEffect(() => {
+    if(!session){
+      return;
+    }
+    console.log('session', session)
+    dispatch(setUser(session?.session?.user))
+    console.log('user', user)
+  }, [session])
   const menuItems = [
-    { icon: <User className="w-5 h-5" />, label: "Profile", href: "/profile" },
+    { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },
     {
       icon: <FileText className="w-5 h-5" />,
       label: "My Post",
@@ -25,7 +42,7 @@ const NavBar = () => {
       label: "Setting",
       href: "/setting",
     },
-    { icon: <LogOut className="w-5 h-5" />, label: "Logout", href: "/logout" },
+    // { icon: (session) ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />, label: (session) ? "Logout" : "Login", href: (session) ? "/api/auth/signout" : "/login" },
   ];
 
   return (
@@ -54,7 +71,7 @@ const NavBar = () => {
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
           <div className="flex items-center gap-2">
-            <span className="text-sm">Username</span>
+            <span className="text-sm">{session.session ? 'In session' : 'out session'} {user?.user?.username ?? "Username"}</span>
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               <User className="w-5 h-5 text-gray-600" />
             </div>
@@ -100,6 +117,16 @@ const NavBar = () => {
               <span>{item.label}</span>
             </Link>
           ))}
+          <Link
+              href={(session.session) ? '/api/auth/signout' : "/login"}
+              className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                session.session ? "text-red-600 hover:text-red-700" : ""
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {session ? (<LogOut className="w-5 h-5"/>) : (<LogIn className="w-5 h-5"/>)}
+              <span>{(session.session) ? "Logout" : "Login"}</span>
+          </Link>
         </div>
       </div>
 

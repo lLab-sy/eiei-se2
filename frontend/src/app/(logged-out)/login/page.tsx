@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { userLogin } from "./action";
 
 const formSchema = z.object({
   username: z
@@ -52,13 +53,14 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   const handleSubmit = async (data: FormFields) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Login attempt with username:", data.username);
-    toast({
-      variant: "default",
-      title: "Login",
-      description: "Login Successful",
-    });
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    // console.log("Login attempt with username:", data.username);
+    // toast({
+    //   variant: "default",
+    //   title: "Login",
+    //   description: "Login Successful",
+    // });
+    await userLogin(data)
   };
 
   return (
