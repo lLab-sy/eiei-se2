@@ -121,6 +121,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
             console.log(post.postID)
              return new ProductionProfessionalHistoryDTO({
                postID: post.postID.toString(),
+               postName:post.postName,
                postDetailID: post.postDetailID.toString(),
                userID: post.userID.toString(),
                roleName: post.roleName,

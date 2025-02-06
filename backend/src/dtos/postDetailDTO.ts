@@ -95,6 +95,16 @@ export class ProductionProfessionalHistoryDTO {
     @IsNotEmpty()
     postDescription!: string;
 
+
+    @ApiProperty({
+        description: 'The name of this post',
+        type: String,
+        example: '123e4567-e89b-12d3-a456-426614174000',
+    })
+    @IsString()
+    @IsNotEmpty()
+    postName!: string;
+
     @ApiProperty({
         description: 'The List of post images',
         type: [String],

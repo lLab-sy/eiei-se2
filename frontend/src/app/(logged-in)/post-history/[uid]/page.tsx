@@ -1,6 +1,6 @@
 'use client'
 import PostHistoryList from "@/components/PostHistoryList";
-import { Project } from "../../../../interface";
+import { Project } from "../../../../../interface";
 import React, { useState } from "react";
 import Image from "next/image";
 
