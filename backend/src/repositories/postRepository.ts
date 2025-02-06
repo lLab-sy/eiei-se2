@@ -30,7 +30,7 @@ class PostRepository {
         try {
              const objectId = new ObjectId(id);
              const posts= await Post.findById(objectId);
-             console.log('Posts from database:', posts);
+            //  console.log('Posts from database:', posts);
              return posts
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);
@@ -49,7 +49,7 @@ class PostRepository {
               });
 
             const result2= await postDetailData.save();
-  
+            console.log(result2)
             return result
         } catch (error) {
             throw new Error('Error creating post in repository: ' + error);

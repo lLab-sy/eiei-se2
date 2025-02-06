@@ -7,7 +7,7 @@ export interface IPostDetail extends Document {
     postId: mongoose.Schema.Types.ObjectId
     CandidateDetail: Array<{
         RoleID: mongoose.Schema.Types.ObjectId
-        CandidateID: string
+        CandidateID: mongoose.Schema.Types.ObjectId
     }>;
     // OfferDetail: Array<{  //Next Sprint
     //     RoleID: mongoose.Schema.Types.ObjectId

@@ -117,7 +117,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: new Date(postData.startDate),
         endDate: new Date (postData.endDate),
       });
-      console.log(postModel)
+      // console.log(postModel)
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);

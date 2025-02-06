@@ -16,7 +16,7 @@ class PostDetailService {
                 postId: postDetails.postId.toString(),
                 CandidateDetail: postDetails.CandidateDetail.map(candidate => ({
                   RoleID: candidate.RoleID.toString(),
-                  CandidateID: candidate.CandidateID,
+                  CandidateID: candidate.CandidateID.toString()
                 })),
               }); 
         })
@@ -37,7 +37,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
           postId: postDetail.postId.toString(),
           CandidateDetail: postDetail.CandidateDetail.map(candidate => ({
             RoleID: candidate.RoleID.toString(),
-            CandidateID: candidate.CandidateID,
+            CandidateID: candidate.CandidateID.toString()
           })),
         });
       }
@@ -81,7 +81,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
   async updatePostDetailAddCandidate(postDetailData: PostDetailDTO,id: string){
     try {
       // map to model before pass it to repository
-      console.log("Get in to add can func")
+      // console.log("Get in to add can func")
       // const postDetailModel = new PostDetail({
       //   postId: postDetailData.postId.toString(),
       //   CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
