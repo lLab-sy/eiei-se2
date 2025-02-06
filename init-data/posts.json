@@ -1,0 +1,113 @@
+[
+    {
+      "postName": "Music Video Editing",
+      "postDescription": "Editing a high-quality music video with VFX.",
+      "postImages": ["https://example.com/image1.jpg"],
+      "postMediaType": "video",
+      "postProjectRoles": ["Editor", "VFX Artist"],
+      "postStatus": "in-progress",
+      "startDate": "2025-01-15T00:00:00.000Z",
+      "endDate": "2025-02-10T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b123"
+    },
+    {
+      "postName": "Photography for Event",
+      "postDescription": "Capturing high-quality photos for a corporate event.",
+      "postImages": ["https://example.com/photo1.jpg", "https://example.com/photo2.jpg"],
+      "postMediaType": "photo",
+      "postProjectRoles": ["Photographer"],
+      "postStatus": "success",
+      "startDate": "2025-02-01T00:00:00.000Z",
+      "endDate": "2025-02-05T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b124"
+    },
+    {
+      "postName": "Podcast Production",
+      "postDescription": "Producing and editing a 10-episode podcast series.",
+      "postImages": ["https://example.com/podcast.jpg"],
+      "postMediaType": "audio",
+      "postProjectRoles": ["Producer", "Editor"],
+      "postStatus": "created",
+      "startDate": "2025-03-01T00:00:00.000Z",
+      "endDate": "2025-05-01T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b125"
+    },
+    {
+      "postName": "Graphic Design for Branding",
+      "postDescription": "Creating branding materials including logos and brochures.",
+      "postImages": ["https://example.com/design1.jpg"],
+      "postMediaType": "graphic",
+      "postProjectRoles": ["Graphic Designer"],
+      "postStatus": "in-progress",
+      "startDate": "2025-01-20T00:00:00.000Z",
+      "endDate": "2025-02-25T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b126"
+    },
+    {
+      "postName": "Short Film Production",
+      "postDescription": "Producing a short film for a festival submission.",
+      "postImages": ["https://example.com/film.jpg"],
+      "postMediaType": "video",
+      "postProjectRoles": ["Director", "Cinematographer"],
+      "postStatus": "created",
+      "startDate": "2025-04-01T00:00:00.000Z",
+      "endDate": "2025-06-30T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b127"
+    },
+    {
+      "postName": "Live Concert Streaming",
+      "postDescription": "Streaming a live concert with multi-camera setup.",
+      "postImages": ["https://example.com/concert.jpg"],
+      "postMediaType": "live",
+      "postProjectRoles": ["Camera Operator", "Streaming Engineer"],
+      "postStatus": "in-progress",
+      "startDate": "2025-02-10T00:00:00.000Z",
+      "endDate": "2025-02-11T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b128"
+    },
+    {
+      "postName": "3D Animation Project",
+      "postDescription": "Creating a 3D animated short film.",
+      "postImages": ["https://example.com/3d.jpg"],
+      "postMediaType": "animation",
+      "postProjectRoles": ["Animator", "VFX Artist"],
+      "postStatus": "success",
+      "startDate": "2024-12-01T00:00:00.000Z",
+      "endDate": "2025-01-30T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b129"
+    },
+    {
+      "postName": "Documentary Filming",
+      "postDescription": "Filming a documentary about environmental conservation.",
+      "postImages": ["https://example.com/docu.jpg"],
+      "postMediaType": "video",
+      "postProjectRoles": ["Director", "Cinematographer"],
+      "postStatus": "created",
+      "startDate": "2025-05-01T00:00:00.000Z",
+      "endDate": "2025-08-01T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b130"
+    },
+    {
+      "postName": "Social Media Content Creation",
+      "postDescription": "Creating social media content for a brand campaign.",
+      "postImages": ["https://example.com/social.jpg"],
+      "postMediaType": "graphic",
+      "postProjectRoles": ["Content Creator", "Video Editor"],
+      "postStatus": "in-progress",
+      "startDate": "2025-02-01T00:00:00.000Z",
+      "endDate": "2025-03-15T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b131"
+    },
+    {
+      "postName": "TV Commercial Production",
+      "postDescription": "Producing a high-budget TV commercial.",
+      "postImages": ["https://example.com/tv-ad.jpg"],
+      "postMediaType": "video",
+      "postProjectRoles": ["Director", "Producer", "Editor"],
+      "postStatus": "success",
+      "startDate": "2024-11-01T00:00:00.000Z",
+      "endDate": "2025-01-15T00:00:00.000Z",
+      "postDetailID": "65bd5b99a1c2a9d1f8e1b132"
+    }
+]
+  
