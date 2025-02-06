@@ -67,16 +67,16 @@ class PostController {
 
   async searchPost(req: Request, res: Response): Promise<void> {
     try {
-      // make sure postMediaTypes and roleRequirments are string[] or undefined
+      // make sure postMediaTypes and roleRequirements are string[] or undefined
       const postMediaTypes = req.query.postMediaTypes as string[]
-      const roleRequirments = req.query.roleRequirments as string[]
+      const roleRequirements = req.query.roleRequirements as string[]
 
       const postSearchReqDTO: PostSearchRequestDTO = {
         page: Number(req.query.page),
         limit: Number(req.query.limit),
         searchText: req.query.searchText? req.query.searchText as string: '',
         postMediaTypes: Array.isArray(postMediaTypes)?postMediaTypes: postMediaTypes? [postMediaTypes]: postMediaTypes,
-        roleRequirments: Array.isArray(roleRequirments)?roleRequirments: roleRequirments? [roleRequirments]: roleRequirments
+        roleRequirements: Array.isArray(roleRequirements)?roleRequirements: roleRequirements? [roleRequirements]: roleRequirements
       }
 
       const posts = await postService.searchPost(postSearchReqDTO);

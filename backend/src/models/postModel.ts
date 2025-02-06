@@ -84,7 +84,7 @@ export interface PostSearchQuery {
 export interface PostSearchRequestModel {
     searchText?: string;
     postMediaTypes?: string[];
-    roleRequirments?: string[];
+    roleRequirements?: string[];
     limit?: number;
     page?: number;
 }
