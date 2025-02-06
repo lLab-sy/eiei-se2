@@ -107,48 +107,49 @@ export default function UserPage() {
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: userData?.email ?? "test@test.com",
-      phone: userData?.phoneNumber ?? "1234567890",
-      bankName: userData?.bankAccount?.bankName ??"default",
+      email: userData?.email ?? "",
+      phone: userData?.phoneNumber ?? "",
+      bankName: userData?.bankAccount?.bankName ??"",
       accountHolderName: userData?.bankAccount?.accountHolderName ??"Tien",
       accountNumber: userData?.bankAccount?.accountNumber ?? "12345678",
-      card_name: userData?.nameOnCard ?? "default",
-      card_number: userData?.cardNumber ?? "default",
-      firstName: userData?.firstName ?? "default",
-      middleName: userData?.middleName ?? "default",
-      lastName: userData?.lastName ?? "default",
+      card_name: userData?.nameOnCard ?? "",
+      card_number: userData?.cardNumber ?? "",
+      firstName: userData?.firstName ?? "",
+      middleName: userData?.middleName ?? "",
+      lastName: userData?.lastName ?? "",
       password: userData?.password ?? "12345678!",
       confirmPassword: userData?.password ?? "12345678!",
       payment_type: userData?.paymentType ?? "qrCode",
-      occupation: userData?.occupation ?? "TestOccupation",
+      occupation: userData?.occupation ?? "",
       skill: userData?.skill ?? [],
       experience: userData?.experience ?? 0,
-      company: userData?.company ??"Ayodia",
+      company: userData?.company ??"",
       gender: userData.gender
     },
   });
   useEffect(() => {
     if (userData) {
       form.reset({
-        email: userData.email ?? "test@test.com",
-        phone: userData.phoneNumber ?? "1234567890",
-        bankName: userData.bankAccount?.bankName ?? "default",
-        accountHolderName: userData.bankAccount?.accountHolderName ?? "Tien",
-        accountNumber: userData.bankAccount?.accountNumber ?? "12345678",
-        card_name: userData.nameOnCard ?? "default",
-        card_number: userData.cardNumber ?? "default",
-        firstName: userData.firstName ?? "default",
-        middleName: userData.middleName ?? "default",
-        lastName: userData.lastName ?? "default",
+        email: userData.email ?? "",
+        phone: userData.phoneNumber ?? "",
+        bankName: userData.bankAccount?.bankName ?? "",
+        accountHolderName: userData.bankAccount?.accountHolderName ?? "",
+        accountNumber: userData.bankAccount?.accountNumber ?? "",
+        card_name: userData.nameOnCard ?? "",
+        card_number: userData.cardNumber ?? "",
+        firstName: userData.firstName ?? "",
+        middleName: userData.middleName ?? "",
+        lastName: userData.lastName ?? "",
         password: "12345678!",
         confirmPassword: "12345678!",
         payment_type: userData.paymentType ?? "qrCode",
-        occupation: userData.occupation ?? "TestOccupation",
+        occupation: userData.occupation ?? "",
         skill: userData.skill ?? [],
         experience: userData.experience ?? 0,
-        company: userData.company ?? "Ayodia",
+        company: userData.company ?? "",
         gender: userData.gender
       });
+      setPaymentState(userData?.paymentType ?? "qrCode")
     }
   }, [userData, form.reset]);
   /*
@@ -160,7 +161,7 @@ export default function UserPage() {
   const [click, setClick] = useState(0);
   const { toast } = useToast();
   // redux to dispatch changes
-  const [paymentState, setPaymentState] = useState(userData?.paymentType ?? "");
+  const [paymentState, setPaymentState] = useState(userData?.paymentType ?? "qrCode");
   const handleSubmit = async (data: formType) => {
     //dispatch to update each case or change only display to none else hidden
     // console.log(form.getValues());
@@ -251,7 +252,6 @@ export default function UserPage() {
     { label: "Astro", value: "astro" },
   ];
 
-  // state redux
   return (
     <main className="font-serif min-h-screen flex bg-blue-400 relative items-center justify-center">
       <div className="flex justify-around w-[60%] h-[800px]">
@@ -639,6 +639,7 @@ export default function UserPage() {
                             <FormControl>
                               <MultipleSelector
                                 {...field}
+                                hidePlaceholderWhenSelected
                                 disabled={!isEdit}
                                 defaultOptions={OPTIONS}
                                 value={OPTIONS.filter((opt) =>

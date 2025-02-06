@@ -57,9 +57,9 @@ class UserController {
             }
 
             sendResponse(res, 'success', updatedUser, 'Successfully updated User')
-        }catch(err){
+        }catch(err : any){
             console.log(err)
-            sendResponse(res, 'error', 'Failed to update User')
+            sendResponse(res, 'error', err?.message ?? "Failed to update user")
         }
     }
 
