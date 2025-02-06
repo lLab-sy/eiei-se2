@@ -208,7 +208,7 @@ router.put('/postDetails/add/:id', postDetailController.updatePostDetailAddCandi
  * @swagger
  * /api/v1/postDetails/delete/{id}:
  *   put:
- *     summary: Remove a candidate from the post detail
+ *     summary: Remove a candidate from the post detail by RoleID and CandidateID
  *     tags: [PostDetail]
  *     parameters:
  *       - in: path
@@ -224,8 +224,12 @@ router.put('/postDetails/add/:id', postDetailController.updatePostDetailAddCandi
  *           schema:
  *             type: object
  *             required:
+ *               - RoleID
  *               - CandidateID
  *             properties:
+ *               RoleID:
+ *                 type: string
+ *                 description: The role's unique ID
  *               CandidateID:
  *                 type: string
  *                 description: The candidate's unique ID to remove
@@ -237,6 +241,69 @@ router.put('/postDetails/add/:id', postDetailController.updatePostDetailAddCandi
  *       500:
  *         description: Server error
  */
+
 router.put('/postDetails/delete/:id', postDetailController.updatePostDetailDeleteCandidate);
+
+
+/**
+ * @swagger
+ * /api/v1/postDetails/user/{id}:
+ *   get:
+ *     summary: Get posts associated with a production professional
+ *     tags: [PostDetail]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the production professional (user ID)
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of posts associated with the production professional
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: The post ID
+ *                   postDetailID:
+ *                     type: string
+ *                     description: The post detail ID
+ *                   userID:
+ *                     type: string
+ *                     description: The production professional's user ID
+ *                   rolename:
+ *                     type: string
+ *                     description: The role name assigned to the professional
+ *                   postStatus:
+ *                     type: string
+ *                     description: The current status of the post
+ *                   postDescription:
+ *                     type: string
+ *                     description: The description of the post
+ *                   postImages:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: The list of images associated with the post
+ *                   startDate:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The start date of the post
+ *                   endDate:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The end date of the post
+ *       404:
+ *         description: No posts found for the given production professional
+ *       500:
+ *         description: Server error
+ */
+router.get('/postDetails/user/:id', postDetailController.getPostsByProductionProfessional);
 
 export default router;

@@ -1,8 +1,9 @@
 import postDetailRepository from '../repositories/postDetailRepository';
-import { PostDetailDTO } from '../dtos/postDetailDTO';
+import { PostDetailDTO, ProductionProfessionalHistoryDTO } from '../dtos/postDetailDTO';
 import postDetail from '../models/postDetail';
 import PostDetail from '../models/postDetail';
 import { PostDTO } from '../dtos/postDTO';
+import { ProductionProfessionalDtO } from '../dtos/productionProfessionalDTO';
 
 class PostDetailService {
 
@@ -13,7 +14,7 @@ class PostDetailService {
         const result = postDetails.map((postDetails)=>{
             return new PostDetailDTO({
                 id: postDetails.id.toString(),
-                postId: postDetails.postId.toString(),
+                postId: postDetails.postID.toString(),
                 CandidateDetail: postDetails.CandidateDetail.map(candidate => ({
                   RoleID: candidate.RoleID.toString(),
                   CandidateID: candidate.CandidateID.toString()
@@ -34,7 +35,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
       if (postDetail) {
         return new PostDetailDTO({
           id: postDetail.id.toString(),
-          postId: postDetail.postId.toString(),
+          postId: postDetail.postID.toString(),
           CandidateDetail: postDetail.CandidateDetail.map(candidate => ({
             RoleID: candidate.RoleID.toString(),
             CandidateID: candidate.CandidateID.toString()
@@ -50,9 +51,8 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
 
   async createPostDetail(postDetailData: PostDetailDTO) {
     try {
-      // map to model before pass it to repository
       const postDetailModel = new PostDetail({
-        postId: postDetailData.postId.toString(),
+        postId: postDetailData.postId,
         CandidateDetail: []
       });
       return await postDetailRepository.createPostDetail(postDetailModel);
@@ -80,17 +80,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
 
   async updatePostDetailAddCandidate(postDetailData: PostDetailDTO,id: string){
     try {
-      // map to model before pass it to repository
-      // console.log("Get in to add can func")
-      // const postDetailModel = new PostDetail({
-      //   postId: postDetailData.postId.toString(),
-      //   CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
-      //     RoleID: candidate.RoleID.toString(),
-      //     CandidateID: candidate.CandidateID,
-      //   })),
-    // });
-      // console.log(postDetailModel)
-      // console.log(postDetailData)
+      console.log(postDetailData)
       const res=await postDetailRepository.updateAddCandidate(postDetailData,id);
       return res;
     } catch (error) {
@@ -100,14 +90,6 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
 
   async updatePostDetailDeleteCandidate(postDetailData: PostDetailDTO,id: string){
     try {
-      // map to model before pass it to repository
-    //   const postDetailModel = new PostDetail({
-    //     postId: postDetailData.postId.toString(),
-    //     CandidateDetail: postDetailData.CandidateDetail.map(candidate => ({
-    //       RoleID: candidate.RoleID.toString(),
-    //       CandidateID: candidate.CandidateID,
-    //     })),
-    // });
       const res=await postDetailRepository.updatedeleteCandidate(postDetailData,id);
       return res;
     } catch (error) {
@@ -136,25 +118,20 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
          const posts = await postDetailRepository.findProductionProfessionalByID(id);
          if(posts){
            const result = posts.map((post) => {
-             const startDate = new Date(post.startDate.toString()) 
-             const endDate =  new Date(post.endDate.toString()) 
-             return new PostDTO({
-               id: post.id.toString(),
-               postName: post.postName as string,
-               postDescription: post.postDescription as string,
-               postImages: post.postImages as [string],
-               postMediaType: post.postMediaType as string,
-               postProjectRoles: post.postProjectRoles.map(eachRole=>(
-                 eachRole.toString()
-               )) as [string],
-               // postProjectRoles: post.postProjectRoles as [string],
-               postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-               // postDetailID: post.postDetailID.toString() as string,
-               userID: post.userID.toString() as string,
-               startDate: startDate,
-               endDate: endDate,
+            console.log(post.postID)
+             return new ProductionProfessionalHistoryDTO({
+               postID: post.postID.toString(),
+               postDetailID: post.postDetailID.toString(),
+               userID: post.userID.toString(),
+               roleName: post.roleName,
+               postStatus: post.postStatus,
+               postDescription: post.postDescription,
+               postImages: post.postImage,
+               startDate: post.startDate,
+               endDate: post.endDate
                });
            })
+           console.log(result)
            return result;
          }
            return null 

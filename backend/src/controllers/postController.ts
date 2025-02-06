@@ -23,6 +23,7 @@ class PostController {
       sendResponse(res, 'error', err, 'Failed to retrieved posts');
     }
   };
+  
   async getPostsByUser(req: Request, res: Response): Promise<void> {
     try {
       const posts = await postService.getPostsbyUser(req.params.id);
@@ -34,8 +35,6 @@ class PostController {
   
   async createPost(req: Request, res: Response): Promise<void> {
     try {
-      // console.log(req.body)
-      // console.log("...............")
       const posts = await postService.createPost(req.body);
       sendResponse(res, 'success', posts, 'Successfully created posts');
     } catch (err) {

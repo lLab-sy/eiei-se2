@@ -71,7 +71,7 @@ class PostDetailRepository {
     public async updateAddCandidate(postDetailData: PostDetailDTO,id:string) {
         try {
             const objectId = new ObjectId(id);
-            const updatedPost = await PostDetail.findOneAndUpdate(
+            const updatedPost = await PostDetail.findOneAndUpdate( //still duplicate if add again
                 { _id: objectId},  
                 { $addToSet: {CandidateDetail:postDetailData} },  
               );
@@ -96,6 +96,99 @@ class PostDetailRepository {
         }
     }
 
+    public async findProductionProfessionalByID(user_id: string) {
+        try {
+            const postDetails = await PostDetail.aggregate(
+                [
+                  {
+                    $unwind: {
+                      path: '$CandidateDetail',
+                      includeArrayIndex: 'string',
+                      preserveNullAndEmptyArrays: true
+                    }
+                  },
+                  {
+                    $match: {
+                      'CandidateDetail.CandidateID': new ObjectId(
+                        user_id
+                      )
+                    }
+                  },
+                  {
+                    $project: {
+                      _id: 0,
+                      postDetailID: '$_id',
+                      postID: 1,
+                      userID: '$CandidateDetail.CandidateID',
+                      role: '$CandidateDetail.RoleID'
+                    }
+                  },
+                  {
+                    $lookup: {
+                      from: 'postTypes',
+                      localField: 'postID',
+                      foreignField: '_id',
+                      as: 'post'
+                    }
+                  },
+                  {
+                    $lookup: {
+                      from: 'postRoleTypes',
+                      localField: 'role',
+                      foreignField: '_id',
+                      as: 'roleNameTable'
+                    }
+                  },
+                  {
+                    $project: {
+                      postDetailID: 1,
+                      postID: 1,
+                      userID: 1,
+                      roleName: {
+                        $arrayElemAt: [
+                          '$roleNameTable.roleName',
+                          0
+                        ]
+                      },
+                      postStatus: {
+                        $arrayElemAt: ['$post.postStatus', 0]
+                      },
+                      postName: {
+                        $arrayElemAt: ['$post.postName', 0]
+                      },
+                      postDescription: {
+                        $arrayElemAt: [
+                          '$post.postDescription',
+                          0
+                        ]
+                      },
+                      postImages: {
+                        $arrayElemAt: ['$post.postImages', 0]
+                      },
+                      startDate: {
+                        $arrayElemAt: ['$post.startDate', 0]
+                      },
+                      endDate: {
+                        $arrayElemAt: ['$post.endDate', 0]
+                      }
+                    }
+                  }
+                ],
+                { maxTimeMS: 60000, allowDiskUse: true }
+              );
+              
+              
+
+           
+            console.log(postDetails)
+            return postDetails
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            throw error;
+        }
+    } 
+
+
     public async deletePostDetail(postData: PostDetailDTO,id:string) {
         try {
             const objectId = new ObjectId(id);
@@ -109,29 +202,6 @@ class PostDetailRepository {
             throw new Error('Error deleting post detail in repository: ' + error);
         }
     }
-
-    public async findProductionProfessionalByID(user_id: string) {
-        try {
-            const postDetails = await PostDetail.find(
-                { "CandidateDetail.userID": user_id },
-                { postId: 1, _id: 0 } // Select only postId
-            );
-    
-            const postIDs = postDetails.map(post => post.postId);
-    
-            if (postIDs.length === 0) {
-                return []; 
-            }
-    
-
-            const posts = await Post.find({ _id: { $in: postIDs } });
-    
-            return posts; // Return full post details
-        } catch (error) {
-            console.error("Error fetching posts:", error);
-            throw error;
-        }
-    } 
 }
 
 export default new PostDetailRepository();

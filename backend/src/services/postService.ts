@@ -87,7 +87,6 @@ async getPost(id:string): Promise<PostDTO|null> {
                 eachRole.toString()
               )) as [string],
               postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-              // postDetailID: post.postDetailID.toString() as string,
               startDate: startDate,
               endDate: endDate,
             });
