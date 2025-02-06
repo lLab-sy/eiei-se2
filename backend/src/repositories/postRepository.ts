@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, PostSearchQuery, PostSearchRequestModel } from '../models/postModel';
+import Post, { IPost, PostSearchRequestModel, PostSearchResponse } from '../models/postModel';
 import { PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
+import { PipelineStage } from 'mongoose';
 
 class PostRepository {
     public async getAllPosts() {
@@ -89,32 +90,57 @@ class PostRepository {
         }
     }
 
-    public async searchPost(postSearchReq: PostSearchRequestModel){
+    public async searchPost(postSearchReq: PostSearchRequestModel): Promise<PostSearchResponse>{
         try {
             const { searchText, postMediaTypes, roleRequirments, limit, page } = postSearchReq;
             // PostSearchQuery from postModel
-            const query: PostSearchQuery = {};
+
+            const matchStage: PipelineStage[] = [];
             
-            // search query param
-            if (searchText) query.$text = { $search: searchText };
-            if (postMediaTypes?.length) query.postMediaType = { $in: postMediaTypes };
-            if (roleRequirments?.length) query.postProjectRoles = { $all: roleRequirments };
+            if (searchText) {
+                matchStage.push({
+                    $match: {
+                        $or: [
+                            { postName: { $regex: searchText, $options: "i" } },
+                            { postDescription: { $regex: searchText, $options: "i" } }
+                        ]
+                    }
+                });
+            }
+
+            if (postMediaTypes?.length) {
+                matchStage.push({
+                    $match: {
+                        postMediaType: { $in: postMediaTypes}
+                    }
+                })
+            }
+
+            if (roleRequirments?.length) {
+                matchStage.push({
+                    $match: {
+                        postProjectRoles: { $all: postMediaTypes}
+                    }
+                })
+            }
             
-            const projection = searchText 
-            ? { score: { $meta: "textScore" } } // If using text search, include score
-            : {}; // Otherwise, don't include textScore
-            
+            const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
             // Pagination
             const pageNumber = Math.max(1, Number(page));
             const pageSize = Math.max(1, Number(limit));
             const skip = (pageNumber - 1) * pageSize;
+            
+            matchStage.push({ $sort: { score: -1 } }, { $skip: skip }, { $limit: pageSize });
 
-            // Perform the search
-            const results = await Post.find(query, projection)
-            .sort(searchText ? { score: { $meta: "textScsore" } } : {})
-            .skip(skip)
-            .limit(pageSize);
-            return results
+            const results = await Post.aggregate(matchStage)
+            const response: PostSearchResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            return response
         } catch (error) {
             throw new Error('Error search post in repository: ' + error);
         }
