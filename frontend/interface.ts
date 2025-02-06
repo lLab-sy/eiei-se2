@@ -8,16 +8,19 @@ export interface PostData {
 }
 
 export interface Project {
-    id: number;
+    id: string;
     postName: string;
-    postDescription:string;
-    postImages:string;
-    postMediaType:string;
-    postProjectRole:string;
-    postStatus:string;
-    startDate: string
-    endDate: string;
+    postDescription: string;
+    postImages: string[];
+    postMediaType: string;
+    postProjectRoles: string[];
+    postStatus: string;
+    startDate: string; // ISO Date string
+    endDate: string;   // ISO Date string
+}
 
-    producer: string; //AuthMe
-  }
-  
+export interface ProjectResponse {
+    status: string;
+    data: Project[];
+    message: string;
+}

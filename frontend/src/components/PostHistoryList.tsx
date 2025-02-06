@@ -12,7 +12,7 @@ export default function PostHistoryList({
   postLists: Project[];
 }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  console.log(postLists)
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
   const currentProjects = postLists.slice(
