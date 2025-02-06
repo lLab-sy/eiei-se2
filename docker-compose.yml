@@ -25,5 +25,6 @@ services:
       sh -c "
         sleep 1 &&
         mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection mediaType --type json --file /init-data/mediaType.json --jsonArray &&
-        mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection users --type json --file /init-data/users.json --jsonArray
+        mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection users --type json --file /init-data/users.json --jsonArray &&
+        mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection postTypes --type json --file /init-data/posts.json --jsonArray
       "
