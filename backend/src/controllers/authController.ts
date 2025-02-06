@@ -83,6 +83,11 @@ class AuthController{
             sendResponse(res, 'error', null, errorMessage);
         };
     }
+
+    async logoutUser(req: Request, res: Response): Promise<void>{
+        res.clearCookie('token');
+        sendResponse(res, 'success', null, 'Logged out successfully.')
+    }
 }
 
 export default new AuthController();

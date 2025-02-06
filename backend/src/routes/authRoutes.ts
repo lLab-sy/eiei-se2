@@ -25,11 +25,11 @@ const router = express.Router(); // Explicitly typing the router as a Router ins
  *         username:
  *           type: string
  *           description: The name of the user
- *           example: johnXina
+ *           example: yilongMa
  *         password:
  *           type: string
  *           description: The password of the user
- *           example: j0hnX1na@
+ *           example: y1l0ngm@
  *         role:
  *           type: string
  *           enum: [producer, production professional, admin]
@@ -52,7 +52,7 @@ const router = express.Router(); // Explicitly typing the router as a Router ins
  *              username:
  *                  type: string
  *                  description: The name of the user
- *                  example: johnXina
+ *                  example: yilongMa
  *              role:
  *                  type: string
  *                  enum: [producer, production professional, admin]
@@ -71,11 +71,11 @@ const router = express.Router(); // Explicitly typing the router as a Router ins
  *         username:
  *           type: string
  *           description: The name of the user
- *           example: johnXina
+ *           example: yilongMa
  *         password:
  *           type: string
  *           description: The password of the user
- *           example: j0hnX1na@
+ *           example: y1l0ngm@
  *     ReturnLoginDTO:
  *       type: object
  *       required:
@@ -302,6 +302,12 @@ const router = express.Router(); // Explicitly typing the router as a Router ins
  *         createdAt:
  *           type: string
  *           format: date-time
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ * 
  */
 
 // Register route - POST /register
@@ -364,14 +370,8 @@ router.post('/login', AuthController.loginUser);
  *   get:
  *     summary: Get own user data
  *     tags: [Authentication] 
- *     parameters:
- *       - in: header
- *         name: Cookie
- *         schema:
- *           type: string
- *           example: token=your_jwt_token
- *         required: true
- *         description: JWT token stored in cookies  
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: A user data and success status
@@ -390,6 +390,25 @@ router.post('/login', AuthController.loginUser);
 
 router.get('/me', AuthMiddleware.authenticate as express.RequestHandler, AuthController.getMe as express.RequestHandler);
 //router.get('/me', AuthMiddleware.authenticate as express.RequestHandler,AuthMiddleware.authorize(['producer']) as RequestHandler , AuthController.getMe as express.RequestHandler);
+
+// Logout route - POST /logout
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user and clear token
+ *     tags: [Authentication]
+ *     security:
+ *         - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout Successful
+ *       401:
+ *         description: Unauthorized - user is not authenticated
+ *       500:
+ *         description: Server error
+ */
+router.post('/logout', AuthMiddleware.authenticate as express.RequestHandler, AuthController.logoutUser);
 
 // Export the router
 export default router;
