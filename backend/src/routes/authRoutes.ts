@@ -363,7 +363,15 @@ router.post('/login', AuthController.loginUser);
  * /api/auth/me:
  *   get:
  *     summary: Get own user data
- *     tags: [Authentication]   
+ *     tags: [Authentication] 
+ *     parameters:
+ *       - in: header
+ *         name: Cookie
+ *         schema:
+ *           type: string
+ *           example: token=your_jwt_token
+ *         required: true
+ *         description: JWT token stored in cookies  
  *     responses:
  *       200:
  *         description: A user data and success status
