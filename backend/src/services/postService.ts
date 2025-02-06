@@ -1,6 +1,7 @@
 import postRepository from '../repositories/postRepository';
 import { PostDTO, PostSearchRequestDTO } from '../dtos/postDTO';
 import Post, { PostSearchRequestModel } from '../models/postModel';
+import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 
 class PostService {
 
@@ -163,17 +164,17 @@ async getPost(id:string): Promise<PostDTO|null> {
     }
   }
 
-  async searchPost(postSearchReq: PostSearchRequestDTO): Promise<PostDTO[]|null> {
+  async searchPost(postSearchReq: PostSearchRequestDTO): Promise<PaginatedResponseDTO<PostDTO>> {
     try {
       const postM: PostSearchRequestModel = postSearchReq
 
       const res = await postRepository.searchPost(postM);
-      return res.map((post) => {
+      const resDTO = res.data.map((post) => {
         const startDate = new Date(post.startDate.toString()) 
         const endDate =  new Date(post.endDate.toString()) 
-        
+
         return new PostDTO({
-        id: post.id.toString(),
+        id: post.id?.toString(),
         postName: post.postName as string,
         postDescription: post.postDescription as string,
         postImages: post.postImages as [string],
@@ -184,6 +185,17 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: startDate,
         endDate: endDate,
       })})
+
+      const response: PaginatedResponseDTO<PostDTO> = {
+        data: resDTO,
+        meta: {
+            page: postSearchReq.page,
+            limit: postSearchReq.limit,
+            totalItems: res.totalItems,
+            totalPages: Math.ceil(res.totalItems / postSearchReq.limit)
+        } as PaginationMetaDTO
+      }
+      return response;
 
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
