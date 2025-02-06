@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { sendResponse } from "../utils/responseHelper";
 import jwt from "jsonwebtoken";
+import { AuthRequest, AuthJwtPayload } from "../dtos/middlewareDTO";
 
 class AuthMiddleware {
-  authenticate(req: Request, res: Response, next: NextFunction) {
+  authenticate = async (req: AuthRequest, res: Response, next: NextFunction):Promise<void> => {
     //read token from cookie
     const token = req.cookies.token;
 
@@ -15,8 +16,18 @@ class AuthMiddleware {
 
     try {
       //verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret_key");
-      (req as any).user = decoded; //store user data in request object (I'm not sure what it is, be careful the 'any')
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret_key") as AuthJwtPayload;
+      // (req as any).user = decoded; //store user data in request object (I'm not sure what it is, be careful the 'any')
+      if(!decoded){
+        sendResponse(res, "unauthorized", null, "Invalid token.");
+        return;
+      }
+      req.user = {
+        userId:decoded.userId,
+        username: decoded.username,
+        role: decoded.role
+      };
+      // console.log(decoded);
       next(); //move to next [middleware or route]
     } catch (error) {
       sendResponse(res, "unauthorized", null, "Invalid token.");
@@ -25,9 +36,9 @@ class AuthMiddleware {
     }
   };
 
-  authorize(roles: string[]) {
-    return (req: Request, res: Response, next: NextFunction) => {
-      const user = (req as any).user;
+  authorize = (roles: string[])=> {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
+      const user = req.user;
 
       if (!roles.includes(user.role)) {
         sendResponse(res, "forbidden", null, "Access denied. You do not have permission.");

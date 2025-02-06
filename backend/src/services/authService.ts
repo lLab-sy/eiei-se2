@@ -1,9 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userRepository from "../repositories/userRepository";
-import { RegisterDTO, ReturnRegisterDTO, LoginDTO, ReturnLoginDTO } from "../dtos/authDTO";
+import { RegisterDTO, ReturnRegisterDTO, LoginDTO, ReturnLoginDTO, ProducerReturnGetMeDTO, ProctionProfessionalReturnGetMeDTO, AdMinReturnGetMeDTO } from "../dtos/authDTO";
 import { User } from "../models/userModel";
 import { Types } from "mongoose";
+// import { ProducerDto } from "../dtos/producerDTO";
+// import { ProductionProfessionalDtO } from "../dtos/productionProfessionalDTO";
 
 class AuthService {
   async registerUser(data: RegisterDTO) {
@@ -57,6 +59,27 @@ class AuthService {
       };
 
       return returnLoginUser;
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+  async getMe(userID: string, role: string) {
+    try {
+      const user = await userRepository.getUserByID(userID);
+      
+      if (!user) throw new Error("Invalid userID.");
+      
+      if(role === 'producer'){
+        const returnUser:ProducerReturnGetMeDTO = user;
+        return returnUser;
+      }else if(role === 'production professional'){
+        const returnUser:ProctionProfessionalReturnGetMeDTO = user;
+        return returnUser;
+      }else{
+        const returnUser:AdMinReturnGetMeDTO = user;
+        return returnUser;
+      };
+
     } catch (error) {
       throw new Error("Error in service layer: " + error);
     }
