@@ -69,7 +69,7 @@ export const postSchema = new Schema<IPost>({
 );
 
 // Create a text index on specific fields
-postSchema.index({ postName: 'text', postDescription: 'text' });
+postSchema.index({ postName: 1, postDescription: 1});
 
 const Post = mongoose.model<IPost>('postType', postSchema, 'postTypes');
 export default Post;
@@ -87,4 +87,9 @@ export interface PostSearchRequestModel {
     roleRequirments?: string[];
     limit?: number;
     page?: number;
+}
+
+export interface PostSearchResponse {
+    data: IPost[],
+    totalItems: number
 }
