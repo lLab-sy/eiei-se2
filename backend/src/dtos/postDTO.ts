@@ -215,7 +215,7 @@ export class PostSearchRequestDTO {
     @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
     @IsArray()
     @IsString({ each: true })  // Ensures that each item in the array is a string
-    roleRequirments!: string[];
+    roleRequirements!: string[];
 
     @ApiProperty({ description: 'The number of post per page' })
     @IsNumber()  

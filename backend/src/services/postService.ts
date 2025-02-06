@@ -179,7 +179,9 @@ async getPost(id:string): Promise<PostDTO|null> {
         postDescription: post.postDescription as string,
         postImages: post.postImages as [string],
         postMediaType: post.postMediaType as string,
-        postProjectRoles: post.postProjectRoles as [string],
+        postProjectRoles: post.postProjectRoles.map(eachRole=>(
+          eachRole.toString()
+        )) as [string],
         postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
         // postDetailID: post.postDetailID.toString() as string,
         startDate: startDate,

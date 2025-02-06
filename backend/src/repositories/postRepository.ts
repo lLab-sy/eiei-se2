@@ -92,7 +92,7 @@ class PostRepository {
 
     public async searchPost(postSearchReq: PostSearchRequestModel): Promise<PostSearchResponse>{
         try {
-            const { searchText, postMediaTypes, roleRequirments, limit, page } = postSearchReq;
+            const { searchText, postMediaTypes, roleRequirements, limit, page } = postSearchReq;
             // PostSearchQuery from postModel
 
             const matchStage: PipelineStage[] = [];
@@ -116,7 +116,7 @@ class PostRepository {
                 })
             }
 
-            if (roleRequirments?.length) {
+            if (roleRequirements?.length) {
                 matchStage.push({
                     $match: {
                         postProjectRoles: { $all: postMediaTypes}

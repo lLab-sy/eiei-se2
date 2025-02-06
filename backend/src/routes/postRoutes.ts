@@ -87,7 +87,7 @@ const router = Router();
  *             type: string
  *         description: The media type of the post
  *       - in: query
- *         name: roleRequirments
+ *         name: roleRequirements
  *         schema:
  *           type: array
  *           items:
