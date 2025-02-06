@@ -22,6 +22,7 @@ const router = Router();
  *         - postImages
  *         - postMediaType
  *         - postProjectRoles
+ *         - userID
  *         - postStatus
  *         - startDate
  *         - endDate
@@ -48,6 +49,9 @@ const router = Router();
  *             type: string
  *             enum: [actor, cameraman, editor, vtuber]
  *           description: The roles associated with the post
+ *         userID:
+ *           type: string
+ *           description: The user belong this post
  *         postStatus:
  *           type: string
  *           enum: [created, in-progress, success, cancel]
@@ -191,4 +195,34 @@ router.put('/posts/:id', postController.updatePost);
  */
 router.delete('/posts/:id', postController.deletePost);
 
+
+
+/**
+ * @swagger
+ * /api/v1/posts/user/{id}:
+ *   get:
+ *     summary: Get posts by a specific user
+ *     tags: [Post]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the user
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of posts created by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PostDTO'
+ *       404:
+ *         description: No posts found for the user
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/user/:id', postController.getPostsByUser);
 export default router;

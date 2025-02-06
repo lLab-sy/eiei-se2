@@ -70,6 +70,15 @@ class PostDetailController {
       sendResponse(res, 'error', err, 'Failed to deleted postDetails at controller');
     }
   };
+
+  async getPostsByProductionProfessional(req: Request, res: Response): Promise<void> {
+      try {
+        const posts = await postDetailService.getProductionProfessionalPosts(req.params.id); //userID of production professional
+        sendResponse(res, 'success', posts, 'Successfully retrieved posts');
+      } catch (err) {
+        sendResponse(res, 'error', err, 'Failed to retrieve posts');
+      }
+    };
 }
 
 export default new PostDetailController();

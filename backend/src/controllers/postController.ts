@@ -24,6 +24,15 @@ class PostController {
     }
   };
   
+  async getPostsByUser(req: Request, res: Response): Promise<void> {
+    try {
+      const posts = await postService.getPostsbyUser(req.params.id);
+      sendResponse(res, 'success', posts, 'Successfully retrieved posts');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to retrieve posts');
+    }
+  };
+  
   async createPost(req: Request, res: Response): Promise<void> {
     try {
       const posts = await postService.createPost(req.body);
@@ -37,6 +46,7 @@ class PostController {
     try {
       const postId = req.params.id
       const posts = await postService.updatePost(req.body,postId);
+      console.log(posts)
       sendResponse(res, 'success', posts, 'Successfully updated posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to updated posts at controller');

@@ -1,13 +1,12 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { IPostRole } from './postRoleModel';  
-// import { IUser } from './user';  
-// import { IOffer } from './Offer';  // 
+ 
 
 export interface IPostDetail extends Document {
-    postId: mongoose.Schema.Types.ObjectId
+    postID: mongoose.Schema.Types.ObjectId
     CandidateDetail: Array<{
         RoleID: mongoose.Schema.Types.ObjectId
-        CandidateID: string
+        CandidateID: mongoose.Schema.Types.ObjectId
     }>;
     // OfferDetail: Array<{  //Next Sprint
     //     RoleID: mongoose.Schema.Types.ObjectId
@@ -16,7 +15,7 @@ export interface IPostDetail extends Document {
 }
 
 const postDetailSchema = new Schema<IPostDetail>({
-    postId: {
+    postID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post', // Reference to the Post model
         required: true,
@@ -28,14 +27,9 @@ const postDetailSchema = new Schema<IPostDetail>({
             required: true,
         },
         CandidateID: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
         }
-        // CandidateID: {
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     ref: 'Candidate', // Reference to the Candidate model
-        //     required: true,
-        // }
     }],
     // OfferDetail: [{ //Next Sprint
     //     RoleID: {
