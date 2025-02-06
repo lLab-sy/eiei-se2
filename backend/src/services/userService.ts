@@ -9,6 +9,16 @@ import { searchReqDTO } from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
 
 class UserService {
+    async getUser(username:string){
+        try{
+            const getUser = await userRepository.findUserByUsername(username)
+            
+            return getUser
+        }catch(err){
+            console.error("Error in service layer:", err);
+            throw new Error("Error in service layer: " + (err as Error).message);
+        }
+    }
     async updateProducer(producerDTO: ProducerDto, id: string) {
         try {
             const hashedPassword = await bcrypt.hash(producerDTO.password, 10)

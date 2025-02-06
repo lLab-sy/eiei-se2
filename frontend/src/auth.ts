@@ -10,7 +10,7 @@ export const loginUser = async (data: {username:string, password:string}) => {
     const res = await axios.post(apiUrl, dataPost)
     
     // data => token + user => id + username + role
-    if(!res.data){
+    if(res.status !== 200 || !res.data){
         throw new Error('Cannot find User data')
         
     }
@@ -38,9 +38,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
                 const user = await loginUser(sendData as {username: string, password:string})
                 
-                if(!user){
-                    throw new Error("Incorrect Credentials")
+                if (!user || user?.status === 'error') {
+                    throw new Error("Invalid username or password"); // ✅ More specific error
                 }
+        
                 return {
                     // id from mongo
                     id: user.data.user.id,
@@ -50,7 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
             }
             catch(err){
-                throw new Error('Error with credential')
+                throw new Error("Login failed");                      
             }
         }
     })
@@ -67,15 +68,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return token;
     },
     session({session, token}  : {token : any, session : any}){
-        session.user.id = token.id as string;
-        session.user.username = token.username;
-        session.user.role = token.role;
-        session.user.token = token.token
+        if(token){
+            session.user.id = token.id as string;
+            session.user.username = token.username;
+            session.user.role = token.role;
+            session.user.token = token.token    
+        }
         return session
     },
     redirect({url, baseUrl}){
         return baseUrl
     },
+    signIn({ user }){
+        if(!user){
+            return false
+        }
+        return true
+    }
    
   },
   pages: {

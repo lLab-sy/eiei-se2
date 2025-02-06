@@ -15,7 +15,20 @@ function validatePassword(password: string): boolean {
     return true;
 }
 class UserController {
-    
+    async getUser(req: Request, res: Response): Promise<void> {
+        try{
+            const username = req.params.username;
+            if(!username){
+                sendResponse(res, 'error', 'Cannot Find Username')
+                return;
+            }
+            const getUser = await userService.getUser(username)
+            sendResponse(res, 'success', getUser, "Successfully get User")
+        }catch(err){
+            console.log(err)
+            sendResponse(res, 'error', 'Failed to get User')
+        }
+    }
     async updateUser(req: Request, res: Response): Promise<void> {
         try {
             

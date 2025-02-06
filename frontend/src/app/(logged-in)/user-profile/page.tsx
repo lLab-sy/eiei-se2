@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
@@ -40,6 +40,7 @@ import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Rating from "@mui/material/Rating";
 import axios from "axios";
+import { setUser } from "@/redux/user/user.slice";
 
 //missing
 //sort position form error
@@ -96,28 +97,60 @@ const formSchema = z
 
 type formType = z.infer<typeof formSchema>;
 export default function UserPage() {
+  // Redux State
+  const user: any = useSelector<RootState>((state) => state.user);
+  const dispatch = useDispatch<AppDispatch>()
+
+  const userData : any = user.user
+  console.log('userData' ,userData)
+  
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "test@test.com",
-      phone: "1234567890",
-      bankName: "default",
-      accountHolderName: "Tien",
-      accountNumber: "12345678",
-      card_name: "default",
-      card_number: "default",
-      firstName: "default",
-      middleName: "default",
-      lastName: "default",
-      password: "12345678!",
-      confirmPassword: "12345678!",
-      payment_type: "qrCode",
-      occupation: "TestOccupation",
-      skill: [],
-      experience: 0,
-      company: "Ayodia",
+      email: userData?.email ?? "test@test.com",
+      phone: userData?.phoneNumber ?? "1234567890",
+      bankName: userData?.bankAccount?.bankName ??"default",
+      accountHolderName: userData?.bankAccount?.accountHolderName ??"Tien",
+      accountNumber: userData?.bankAccount?.accountNumber ?? "12345678",
+      card_name: userData?.nameOnCard ?? "default",
+      card_number: userData?.cardNumber ?? "default",
+      firstName: userData?.firstName ?? "default",
+      middleName: userData?.middleName ?? "default",
+      lastName: userData?.lastName ?? "default",
+      password: userData?.password ?? "12345678!",
+      confirmPassword: userData?.password ?? "12345678!",
+      payment_type: userData?.paymentType ?? "qrCode",
+      occupation: userData?.occupation ?? "TestOccupation",
+      skill: userData?.skill ?? [],
+      experience: userData?.experience ?? 0,
+      company: userData?.company ??"Ayodia",
+      gender: userData.gender
     },
   });
+  useEffect(() => {
+    if (userData) {
+      form.reset({
+        email: userData.email ?? "test@test.com",
+        phone: userData.phoneNumber ?? "1234567890",
+        bankName: userData.bankAccount?.bankName ?? "default",
+        accountHolderName: userData.bankAccount?.accountHolderName ?? "Tien",
+        accountNumber: userData.bankAccount?.accountNumber ?? "12345678",
+        card_name: userData.nameOnCard ?? "default",
+        card_number: userData.cardNumber ?? "default",
+        firstName: userData.firstName ?? "default",
+        middleName: userData.middleName ?? "default",
+        lastName: userData.lastName ?? "default",
+        password: "12345678!",
+        confirmPassword: "12345678!",
+        payment_type: userData.paymentType ?? "qrCode",
+        occupation: userData.occupation ?? "TestOccupation",
+        skill: userData.skill ?? [],
+        experience: userData.experience ?? 0,
+        company: userData.company ?? "Ayodia",
+        gender: userData.gender
+      });
+    }
+  }, [userData, form.reset]);
   /*
   Image
 
@@ -127,7 +160,7 @@ export default function UserPage() {
   const [click, setClick] = useState(0);
   const { toast } = useToast();
   // redux to dispatch changes
-  const [paymentState, setPaymentState] = useState("");
+  const [paymentState, setPaymentState] = useState(userData?.paymentType ?? "");
   const handleSubmit = async (data: formType) => {
     //dispatch to update each case or change only display to none else hidden
     // console.log(form.getValues());
@@ -137,7 +170,8 @@ export default function UserPage() {
       accountHolderName: data.accountHolderName,
       accountNumber: data.accountNumber,
     };
-    const userData = {
+    const sendUserData = {
+      ...userData,
       firstName: data.firstName,
       middleName: data.middleName,
       lastName: data.lastName,
@@ -147,22 +181,23 @@ export default function UserPage() {
       profileImage: "",
       role: user?.user?.role,
       password: data.password,
+      email: data.email,
     };
     const producerData = {
-      ...userData,
+      ...sendUserData,
       company: data.company,
       paymentType: data.payment_type,
       nameOnCard: data.card_name,
       cardNumber: data.card_number,
     };
     const productionData = {
-      ...userData,
+      ...sendUserData,
       occupation: data.occupation,
       skill: data.skill,
       experience: data.experience,
     };
     // console.log("production data", productionData);
-    const id = user.user.id;
+    const id = user.user._id;
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/update-user/${id}`;
     const returnUser = await axios.put(
       apiUrl,
@@ -185,6 +220,7 @@ export default function UserPage() {
       title: "Edit Profile",
       description: "Edit Profile Successful",
     });
+    dispatch(setUser((userData.role === 'producer') ? producerData : productionData))
     setIsEdit(false);
   };
   const [img, setImageState] = useState({
@@ -200,6 +236,7 @@ export default function UserPage() {
       // console.log(e.target.files)
     }
   };
+  // mock data
   const OPTIONS: Option[] = [
     { label: "Cameraman", value: "cameraman" },
     { label: "Lighting", value: "lighting" },
@@ -215,7 +252,6 @@ export default function UserPage() {
   ];
 
   // state redux
-  const user: any = useSelector<RootState>((state) => state.user);
   return (
     <main className="font-serif min-h-screen flex bg-blue-400 relative items-center justify-center">
       <div className="flex justify-around w-[60%] h-[800px]">
@@ -224,8 +260,8 @@ export default function UserPage() {
             <CardTitle>Profile</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <div className="text-2xl font-serif font-bold flex justify-center h-[50px] items-center">
-              Name
+            <div className="text-md text-center font-serif font-bold flex justify-center h-[50px] items-center">
+              {userData.firstName} {userData.middleName} {userData.lastName}
             </div>
             {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
               <Image src={} alt=''/>
@@ -526,7 +562,7 @@ export default function UserPage() {
                     )}
 
                     {/* <div>{paymentState}</div> */}
-                    {paymentState === "creditDebit" ? (
+                    {(paymentState === "creditDebit") ? (
                       <div className="  flex flex-col justify-around py-4 h-[200px]">
                         <FormField
                           name="card_name"

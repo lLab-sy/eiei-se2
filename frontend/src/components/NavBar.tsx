@@ -4,11 +4,10 @@ import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn } from "lucide-r
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {useSession} from 'next-auth/react'
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { setUser } from "@/redux/user/user.slice";
-
+import { setToken, setUser } from "@/redux/user/user.slice";
+import axios from "axios";
 
 const NavBar = (session: any) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,15 +15,32 @@ const NavBar = (session: any) => {
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
   // console.log('session', session)
-  console.log('session',session.session)
+  // console.log('session',session.session)
   useEffect(() => {
     if(!session){
       return;
     }
-    console.log('session', session)
-    dispatch(setUser(session?.session?.user))
-    console.log('user', user)
+    // set token and set user from fetch data
+    const handleFetch = async () => {
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/${session?.session?.user?.username}`
+      const res = await axios(apiUrl)
+
+      const controller = new AbortController()
+      if(!res){
+        throw new Error('Failed to Fetch')
+      }
+      if(!res.data){
+        throw new Error('Failed Data')
+      }
+      const returnUser = await res.data
+      dispatch(setUser(returnUser.data))
+      console.log('persist User',user)
+      return () => controller.abort()
+    }
+    dispatch(setToken(session?.session?.user?.token))
+    handleFetch()
   }, [session])
+
   const menuItems = [
     { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },
     {
@@ -71,7 +87,7 @@ const NavBar = (session: any) => {
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
           <div className="flex items-center gap-2">
-            <span className="text-sm">{session.session ? 'In session' : 'out session'} {user?.user?.username ?? "Username"}</span>
+            <span className="text-sm">Gender: {user?.user?.gender ?? "None"} {session.session ? 'In session' : 'out session'} {user?.user?.username ?? "Username"}</span>
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               <User className="w-5 h-5 text-gray-600" />
             </div>
