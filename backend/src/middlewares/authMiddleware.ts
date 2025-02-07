@@ -5,12 +5,12 @@ import { AuthRequest, AuthJwtPayload } from "../dtos/middlewareDTO";
 
 class AuthMiddleware {
   authenticate = async (req: AuthRequest, res: Response, next: NextFunction):Promise<void> => {
-    // let token;
+    let token;
 
-    // if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
-    //     token = req.headers.authorization.split(' ')[1];
-    // }
-    const token = req.cookies.token;
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token = req.headers.authorization.split(' ')[1];
+    }
+    // const token = req.cookies.token;
     if (!token) {
       sendResponse(res, "unauthorized", null, "Access denied. No token provided.");
       return;

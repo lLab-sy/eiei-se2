@@ -370,6 +370,8 @@ router.post('/login', AuthController.loginUser);
  *   get:
  *     summary: Get own user data
  *     tags: [Authentication] 
+ *     security:
+ *      - BearerAuth: []
  *     responses:
  *       200:
  *         description: A user data and success status
@@ -396,6 +398,8 @@ router.get('/me', AuthMiddleware.authenticate as express.RequestHandler, AuthCon
  *   post:
  *     summary: Logout user and clear token
  *     tags: [Authentication]
+ *     security:
+ *      - BearerAuth: []
  *     responses:
  *       200:
  *         description: Logout Successful
