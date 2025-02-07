@@ -91,7 +91,6 @@ const ProfessionalsPage = () => {
           onPageChange={handlePageChange}
         />
       </div>
-      <Footer />
     </div>
   );
 };

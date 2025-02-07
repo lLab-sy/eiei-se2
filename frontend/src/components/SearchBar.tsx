@@ -15,16 +15,8 @@ const SearchBar = () => {
     type: "experience" | "rating";
   }
 
-  const handleStarClick = ({ value, type }: HandleStarClickParams) => {
-    if (type === "experience") {
-      setExperience(value);
-    } else {
-      setRating(value);
-    }
-  };
-
   const handleSearch = () => {
-    console.log("Search " + query);
+    console.log("Search " + query + " with experience " + experience + " and rating " + rating);
   };
 
   return (
@@ -51,7 +43,7 @@ const SearchBar = () => {
             type="number"
             placeholder="Minimum Year..."
             className="bg-transparent outline-none w-auto text-gray-700 placeholder-gray-500"
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => setExperience(Number(e.target.value))}
           />
         </div>
         <span className="font-bold text-white">Rating:</span>
@@ -59,7 +51,7 @@ const SearchBar = () => {
           <span
             key={i}
             className={`cursor-pointer text-xl ${i < rating ? "text-yellow-500" : "text-gray-300"}`}
-            onClick={() => handleStarClick({ value: i + 1, type: "rating" })}
+            onClick={() => setRating(i + 1)}
           >
             ★
           </span>
