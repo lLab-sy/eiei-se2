@@ -10,8 +10,7 @@ class PostService {
         const posts = await postRepository.getAllPosts();
   
         const result = posts.map((post) => {
-            // const startDate = new Date(post.startDate) 
-            // const endDate =  new Date(post.endDate)) 
+  
             return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
@@ -138,7 +137,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
-      await postRepository.updatePost(postData,id);
+      await postRepository.updatePost(postModel,id);
       return postModel;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -171,8 +170,7 @@ async getPost(id:string): Promise<PostDTO|null> {
 
       const res = await postRepository.searchPost(postM);
       const resDTO = res.data.map((post) => {
-        const startDate = new Date(post.startDate.toString()) 
-        const endDate =  new Date(post.endDate.toString()) 
+ 
 
         return new PostDTO({
         id: post.id?.toString(),
@@ -185,8 +183,8 @@ async getPost(id:string): Promise<PostDTO|null> {
         )) as [string],
         postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
         // postDetailID: post.postDetailID.toString() as string,
-        startDate: startDate,
-        endDate: endDate,
+        startDate: post.startDate?post.startDate:"", //Sorry Ball but I need to change
+        endDate: post.endDate?post.endDate:""
       })})
 
       const response: PaginatedResponseDTO<PostDTO> = {
