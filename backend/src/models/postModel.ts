@@ -18,11 +18,13 @@ export const postSchema = new Schema<IPost>({
         type: String,
         required: [true, 'Post name is required'],
         trim: true,
+        minlength:[4,"Please name the post more than 4 characters"],
         maxlength: [50, 'Post name cannot exceed 50 characters'],
     },
     postDescription: {
         type: String,
         required: [true, 'Post description is required'],
+        minlength:[50,"Please name the post more than 4 characters"],
         maxlength: [500, 'Description cannot exceed 500 characters'],
     },
     postImages: {
@@ -48,7 +50,7 @@ export const postSchema = new Schema<IPost>({
             validator: function (roles: mongoose.Schema.Types.ObjectId[]) {
                 return roles.length > 0; // Ensures the array is not empty
             },
-        message: "Post project roles cannot be empty"
+            message: "Post project roles cannot be empty"
         }
         }
     ,
@@ -63,7 +65,7 @@ export const postSchema = new Schema<IPost>({
     },
     endDate: {
         type: String,
-        // required: [true, 'End date is required'],
+        
     },
     postDetailID: {
         type: mongoose.Schema.Types.ObjectId,

@@ -74,7 +74,7 @@ class PostRepository {
         try {
              const objectId = new ObjectId(id);
              const posts= await Post.findById(objectId);
-            //  console.log('Posts from database:', posts);
+        
              return posts
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);
@@ -83,6 +83,7 @@ class PostRepository {
 
     public async createPost(postData: IPost) {
         try {
+            console.log("Before Create Post")
             const post = new Post(postData);
             const result= await post.save();
 
@@ -100,7 +101,7 @@ class PostRepository {
         }
     }
 
-    public async updatePost(postData: PostDTO,id:string) {
+    public async updatePost(postData: IPost,id:string) {
         try {
             console.log(postData)
             // console.log(postData.id,"id")

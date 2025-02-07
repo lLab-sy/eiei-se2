@@ -49,7 +49,12 @@ class PostController {
     try {
       const postId = req.params.id
       const posts = await postService.updatePost(req.body,postId);
-      console.log(posts)
+ 
+      
+      if(req.body.postStatus!="created" && req.body.postStatus!="in-progress" && req.body.postStatus!="cancel" && req.body.postStatus!="success"){
+        sendResponse(res, 'error', 'Failed PostStatus');
+        return;
+      }
       sendResponse(res, 'success', posts, 'Successfully updated posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to updated posts at controller');

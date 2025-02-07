@@ -105,8 +105,7 @@ async getPost(id:string): Promise<PostDTO|null> {
   async createPost(postData: PostDTO) {
     try {
       // map to model before pass it to repository
-      console.log(postData)
-      // console.log(postData.startDate)
+ 
 
       const postModel = new Post({
         postName: postData.postName,
@@ -119,7 +118,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
-      console.log("Hello",postModel)
+ 
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -136,7 +135,6 @@ async getPost(id:string): Promise<PostDTO|null> {
         postMediaType:postData.postMediaType,
         postProjectRoles: postData.postProjectRoles,
         postStatus: postData.postStatus,
-        userID: postData.userID,
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
