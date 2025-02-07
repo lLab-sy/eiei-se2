@@ -96,7 +96,7 @@ const ProfessionalDetail = () => {
             </div>
             <div className="flex items-center space-x-3">
               <Star className="h-5 w-5 text-mainyellow" />
-              <span className="text-maingrey">Rating: {ProfessionalInfo.rating}⭐</span>
+              <span className="text-maingrey">Rating: {ProfessionalInfo.rating}</span>
             </div>
             <div className="flex items-center space-x-3">
               <Phone className="h-5 w-5 text-maingreen" />

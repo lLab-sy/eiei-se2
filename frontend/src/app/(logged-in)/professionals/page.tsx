@@ -2,15 +2,13 @@
 import { useState } from "react";
 import React from "react";
 
-import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
 import ProfessionalCard from "@/components/ProfessionalCrad";
 import Pagination from "@/components/Pagination";
-import NavBar from "@/components/NavBar";
 
 const PAGE_SIZE = 32;
 
-////////// For testing
+////////// For testing 
 const professionals = Array.from({ length: 259 }, (_, index) => ({
   title: `John Doe ${index + 1}`,
   skill: ["Cameraman", "Lighting", "Editing"],
@@ -53,7 +51,6 @@ const ProfessionalsPage = () => {
     <div className="sticky min-h-screen bg-gray-50 ">
 
       {/*Header*/}
-      <NavBar/>
       <div className="sticky top-0 bg-mainblue-light z-10 py-4">
         <div className="flex justify-center items-center space-x-4">
           <SearchBar />
