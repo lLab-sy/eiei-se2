@@ -7,16 +7,27 @@ import ProducerRespository from '../repositories/producerRepository';
 import ProductionProfessionalRespository from "../repositories/productionProfessionalRespository";
 import { searchReqDTO } from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
+import userRepository from "../repositories/userRepository";
 
 class UserService {
+    async getUser(username:string){
+        try{
+            const getUser = await userRepository.findUserByUsername(username)
+            
+            return getUser
+        }catch(err){
+            console.error("Error in service layer:", err);
+            throw new Error("Error in service layer: " + (err as Error).message);
+        }
+    }
     async updateProducer(producerDTO: ProducerDto, id: string) {
         try {
-            const hashedPassword = await bcrypt.hash(producerDTO.password, 10)
-            const producerObject = { ...producerDTO, password: hashedPassword};
+            // const hashedPassword = await bcrypt.hash(producerDTO.password, 10)
+            // const producerObject = { ...producerDTO, password: hashedPassword};
 
-            const res = await ProducerRespository.updateProducer(producerObject as IProducer, id);
+            const res = await ProducerRespository.updateProducer(producerDTO as IProducer, id);
             return res;
-        } catch (error) {
+        } catch (error : any) {
             console.error("Error in service layer:", error);
             throw new Error("Error in service layer: " + (error as Error).message);
         }
@@ -24,11 +35,11 @@ class UserService {
 
     async updateProductionProfessional(productionDTO: ProductionProfessionalDtO, id: string) {
         try {
-            const hashedPassword = await bcrypt.hash(productionDTO.password, 10)
-            const professionalObject = { ...productionDTO, password:hashedPassword };
-            const res = await ProductionProfessionalRespository.updateProductionProfessional(professionalObject as IProductionProfessional, id);
+        //     const hashedPassword = await bcrypt.hash(productionDTO.password, 10)
+        //     const professionalObject = { ...productionDTO, password:hashedPassword };
+            const res = await ProductionProfessionalRespository.updateProductionProfessional(productionDTO as IProductionProfessional, id);
             return res;
-        } catch (error) {
+        } catch (error : any) {
             console.error("Error updating Production Professional:", error);
             throw new Error("Error in service layer: " + (error as Error).message);
         }
