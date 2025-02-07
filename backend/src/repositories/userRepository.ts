@@ -33,6 +33,18 @@ class UserRepository {
             throw new Error('Error logging in user in repository: ' + err);
         }
     }
+
+    async getUserByID(userID: string){
+        try{
+            const user = await User.findById(userID);
+            if(!user){
+                throw new Error("User not found.")
+            }
+            return user;
+        } catch(err){
+            throw new Error('Error logging in user in repository: ' + err);
+        }
+    }
 }
 
 export default new UserRepository();

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import authService from '../services/authService';
 import { RegisterDTO, LoginDTO } from '../dtos/authDTO';
 import { sendResponse } from '../utils/responseHelper';
+import { NextFunction } from 'express-serve-static-core';
+import { AuthRequest } from '../dtos/middlewareDTO';
 // import jwt from 'jsonwebtoken'
 
 function validatePassword(password: string): boolean {
@@ -70,6 +72,22 @@ class AuthController{
             sendResponse(res, 'error', null, errorMessage);
         }
     };
+
+    async getMe(req: AuthRequest, res: Response, next: NextFunction): Promise<void>{
+        try{
+            const user = await authService.getMe(req.user.userId, req.user.role);
+            sendResponse(res, 'success', user, 'Get User successful.');
+        }catch(err){
+            const errorMessage = (err as Error).message || "Internal server error.";
+            
+            sendResponse(res, 'error', null, errorMessage);
+        };
+    }
+
+    async logoutUser(req: Request, res: Response): Promise<void>{
+        res.clearCookie('token');
+        sendResponse(res, 'success', null, 'Logged out successfully.')
+    }
 }
 
 export default new AuthController();
