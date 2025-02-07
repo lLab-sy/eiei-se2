@@ -17,7 +17,7 @@ class PostRepository {
     public async getPostsByUser(id:string) {
         try {
              const posts= await Post.find(
-                 {userID:id}
+                 {userID:id,postStatus:"success"}
              );
              console.log('Posts from database:', posts);
              return posts
@@ -42,14 +42,15 @@ class PostRepository {
             const post = new Post(postData);
             const result= await post.save();
 
-
+            console.log("Create Post Success")
             const postDetailData = new PostDetail({
-                postId: result._id, 
+                postID: result._id, 
                 CandidateDetail: [],
               });
-
+            
+            console.log(postDetailData)
             const result2= await postDetailData.save();
-            console.log(result2)
+            console.log("create Post Detail success")
             return result
         } catch (error) {
             throw new Error('Error creating post in repository: ' + error);
