@@ -1,5 +1,5 @@
 import postRepository from '../repositories/postRepository';
-import { PostDTO, PostSearchRequestDTO } from '../dtos/postDTO';
+import { PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO } from '../dtos/postDTO';
 import Post, { PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 
@@ -70,22 +70,22 @@ async getPost(id:string): Promise<PostDTO|null> {
   }
 }
 
-  async getPostsbyUser(id:string): Promise<PostDTO[]|null> {
+  async getPostsbyUser(id:string): Promise<PostWithRoleCountDTO[]|null> {
     try {
       const posts = await postRepository.getPostsByUser(id);
       if(posts){
         const result = posts.map((post) => {
           const startDate = new Date(post.startDate.toString()) 
           const endDate =  new Date(post.endDate.toString()) 
-          return new PostDTO({
-              id: post.id.toString(),
+          const postId = post._id?post._id.toString():'';
+          return new PostWithRoleCountDTO({
+              id: postId,
               postName: post.postName as string,
               postDescription: post.postDescription as string,
               postImages: post.postImages as [string],
               postMediaType: post.postMediaType as string,
-              postProjectRoles: post.postProjectRoles.map(eachRole=>(
-                eachRole.toString()
-              )) as [string],
+              roleCount: post.roleCount as number,
+              postProjectRoles: post.postProjectRoles as string[],
               postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
               startDate: startDate,
               endDate: endDate,

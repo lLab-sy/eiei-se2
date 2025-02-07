@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import postController from '../controllers/postController';
+import AuthMiddleware from '../middlewares/authMiddleware'
+import { RequestHandler } from '@nestjs/common/interfaces';
 
 const router = Router();
 
@@ -167,6 +169,30 @@ router.post('/posts', postController.createPost);
 
 /**
  * @swagger
+ * /api/v1/posts/user:
+ *   get:
+ *     summary: Get posts by a specific user
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of posts created by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PostDTO'
+ *       404:
+ *         description: No posts found for the user
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+
+/**
+ * @swagger
  * /api/v1/posts/{id}:
  *   get:
  *     summary: Get a post by ID
@@ -250,32 +276,5 @@ router.delete('/posts/:id', postController.deletePost);
 
 
 
-/**
- * @swagger
- * /api/v1/posts/user/{id}:
- *   get:
- *     summary: Get posts by a specific user
- *     tags: [Post]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: The unique identifier of the user
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: A list of posts created by the user
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/PostDTO'
- *       404:
- *         description: No posts found for the user
- *       500:
- *         description: Server error
- */
-router.get('/posts/user/:id', postController.getPostsByUser);
+
 export default router;
