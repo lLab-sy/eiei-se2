@@ -225,3 +225,14 @@ export class PostSearchRequestDTO {
     @IsNumber() 
     page!: number;
 }
+
+export class PostWithRoleCountDTO extends PostDTO{
+    @ApiProperty({ description: 'The count of all role in post.' })
+    @IsNumber()
+    roleCount!: number;
+
+    constructor(data: Partial<PostWithRoleCountDTO>){
+        super(data);
+        this.roleCount = data.roleCount!;
+    }
+}
