@@ -3,7 +3,7 @@ import { useState } from "react";
 import React from "react";
 
 import Footer from "@/components/Footer";
-// import SearchBar from "@/components/SearchBar";
+import SearchPostBar from "@/components/SearchPostBar";
 import Pagination from "@/components/Pagination";
 import NavBar from "@/components/NavBar";
 import PostCrad from "@/components/PostCard";
@@ -31,18 +31,6 @@ const ProfessionalsPage = () => {
     currentPage * PAGE_SIZE
   );
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -54,6 +42,7 @@ const ProfessionalsPage = () => {
       <NavBar/>
       <div className="sticky top-0 bg-mainblue-light z-10 py-4">
         <div className="flex justify-center items-center space-x-4">
+          <SearchPostBar />
         </div>
       </div>
 
