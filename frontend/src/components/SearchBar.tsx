@@ -8,6 +8,7 @@ const MAX_STARS = 5;
 const SearchBar = () => {
   const [experience, setExperience] = useState(0);
   const [rating, setRating] = useState(0);
+  const [query, setQuery] = useState("");
 
   interface HandleStarClickParams {
     value: number;
@@ -23,7 +24,7 @@ const SearchBar = () => {
   };
 
   const handleSearch = () => {
-    console.log({ experience, rating });
+    console.log("Search " + query);
   };
 
   return (
@@ -34,12 +35,13 @@ const SearchBar = () => {
           type="text"
           placeholder="Search..."
           className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500"
+          onChange={(e) => setQuery(e.target.value)}
         />
         <button
           onClick={handleSearch}
           className="bg-blue-500 text-white rounded-full px-4 py-2 ml-2 hover:bg-blue-600 transition-colors"
         >
-          Filters
+          Search
         </button>
       </div>
       <div className="flex items-center space-x-4 mt-4">
