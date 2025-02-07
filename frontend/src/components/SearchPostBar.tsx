@@ -2,7 +2,6 @@
 
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { set } from "react-hook-form";
 
 const mediaOptions = ["Movie", "TV Show", "Music", "Podcast", "Book", "Game"];
 const roleOptions = ["Admin", "Editor", "Viewer"];
