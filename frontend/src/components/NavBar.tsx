@@ -1,15 +1,68 @@
 "use client";
 
-import { Menu, X, User, FileText, Gift, Settings, LogOut } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn } from "lucide-react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { setUser } from "@/redux/user/user.slice";
+import axios from "axios";
+import { signOut } from "next-auth/react";
+import { Button } from "./ui/button";
 
-const NavBar = () => {
+const NavBar = (session: any) => {
+  const token = session?.session?.user?.token ?? ''
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // const {data: session, status} = useSession()
+  const dispatch = useDispatch<AppDispatch>()
+  const user: any = useSelector<RootState>(state => state.user)
+  console.log('session', session)
+  
+  const handleLogout = async () => {
+    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
+    await axios.post(apiUrl, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    await signOut()
+  }
+  // console.log('session',session.session)
+  useEffect(() => {
+    if(!session.session || token === ''){
+      return;
+    }
+    // set token and set user from fetch data
+    const handleFetch = async (fetchToken : string) => {
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`
+      const res = await axios.get(apiUrl, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${fetchToken}`
+        }
+      })
+      console.log('res', res)
+      const controller = new AbortController()
+      if(!res){
+        throw new Error('Failed to Fetch')
+      }
+      if(!res.data){
+        throw new Error('Failed Data')
+      }
+      const returnUser = await res.data
+      dispatch(setUser(returnUser.data))
+      console.log('setuser', user.user)
+      return () => controller.abort()
+    }
+    handleFetch(token)
+  }, [session.session, token])
 
   const menuItems = [
-    { icon: <User className="w-5 h-5" />, label: "Profile", href: "/profile" },
+    { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },
     {
       icon: <FileText className="w-5 h-5" />,
       label: "My Post",
@@ -25,7 +78,7 @@ const NavBar = () => {
       label: "Setting",
       href: "/setting",
     },
-    { icon: <LogOut className="w-5 h-5" />, label: "Logout", href: "/logout" },
+    // { icon: (session) ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />, label: (session) ? "Logout" : "Login", href: (session) ? "/api/auth/signout" : "/login" },
   ];
 
   return (
@@ -54,7 +107,11 @@ const NavBar = () => {
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
           <div className="flex items-center gap-2">
-            <span className="text-sm">Username</span>
+            {/* {session.session  ?  <Button onClick={async () => {
+              await handleLogout()
+              await signOut()
+            }}>Logout</Button> : ''} */}
+            <span className="text-sm">Gender: {user?.user?.gender ?? "None"} {session.session ? 'In session' : 'out session'} {user?.user?.username ?? "Username"}</span>
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               <User className="w-5 h-5 text-gray-600" />
             </div>
@@ -100,6 +157,16 @@ const NavBar = () => {
               <span>{item.label}</span>
             </Link>
           ))}
+          <Link
+              href={(session.session) ? '/api/auth/signout' : "/login"}
+              className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                session.session ? "text-red-600 hover:text-red-700" : ""
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {session ? (<LogOut className="w-5 h-5"/>) : (<LogIn className="w-5 h-5"/>)}
+              <span>{(session.session) ? "Logout" : "Login"}</span>
+          </Link>
         </div>
       </div>
 

@@ -6,7 +6,7 @@ export const createUser = async (data: { username: string; password: string; rol
 
     try {
         const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`
-        console.log(apiUrl)
+        // console.log(apiUrl)
        
         const res = await axios.post(apiUrl, data);
         return res; 
