@@ -35,7 +35,7 @@ export default function HistoryPostPage(){
       fetchData()
   },[])
   
-  console.log(postHistoryResponse)
+ 
 
   if(!postHistoryResponse){
     return <>Loading</>

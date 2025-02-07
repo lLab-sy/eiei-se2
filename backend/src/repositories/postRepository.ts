@@ -86,9 +86,9 @@ class PostRepository {
             const post = new Post(postData);
             const result= await post.save();
 
-
+            console.log("Create Post Success")
             const postDetailData = new PostDetail({
-                postId: result._id, 
+                postID: result._id, 
                 CandidateDetail: [],
               });
 

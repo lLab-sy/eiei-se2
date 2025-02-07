@@ -178,12 +178,12 @@ export class PostDTO {
     postStatus!: 'created' | 'in-progress' | 'success' | 'cancel';
 
     @ApiProperty({ description: 'The start date of the post' })
-    @IsDate()  
-    startDate!: Date;
+    @IsString()  
+    startDate!: string;
 
     @ApiProperty({ description: 'The end date of the post' })
-    @IsDate() // Use @IsDate() to validate Date fields
-    endDate!: Date;
+    @IsString()
+    endDate!: string;
 
     @ApiProperty({ description: 'The post detail ID which is a reference to the PostDetail model', type: String })
     @IsString()
