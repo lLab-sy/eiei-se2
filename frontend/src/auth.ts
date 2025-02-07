@@ -8,7 +8,7 @@ export const loginUser = async (data: {username:string, password:string}) => {
         password: data.password,
     }
     const res = await axios.post(apiUrl, dataPost)
-    
+
     // data => token + user => id + username + role
     if(res.status !== 200 || !res.data){
         throw new Error('Cannot find User data')
@@ -39,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 const user = await loginUser(sendData as {username: string, password:string})
                 
                 if (!user || user?.status === 'error') {
-                    throw new Error("Invalid username or password"); // ✅ More specific error
+                    throw new Error("Invalid username or password");
                 }
         
                 return {

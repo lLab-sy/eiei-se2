@@ -8,23 +8,43 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { setToken, setUser } from "@/redux/user/user.slice";
 import axios from "axios";
+import { signOut } from "next-auth/react";
 
 const NavBar = (session: any) => {
+  const token = session?.session?.user?.token ?? ''
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // const {data: session, status} = useSession()
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
-  // console.log('session', session)
+  console.log('session', session)
+  
+  const handleLogout = async () => {
+    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
+    await axios.post(apiUrl, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    await signOut()
+  }
   // console.log('session',session.session)
   useEffect(() => {
-    if(!session){
+    if(!session.session || token === ''){
       return;
     }
     // set token and set user from fetch data
-    const handleFetch = async () => {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/${session?.session?.user?.username}`
-      const res = await axios(apiUrl)
+    const handleFetch = async (fetchToken : string) => {
 
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`
+      const res = await axios.get(apiUrl, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${fetchToken}`
+        }
+      })
+      console.log('res', res)
       const controller = new AbortController()
       if(!res){
         throw new Error('Failed to Fetch')
@@ -34,12 +54,12 @@ const NavBar = (session: any) => {
       }
       const returnUser = await res.data
       dispatch(setUser(returnUser.data))
-      console.log('persist User',user)
+      console.log('setuser', user.user)
       return () => controller.abort()
     }
-    dispatch(setToken(session?.session?.user?.token))
-    handleFetch()
-  }, [session])
+    dispatch(setToken(token))
+    handleFetch(token)
+  }, [session.session, token])
 
   const menuItems = [
     { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },

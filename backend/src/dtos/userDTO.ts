@@ -10,11 +10,11 @@ export class UserDTO {
   @MaxLength(50)
   username!: string;
 
-  @ApiProperty({ description: 'User password (min 6 characters)' })
-  @IsString()
-  @MinLength(8)
-  @MaxLength(20)
-  password!: string;
+  // @ApiProperty({ description: 'User password (min 6 characters)' })
+  // @IsString()
+  // @MinLength(8)
+  // @MaxLength(20)
+  // password!: string;
 
   @ApiProperty({ description: 'User email address' })
   @IsEmail()

@@ -65,14 +65,14 @@ const formSchema = z
     card_name: z.string().optional(),
     card_number: z.string().optional(),
     company: z.string().optional(),
-    password: z
-      .string()
-      .min(8, "Password must contain at least 8 characters")
-      .max(20, "Password must contain at most 20 characters")
-      .regex(new RegExp(".*[ -/:-@[-`{-~].*"), {
-        message: "Password should contain at least one special characters",
-      }),
-    confirmPassword: z.string(),
+    // password: z
+    //   .string()
+    //   .min(8, "Password must contain at least 8 characters")
+    //   .max(20, "Password must contain at most 20 characters")
+    //   .regex(new RegExp(".*[ -/:-@[-`{-~].*"), {
+    //     message: "Password should contain at least one special characters",
+    //   }),
+    // confirmPassword: z.string(),
     occupation: z.string().optional(),
     skill: z.array(z.any()).optional(),
     experience: z.coerce.number().optional(),
@@ -85,15 +85,15 @@ const formSchema = z
       )
       .optional(),
   })
-  .superRefine((val, ctx) => {
-    if (val.password != val.confirmPassword) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["confirmPassword"],
-        message: "Password do not match",
-      });
-    }
-  });
+  // .superRefine((val, ctx) => {
+  //   if (val.password != val.confirmPassword) {
+  //     ctx.addIssue({
+  //       code: z.ZodIssueCode.custom,
+  //       path: ["confirmPassword"],
+  //       message: "Password do not match",
+  //     });
+  //   }
+  // });
 
 type formType = z.infer<typeof formSchema>;
 export default function UserPage() {
@@ -103,7 +103,7 @@ export default function UserPage() {
 
   const userData : any = user.user
   console.log('userData' ,userData)
-  
+  console.log('user', user)
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -117,8 +117,8 @@ export default function UserPage() {
       firstName: userData?.firstName ?? "",
       middleName: userData?.middleName ?? "",
       lastName: userData?.lastName ?? "",
-      password: userData?.password ?? "12345678!",
-      confirmPassword: userData?.password ?? "12345678!",
+      // password: userData?.password ?? "12345678!",
+      // confirmPassword: userData?.password ?? "12345678!",
       payment_type: userData?.paymentType ?? "qrCode",
       occupation: userData?.occupation ?? "",
       skill: userData?.skill ?? [],
@@ -140,8 +140,8 @@ export default function UserPage() {
         firstName: userData.firstName ?? "",
         middleName: userData.middleName ?? "",
         lastName: userData.lastName ?? "",
-        password: "12345678!",
-        confirmPassword: "12345678!",
+        // password: "12345678!",
+        // confirmPassword: "12345678!",
         payment_type: userData.paymentType ?? "qrCode",
         occupation: userData.occupation ?? "",
         skill: userData.skill ?? [],
@@ -181,7 +181,7 @@ export default function UserPage() {
       bankAccount: bankAccount,
       profileImage: "",
       role: user?.user?.role,
-      password: data.password,
+      // password: data.password,
       email: data.email,
     };
     const producerData = {
@@ -199,10 +199,16 @@ export default function UserPage() {
     };
     // console.log("production data", productionData);
     const id = user.user._id;
+    const token = user.token
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/update-user/${id}`;
     const returnUser = await axios.put(
       apiUrl,
-      user.user.role === "producer" ? producerData : productionData,
+      user.user.role === "producer" ? producerData : productionData,{
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
     );
     if (!returnUser) {
       throw new Error("Failed Api");
@@ -317,20 +323,20 @@ export default function UserPage() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="h-[60%]"
+                className="h-[50%] "
               >
                 <fieldset
                   disabled={form.formState.isSubmitting}
                   className="h-[100%] flex items-start"
                 >
                   <div
-                    className={`${click == 0 ? "" : "hidden"} h-full flex flex-row space-y-0 w-[100%] flex-wrap  justify-between `}
+                    className={`${click == 0 ? "" : "hidden"} h-full flex flex-row space-y-0 w-[100%] flex-wrap items-start  justify-between `}
                   >
                     <FormField
                       name="firstName"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem className="w-[40%]">
+                        <FormItem className="w-[40%">
                           <FormLabel className="">First Name</FormLabel>
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
@@ -343,7 +349,7 @@ export default function UserPage() {
                       name="middleName"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem className="w-[40%]">
+                        <FormItem className="w-[40%] ">
                           <FormLabel className="">Middle Name</FormLabel>
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
@@ -421,7 +427,7 @@ export default function UserPage() {
                         </FormItem>
                       )}
                     />
-                    <FormField
+                    {/* <FormField
                       name="password"
                       control={form.control}
                       render={({ field }) => (
@@ -454,7 +460,7 @@ export default function UserPage() {
                           <FormMessage />
                         </FormItem>
                       )}
-                    />
+                    /> */}
                     <div
                       className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
                     >
