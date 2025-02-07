@@ -18,7 +18,8 @@ const professionals = Array.from({ length: 259 }, (_, index) => ({
   ratings: (Math.random() * 5),
   mediaType: "Video Production",
   price: `฿${(Math.random() * 10000 + 1000).toFixed(0)}`,
-  imageUrl: "https://via.placeholder.com/150"
+  imageUrl: "https://via.placeholder.com/150",
+  id: index.toString(),
 }));
 
 const ProfessionalsPage = () => {
@@ -75,7 +76,8 @@ const ProfessionalsPage = () => {
               imageUrl={professional.imageUrl} 
               role={professional.role} 
               ratings={professional.ratings} 
-              mediaType={professional.mediaType}            
+              mediaType={professional.mediaType}
+              id={professional.id}          
               />
           ))}
         </div>
