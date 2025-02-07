@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
 import { PostSearchRequestDTO } from '../dtos/postDTO';
+import { AuthRequest } from '../dtos/middlewareDTO';
 
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
@@ -26,10 +27,10 @@ class PostController {
     }
   };
   
-  async getPostsByUser(req: Request, res: Response): Promise<void> {
+  async getPostsByUser(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const posts = await postService.getPostsbyUser(req.params.id);
-      sendResponse(res, 'success', posts, 'Successfully retrieved posts');
+      const posts = await postService.getPostsbyUser(req.user.userId);
+      sendResponse(res, 'success', posts, `Successfully retrieved ${posts?posts.length:0} posts`);
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
