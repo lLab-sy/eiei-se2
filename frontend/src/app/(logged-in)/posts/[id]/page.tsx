@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Mail, Phone, Briefcase, Star, User, Award, Calendar } from "lucide-react";
+import { Mail, Phone, Star, User, Calendar } from "lucide-react";
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -13,7 +13,7 @@ const PostDetail = () => {
 
   const PostInfo = {
     postName: "Marvel Studios",
-    postDescription: "    We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We’re looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we’d love to hear from you.",
+    postDescription: "We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We’re looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we’d love to hear from you.",
     postImages: [],
     postMediaType: "Video",
     postProjectRoles: ["Videographer", "Editor"],
@@ -35,10 +35,10 @@ const PostDetail = () => {
           <CardTitle className="text-3xl font-semibold text-gray-800">Project Overview</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-8">
+        <CardContent className="space-y-6">
           {/* Image Carousel */}
           <div className="w-full flex justify-center">
-            <Carousel className="rounded-lg shadow-md bg-gray-50 p-2 w-full max-w-md">
+            <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
               <CarouselContent>
                 {PostInfo.postImages.length !== 0 ? (
                   PostInfo.postImages.map((imgSrc) => (
@@ -72,12 +72,13 @@ const PostDetail = () => {
           </div>
 
           {/* Project Name */}
-          <div className="w-full text-center">
-            <h2 className="text-2xl font-bold text-main-gery py-3">{PostInfo.postName}</h2>
-            <span className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-2 rounded-full shadow-sm"> {PostInfo.postMediaType} </span>
-            
+          <div className="w-full text-center space-y-3">
+            <h2 className="text-2xl font-bold text-main-gery">{PostInfo.postName}</h2>
+            <div className="w-full text-center">
+              <span className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-2 rounded-full shadow-sm"> {PostInfo.postMediaType} </span>
+            </div>
           </div>
-          <p className="mt-5 ">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
 
           {/* Project Detail Section */}
           <div className="place-content-center grid grid-cols-1 gap-3">
