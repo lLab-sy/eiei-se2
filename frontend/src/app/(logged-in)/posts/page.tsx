@@ -5,7 +5,6 @@ import React from "react";
 import Footer from "@/components/Footer";
 import SearchPostBar from "@/components/SearchPostBar";
 import Pagination from "@/components/Pagination";
-import NavBar from "@/components/NavBar";
 import PostCrad from "@/components/PostCard";
 
 const PAGE_SIZE = 32;
@@ -17,7 +16,8 @@ const posts = Array.from({ length: 259 }, (_, index) => ({
   description: "This is post description.",
   mediaType: "Video Production",
   price: `฿${(Math.random() * 10000 + 1000).toFixed(0)}`,
-  imageUrl: "https://via.placeholder.com/150"
+  imageUrl: "https://via.placeholder.com/150",
+  id: `${index + 1}`,
 }));
 
 const ProfessionalsPage = () => {
@@ -60,7 +60,8 @@ const ProfessionalsPage = () => {
               price={professional.price}
               imageUrl={professional.imageUrl} 
               role={professional.role} 
-              mediaType={professional.mediaType}            
+              mediaType={professional.mediaType}
+              id={professional.id}          
               />
           ))}
         </div>

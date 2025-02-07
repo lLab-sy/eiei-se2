@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 interface PostCradProp {
   title: string;
@@ -7,6 +8,7 @@ interface PostCradProp {
   mediaType: string;
   price: string;
   imageUrl: string;
+  id: string;
 }
 
 const PostCrad: React.FC<PostCradProp> = ({
@@ -16,6 +18,7 @@ const PostCrad: React.FC<PostCradProp> = ({
   mediaType,
   price,
   imageUrl,
+  id,
 }) => {
     return (
     <div className="flex flex-col bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -42,9 +45,12 @@ const PostCrad: React.FC<PostCradProp> = ({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-mainblue-lightest font-bold">{price}</span>
-            <button className="bg-mainblue-lightest text-white px-4 py-2 rounded-full text-sm hover:bg-mainblue-dark">
-              View More
-            </button>
+            <Link href={`/posts/${id}`}>
+              <button className="bg-mainblue-lightest text-white px-4 py-2 rounded-full text-sm hover:bg-mainblue-dark">
+                View More
+              </button>
+            </Link>
+            
           </div>
         </div>
         </div>
