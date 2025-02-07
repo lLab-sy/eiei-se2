@@ -6,9 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { setToken, setUser } from "@/redux/user/user.slice";
+import { setUser } from "@/redux/user/user.slice";
 import axios from "axios";
 import { signOut } from "next-auth/react";
+import { Button } from "./ui/button";
 
 const NavBar = (session: any) => {
   const token = session?.session?.user?.token ?? ''
@@ -57,7 +58,6 @@ const NavBar = (session: any) => {
       console.log('setuser', user.user)
       return () => controller.abort()
     }
-    dispatch(setToken(token))
     handleFetch(token)
   }, [session.session, token])
 
@@ -107,6 +107,10 @@ const NavBar = (session: any) => {
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
           <div className="flex items-center gap-2">
+            {/* {session.session  ?  <Button onClick={async () => {
+              await handleLogout()
+              await signOut()
+            }}>Logout</Button> : ''} */}
             <span className="text-sm">Gender: {user?.user?.gender ?? "None"} {session.session ? 'In session' : 'out session'} {user?.user?.username ?? "Username"}</span>
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               <User className="w-5 h-5 text-gray-600" />
