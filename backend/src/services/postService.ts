@@ -10,7 +10,8 @@ class PostService {
         const posts = await postRepository.getAllPosts();
   
         const result = posts.map((post) => {
-  
+            // const startDate = new Date(post.startDate) 
+            // const endDate =  new Date(post.endDate)) 
             return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,

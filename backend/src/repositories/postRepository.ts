@@ -138,8 +138,11 @@ class PostRepository {
     public async searchPost(postSearchReq: PostSearchRequestModel): Promise<PostSearchResponse>{
         try {
             const { searchText, postMediaTypes, roleRequirements, limit, page } = postSearchReq;
-            // PostSearchQuery from postModel
+            
+                
 
+            // PostSearchQuery from postModel
+            // console.log("Check",roleRequirements)
             const matchStage: PipelineStage[] = [];
             
             if (searchText) {
@@ -162,13 +165,20 @@ class PostRepository {
             }
 
             if (roleRequirements?.length) {
+                console.log("EIEIEI")
+                // console.log()
+                const postProjectRoles = roleRequirements.map((eachRole) => {
+                    return new ObjectId(eachRole);
+                  
+                });
+                console.log("PostProject",postProjectRoles)
                 matchStage.push({
                     $match: {
-                        postProjectRoles: { $all: postMediaTypes}
+                        postProjectRoles: { $all: postProjectRoles}
                     }
                 })
             }
-            
+            console.log("Check2",matchStage)
             const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
             const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
@@ -185,6 +195,7 @@ class PostRepository {
                 data: results,
                 totalItems: totalItems
             }
+            console.log("ANSWER",response)
             return response
         } catch (error) {
             throw new Error('Error search post in repository: ' + error);
@@ -193,3 +204,7 @@ class PostRepository {
 }
 
 export default new PostRepository();
+
+
+
+ 
