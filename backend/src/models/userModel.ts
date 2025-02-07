@@ -36,6 +36,7 @@ export interface IProducer extends IUser {
 // ProductionProfessional-specific fields
 export interface IProductionProfessional extends IUser {
   occupation?: string;
+  description?: string;
   skill?: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
   experience?: number; // Years of experience
   rating?: Array<{
@@ -147,6 +148,10 @@ export const Producer = User.discriminator<IProducer>("producer", producerSchema
 // Production Professional Schema
 export const productionProfessionalSchema = new Schema<IProductionProfessional>({
   occupation: {
+    type: String,
+    trim: true,
+  },
+  description: {
     type: String,
     trim: true,
   },

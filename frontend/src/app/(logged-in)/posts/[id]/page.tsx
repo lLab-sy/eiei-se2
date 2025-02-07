@@ -5,46 +5,47 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Mail, Phone, Briefcase, Star, User, Award } from "lucide-react";
+import { Mail, Phone, Briefcase, Star, User, Award, Calendar } from "lucide-react";
 
 const PostDetail = () => {
   const { id } = useParams();
   const [img, setImg] = useState<string[]>([]);
 
-  const ProfessionalInfo = {
-    id,
+  const PostInfo = {
+    postName: "Marvel Studios",
+    postDescription: "    We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We’re looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we’d love to hear from you.",
+    postImages: [],
+    postMediaType: "Video",
+    postProjectRoles: ["Videographer", "Editor"],
+    postStatus: "Created",
+    startDate: "2022-10-01",
+    endDate: "2022-10-31",
+    price: "100",
     firstName: "John",
     lastName: "Doe",
-    email: "test@email.com",
+    email: "realMarvelStudio@yahoo.com",
     phoneNumber: "123-456-7890",
-    gender: "Male",
-    profileImage: "/image/logo.png",
-    description: "Experienced media professional with expertise in cinematography, lighting, and video editing.",
-    occupation: "Videographer",
-    skill: ["Cameraman", "Lighting", "Editing"],
-    experience: "10", // Years of experience
-    rating: 5.0,
   };
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
-      <Card className="w-full max-w-4xl shadow-lg rounded-xl bg-white">
+      <Card className="w-full max-w-3xl shadow-lg rounded-2xl bg-white p-8">
         {/* Header */}
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-semibold text-gray-800">Professional Profile</CardTitle>
+        <CardHeader className="text-center mb-4">
+          <CardTitle className="text-3xl font-semibold text-gray-800">Project Overview</CardTitle>
         </CardHeader>
 
-        <CardContent className="flex flex-col items-center space-y-6 p-6">
+        <CardContent className="space-y-8">
           {/* Image Carousel */}
-          <div className="w-full max-w-md">
-            <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
+          <div className="w-full flex justify-center">
+            <Carousel className="rounded-lg shadow-md bg-gray-50 p-2 w-full max-w-md">
               <CarouselContent>
-                {img.length !== 0 ? (
-                  img.map((imgSrc) => (
+                {PostInfo.postImages.length !== 0 ? (
+                  PostInfo.postImages.map((imgSrc) => (
                     <CarouselItem key={imgSrc} className="flex justify-center">
                       <Image
                         src={imgSrc}
-                        alt="Professional Image"
+                        alt="Project Image"
                         width={300}
                         height={300}
                         className="rounded-lg object-cover shadow-sm"
@@ -56,7 +57,7 @@ const PostDetail = () => {
                   <CarouselItem className="flex justify-center">
                     <Image
                       src="/image/logo.png"
-                      alt="Default Profile Image"
+                      alt="Default Project Image"
                       width={300}
                       height={300}
                       className="rounded-lg object-cover shadow-sm"
@@ -70,55 +71,56 @@ const PostDetail = () => {
             </Carousel>
           </div>
 
-          {/* Professional Info */}
-          <div className="w-full text-center space-y-3">
-            <h2 className="text-2xl font-bold text-main-gery">{ProfessionalInfo.firstName} {ProfessionalInfo.lastName}</h2>
-            <p className="text-lg text-maingrey flex items-center justify-center gap-2">
-              <Briefcase className="h-5 w-5 text-mainblue-lightest" />
-              {ProfessionalInfo.occupation}
-            </p>
-            <p className="text- mt-3">{ProfessionalInfo.description}</p>
+          {/* Project Name */}
+          <div className="w-full text-center">
+            <h2 className="text-2xl font-bold text-main-gery py-3">{PostInfo.postName}</h2>
+            <span className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-2 rounded-full shadow-sm"> {PostInfo.postMediaType} </span>
+            
           </div>
+          <p className="mt-5 ">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
-            <div className="flex items-center space-x-3">
-              <User className="h-5 w-5 text-mainblue-lightest" />
-              <span className="text-maingrey">Gender: {ProfessionalInfo.gender}</span>
+          {/* Project Detail Section */}
+          <div className="place-content-center grid grid-cols-1 gap-3">
+             <div className="flex items-center gap-2 justify-center">
+                <div className="flex flex-wrap gap-2 ">
+                  <h3 className="font-semibold text-maingrey text-center">Roles : </h3>
+                  {PostInfo.postProjectRoles.map((skill) => (
+                    <span key={skill} className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-1 rounded-full shadow-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <h3 className="text- font-semibold text-maingrey text-center">Budget : {PostInfo.price} Bath</h3>
+          </div>
+         
+          <div className="place-content-center grid grid-cols-2 gap-4 place-items-center h-full">
+            {/* Project Status Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">Project Status</h2>
+              <div className="grid grid-cols-1 gap-4 text-gray-700">
+                <p className="flex items-center gap-2 font-medium"><Star className="w-5 h-5 text-yellow-500" /> Status: {PostInfo.postStatus}</p>
+                <p className="flex items-center gap-2 font-medium"><Calendar className="w-5 h-5 text-green-500" /> Start Date: {PostInfo.startDate}</p>
+                <p className="flex items-center gap-2 font-medium"><Calendar className="w-5 h-5 text-red-500" /> End Date: {PostInfo.endDate}</p>
+              </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <Award className="h-5 w-5 text-mainblue-lightest" />
-              <span className="text-maingrey">Experience: {ProfessionalInfo.experience} years</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Mail className="h-5 w-5 text-mainblue-lightest" />
-              <span className="text-maingrey">{ProfessionalInfo.email}</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Star className="h-5 w-5 text-mainyellow" />
-              <span className="text-maingrey">Rating: {ProfessionalInfo.rating}</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Phone className="h-5 w-5 text-maingreen" />
-              <span className="text-maingrey">{ProfessionalInfo.phoneNumber}</span>
+
+            {/* Project Owner Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">Project Owner</h2>
+              <div className="grid grid-cols-1 gap-4 text-gray-700">
+                <p className="flex items-center gap-2 font-medium"><User className="w-5 h-5 text-blue-500" /> {PostInfo.firstName} {PostInfo.lastName}</p>
+                <p className="flex items-center gap-2 font-medium"><Mail className="w-5 h-5 text-red-500" /> {PostInfo.email}</p>
+                <p className="flex items-center gap-2 font-medium"><Phone className="w-5 h-5 text-orange-500" /> {PostInfo.phoneNumber}</p>
+              </div>
             </div>
           </div>
+          
 
-          {/* Skills Section */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-maingrey mb-2">Skills</h3>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {ProfessionalInfo.skill.map((skill) => (
-                <span key={skill} className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-1 rounded-full shadow-sm">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
+          {/* Contact Button */}
           <div className="mt-6 flex justify-center">
-            <a href="mailto:{ProfessionalInfo.email}" className="bg-mainblue-lightest text-white py-3 px-8 rounded-lg shadow-md hover:bg-mainblue-light transition-colors duration-300">
-              Contact
+            <a href={`mailto:${PostInfo.email}`} className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300">
+              Contact Owner
             </a>
           </div>
         </CardContent>
