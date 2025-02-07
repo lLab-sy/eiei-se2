@@ -46,15 +46,14 @@ const SearchBar = () => {
       </div>
       <div className="flex items-center space-x-4 mt-4">
         <span className="font-bold text-white">Experience:</span>
-        {[...Array(MAX_STARS)].map((_, i) => (
-          <span
-            key={i}
-            className={`cursor-pointer text-xl ${i < experience ? "text-yellow-500" : "text-gray-300"}`}
-            onClick={() => handleStarClick({ value: i + 1, type: "experience" })}
-          >
-            ★
-          </span>
-        ))}
+        <div className="flex items-center bg-gray-200 rounded-full px-4 py-2 w-full">
+          <input
+            type="number"
+            placeholder="Minimum Year..."
+            className="bg-transparent outline-none w-auto text-gray-700 placeholder-gray-500"
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
         <span className="font-bold text-white">Rating:</span>
         {[...Array(MAX_STARS)].map((_, i) => (
           <span

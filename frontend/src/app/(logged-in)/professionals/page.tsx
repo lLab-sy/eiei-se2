@@ -12,13 +12,13 @@ const PAGE_SIZE = 32;
 
 ////////// For testing
 const professionals = Array.from({ length: 259 }, (_, index) => ({
-  title: `Service ${index + 1}`,
-  role: ["Editor", "Videographer"],
-  description: "Sample description for service",
+  title: `John Doe ${index + 1}`,
+  skill: ["Cameraman", "Lighting", "Editing"],
+  description: "My name is John Doe and I am a professional videographer.",
   ratings: (Math.random() * 5),
-  mediaType: "Video Production",
-  price: `฿${(Math.random() * 10000 + 1000).toFixed(0)}`,
+  occupation: "Videographer",
   imageUrl: "https://via.placeholder.com/150",
+  experience: 10,
   id: index.toString(),
 }));
 
@@ -72,11 +72,11 @@ const ProfessionalsPage = () => {
               key={index}
               title={professional.title}
               description={professional.description}
-              price={professional.price}
               imageUrl={professional.imageUrl} 
-              role={professional.role} 
+              skill={professional.skill} 
               ratings={professional.ratings} 
-              mediaType={professional.mediaType}
+              occupation={professional.occupation}
+              experience={professional.experience}
               id={professional.id}          
               />
           ))}

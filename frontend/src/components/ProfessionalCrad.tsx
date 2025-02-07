@@ -1,25 +1,26 @@
 import React from "react";
 import Link from "next/link";
+import { Award } from "lucide-react";
 
 interface ProfessionalCradProp {
   title: string;
-  role: string[];
+  skill: string[];
   description: string;
   ratings: number;
-  mediaType: string;
-  price: string;
+  occupation: string;
   imageUrl: string;
   id: string;
+  experience: number;
 }
 
 const ProfessionalCrad: React.FC<ProfessionalCradProp> = ({
   title,
-  role,
+  skill,
   description,
   ratings,
-  mediaType,
-  price,
+  occupation,
   imageUrl,
+  experience,
   id,
 }) => {
     return (
@@ -30,7 +31,7 @@ const ProfessionalCrad: React.FC<ProfessionalCradProp> = ({
 
         {/* Role badges */}
         <div className="flex flex-wrap gap-2 mt-2">
-            {role.map((item, index) => (
+            {skill.map((item, index) => (
             <span key={index} className="bg-blue-100 text-blue-700 px-2 py-1 text-xs rounded-full">
                 {item}
             </span>
@@ -43,11 +44,12 @@ const ProfessionalCrad: React.FC<ProfessionalCradProp> = ({
         {/* Footer Section */}
         <div className="mt-auto pt-10">
           <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
-            <span>⭐ {ratings.toFixed(1)} / 5</span>
-            <span className="italic">{mediaType}</span>
+          <Award className="h-5 w-5 text-mainblue-lightest" />
+            <span className="text-maingrey">{experience} years</span>
+            <span className="italic ml-auto">{occupation}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-mainblue-lightest font-bold">{price}</span>
+            <span>⭐ {ratings.toFixed(1)} / 5</span>
             <Link href={`/professionals/${id}`}>
               <button className="bg-mainblue-lightest text-white px-4 py-2 rounded-full text-sm hover:bg-mainblue-dark">
                 View More

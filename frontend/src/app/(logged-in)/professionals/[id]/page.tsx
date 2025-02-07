@@ -20,7 +20,7 @@ const ProfessionalDetail = () => {
     gender: "Male",
     profileImage: "/image/logo.png",
     description: "Experienced media professional with expertise in cinematography, lighting, and video editing.",
-    occupation: "Videographer & Editor",
+    occupation: "Videographer",
     skill: ["Cameraman", "Lighting", "Editing"],
     experience: "10", // Years of experience
     rating: 5.0,
@@ -91,12 +91,12 @@ const ProfessionalDetail = () => {
               <span className="text-maingrey">Experience: {ProfessionalInfo.experience} years</span>
             </div>
             <div className="flex items-center space-x-3">
-              <Star className="h-5 w-5 text-mainyellow" />
-              <span className="text-maingrey">Rating: {ProfessionalInfo.rating}⭐</span>
-            </div>
-            <div className="flex items-center space-x-3">
               <Mail className="h-5 w-5 text-mainblue-lightest" />
               <span className="text-maingrey">{ProfessionalInfo.email}</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Star className="h-5 w-5 text-mainyellow" />
+              <span className="text-maingrey">Rating: {ProfessionalInfo.rating}⭐</span>
             </div>
             <div className="flex items-center space-x-3">
               <Phone className="h-5 w-5 text-maingreen" />
