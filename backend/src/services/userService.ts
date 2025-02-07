@@ -7,6 +7,7 @@ import ProducerRespository from '../repositories/producerRepository';
 import ProductionProfessionalRespository from "../repositories/productionProfessionalRespository";
 import { searchReqDTO } from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
+import userRepository from "../repositories/userRepository";
 
 class UserService {
     async getUser(username:string){
