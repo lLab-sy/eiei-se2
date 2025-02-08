@@ -104,8 +104,7 @@ class PostRepository {
     public async updatePost(postData: IPost,id:string) {
         try {
             console.log(postData)
-            // console.log(postData.id,"id")
-            // const postId = new Object(postData.id);
+  
             const objectId = new ObjectId(id);
             console.log(objectId)
             const updatedPost = await Post.findOneAndUpdate(
@@ -139,10 +138,7 @@ class PostRepository {
         try {
             const { searchText, postMediaTypes, roleRequirements, limit, page } = postSearchReq;
             
-                
 
-            // PostSearchQuery from postModel
-            // console.log("Check",roleRequirements)
             const matchStage: PipelineStage[] = [];
             
             if (searchText) {
@@ -165,8 +161,6 @@ class PostRepository {
             }
 
             if (roleRequirements?.length) {
-                console.log("EIEIEI")
-                // console.log()
                 const postProjectRoles = roleRequirements.map((eachRole) => {
                     return new ObjectId(eachRole);
                   
