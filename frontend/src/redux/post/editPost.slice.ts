@@ -4,7 +4,7 @@ import storage from "redux-persist/lib/storage";
 
 interface Image {
   imgSrc: string;
-  imgFile: string;
+  imgFile: string | null;
 }
 
 interface Role {

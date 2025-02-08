@@ -1,4 +1,4 @@
-/*"use client";
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +18,7 @@ import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useRouter } from "next/router";
 import {
   setPostName,
   setDescription,
@@ -27,6 +28,8 @@ import {
   resetPost,
   setInitialState,
 } from "@/redux/post/editPost.slice";
+import { fetchPostData, updateMockDatabase } from "@/libs/mockPostApi";
+import { useParams } from "next/navigation";
 
 const OPTIONS: Option[] = [
   { label: "Producer", value: "producer" },
@@ -39,9 +42,17 @@ const OPTIONS: Option[] = [
   { label: "Audio Technician", value: "audio technician" },
 ];
 
-export default function EditPostPage({ postId }: { postId: string }) {
+export default function EditPostPage({ initialPostId  }: { initialPostId : string }) {
+  const params = useParams();
+  console.log("Params from useParams:", params); // ดูค่าที่ได้
+
+  const postId = params?.postId as string || initialPostId; // ✅ ดึงค่า postId อย่างถูกต้อง
+  console.log("Current postId:", postId);
+
   const { toast } = useToast();
   const dispatch = useDispatch();
+  //const router = useRouter();
+  //const postIdFromURL = router.query.postId as string; // ดึง postId จาก URL
   const post = useSelector((state: RootState) => state.post);
 
   const { postName, description, mediaType, roles } = post;
@@ -59,6 +70,25 @@ export default function EditPostPage({ postId }: { postId: string }) {
     ),
   });
 
+  // โหลดข้อมูลเฉพาะเมื่อ Redux state ยังไม่มีข้อมูล
+  useEffect(() => {
+    if (postId) {
+      console.log("New postId detected:", postId);
+      const loadPostData = async () => {
+        const data = await fetchPostData(postId);
+        dispatch(setInitialState(data)); // ✅ อัปเดต Redux ทันทีที่ `postId` เปลี่ยน
+        form.reset({
+          postname: data.postName,
+          description: data.description,
+          type: data.mediaType,
+          roles: data.roles,
+        });
+      };
+      loadPostData();
+    }
+  }, [postId, dispatch, form]);
+  
+
   useEffect(() => {
     form.reset({
       postname: postName,
@@ -66,9 +96,15 @@ export default function EditPostPage({ postId }: { postId: string }) {
       type: mediaType,
       roles,
     });
-  }, [postName, description, mediaType, roles]);
+  }, [postId, form]);
+
+  useEffect(() => {
+    console.log("Current form values:", form.getValues());
+  }, [form.getValues()]);
 
   const onSubmit = async (values: any) => {
+    console.log("Form submitted with values:", values); // ✅ Debug เช็คค่าที่ส่งมา
+
     const updatedData = {
       postName: values.postname,
       description: values.description,
@@ -76,8 +112,11 @@ export default function EditPostPage({ postId }: { postId: string }) {
       roles: values.roles,
       images,
     };
-
+    console.log("✅ Updated Data to be saved:", updatedData); // ✅ Debug จุดที่สอง
     dispatch(setInitialState(updatedData));
+    await updateMockDatabase(postId, updatedData);
+
+    console.log("🚀 Data update complete! Showing toast..."); // ✅ Debug จุดที่สาม
     toast({ title: "Post updated successfully!" });
   };
 
@@ -203,7 +242,7 @@ export default function EditPostPage({ postId }: { postId: string }) {
                     )}
                   </div>
                 </div>
-                <Button type="submit">Update Post</Button>
+                <Button onClick={form.handleSubmit(onSubmit)}>Update Post</Button>
               </form>
             </CardContent>
           </div>
@@ -212,4 +251,3 @@ export default function EditPostPage({ postId }: { postId: string }) {
     </div>
   );
 }
-*/
