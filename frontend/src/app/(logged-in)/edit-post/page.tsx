@@ -81,20 +81,27 @@ export default function EditPostPage({ postId }: { postId: string }) {
     toast({ title: "Post updated successfully!" });
   };
 
+  const [files, setFiles] = useState<File[]>([]);
+
   const onImgChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
 
-    const uploadedImages = Array.from(event.target.files).map((file) => ({
+    const uploadedFiles = Array.from(event.target.files);
+    const uploadedImages = uploadedFiles.map((file) => ({
       imgSrc: URL.createObjectURL(file),
-      imgFile: file,
+      imgFile: file.name,
     }));
 
-    dispatch(setImages([...images, ...uploadedImages])); // ใช้ dispatch
+    setFiles((prev) => [...prev, ...uploadedFiles]); // เก็บ `File` ใน useState
+    dispatch(setImages([...images, ...uploadedImages])); // Redux เก็บแค่ข้อมูลที่ serialize ได้
   };
 
   const removeImage = (index: number) => {
+    const updatedFiles = files.filter((_, i) => i !== index);
     const updatedImages = images.filter((_, i) => i !== index);
-    dispatch(setImages(updatedImages)); // ใช้ dispatch
+
+    setFiles(updatedFiles); // อัปเดต useState
+    dispatch(setImages(updatedImages)); // อัปเดต Redux
   };
 
   return (
