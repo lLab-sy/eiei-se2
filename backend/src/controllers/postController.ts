@@ -71,16 +71,29 @@ class PostController {
       // make sure postMediaTypes and roleRequirements are string[] or undefined
       const postMediaTypes = req.query.postMediaTypes as string[]
       const roleRequirements = req.query.roleRequirements as string[]
+      const limit = req.query.limit ? Number(req.query.limit): 10
+      const page = req.query.page ? Number(req.query.page): 1
+      
+      if (limit < 1 || page < 1) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
 
       const postSearchReqDTO: PostSearchRequestDTO = {
-        page: Number(req.query.page),
-        limit: Number(req.query.limit),
+        page: page,
+        limit: limit,
         searchText: req.query.searchText? req.query.searchText as string: '',
         postMediaTypes: Array.isArray(postMediaTypes)?postMediaTypes: postMediaTypes? [postMediaTypes]: postMediaTypes,
         roleRequirements: Array.isArray(roleRequirements)?roleRequirements: roleRequirements? [roleRequirements]: roleRequirements
       }
 
       const posts = await postService.searchPost(postSearchReqDTO);
+
+      if (posts.meta.totalPages < page) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+
       sendResponse(res, 'success', posts, 'Successfully search posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
