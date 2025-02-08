@@ -1,17 +1,34 @@
-version: '3.8'
+version: '3.9'
 
 services:
   # MongoDB Service
   mongodb:
     image: mongo:8
-    container_name: mongodbe-eiei
+    restart: always
+    container_name: mongodb-eiei
     ports:
       - "${MONGO_PORT}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: eiei
+    # volumes:
+    #   - ./init-mongo/:/docker-entrypoint-initdb.d/
+  mongo-seed:
+    image: mongo:8
+    depends_on:
+      - mongodb
     volumes:
-      - ./init-mongo/init.js:/docker-entrypoint-initdb.d/init.js
+      - ./init-data:/init-data
+    env_file:
+      - .env 
+    command: 
+      sh -c "
+        sleep 1 &&
+        mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection mediaType --type json --file /init-data/mediaType.json --jsonArray &&
+        mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection users --type json --file /init-data/users.json --jsonArray &&
+        mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection postTypes --type json --file /init-data/posts.json --jsonArray
+      "
 
   # Backend Service (Express + TypeScript)
   backend:
