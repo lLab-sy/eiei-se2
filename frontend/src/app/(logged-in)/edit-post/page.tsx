@@ -23,6 +23,7 @@ import {
   setDescription,
   setMediaType,
   setRoles,
+  setImages,
   resetPost,
   setInitialState,
 } from "@/redux/post/editPost.slice";
@@ -42,12 +43,9 @@ export default function EditPostPage({ postId }: { postId: string }) {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const post = useSelector((state: RootState) => state.post);
-  const { postName, description, mediaType, roles } = post;
 
-  const [img, setImg] = useState<{ imgSrc: string; imgFile: File | null }[]>(
-    [],
-  );
-  const [mostRecentImg, setMostRecentImg] = useState<string>("");
+  const { postName, description, mediaType, roles } = post;
+  const images = useSelector((state: RootState) => state.post.images) || [];
 
   const form = useForm({
     defaultValues: useMemo(
@@ -76,22 +74,27 @@ export default function EditPostPage({ postId }: { postId: string }) {
       description: values.description,
       mediaType: values.type,
       roles: values.roles,
+      images,
     };
 
     dispatch(setInitialState(updatedData));
     toast({ title: "Post updated successfully!" });
   };
 
-  const onImgChange = (e: any) => {
-    if (e.target.files && e.target.files[0]) {
-      const files: File[] = Array.from(e.target.files);
-      const newImages = files.map((file) => ({
-        imgSrc: URL.createObjectURL(file),
-        imgFile: file,
-      }));
-      setMostRecentImg(newImages[newImages.length - 1]?.imgSrc || "");
-      setImg([...img, ...newImages]);
-    }
+  const onImgChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return;
+
+    const uploadedImages = Array.from(event.target.files).map((file) => ({
+      imgSrc: URL.createObjectURL(file),
+      imgFile: file,
+    }));
+
+    dispatch(setImages([...images, ...uploadedImages])); // ใช้ dispatch
+  };
+
+  const removeImage = (index: number) => {
+    const updatedImages = images.filter((_, i) => i !== index);
+    dispatch(setImages(updatedImages)); // ใช้ dispatch
   };
 
   return (
@@ -103,7 +106,10 @@ export default function EditPostPage({ postId }: { postId: string }) {
           </CardHeader>
           <div className="flex flex-row">
             <CardContent className="flex flex-col py-5 w-[60%]">
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 <div>
                   <label>Post Name</label>
                   <Input
@@ -128,9 +134,9 @@ export default function EditPostPage({ postId }: { postId: string }) {
                   <label>Media Type</label>
                   <Select
                     value={mediaType}
-                    onValueChange={(value: "media" | "short" | "drama" | "ads") =>
-                      dispatch(setMediaType(value))
-                    }
+                    onValueChange={(
+                      value: "media" | "short" | "drama" | "ads",
+                    ) => dispatch(setMediaType(value))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select media type" />
@@ -161,6 +167,34 @@ export default function EditPostPage({ postId }: { postId: string }) {
                       )
                     }
                   />
+                </div>
+                <div>
+                  <label>Images</label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={onImgChange}
+                  />
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {images?.length > 0 ? (
+                      images.map((image, index) => (
+                        <div key={index} className="relative">
+                          <Image
+                            src={image.imgSrc}
+                            alt={`Image ${index}`}
+                            width={200}
+                            height={200}
+                          />
+                          <button onClick={() => removeImage(index)}>
+                            Remove
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No images uploaded yet.</p>
+                    )}
+                  </div>
                 </div>
                 <Button type="submit">Update Post</Button>
               </form>

@@ -2,10 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
+interface Image {
+  imgSrc: string;
+  imgFile: File;
+}
+
 interface Role {
   label: string;
   value: string;
-  disable?: boolean;
 }
 
 interface PostState {
@@ -13,6 +17,7 @@ interface PostState {
   description: string;
   mediaType: "media" | "short" | "drama" | "ads";
   roles: Role[];
+  images: Image[];
 }
 
 const initialState: PostState = {
@@ -20,6 +25,7 @@ const initialState: PostState = {
   description: "",
   mediaType: "media",
   roles: [],
+  images: [],
 };
 
 const postSlice = createSlice({
@@ -45,16 +51,19 @@ const postSlice = createSlice({
     setInitialState: (state, action: PayloadAction<PostState>) => {
       return action.payload;
     },
+    setImages(state, action: PayloadAction<Image[]>) {
+      state.images = action.payload;
+    },
   },
 });
 
 const persistConfig = {
   key: "editPost",  // ต้องใช้ key ที่ไม่ซ้ำกับ root
   storage,
-  whitelist: ["postName", "description", "mediaType", "roles"], // ระบุเฉพาะ key ที่ต้องการ persist
+  whitelist: ["postName", "description", "mediaType", "roles", "images"], // ระบุเฉพาะ key ที่ต้องการ persist
 };
 
-export const { setPostName, setDescription, setMediaType, setRoles, resetPost, setInitialState  } =
+export const { setPostName, setDescription, setMediaType, setRoles, resetPost, setInitialState, setImages  } =
   postSlice.actions;
 
   export default persistReducer(persistConfig, postSlice.reducer);
