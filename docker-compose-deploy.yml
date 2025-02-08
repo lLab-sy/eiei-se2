@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # MongoDB Service
+  mongodb:
+    image: mongo:8
+    container_name: mongodbe-eiei
+    ports:
+      - "${MONGO_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - ./init-mongo/init.js:/docker-entrypoint-initdb.d/init.js
+
+  # Backend Service (Express + TypeScript)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "1000:1000"
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      PORT: 1000
+    depends_on:
+      - mongodb
+
+  # Frontend Service (Next.js + TypeScript)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000
+    depends_on:
+      - backend
