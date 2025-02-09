@@ -1,0 +1,18 @@
+[
+    {
+        "_id": { "$oid": "65b1234567abcd1234ef5678" },
+        "roleName": "Director"
+    },
+    {
+        "_id": { "$oid": "65b8765432abcd5678ef1234" },
+        "roleName": "Actor"
+    },
+    {
+        "_id": { "$oid": "65a1234567abcd1234ef5678" },
+        "roleName": "Producer"
+    },
+    {
+        "_id": { "$oid": "65c8765432abcd5678ef1234" },
+        "roleName": "Writer"
+    }
+]

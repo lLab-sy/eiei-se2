@@ -71,6 +71,11 @@ class UserController {
             const limit = req.query.limit ? Number(req.query.limit): 10
             const page = req.query.page ? Number(req.query.page): 1
 
+            if (limit < 1 || page < 1) {
+                sendResponse(res, 'error', '', 'bad request', 400);
+                return
+            }
+
             const searchParams: searchReqDTO = {
                 searchText: req.query.searchText as string,
                 minExperience: minExperience,
@@ -81,6 +86,12 @@ class UserController {
             }
 
             const result = await userService.searchProductionProfessional(searchParams);
+
+            if (result.meta.totalPages < page) {
+                sendResponse(res, 'error', '', 'bad request', 400);
+                return
+            }
+
             sendResponse(res, 'success', result)
         } catch (error) {
             sendResponse(res, 'error', error)
