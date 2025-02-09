@@ -9,10 +9,10 @@ interface PostState {
 }
 
 const initialState: PostState = {
-  postname: "",
-  description: "",
+  postname: "My Deer Friend Nokotan",
+  description: "Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan",
   type: "media",
-  roles: [],
+  roles: [{ label: "Director", value: "director" },],
   images: [],
 };
 
