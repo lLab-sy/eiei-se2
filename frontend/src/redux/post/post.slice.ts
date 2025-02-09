@@ -5,6 +5,7 @@ interface PostState {
   description: string;
   type: "media" | "short" | "drama" | "ads";
   roles: { label: string; value: string }[];
+  images: { imgSrc: string; imgFile?: File }[]; // เพิ่ม state สำหรับรูปภาพ
 }
 
 const initialState: PostState = {
@@ -12,6 +13,7 @@ const initialState: PostState = {
   description: "",
   type: "media",
   roles: [],
+  images: [],
 };
 
 const postSlice = createSlice({
@@ -22,8 +24,16 @@ const postSlice = createSlice({
       return { ...state, ...action.payload };
     },
     resetPost: () => initialState,
+    addImage: (state, action: PayloadAction<{ imgSrc: string}>) => {
+      if (state.images.length < 3) {
+        state.images.push(action.payload);
+      }
+    },
+    removeImage: (state, action: PayloadAction<string>) => {
+      state.images = state.images.filter((img) => img.imgSrc !== action.payload);
+    },
   },
 });
 
-export const { setPost, resetPost } = postSlice.actions;
+export const { setPost, resetPost, addImage, removeImage } = postSlice.actions;
 export default postSlice.reducer;
