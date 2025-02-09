@@ -20,16 +20,16 @@ const NavBar = (session: any) => {
   const user: any = useSelector<RootState>(state => state.user)
   console.log('session', session)
   
-  const handleLogout = async () => {
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
-    await axios.post(apiUrl, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    await signOut()
-  }
+  // const handleLogout = async () => {
+  //   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
+  //   await axios.post(apiUrl, {
+  //     withCredentials: true,
+  //     headers: {
+  //       Authorization: `Bearer ${token}`
+  //     }
+  //   })
+  //   await signOut()
+  // }
   // console.log('session',session.session)
   useEffect(() => {
     if(!session.session || token === ''){
@@ -82,8 +82,8 @@ const NavBar = (session: any) => {
   ];
 
   return (
-    <header className="bg-[#2B428C] text-white">
-      <div className="flex justify-between items-center h-16">
+    <header className="bg-[#2B428C] text-white fixed m-auto w-[100%] z-50">
+      <div className="flex justify-between items-center h-16 bg-[#2B428C] text-white">
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-2 pl-2">
           <div className="relative w-10 h-10">

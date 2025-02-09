@@ -7,8 +7,8 @@ export interface IPost extends Document {
     postMediaType:string;
     postProjectRoles: mongoose.Schema.Types.ObjectId[]; // Updated type
     postStatus:'created'| 'in-progress'| 'success'|'cancel';
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     postDetailID: mongoose.Schema.Types.ObjectId;
     userID: mongoose.Schema.Types.ObjectId;
 }
@@ -18,17 +18,24 @@ export const postSchema = new Schema<IPost>({
         type: String,
         required: [true, 'Post name is required'],
         trim: true,
+        minlength:[4,"Please name the post more than 4 characters"],
         maxlength: [50, 'Post name cannot exceed 50 characters'],
     },
     postDescription: {
         type: String,
         required: [true, 'Post description is required'],
+        minlength:[50,"Please name the post more than 4 characters"],
         maxlength: [500, 'Description cannot exceed 500 characters'],
     },
     postImages: {
         type: [String],  
         required: [true, 'At least one image is required'],
-        default: [],
+        validate: {
+            validator: function (postImages: mongoose.Schema.Types.ObjectId[]) {
+                return postImages.length > 0; // Ensures the array is not empty
+            },
+        message: "Post Images roles cannot be empty"
+        }
     },
     postMediaType: {
         type: String,
@@ -36,23 +43,29 @@ export const postSchema = new Schema<IPost>({
     },
     postProjectRoles: 
         {
-         type: [mongoose.Schema.Types.ObjectId],
+        type: [mongoose.Schema.Types.ObjectId],
         ref: 'postRoleType', // Reference to the Role model
-        required: true,
+        required: [true,"require post project roles"],
+        validate: {
+            validator: function (roles: mongoose.Schema.Types.ObjectId[]) {
+                return roles.length > 0; // Ensures the array is not empty
+            },
+            message: "Post project roles cannot be empty"
+        }
         }
     ,
     postStatus: {
         type: String,
         enum: ['created', 'in-progress', 'success', 'delete'],
-        required: true,
+            required: true,
     },
     startDate: {
-        type: Date,
+        type: String,
         // required: [true, 'Start date is required'],
     },
     endDate: {
-        type: Date,
-        // required: [true, 'End date is required'],
+        type: String,
+        
     },
     postDetailID: {
         type: mongoose.Schema.Types.ObjectId,

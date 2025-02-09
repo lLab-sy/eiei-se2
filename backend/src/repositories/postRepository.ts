@@ -74,7 +74,7 @@ class PostRepository {
         try {
              const objectId = new ObjectId(id);
              const posts= await Post.findById(objectId);
-            //  console.log('Posts from database:', posts);
+        
              return posts
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);
@@ -83,12 +83,13 @@ class PostRepository {
 
     public async createPost(postData: IPost) {
         try {
+            console.log("Before Create Post")
             const post = new Post(postData);
             const result= await post.save();
 
-
+            console.log("Create Post Success")
             const postDetailData = new PostDetail({
-                postId: result._id, 
+                postID: result._id, 
                 CandidateDetail: [],
               });
 
@@ -100,11 +101,10 @@ class PostRepository {
         }
     }
 
-    public async updatePost(postData: PostDTO,id:string) {
+    public async updatePost(postData: IPost,id:string) {
         try {
             console.log(postData)
-            // console.log(postData.id,"id")
-            // const postId = new Object(postData.id);
+  
             const objectId = new ObjectId(id);
             console.log(objectId)
             const updatedPost = await Post.findOneAndUpdate(
@@ -137,7 +137,7 @@ class PostRepository {
     public async searchPost(postSearchReq: PostSearchRequestModel): Promise<PostSearchResponse>{
         try {
             const { searchText, postMediaTypes, roleRequirements, limit, page } = postSearchReq;
-            // PostSearchQuery from postModel
+            
 
             const matchStage: PipelineStage[] = [];
             
@@ -161,13 +161,18 @@ class PostRepository {
             }
 
             if (roleRequirements?.length) {
+                const postProjectRoles = roleRequirements.map((eachRole) => {
+                    return new ObjectId(eachRole);
+                  
+                });
+                console.log("PostProject",postProjectRoles)
                 matchStage.push({
                     $match: {
-                        postProjectRoles: { $all: postMediaTypes}
+                        postProjectRoles: { $all: postProjectRoles}
                     }
                 })
             }
-            
+            console.log("Check2",matchStage)
             const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
             const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
@@ -184,6 +189,7 @@ class PostRepository {
                 data: results,
                 totalItems: totalItems
             }
+            console.log("ANSWER",response)
             return response
         } catch (error) {
             throw new Error('Error search post in repository: ' + error);
@@ -192,3 +198,7 @@ class PostRepository {
 }
 
 export default new PostRepository();
+
+
+
+ 

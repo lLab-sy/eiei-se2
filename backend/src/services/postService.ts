@@ -10,8 +10,6 @@ class PostService {
         const posts = await postRepository.getAllPosts();
   
         const result = posts.map((post) => {
-            const startDate = new Date(post.startDate.toString()) 
-            const endDate =  new Date(post.endDate.toString()) 
             return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
@@ -21,12 +19,10 @@ class PostService {
                 postProjectRoles: post.postProjectRoles.map(eachRole=>(
                   eachRole.toString()
                 )) as [string],
-                // postProjectRoles: post.postProjectRoles as [string],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-                // postDetailID: post.postDetailID.toString() as string,
                 userID: post.userID.toString() as string,
-                startDate: startDate,
-                endDate: endDate,
+                startDate: post.startDate? post.startDate.toString():"",
+                endDate: post.endDate?post.endDate.toString():""
             });
         });
  
@@ -56,8 +52,8 @@ async getPost(id:string): Promise<PostDTO|null> {
             postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
             // postDetailID: post.postDetailID.toString() as string,
             userID: post.userID.toString() as string,
-            startDate: new Date(post.startDate.toString()) ,
-            endDate: new Date(post.endDate.toString()) ,
+            startDate: post.startDate? post.startDate.toString():"",
+            endDate: post.endDate?post.endDate.toString():""
           });
           return result; 
       }else{
@@ -75,8 +71,6 @@ async getPost(id:string): Promise<PostDTO|null> {
       const posts = await postRepository.getPostsByUser(id);
       if(posts){
         const result = posts.map((post) => {
-          const startDate = new Date(post.startDate.toString()) 
-          const endDate =  new Date(post.endDate.toString()) 
           const postId = post._id?post._id.toString():'';
           return new PostWithRoleCountDTO({
               id: postId,
@@ -87,10 +81,11 @@ async getPost(id:string): Promise<PostDTO|null> {
               roleCount: post.roleCount as number,
               postProjectRoles: post.postProjectRoles as string[],
               postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-              startDate: startDate,
-              endDate: endDate,
+              startDate: post.startDate? post.startDate.toString():"",
+              endDate: post.endDate?post.endDate.toString():""
             });
         })
+        // console.log(result)
         return result;
       }
         return null 
@@ -104,7 +99,6 @@ async getPost(id:string): Promise<PostDTO|null> {
   async createPost(postData: PostDTO) {
     try {
       // map to model before pass it to repository
-      console.log(postData.postProjectRoles)
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
@@ -113,10 +107,10 @@ async getPost(id:string): Promise<PostDTO|null> {
         postProjectRoles: postData.postProjectRoles,
         postStatus: postData.postStatus,
         userID: postData.userID,
-        startDate: new Date(postData.startDate),
-        endDate: new Date (postData.endDate),
+        startDate: postData.startDate?postData.startDate:"",
+        endDate: postData.endDate?postData.endDate:""
       });
-      // console.log(postModel)
+ 
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -133,11 +127,10 @@ async getPost(id:string): Promise<PostDTO|null> {
         postMediaType:postData.postMediaType,
         postProjectRoles: postData.postProjectRoles,
         postStatus: postData.postStatus,
-        userID: postData.userID,
-        startDate: new Date(postData.startDate),
-        endDate: new Date (postData.endDate),
+        startDate: postData.startDate?postData.startDate:"",
+        endDate: postData.endDate?postData.endDate:""
       });
-      await postRepository.updatePost(postData,id);
+      await postRepository.updatePost(postModel,id);
       return postModel;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -154,8 +147,8 @@ async getPost(id:string): Promise<PostDTO|null> {
         postMediaType:postData.postMediaType,
         postProjectRole: postData.postProjectRoles,
         postStatus: postData.postStatus,
-        startDate: new Date(postData.startDate),
-        endDate: new Date (postData.endDate),
+        startDate: postData.startDate?postData.startDate:"",
+        endDate: postData.endDate?postData.endDate:""
       });
       await postRepository.deletePost(postData,id);
       return postModel;
@@ -170,8 +163,7 @@ async getPost(id:string): Promise<PostDTO|null> {
 
       const res = await postRepository.searchPost(postM);
       const resDTO = res.data.map((post) => {
-        const startDate = new Date(post.startDate.toString()) 
-        const endDate =  new Date(post.endDate.toString()) 
+ 
 
         return new PostDTO({
         id: post.id?.toString(),
@@ -184,8 +176,8 @@ async getPost(id:string): Promise<PostDTO|null> {
         )) as [string],
         postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
         // postDetailID: post.postDetailID.toString() as string,
-        startDate: startDate,
-        endDate: endDate,
+        startDate: post.startDate?post.startDate:"",  
+        endDate: post.endDate?post.endDate:""
       })})
 
       const response: PaginatedResponseDTO<PostDTO> = {

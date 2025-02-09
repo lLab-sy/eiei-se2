@@ -4,6 +4,7 @@ import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
 import { PostSearchRequestDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
+import postDetailService from '../services/postDetailService';
 
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
@@ -29,8 +30,17 @@ class PostController {
   
   async getPostsByUser(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const posts = await postService.getPostsbyUser(req.user.userId);
-      sendResponse(res, 'success', posts, `Successfully retrieved ${posts?posts.length:0} posts`);
+      const role=req.user.role
+      if(role=="producer"){
+        const posts = await postService.getPostsbyUser(req.user.userId);
+        sendResponse(res, 'success', posts, `Successfully retrieved ${posts?posts.length:0} posts`);
+        return;
+      }else if(role=="production professional"){
+        const posts = await postDetailService.getProductionProfessionalPosts(req.user.userId);
+        sendResponse(res, 'success', posts, `Successfully retrieved ${posts?posts.length:0} posts`);
+        return;
+      }
+  
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
@@ -49,7 +59,12 @@ class PostController {
     try {
       const postId = req.params.id
       const posts = await postService.updatePost(req.body,postId);
-      console.log(posts)
+ 
+      
+      if(req.body.postStatus!="created" && req.body.postStatus!="in-progress" && req.body.postStatus!="cancel" && req.body.postStatus!="success"){
+        sendResponse(res, 'error', 'Failed PostStatus');
+        return;
+      }
       sendResponse(res, 'success', posts, 'Successfully updated posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to updated posts at controller');

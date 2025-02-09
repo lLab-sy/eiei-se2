@@ -2,7 +2,7 @@ import postDetailRepository from '../repositories/postDetailRepository';
 import { PostDetailDTO, ProductionProfessionalHistoryDTO } from '../dtos/postDetailDTO';
 import postDetail from '../models/postDetail';
 import PostDetail from '../models/postDetail';
-import { PostDTO } from '../dtos/postDTO';
+import { PostDTO, PostWithRoleCountDTO } from '../dtos/postDTO';
 import { ProductionProfessionalDtO } from '../dtos/productionProfessionalDTO';
 
 class PostDetailService {
@@ -108,7 +108,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
         })),
     });
       const res=await postDetailRepository.deletePostDetail(postDetailData,id);
-      return postDetailModel;
+      return res;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
     }
@@ -119,18 +119,18 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
          if(posts){
            const result = posts.map((post) => {
             console.log(post.postID)
-             return new ProductionProfessionalHistoryDTO({
-               postID: post.postID.toString(),
-               postName:post.postName,
-               postDetailID: post.postDetailID.toString(),
-               userID: post.userID.toString(),
-               roleName: post.roleName,
-               postStatus: post.postStatus,
-               postDescription: post.postDescription,
-               postImages: post.postImage,
-               startDate: post.startDate,
-               endDate: post.endDate
-               });
+              return new PostWithRoleCountDTO({
+                  id: post.postID,
+                  postName: post.postName as string,
+                  postDescription: post.postDescription as string,
+                  postImages: post.postImages as [string],
+                  postMediaType: post.postMediaType as string,
+                  roleCount: 1,
+                  postProjectRoles: [post.roleName] as string[],
+                  postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                  startDate: post.startDate? post.startDate:"",
+                  endDate: post.endDate?post.endDate:""
+                });
            })
            console.log(result)
            return result;

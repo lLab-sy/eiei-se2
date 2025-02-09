@@ -7,12 +7,13 @@ import PaginationBar from "./PostHistoryPaginationBar";
 import Link from "next/link";
 
 export default function PostHistoryList({
-  postLists,
+  postLists,userName
 }: {
-  postLists: Project[];
+  postLists: Project[],
+  userName:string
 }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  console.log(postLists)
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
   const currentProjects = postLists.slice(
@@ -37,13 +38,13 @@ export default function PostHistoryList({
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {currentProjects.map((project) => (
+          {currentProjects.map((project,index) => (
             <div
-              key={project.id}
+              key={index}
               className="transform hover:-translate-y-1 transition-transform duration-300"
             >
               <Link href={`/post/${project.id}`}>
-                <PostHistoryCard post={project} />
+                <PostHistoryCard post={project} userName={userName} />
               </Link>
             </div>
           ))}
@@ -54,7 +55,7 @@ export default function PostHistoryList({
           <PaginationBar
             currentPage={currentPage}
             projectsPerPage={projectsPerPage}
-            postListLenght={postLists.length}
+            postListLength={postLists.length}
             setCurrentPage={setCurrentPage}
           />
         </div>
