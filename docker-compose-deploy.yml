@@ -1,19 +1,45 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  # MongoDB Service
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    image: eiei-backend:frist-time
+    ports:
+      - "1000:1000"
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      PORT: 1000
+    depends_on:
+      - mongodb
+
+  # Frontend Service (Next.js + TypeScript)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: frontend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     NEXT_PUBLIC_API_URL: http://localhost:5000
+  #   depends_on:
+  #     - backend
+
   mongodb:
     image: mongo:8
     restart: always
     container_name: mongodb-eiei
     ports:
-      - "${MONGO_PORT}:27017"
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
       MONGO_INITDB_DATABASE: eiei
-    # volumes:
-    #   - ./init-mongo/:/docker-entrypoint-initdb.d/
+
   mongo-seed:
     image: mongo:8
     depends_on:
@@ -29,30 +55,3 @@ services:
         mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection users --type json --file /init-data/users.json --jsonArray &&
         mongoimport --authenticationDatabase admin --username $MONGO_USER --password $MONGO_PASSWORD --host mongodb --port 27017 --db eiei --collection postTypes --type json --file /init-data/posts.json --jsonArray
       "
-
-  # Backend Service (Express + TypeScript)
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend
-    ports:
-      - "1000:1000"
-    environment:
-      MONGO_URI: ${MONGO_URI}
-      PORT: 1000
-    depends_on:
-      - mongodb
-
-  # Frontend Service (Next.js + TypeScript)
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    ports:
-      - "3000:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:5000
-    depends_on:
-      - backend
