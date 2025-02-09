@@ -10,8 +10,6 @@ class PostService {
         const posts = await postRepository.getAllPosts();
   
         const result = posts.map((post) => {
-            // const startDate = new Date(post.startDate) 
-            // const endDate =  new Date(post.endDate)) 
             return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
@@ -21,9 +19,7 @@ class PostService {
                 postProjectRoles: post.postProjectRoles.map(eachRole=>(
                   eachRole.toString()
                 )) as [string],
-                // postProjectRoles: post.postProjectRoles as [string],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-                // postDetailID: post.postDetailID.toString() as string,
                 userID: post.userID.toString() as string,
                 startDate: post.startDate? post.startDate.toString():"",
                 endDate: post.endDate?post.endDate.toString():""
@@ -75,8 +71,6 @@ async getPost(id:string): Promise<PostDTO|null> {
       const posts = await postRepository.getPostsByUser(id);
       if(posts){
         const result = posts.map((post) => {
-          const startDate = new Date(post.startDate.toString()) 
-          const endDate =  new Date(post.endDate.toString()) 
           const postId = post._id?post._id.toString():'';
           return new PostWithRoleCountDTO({
               id: postId,
@@ -105,8 +99,6 @@ async getPost(id:string): Promise<PostDTO|null> {
   async createPost(postData: PostDTO) {
     try {
       // map to model before pass it to repository
- 
-
       const postModel = new Post({
         postName: postData.postName,
         postDescription: postData.postDescription,
@@ -184,7 +176,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         )) as [string],
         postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
         // postDetailID: post.postDetailID.toString() as string,
-        startDate: post.startDate?post.startDate:"", //Sorry Ball but I need to change
+        startDate: post.startDate?post.startDate:"",  
         endDate: post.endDate?post.endDate:""
       })})
 

@@ -54,7 +54,7 @@ export default function PostHistoryList({
           <PaginationBar
             currentPage={currentPage}
             projectsPerPage={projectsPerPage}
-            postListLenght={postLists.length}
+            postListLength={postLists.length}
             setCurrentPage={setCurrentPage}
           />
         </div>

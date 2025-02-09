@@ -108,7 +108,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
         })),
     });
       const res=await postDetailRepository.deletePostDetail(postDetailData,id);
-      return postDetailModel;
+      return res;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
     }
