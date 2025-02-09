@@ -18,8 +18,8 @@ const ProfessionalDetail = () => {
     email: "test@email.com",
     phoneNumber: "123-456-7890",
     gender: "Male",
-    profileImage: "/image/logo.png",
-    description: "Experienced media professional with expertise in cinematography, lighting, and video editing.",
+    profileImage: ["/image/logo.png"],
+    description: "Seasoned media professional with extensive expertise in cinematography, lighting design, and advanced video editing techniques. Adept at creating visually compelling content for various media formats, from films and commercials to digital campaigns and documentaries. Skilled in operating high-end camera systems, setting up intricate lighting schemes to enhance mood and aesthetics, and crafting seamless, engaging narratives through meticulous post-production editing.",
     occupation: "Videographer",
     skill: ["Cameraman", "Lighting", "Editing"],
     experience: "10", // Years of experience
@@ -28,23 +28,23 @@ const ProfessionalDetail = () => {
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
-      <Card className="w-full max-w-4xl shadow-lg rounded-xl bg-white">
+      <Card className="w-full max-w-3xl shadow-lg rounded-2xl bg-white p-8">
         {/* Header */}
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-semibold text-gray-800">Professional Profile</CardTitle>
+        <CardHeader className="text-center mb-4">
+          <CardTitle className="text-3xl font-semibold text-gray-800">Professional Profile</CardTitle>
         </CardHeader>
 
-        <CardContent className="flex flex-col items-center space-y-6 p-6">
+        <CardContent className="space-y-6">
           {/* Image Carousel */}
-          <div className="w-full max-w-md">
+          <div className="w-full flex justify-center">
             <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
               <CarouselContent>
-                {img.length !== 0 ? (
-                  img.map((imgSrc) => (
+                {ProfessionalInfo.profileImage.length !== 0 ? (
+                  ProfessionalInfo.profileImage.map((imgSrc) => (
                     <CarouselItem key={imgSrc} className="flex justify-center">
                       <Image
                         src={imgSrc}
-                        alt="Professional Image"
+                        alt="Project Image"
                         width={300}
                         height={300}
                         className="rounded-lg object-cover shadow-sm"
@@ -56,7 +56,7 @@ const ProfessionalDetail = () => {
                   <CarouselItem className="flex justify-center">
                     <Image
                       src="/image/logo.png"
-                      alt="Default Profile Image"
+                      alt="Default Project Image"
                       width={300}
                       height={300}
                       className="rounded-lg object-cover shadow-sm"
@@ -73,41 +73,37 @@ const ProfessionalDetail = () => {
           {/* Professional Info */}
           <div className="w-full text-center space-y-3">
             <h2 className="text-2xl font-bold text-main-gery">{ProfessionalInfo.firstName} {ProfessionalInfo.lastName}</h2>
-            <p className="text-lg text-maingrey flex items-center justify-center gap-2">
-              <Briefcase className="h-5 w-5 text-mainblue-lightest" />
-              {ProfessionalInfo.occupation}
-            </p>
-            <p className="text- mt-3">{ProfessionalInfo.description}</p>
+            <div className="w-full text-center">
+              <span className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-2 rounded-full shadow-sm"> {ProfessionalInfo.occupation} </span>
+            </div>
           </div>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;{ProfessionalInfo.description}</p>
+          
+          <div className="grid grid-cols-2 gap-10 place-items-start h-full">
+            {/* Project Status Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">Personal Information</h2>
+              <div className="grid grid-cols-1 gap-4 text-gray-700">
+                <p className="flex items-center gap-2 font-medium"><User className="h-5 w-5 text-mainblue-lightest" />{ProfessionalInfo.gender}</p>
+                <p className="flex items-center gap-2 font-medium"><Mail className="h-5 w-5 text-mainblue-lightest" />{ProfessionalInfo.email}</p>
+                <p className="flex items-center gap-2 font-medium"><Phone className="h-5 w-5 text-maingreen" />{ProfessionalInfo.phoneNumber}</p>
+              </div>
+            </div>
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
-            <div className="flex items-center space-x-3">
-              <User className="h-5 w-5 text-mainblue-lightest" />
-              <span className="text-maingrey">Gender: {ProfessionalInfo.gender}</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Award className="h-5 w-5 text-mainblue-lightest" />
-              <span className="text-maingrey">Experience: {ProfessionalInfo.experience} years</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Mail className="h-5 w-5 text-mainblue-lightest" />
-              <span className="text-maingrey">{ProfessionalInfo.email}</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Star className="h-5 w-5 text-mainyellow" />
-              <span className="text-maingrey">Rating: {ProfessionalInfo.rating}</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Phone className="h-5 w-5 text-maingreen" />
-              <span className="text-maingrey">{ProfessionalInfo.phoneNumber}</span>
+            {/* Project Owner Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">Experience</h2>
+              <div className="grid grid-cols-1 gap-4 text-gray-700">
+                <p className="flex items-center gap-2 font-medium"><Award className="h-5 w-5 text-mainblue-lightest" /> Experience: {ProfessionalInfo.experience} years</p>
+                <p className="flex items-center gap-2 font-medium"><Star className="h-5 w-5 text-mainyellow" /> Rating: {ProfessionalInfo.rating}</p>
+              </div>
             </div>
           </div>
 
           {/* Skills Section */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-maingrey mb-2">Skills</h3>
-            <div className="flex flex-wrap gap-2 justify-center">
+          <div className="flex items-center gap-2 justify-center">
+            <div className="flex flex-wrap gap-2 ">
+              <h3 className="font-semibold text-maingrey text-center">Roles : </h3>
               {ProfessionalInfo.skill.map((skill) => (
                 <span key={skill} className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-1 rounded-full shadow-sm">
                   {skill}
@@ -117,7 +113,7 @@ const ProfessionalDetail = () => {
           </div>
 
           <div className="mt-6 flex justify-center">
-            <a href="mailto:{ProfessionalInfo.email}" className="bg-mainblue-lightest text-white py-3 px-8 rounded-lg shadow-md hover:bg-mainblue-light transition-colors duration-300">
+            <a href={`mailto:${ProfessionalInfo.email}`} className="bg-mainblue-lightest text-white py-3 px-8 rounded-lg shadow-md hover:bg-mainblue-light transition-colors duration-300">
               Contact
             </a>
           </div>
