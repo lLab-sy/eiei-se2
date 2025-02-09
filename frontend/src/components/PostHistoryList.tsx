@@ -8,6 +8,7 @@ import Link from "next/link";
 
 export default function PostHistoryList({
   postLists,
+  username
 }: {
   postLists: Project[];
 }) {
@@ -37,9 +38,9 @@ export default function PostHistoryList({
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {currentProjects.map((project) => (
+          {currentProjects.map((project,index) => (
             <div
-              key={project.id}
+              key={index}
               className="transform hover:-translate-y-1 transition-transform duration-300"
             >
               <Link href={`/post/${project.id}`}>

@@ -27,10 +27,10 @@ import { userLogin } from "./action";
 const formSchema = z.object({
   username: z
     .string()
-    .min(15, "Username must contain at least 15 characters")
+    .min(5, "Username must contain at least 5 characters")
     .max(50, "Username must contain at most 50 characters")
-    .regex(new RegExp("^[^0-9]*$"), "Username must not contain number"),
-  password: z
+    // .regex(new RegExp("^[^0-9]*$"), "Username must not contain number"),
+  ,password: z
     .string()
     .min(8, "Password must contain at least 8 characters")
     .max(20, "Password must contain at most 20 characters")

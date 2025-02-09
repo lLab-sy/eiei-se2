@@ -12,6 +12,6 @@ export interface AuthContextProps {
   session: any
 }
 
-export default function AuthContext({ children }: AuthContextProps) {
-  return <SessionProvider>{children}</SessionProvider>
+export default function AuthContext({ children,session }: AuthContextProps) {
+  return <SessionProvider session={session}>{children}</SessionProvider>
 }

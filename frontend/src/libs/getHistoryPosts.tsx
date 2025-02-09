@@ -1,10 +1,20 @@
-export default async function getHistoryPosts(id:string){
+import axios from "axios"
 
-    const response = await fetch(`http://localhost:1000/api/v1/posts/user/${id}`)
-    if(!response.ok){
-        throw new Error("Falied to fetch posthistory")
+export default async function getHistoryPosts(token:string){
+
+    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/user`
+    const response= await axios.get(apiUrl, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+
+    if(!response){
+        throw new Error("Falied to fetch post history")
     }
-    const result =await response.json()
-    console.log("Hello",result)
-    return await result
+    // const result =await response.json()
+    console.log("Hello Fetch Post History",response)
+    return await response
 }

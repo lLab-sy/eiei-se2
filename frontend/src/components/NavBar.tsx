@@ -20,16 +20,16 @@ const NavBar = (session: any) => {
   const user: any = useSelector<RootState>(state => state.user)
   console.log('session', session)
   
-  const handleLogout = async () => {
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
-    await axios.post(apiUrl, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    await signOut()
-  }
+  // const handleLogout = async () => {
+  //   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
+  //   await axios.post(apiUrl, {
+  //     withCredentials: true,
+  //     headers: {
+  //       Authorization: `Bearer ${token}`
+  //     }
+  //   })
+  //   await signOut()
+  // }
   // console.log('session',session.session)
   useEffect(() => {
     if(!session.session || token === ''){

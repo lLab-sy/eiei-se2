@@ -1,10 +1,12 @@
 'use client'
 import PostHistoryList from "@/components/PostHistoryList";
-import { Project } from "../../../../../interface";
+import { Project } from "../../../../interface";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import getHistoryPost from "@/libs/getHistoryPosts";
 import getHistoryPosts from "@/libs/getHistoryPosts";
+import session from "redux-persist/lib/storage/session";
+import { useSession } from "next-auth/react";
 
 
 //Mock Data
@@ -25,15 +27,22 @@ import getHistoryPosts from "@/libs/getHistoryPosts";
 
 export default function HistoryPostPage(){
   const [postHistoryResponse,setPostHistoryResponse]= useState<Project[]|null>(null)
-  const id="679f4b5e6a883d2014e8360e"
+  const {data:session} = useSession()
+  
+  if(!session){
+    return <>Loading</>
+  }
+
+  const token=session.user?.token
+  const userName=session.user?.name
+
   useEffect(()=>{
       const fetchData=async()=>{
-          const response= await getHistoryPosts(id)
-          console.log(response)
-          setPostHistoryResponse(response.data)
+          const response= await getHistoryPosts(token)
+          setPostHistoryResponse(response.data.data)
       }
       fetchData()
-  },[])
+  },[session])
   
  
 
