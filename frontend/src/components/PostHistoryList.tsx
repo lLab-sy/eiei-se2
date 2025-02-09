@@ -7,10 +7,10 @@ import PaginationBar from "./PostHistoryPaginationBar";
 import Link from "next/link";
 
 export default function PostHistoryList({
-  postLists,
-  username
+  postLists,userName
 }: {
-  postLists: Project[];
+  postLists: Project[],
+  userName:string
 }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   console.log(postLists)
@@ -44,7 +44,7 @@ export default function PostHistoryList({
               className="transform hover:-translate-y-1 transition-transform duration-300"
             >
               <Link href={`/post/${project.id}`}>
-                <PostHistoryCard post={project} />
+                <PostHistoryCard post={project} userName={userName} />
               </Link>
             </div>
           ))}

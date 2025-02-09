@@ -82,8 +82,8 @@ const NavBar = (session: any) => {
   ];
 
   return (
-    <header className="bg-[#2B428C] text-white">
-      <div className="flex justify-between items-center h-16">
+    <header className="bg-[#2B428C] text-white fixed m-auto w-[100%] z-50">
+      <div className="flex justify-between items-center h-16 bg-[#2B428C] text-white">
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-2 pl-2">
           <div className="relative w-10 h-10">

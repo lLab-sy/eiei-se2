@@ -34,7 +34,7 @@ export default function HistoryPostPage(){
   }
 
   const token=session.user?.token
-  const userName=session.user?.name
+  const userName=session.user?.username
 
   useEffect(()=>{
       const fetchData=async()=>{
@@ -55,8 +55,8 @@ export default function HistoryPostPage(){
     <div className="p-4">
 
       {/* Project History */}
-      <h2 className="text-2xl font-bold text-center my-4">Post-History</h2>
-      <PostHistoryList postLists={postHistoryResponse}/>
+      {/* <h2 className="text-2xl font-bold text-center my-4">Post-History</h2> */}
+      <PostHistoryList postLists={postHistoryResponse} userName={userName}/>
     
     </div>
   );

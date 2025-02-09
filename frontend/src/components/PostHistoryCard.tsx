@@ -4,15 +4,13 @@ import { Clock, Calendar, User, Film } from "lucide-react";
  
  
 
-export default function PostHistoryCard({ post }: { post: Project }) {
+export default function PostHistoryCard({ post,userName }: { post: Project,userName:string }) {
   const endDateDayJS = new Date(post.endDate)
   const EndDate = endDateDayJS.toDateString();
 
   const startDateDayJS = new Date(post.endDate)
   const StartDate = startDateDayJS.toDateString();
-  
-  // const session= await getServerSession(authOp)
-  // console.log(session)
+
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden">
@@ -35,7 +33,7 @@ export default function PostHistoryCard({ post }: { post: Project }) {
           <div className="space-y-2">
             <div className="flex items-center text-gray-600">
               <User className="w-4 h-4 mr-2" />
-              <p className="text-sm">{post.postName}</p>
+              <p className="text-sm">{userName}</p>
             </div>
             <div className="flex items-center text-gray-600">
               <Calendar className="w-4 h-4 mr-2" />
@@ -47,7 +45,7 @@ export default function PostHistoryCard({ post }: { post: Project }) {
             </div>
             <div className="flex items-center text-gray-600">
               <Film className="w-4 h-4 mr-2" />
-              <p className="text-sm">Role: {post.postProjectRoles}</p>
+              <p className="text-sm">Your Role: {post.postProjectRoles}</p>
             </div>
           </div>
         </div>
