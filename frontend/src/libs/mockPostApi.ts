@@ -2,7 +2,11 @@
 let mockDatabase: Record<string, any> = {};
 
 export const fetchPostData = async (postId: string) => {
-  // คืนค่าข้อมูลจาก mockDatabase ถ้ามี
+    console.log("Fetching post data for postId:", postId); // Debug
+    console.log("Current mockDatabase:", mockDatabase); // ดูข้อมูล mockDatabase
+    return mockDatabase[postId] || {};
+  
+    // คืนค่าข้อมูลจาก mockDatabase ถ้ามี
   if (mockDatabase[postId]) return mockDatabase[postId];
 
   // ถ้าไม่มี ให้เพิ่มข้อมูล mock ลงใน mockDatabase
@@ -24,4 +28,5 @@ export const fetchPostData = async (postId: string) => {
 export const updateMockDatabase = async (postId: string, updatedData: any) => {
   console.log("Updating post in mockDatabase:", postId, updatedData);
   mockDatabase[postId] = updatedData;
+  return Promise.resolve();
 };

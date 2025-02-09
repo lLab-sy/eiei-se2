@@ -1,4 +1,4 @@
-/*"use client";
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,23 +11,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+//Multiselect: https://shadcnui-expansions.typeart.cc/docs/multiple-selector
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import Image from "next/image";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Label } from "@/components/ui/label";
+import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import {
-  setPostName,
-  setDescription,
-  setMediaType,
-  setRoles,
-  setImages,
-  resetPost,
-  setInitialState,
-} from "@/redux/post/editPost.slice";
+import { setPost } from "@/redux/post/post.slice";
+// import { useRouter } from "next/navigation"; //for renavigation after finishing
 
+const optionSchema = z.object({
+  label: z.string(),
+  value: z.string(),
+  disable: z.boolean().optional(),
+});
+
+const formSchema = z.object({
+  postname: z
+    .string()
+    .trim() //prevent case of PURELY whitespace
+    .min(4, { message: "Project name must be at least 4 characters." })
+    .max(100, { message: "Project name must not exceed 100 characters." }),
+  description: z
+    .string()
+    .trim() //prevent case of PURELY whitespace
+    .min(50, { message: "Description must be at least 50 characters." })
+    .max(1000, { message: "Description must not exceed 1000 characters." }),
+  //mock type, roles -> will need API to be updatable
+  type: z.enum(["media", "short", "drama", "ads"], {
+    required_error: "Please select your media type",
+  }),
+  roles: z
+    .array(optionSchema)
+    .min(1, { message: "Please choose at least one role." }),
+});
+//mock options -> will use API in later stage
 const OPTIONS: Option[] = [
   { label: "Producer", value: "producer" },
   { label: "Camera Operator", value: "camera operator" },
@@ -39,70 +73,87 @@ const OPTIONS: Option[] = [
   { label: "Audio Technician", value: "audio technician" },
 ];
 
-export default function EditPostPage({ postId }: { postId: string }) {
-  const { toast } = useToast();
+export default function EditPostPage() {
   const dispatch = useDispatch();
-  const post = useSelector((state: RootState) => state.post);
+  const postState = useSelector((state: RootState) => state.post); // ดึงค่าที่เคยกรอกไว้
 
-  const { postName, description, mediaType, roles } = post;
-  const images = useSelector((state: RootState) => state.post.images) || [];
+  interface imagePair {
+    imgSrc: string
+    imgFile: File
+  }
 
-  const form = useForm({
-    defaultValues: useMemo(
-      () => ({
-        postname: postName || "",
-        description: description || "",
-        type: mediaType || "media",
-        roles: roles || [],
-      }),
-      [postName, description, mediaType, roles],
-    ),
+  const [img,setImg] = useState<imagePair[]>([]);
+  const [mostRecentImg, setMostRecentImg] = useState<string>("")
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: postState,
   });
 
+  const { toast } = useToast();
+
   useEffect(() => {
-    form.reset({
-      postname: postName,
-      description,
-      type: mediaType,
-      roles,
+    const subscription = form.watch((values) => {
+      dispatch(
+        setPost({
+          ...values,
+          roles: values.roles
+            ?.filter((role) => role !== undefined) // ลบ undefined ออกจากอาร์เรย์
+            .map((role) => ({
+              label: role?.label || "", // ให้แน่ใจว่ามีค่าเป็น string เสมอ
+              value: role?.value || "",
+            })),
+        })
+      );
     });
-  }, [postName, description, mediaType, roles]);
+  
+    return () => subscription.unsubscribe();
+  }, [form, dispatch]);
 
-  const onSubmit = async (values: any) => {
-    const updatedData = {
-      postName: values.postname,
-      description: values.description,
-      mediaType: values.type,
-      roles: values.roles,
-      images,
-    };
+  async function onSubmit (values: z.infer<typeof formSchema>) {
+    console.log("Submit data:", values);
+  }
 
-    dispatch(setInitialState(updatedData));
-    toast({ title: "Post updated successfully!" });
-  };
-
-  const [files, setFiles] = useState<File[]>([]);
-
-  const onImgChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
-
-    const uploadedFiles = Array.from(event.target.files);
-    const uploadedImages = uploadedFiles.map((file) => ({
-      imgSrc: URL.createObjectURL(file),
-      imgFile: file.name,
-    }));
-
-    setFiles((prev) => [...prev, ...uploadedFiles]); // เก็บ `File` ใน useState
-    dispatch(setImages([...images, ...uploadedImages])); // Redux เก็บแค่ข้อมูลที่ serialize ได้
-  };
-
-  const removeImage = (index: number) => {
-    const updatedFiles = files.filter((_, i) => i !== index);
-    const updatedImages = images.filter((_, i) => i !== index);
-
-    setFiles(updatedFiles); // อัปเดต useState
-    dispatch(setImages(updatedImages)); // อัปเดต Redux
-  };
+  const onImgChange = (e:any) => {
+    if (e.target.files && e.target.files[0]) {
+      const files: File[] = Array.from(e.target.files)
+      if (files.length + img.length > 3){
+        toast({
+          variant: "destructive",
+          title: "Picture count limit",
+          description: "Sorry, only up to 3 pictures are allowed.",
+        })
+        return
+      }
+      const oversizedFiles: string[] = [];
+      const filenames: imagePair[] = files.filter((file)=>{
+        if (file.size > 8388608) {
+          oversizedFiles.push(file.name+file.type)
+          return false
+        }
+        return true
+      })
+      .map((file)=>{return {
+        imgSrc: URL.createObjectURL(file), 
+        imgFile: file} as imagePair})
+      if (oversizedFiles.length > 0){
+        toast({
+          variant: "destructive",
+          title: "Picture size limit",
+          description: `Sorry, only up to 8MB pictures are allowed. ${oversizedFiles.length >2 ? '':oversizedFiles.join(",")}`,
+        })
+      }
+      setMostRecentImg(filenames[filenames.length-1].imgSrc)
+      const newImg = [...img,...filenames]
+      setImg(newImg)
+    }
+  }
+  const removeImg = (imgSrc:string) => {
+    setImg(img.filter((img)=>img.imgSrc !== imgSrc))
+    console.log(img.length)
+    if (mostRecentImg === imgSrc && img.length > 1) 
+      setMostRecentImg(img[img.length-2].imgSrc)
+  }
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
@@ -112,104 +163,170 @@ export default function EditPostPage({ postId }: { postId: string }) {
             <CardTitle className="justify-center flex">Edit Post</CardTitle>
           </CardHeader>
           <div className="flex flex-row">
-            <CardContent className="flex flex-col py-5 w-[60%]">
+          <CardContent className="flex flex-col py-5 w-[60%]">
+            <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8"
               >
-                <div>
-                  <label>Post Name</label>
-                  <Input
-                    value={form.watch("postname")}
-                    onChange={(e) => {
-                      dispatch(setPostName(e.target.value));
-                      form.setValue("postname", e.target.value);
-                    }}
-                  />
-                </div>
-                <div>
-                  <label>Description</label>
-                  <Textarea
-                    value={form.watch("description")}
-                    onChange={(e) => {
-                      dispatch(setDescription(e.target.value));
-                      form.setValue("description", e.target.value);
-                    }}
-                  />
-                </div>
-                <div>
-                  <label>Media Type</label>
-                  <Select
-                    value={mediaType}
-                    onValueChange={(
-                      value: "media" | "short" | "drama" | "ads",
-                    ) => dispatch(setMediaType(value))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select media type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="media">Media</SelectItem>
-                        <SelectItem value="short">Short</SelectItem>
-                        <SelectItem value="drama">Drama</SelectItem>
-                        <SelectItem value="ads">Ads</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label>Role Requirements</label>
-                  <MultipleSelector
-                    value={roles.map(({ label, value }) => ({ label, value }))}
-                    defaultOptions={OPTIONS}
-                    onChange={(selectedOptions) =>
-                      dispatch(
-                        setRoles(
-                          selectedOptions.map((option) => ({
-                            ...option,
-                            disable: false,
-                          })),
-                        ),
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label>Images</label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={onImgChange}
-                  />
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {images?.length > 0 ? (
-                      images.map((image, index) => (
-                        <div key={index} className="relative">
-                          <Image
-                            src={image.imgSrc}
-                            alt={`Image ${index}`}
-                            width={200}
-                            height={200}
-                          />
-                          <button onClick={() => removeImage(index)}>
-                            Remove
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No images uploaded yet.</p>
-                    )}
-                  </div>
-                </div>
-                <Button type="submit">Update Post</Button>
+                <FormField
+                  control={form.control}
+                  name="postname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Post name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Help Required" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="I'm making a short film."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Media Type</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose your media type." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="media">Media</SelectItem>
+                              <SelectItem value="short">Short</SelectItem>
+                              <SelectItem value="drama">Drama</SelectItem>
+                              <SelectItem value="ads">Ads</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="roles"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role Requirement</FormLabel>
+                      <FormControl>
+                        <MultipleSelector
+                          {...field}
+                          defaultOptions={OPTIONS}
+                          placeholder="Choose roles required for your project"
+                          hidePlaceholderWhenSelected
+                          emptyIndicator={
+                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                              No result found.
+                            </p>
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit">Edit Post</Button>
               </form>
-            </CardContent>
+            </Form>
+          </CardContent>
+          <CardContent className="w-[40%] py-5">
+            <CardTitle className="text-sm">Your Post Picture</CardTitle>
+            <div className="flex flex-col items-center">
+              <div className="h-1/2">
+              {img.length !== 0 ? (
+                  <Image src={mostRecentImg} 
+                    alt="Post Image Here" 
+                    width={parent.innerWidth}
+                    height={parent.innerHeight}
+                    className="max-h-48 object-scale-down aspect-square" 
+                    priority
+                    placeholder= "empty"/>
+              ):(
+                <Image src="/image/logo.png"
+                alt="Post Image Here" 
+                width={parent.innerWidth}
+                height={parent.innerHeight}
+                className="max-h-48 object-scale-down" 
+                priority
+                placeholder= "empty"/>
+              )}
+              </div>
+              <Input 
+                type="file"
+                accept="image/*"
+                className="file:text-mainyellow-light file:font-medium bg-mainblue my-5 cursor-pointer hover:bg-mainblue-light text-white"
+                placeholder= "Your post picture"
+                onChange={onImgChange}
+                multiple
+                disabled = {img.length >= 3 ? true : false}
+                />
+              <div className="w-[80%] justify-center flex">
+                <Carousel>
+                  <CarouselContent>
+                    {img.length !== 0 ?(img.map((img)=> 
+                        (
+                        <CarouselItem key={img.imgSrc} className="relative pt-1 justify-center inline-flex flex-col group">
+                          <Image src={img.imgSrc} 
+                            alt="Post Image Here" 
+                            width={parent.innerWidth}
+                            height={parent.innerHeight}
+                            className="max-h-48 object-contain aspect-square cursor-pointer bg-maingrey " 
+                            priority
+                            placeholder= "empty"
+                            onClick={()=>
+                              setMostRecentImg(img.imgSrc)
+                            }/>
+                            <X className="absolute top-1 right-1 hidden group-hover:block
+                           bg-mainblue-lightest cursor-pointer"
+                           onClick = {()=>removeImg(img.imgSrc)} />
+                        </CarouselItem>
+                        )
+                      )
+                    ):(
+                        <CarouselItem key={"/image/logo.png"} className="pt-1">
+                          <Image src="/image/logo.png"
+                            alt="Post Image Here" 
+                            width={parent.innerWidth}
+                            height={parent.innerHeight}
+                            className="max-h-48 object-scale-down" 
+                            placeholder= "empty"/>
+                        </CarouselItem>)
+                    }
+                  </CarouselContent>
+                  <Label>Total item: {img.length}</Label>
+                  <CarouselPrevious/>
+                  <CarouselNext/>
+                </Carousel>
+              </div>
+            </div>
+          </CardContent>
           </div>
         </Card>
       </div>
     </div>
   );
 }
-*/
