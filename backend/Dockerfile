@@ -1,4 +1,6 @@
-FROM node:18-alpine
+ARG NODE_VERSION=20.18.0
+
+FROM node:${NODE_VERSION}-alpine
 
 # Install build dependencies
 RUN apk add --no-cache python3 make g++
