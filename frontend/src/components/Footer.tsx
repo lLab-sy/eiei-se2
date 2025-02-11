@@ -1,9 +1,17 @@
-'use client';
+"use client";
 
-import { FC } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Mail, Clock, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucide-react';
+import { FC } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import {
+  Mail,
+  Clock,
+  Phone,
+  MapPin,
+  Facebook,
+  Instagram,
+  Twitter,
+} from "lucide-react";
 
 const Footer: FC = () => {
   return (
@@ -15,9 +23,10 @@ const Footer: FC = () => {
           <div className="space-y-4">
             <h3 className="text-xl font-bold">About Us</h3>
             <p className="text-gray-300 text-sm">
-              BualoiDev connects creative talents with producers, making it easier to find and collaborate on media projects.
+              BualoiDev connects creative talents with producers, making it
+              easier to find and collaborate on media projects.
             </p>
-            <Link 
+            <Link
               href="/about"
               className="block text-sm hover:text-gray-300 transition-colors"
             >
@@ -30,22 +39,34 @@ const Footer: FC = () => {
             <h3 className="text-xl font-bold">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/faq" className="text-sm hover:text-gray-300 transition-colors">
+                <Link
+                  href="/faq"
+                  className="text-sm hover:text-gray-300 transition-colors"
+                >
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-sm hover:text-gray-300 transition-colors">
+                <Link
+                  href="/terms"
+                  className="text-sm hover:text-gray-300 transition-colors"
+                >
                   Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-sm hover:text-gray-300 transition-colors">
+                <Link
+                  href="/privacy"
+                  className="text-sm hover:text-gray-300 transition-colors"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/help" className="text-sm hover:text-gray-300 transition-colors">
+                <Link
+                  href="/help"
+                  className="text-sm hover:text-gray-300 transition-colors"
+                >
                   Help Center
                 </Link>
               </li>
@@ -85,25 +106,25 @@ const Footer: FC = () => {
           <div className="space-y-4">
             <h3 className="text-xl font-bold">Follow Us</h3>
             <div className="flex gap-4">
-              <a 
-                href="https://facebook.com" 
-                target="_blank" 
+              <a
+                href="https://facebook.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-blue-400 transition-colors"
               >
                 <Facebook className="w-6 h-6" />
               </a>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
+              <a
+                href="https://instagram.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-pink-400 transition-colors"
               >
                 <Instagram className="w-6 h-6" />
               </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
+              <a
+                href="https://twitter.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-blue-400 transition-colors"
               >
@@ -113,7 +134,10 @@ const Footer: FC = () => {
             <div className="pt-4">
               <h4 className="text-sm font-semibold mb-2">Download Our App</h4>
               <div className="flex gap-2">
-                <Link href="#" className="opacity-80 hover:opacity-100 transition-opacity">
+                <Link
+                  href="#"
+                  className="opacity-80 hover:opacity-100 transition-opacity"
+                >
                   <Image
                     src="/api/placeholder/120/40"
                     alt="Download on App Store"
@@ -122,7 +146,10 @@ const Footer: FC = () => {
                     className="rounded"
                   />
                 </Link>
-                <Link href="#" className="opacity-80 hover:opacity-100 transition-opacity">
+                <Link
+                  href="#"
+                  className="opacity-80 hover:opacity-100 transition-opacity"
+                >
                   <Image
                     src="/api/placeholder/120/40"
                     alt="Get it on Google Play"
@@ -145,13 +172,22 @@ const Footer: FC = () => {
               © {new Date().getFullYear()} BualoiDev. All rights reserved.
             </p>
             <div className="flex gap-4 text-sm">
-              <Link href="/terms" className="hover:text-gray-300 transition-colors">
+              <Link
+                href="/terms"
+                className="hover:text-gray-300 transition-colors"
+              >
                 Terms
               </Link>
-              <Link href="/privacy" className="hover:text-gray-300 transition-colors">
+              <Link
+                href="/privacy"
+                className="hover:text-gray-300 transition-colors"
+              >
                 Privacy
               </Link>
-              <Link href="/cookies" className="hover:text-gray-300 transition-colors">
+              <Link
+                href="/cookies"
+                className="hover:text-gray-300 transition-colors"
+              >
                 Cookies
               </Link>
             </div>
