@@ -147,6 +147,8 @@ router.get('/posts', postController.getAllPosts);
  *   post:
  *     summary: Create a new post
  *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -165,7 +167,8 @@ router.get('/posts', postController.getAllPosts);
  *       500:
  *         description: Server error
  */
-router.post('/posts', postController.createPost);
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.post('/posts', AuthMiddleware.authenticate as RequestHandler, postController.createPost as RequestHandler);
 
 /**
  * @swagger
@@ -224,6 +227,8 @@ router.get('/posts/:id', postController.getPost);
  *   put:
  *     summary: Update an existing post by ID
  *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -249,7 +254,7 @@ router.get('/posts/:id', postController.getPost);
  *       500:
  *         description: Server error
  */
-router.put('/posts/:id', postController.updatePost);
+router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postController.updatePost as RequestHandler);
 
 /**
  * @swagger
@@ -257,6 +262,8 @@ router.put('/posts/:id', postController.updatePost);
  *   delete:
  *     summary: Delete an existing post by ID
  *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -272,7 +279,7 @@ router.put('/posts/:id', postController.updatePost);
  *       500:
  *         description: Server error
  */
-router.delete('/posts/:id', postController.deletePost);
+router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postController.deletePost as RequestHandler);
 
 
 

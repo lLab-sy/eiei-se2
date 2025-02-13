@@ -46,20 +46,32 @@ class PostController {
     }
   };
   
-  async createPost(req: Request, res: Response): Promise<void> {
+  //@Private Request from Producer Role only and userID from frontEnd isMatch
+  async createPost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const posts = await postService.createPost(req.body);
-      sendResponse(res, 'success', posts, 'Successfully created posts');
+      //unauthorize
+      if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+          sendResponse(res.status(401),'error', 'Unauthorize to create post');
+          return;
+      }
+      const post= await postService.createPost(req.body)
+      sendResponse(res.status(201), 'success', post , 'Successfully created posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to created posts');
     }
   };
-
-  async updatePost(req: Request, res: Response): Promise<void> {
+  
+//@Private Request from Producer Role only and userID from frontEnd isMatch
+  async updatePost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const postId = req.params.id
+      
+      if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+        sendResponse(res.status(401), 'error', 'Unauthorize to update post');
+        return;
+      } 
+
       const posts = await postService.updatePost(req.body,postId);
- 
       
       if(req.body.postStatus!="created" && req.body.postStatus!="in-progress" && req.body.postStatus!="cancel" && req.body.postStatus!="success"){
         sendResponse(res, 'error', 'Failed PostStatus');
@@ -71,9 +83,13 @@ class PostController {
     }
   };
 
-  async deletePost(req: Request, res: Response): Promise<void> {
+  async deletePost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const postId = req.params.id
+      if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+        sendResponse(res.status(401), 'error', 'Unauthorize to delete post');
+        return;
+      } 
       const posts = await postService.deletePost(req.body,postId);
       sendResponse(res, 'success', posts, 'Successfully deleted posts');
     } catch (err) {

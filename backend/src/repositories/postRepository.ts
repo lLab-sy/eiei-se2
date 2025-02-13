@@ -95,7 +95,7 @@ class PostRepository {
               });
 
             await postDetailData.save();
-  
+            console.log("Create Post Detail Success")
             return result
         } catch (error) {
             throw new Error('Error creating post in repository: ' + error);

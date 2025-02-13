@@ -15,7 +15,7 @@ class PostService {
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: post.postImages as [string],
-                postMediaType: post.postMediaType as string,
+                postMediaType: post.postMediaType.toString() as string,
                 postProjectRoles: post.postProjectRoles.map(eachRole=>(
                   eachRole.toString()
                 )) as [string],
@@ -45,7 +45,7 @@ async getPost(id:string): Promise<PostDTO|null> {
             postName: post.postName as string,
             postDescription: post.postDescription as string,
             postImages: post.postImages as [string],
-            postMediaType: post.postMediaType as string,
+            postMediaType: post.postMediaType.toString() as string,
             postProjectRoles: post.postProjectRoles.map(eachRole=>(
               eachRole.toString()
             )) as [string],
@@ -170,7 +170,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         postName: post.postName as string,
         postDescription: post.postDescription as string,
         postImages: post.postImages as [string],
-        postMediaType: post.postMediaType as string,
+        postMediaType: post.postMediaType.toString() as string,
         postProjectRoles: post.postProjectRoles.map(eachRole=>(
           eachRole.toString()
         )) as [string],

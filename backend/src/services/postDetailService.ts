@@ -50,6 +50,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
   }
 
   async createPostDetail(postDetailData: PostDetailDTO) {
+    //Private Admin
     try {
       const postDetailModel = new PostDetail({
         postId: postDetailData.postId,
@@ -62,6 +63,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
   }
 
   async updatePostDetail(postDetailData: PostDetailDTO,id: string){
+    //Private Admin
     try {
       // map to model before pass it to repository
       const postDetailModel = new PostDetail({
@@ -79,6 +81,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
   }
 
   async updatePostDetailAddCandidate(postDetailData: PostDetailDTO,id: string){
+    //Private Admin
     try {
       console.log(postDetailData)
       const res=await postDetailRepository.updateAddCandidate(postDetailData,id);
@@ -89,6 +92,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
   }
 
   async updatePostDetailDeleteCandidate(postDetailData: PostDetailDTO,id: string){
+    //Private Admin
     try {
       const res=await postDetailRepository.updatedeleteCandidate(postDetailData,id);
       return res;
