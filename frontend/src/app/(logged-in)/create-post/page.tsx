@@ -24,14 +24,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 //Multiselect: https://shadcnui-expansions.typeart.cc/docs/multiple-selector
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import uploadImage from "@/hooks/upload-image";
-import createPost from "@/hooks/create-post";
+import { useSession } from "next-auth/react";
+import { imagePair, PostData, PostRolesResponse } from "../../../../interface";
+import getPostRoles from "@/libs/getPostRoles";
+import createPost from "@/libs/postPost";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
 
 const optionSchema = z.object({
@@ -59,6 +62,7 @@ const formSchema = z.object({
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
+
 //mock options -> will use API in later stage
 const OPTIONS: Option[] = [
   { label: "Producer", value: "producer" },
@@ -72,6 +76,33 @@ const OPTIONS: Option[] = [
 ];
 
 export default function CreatePostPage() {
+
+  const {data:session} = useSession()
+  
+  if(!session){
+    return <>Loading</>
+  }
+
+  const token=session.user?.token
+
+  useEffect(()=>{
+      const fetchData=async()=>{
+          const response= await getPostRoles()
+          // setPostRoles(response.data.data)
+          const tmp= response.data.data
+          let options:Option[]=[];
+          tmp.map((eachRole:PostRolesResponse)=>{
+            // console.log(eachRole)
+            options.push({ label: eachRole.roleName, value: eachRole.id })
+          })
+          setPostRoles(options)
+          // console.log("Option",options)
+      }
+      fetchData()
+  },[session])
+
+
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -80,11 +111,23 @@ export default function CreatePostPage() {
       type: "media",
     },
   });
+
+
+
+  
   /*  TODO: wait for the need to use renavigate
   const router = useRouter(); */
   const { toast } = useToast();
+
+
+  //For CREATE POST 
+
   async function onSubmit (values: z.infer<typeof formSchema>) {
     const imageList = img.map((img)=>(img.imgFile))
+    const userID= session?.user.id
+    if(!userID){
+      return;
+    }
     // const response = await uploadImage({imageFiles : imageList, token : ''})
     // if (response === null) {
     //   toast({
@@ -98,43 +141,43 @@ export default function CreatePostPage() {
 
     //mock image
     const postImage = imageList.map((img)=>(URL.createObjectURL(img)))
-
-    const postData = {
+    const postData:PostData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
-      postDescription: values.description,
-      postImages: postImage
+      postImages:["Picture.png"],
+      postStatus: "created",
+      userID: session?.user.id,
+      postDescription: values.description
     };
-    console.log(postData);
-    console.log(JSON.stringify(postData));
+    // console.log(postData);
+    // console.log(JSON.stringify(postData));
 
 
-    // const postCreateResponse = await createPost({postData: postData, token: ''})
-    // if (postCreateResponse === null) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Image uploading failed",
-    //     description: "Please try again.",
-    //   })
-    //   return
-    // }
-    // toast({
-    //   variant: "default",
-    //   title: "Successful post creation",
-    //   description: "Redirecting you...",
-    // })
+    const postCreateResponse = await createPost(postData,token)
+    if (postCreateResponse === null) {
+      toast({
+        variant: "destructive",
+        title: "Image uploading failed",
+        description: "Please try again.",
+      })
+      return
+    }
+      toast({
+      variant: "default",
+      title: "Successful post creation",
+      description: "Redirecting you...",
+    })
     // TODO: await for API to finish then renavigate
     // router.push(`/my-post`); 
   }
 
-  interface imagePair {
-    imgSrc: string
-    imgFile: File
-  }
+
 
   const [img,setImg] = useState<imagePair[]>([]);
+  const [postRoles,setPostRoles]=useState<Option[]|null>(null)
   const [mostRecentImg, setMostRecentImg] = useState<string>("")
+
 
   const onImgChange = (e:any) => {
     if (e.target.files && e.target.files[0]) {
@@ -175,6 +218,9 @@ export default function CreatePostPage() {
     console.log(img.length)
     if (mostRecentImg === imgSrc && img.length > 1) 
       setMostRecentImg(img[img.length-2].imgSrc)
+  }
+  if(!postRoles){
+    return <>Loading</>
   }
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
@@ -256,7 +302,7 @@ export default function CreatePostPage() {
                       <FormControl>
                         <MultipleSelector
                           {...field}
-                          defaultOptions={OPTIONS}
+                          defaultOptions={postRoles}
                           placeholder="Choose roles required for your project"
                           hidePlaceholderWhenSelected
                           emptyIndicator={

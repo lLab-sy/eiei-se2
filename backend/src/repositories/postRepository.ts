@@ -84,6 +84,7 @@ class PostRepository {
     public async createPost(postData: IPost) {
         try {
             console.log("Before Create Post")
+            console.log(postData)
             const post = new Post(postData);
             const result= await post.save();
 
