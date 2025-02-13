@@ -33,6 +33,11 @@ export interface PostRolesResponse{
     id: string
 }
 
+export interface MediaTypesResponse{
+    mediaName: string,
+    id: string
+}
+
 export interface imagePair {
     imgSrc: string
     imgFile: File

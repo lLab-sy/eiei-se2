@@ -9,7 +9,12 @@ export default async function createPost(data:PostData,token:string){
     console.log(body)
     const response= await axios.post(
     apiUrl, 
-    data)
+    data, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
 
 
     if(!response){

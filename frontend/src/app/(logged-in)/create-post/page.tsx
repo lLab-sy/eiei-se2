@@ -32,9 +32,11 @@ import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import uploadImage from "@/hooks/upload-image";
 import { useSession } from "next-auth/react";
-import { imagePair, PostData, PostRolesResponse } from "../../../../interface";
+import { imagePair, MediaTypesResponse, PostData, PostRolesResponse } from "../../../../interface";
 import getPostRoles from "@/libs/getPostRoles";
 import createPost from "@/libs/postPost";
+import getMediaTypes from "@/libs/getMediaTypes";
+import router, { useRouter } from "next/navigation";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
 
 const optionSchema = z.object({
@@ -55,26 +57,20 @@ const formSchema = z.object({
     .min(50, { message: "Description must be at least 50 characters." })
     .max(1000, { message: "Description must not exceed 1000 characters." }),
   //mock type, roles -> will need API to be updatable
-  type: z.enum(["media", "short", "drama", "ads"], {
-    required_error: "Please select your media type",
-  }),
+  type: z
+  //   .enum(["media", "short", "drama", "ads"], {
+  //   required_error: "Please select your media type",
+  // }),
+    .string(
+    {
+      required_error: "Please select your media type"
+    }),
   roles: z
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
 
-//mock options -> will use API in later stage
-const OPTIONS: Option[] = [
-  { label: "Producer", value: "producer" },
-  { label: "Camera Operator", value: "camera operator" },
-  { label: "Director", value: "director" },
-  { label: "Cinematographer", value: "cinematographer" },
-  { label: "Editor", value: "editor" },
-  { label: "Sound Mixer", value: "sound mixer" },
-  { label: "Prop Master", value: "prop master" },
-  { label: "Audio Technician", value: "audio technician" },
-];
-
+ 
 export default function CreatePostPage() {
 
   const {data:session} = useSession()
@@ -88,19 +84,29 @@ export default function CreatePostPage() {
   useEffect(()=>{
       const fetchData=async()=>{
           const response= await getPostRoles()
-          // setPostRoles(response.data.data)
           const tmp= response.data.data
           let options:Option[]=[];
           tmp.map((eachRole:PostRolesResponse)=>{
-            // console.log(eachRole)
             options.push({ label: eachRole.roleName, value: eachRole.id })
           })
           setPostRoles(options)
           // console.log("Option",options)
       }
       fetchData()
-  },[session])
-
+  },[])
+  useEffect(()=>{
+    const fetchData=async()=>{
+        const response= await getMediaTypes()
+        const tmp= response.data.data
+        let options:Option[]=[];
+        tmp.map((eachMediaType:MediaTypesResponse)=>{
+          options.push({ label: eachMediaType.mediaName, value: eachMediaType.id })
+        })
+        setMediaTypes(options)
+        console.log("MediaType",options)
+    }
+    fetchData()
+},[])
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -115,8 +121,8 @@ export default function CreatePostPage() {
 
 
   
-  /*  TODO: wait for the need to use renavigate
-  const router = useRouter(); */
+  // /*  TODO: wait for the need to use renavigate
+  const router = useRouter(); 
   const { toast } = useToast();
 
 
@@ -150,8 +156,7 @@ export default function CreatePostPage() {
       userID: session?.user.id,
       postDescription: values.description
     };
-    // console.log(postData);
-    // console.log(JSON.stringify(postData));
+ 
 
 
     const postCreateResponse = await createPost(postData,token)
@@ -176,6 +181,7 @@ export default function CreatePostPage() {
 
   const [img,setImg] = useState<imagePair[]>([]);
   const [postRoles,setPostRoles]=useState<Option[]|null>(null)
+  const [mediaTypes,setMediaTypes]=useState<Option[]|null>(null)
   const [mostRecentImg, setMostRecentImg] = useState<string>("")
 
 
@@ -219,9 +225,11 @@ export default function CreatePostPage() {
     if (mostRecentImg === imgSrc && img.length > 1) 
       setMostRecentImg(img[img.length-2].imgSrc)
   }
-  if(!postRoles){
+  if(!postRoles || !mediaTypes){
     return <>Loading</>
   }
+
+ 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
       <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18">
@@ -281,10 +289,12 @@ export default function CreatePostPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="media">Media</SelectItem>
-                              <SelectItem value="short">Short</SelectItem>
-                              <SelectItem value="drama">Drama</SelectItem>
-                              <SelectItem value="ads">Ads</SelectItem>
+                              {
+                                mediaTypes.map((eachMediaType:Option)=>(
+                                  <SelectItem key={eachMediaType.value} value={eachMediaType.value}>{eachMediaType.label}</SelectItem>
+                                ))
+                              }
+  
                             </SelectGroup>
                           </SelectContent>
                         </Select>

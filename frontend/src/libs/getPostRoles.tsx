@@ -9,7 +9,7 @@ export default async function getPostRoles(){
     if(!response){
         throw new Error("Falied to fetch all roles")
     }
-    // const result =await response.json()
-    console.log("Hello All Roles",response)
+ 
+    // console.log("Hello All Roles",response)
     return await response
 }
