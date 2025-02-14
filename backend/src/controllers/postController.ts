@@ -9,9 +9,16 @@ import postDetailService from '../services/postDetailService';
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
     try {
-      const posts = await postService.getAllPosts();
+      //Handler Query
+      const reqQuery= {...req.query}
+      const removeFields=['select','sort']
+      removeFields.forEach(param=> delete reqQuery[param])
+      let queryStr=JSON.stringify(req.query);
+      //Handler Compare
+      queryStr=queryStr.replace(/\b(gt|gte|lt|lte|e)\b/g,match=>`$${match}`)
+      const posts = await postService.getAllPosts(queryStr);
       // console.log('Fetched posts:', posts);  // Log fetched posts
-      sendResponse(res, 'success', posts, 'Successfully retrieved posts');
+      sendResponse(res, 'success',posts , 'Successfully retrieved posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }

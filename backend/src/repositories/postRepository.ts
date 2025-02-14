@@ -5,9 +5,10 @@ import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
 
 class PostRepository {
-    public async getAllPosts() {
+    public async getAllPosts(queryStr:string) {
         try {
-             const posts= await Post.find();
+            console.log(queryStr)
+             const posts= await Post.find(JSON.parse(queryStr));
              console.log('Posts from database:', posts);
              return posts
         } catch (error) {

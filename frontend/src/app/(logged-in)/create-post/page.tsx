@@ -38,7 +38,17 @@ import createPost from "@/libs/postPost";
 import getMediaTypes from "@/libs/getMediaTypes";
 import router, { useRouter } from "next/navigation";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 const optionSchema = z.object({
   label: z.string(),
   value: z.string(),
@@ -58,13 +68,8 @@ const formSchema = z.object({
     .max(1000, { message: "Description must not exceed 1000 characters." }),
   //mock type, roles -> will need API to be updatable
   type: z
-  //   .enum(["media", "short", "drama", "ads"], {
-  //   required_error: "Please select your media type",
-  // }),
-    .string(
-    {
-      required_error: "Please select your media type"
-    }),
+    .string({required_error: "Please select your media type"})
+    .min(1,{message:"Please Select mediaType"}),
   roles: z
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
@@ -103,7 +108,7 @@ export default function CreatePostPage() {
           options.push({ label: eachMediaType.mediaName, value: eachMediaType.id })
         })
         setMediaTypes(options)
-        console.log("MediaType",options)
+        // console.log("MediaType",options)
     }
     fetchData()
 },[])
@@ -114,7 +119,7 @@ export default function CreatePostPage() {
     defaultValues: {
       postname: "",
       description: "",
-      type: "media",
+      type: "",
     },
   });
 
@@ -327,9 +332,29 @@ export default function CreatePostPage() {
                   )}
                   // still lacking picture but uncertain if needed
                 />
-                <Button type="submit">Create Post</Button>
+                {/* <Button type="submit">Create Post</Button> */}
+                <AlertDialog>
+                  <AlertDialogTrigger className=" bg-mainblue text-white p-3 rounded-md hover:bg-sky-700">Create Post</AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This post will add to your my-posts
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction className="bg-green-700" asChild> 
+                          <Button
+                        onClick={() => form.handleSubmit(onSubmit)()}>Confirm</Button>
+                          </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
               </form>
             </Form>
+
           </CardContent>
           <CardContent className="w-[40%] py-5">
             <CardTitle className="text-sm">Your Post Picture</CardTitle>

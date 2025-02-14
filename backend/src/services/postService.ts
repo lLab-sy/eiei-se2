@@ -5,9 +5,9 @@ import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 
 class PostService {
 
-  async getAllPosts(): Promise<PostDTO[]> {
+  async getAllPosts(queryStr:string): Promise<PostDTO[]> {
     try {
-        const posts = await postRepository.getAllPosts();
+        const posts = await postRepository.getAllPosts(queryStr);
   
         const result = posts.map((post) => {
             return new PostDTO({

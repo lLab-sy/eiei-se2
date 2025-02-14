@@ -10,6 +10,6 @@ export default async function getMediaTypes(){
         throw new Error("Falied to fetch all mediaTypes")
     }
 
-    console.log("Hello All Media Types",response)
+    // console.log("Hello All Media Types",response)
     return await response
 }
