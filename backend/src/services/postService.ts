@@ -5,9 +5,9 @@ import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 
 class PostService {
 
-  async getAllPosts(): Promise<PostDTO[]> {
+  async getAllPosts(queryStr:string): Promise<PostDTO[]> {
     try {
-        const posts = await postRepository.getAllPosts();
+        const posts = await postRepository.getAllPosts(queryStr);
   
         const result = posts.map((post) => {
             return new PostDTO({
@@ -15,7 +15,7 @@ class PostService {
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: post.postImages as [string],
-                postMediaType: post.postMediaType as string,
+                postMediaType: post.postMediaType.toString() as string,
                 postProjectRoles: post.postProjectRoles.map(eachRole=>(
                   eachRole.toString()
                 )) as [string],
@@ -45,7 +45,7 @@ async getPost(id:string): Promise<PostDTO|null> {
             postName: post.postName as string,
             postDescription: post.postDescription as string,
             postImages: post.postImages as [string],
-            postMediaType: post.postMediaType as string,
+            postMediaType: post.postMediaType.toString() as string,
             postProjectRoles: post.postProjectRoles.map(eachRole=>(
               eachRole.toString()
             )) as [string],
@@ -110,7 +110,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
- 
+      console.log("postData",postData)
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -130,7 +130,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
-      await postRepository.updatePost(postModel,id);
+      await postRepository.updatePost(postData,id);
       return postModel;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -170,7 +170,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         postName: post.postName as string,
         postDescription: post.postDescription as string,
         postImages: post.postImages as [string],
-        postMediaType: post.postMediaType as string,
+        postMediaType: post.postMediaType.toString() as string,
         postProjectRoles: post.postProjectRoles.map(eachRole=>(
           eachRole.toString()
         )) as [string],

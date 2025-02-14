@@ -5,9 +5,10 @@ import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
 
 class PostRepository {
-    public async getAllPosts() {
+    public async getAllPosts(queryStr:string) {
         try {
-             const posts= await Post.find();
+            console.log(queryStr)
+             const posts= await Post.find(JSON.parse(queryStr));
              console.log('Posts from database:', posts);
              return posts
         } catch (error) {
@@ -84,6 +85,7 @@ class PostRepository {
     public async createPost(postData: IPost) {
         try {
             console.log("Before Create Post")
+            console.log(postData)
             const post = new Post(postData);
             const result= await post.save();
 
@@ -94,16 +96,16 @@ class PostRepository {
               });
 
             await postDetailData.save();
-  
+            console.log("Create Post Detail Success")
             return result
         } catch (error) {
             throw new Error('Error creating post in repository: ' + error);
         }
     }
 
-    public async updatePost(postData: IPost,id:string) {
+    public async updatePost(postData: PostDTO,id:string) {
         try {
-            console.log(postData)
+            // console.log("HELlo",postData)
   
             const objectId = new ObjectId(id);
             console.log(objectId)

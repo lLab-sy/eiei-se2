@@ -5,6 +5,7 @@ import postRoutes from "./routes/postRoutes"
 import authRoutes from './routes/authRoutes';
 import postRoleRoutes from "./routes/postRoleRoutes"
 import postDetailRoutes from "./routes/postDetailRoutes"
+import mediaTypeRoutes from "./routes/mediaTypeRoutes"
 import morgan from 'morgan';
 import helmet from "helmet";
 import cors from "cors";
@@ -43,7 +44,7 @@ setupSwagger(app);
 // Routes
 app.use('/api', testRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes);
+app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes,mediaTypeRoutes);
 app.use('/api/users', userRoutes)
 
 // Server

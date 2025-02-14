@@ -1,10 +1,13 @@
 export interface PostData {
-    postname: string;
-    postdescription: string;
-    postmediatype: string;
-    postProjectRole: string;
-    poststatus: string;
-    file: string;  // Base64 encoded file data
+    postName: string;
+    postDescription: string;
+    postImages?: string[];
+    postMediaType: string;
+    postProjectRoles: string[];
+    postStatus: string;
+    startDate?: string; 
+    endDate?: string;  
+    userID: string;
 }
 
 export interface Project {
@@ -15,8 +18,8 @@ export interface Project {
     postMediaType: string;
     postProjectRoles: string[];
     postStatus: string;
-    startDate: string; // ISO Date string
-    endDate: string;   // ISO Date string
+    startDate: string; 
+    endDate: string;    
 }
 
 export interface ProjectResponse {
@@ -24,3 +27,18 @@ export interface ProjectResponse {
     data: Project[];
     message: string;
 }
+
+export interface PostRolesResponse{
+    roleName: string,
+    id: string
+}
+
+export interface MediaTypesResponse{
+    mediaName: string,
+    id: string
+}
+
+export interface imagePair {
+    imgSrc: string
+    imgFile: File
+  }

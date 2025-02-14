@@ -4,11 +4,11 @@ export interface IPost extends Document {
     postName:string;
     postDescription:string;
     postImages: string[];
-    postMediaType:string;
+    postMediaType: mongoose.Schema.Types.ObjectId;
     postProjectRoles: mongoose.Schema.Types.ObjectId[]; // Updated type
     postStatus:'created'| 'in-progress'| 'success'|'cancel';
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
     postDetailID: mongoose.Schema.Types.ObjectId;
     userID: mongoose.Schema.Types.ObjectId;
 }
@@ -38,7 +38,8 @@ export const postSchema = new Schema<IPost>({
         }
     },
     postMediaType: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MediaType',
         required: [true, 'Post media type is required'],
     },
     postProjectRoles: 

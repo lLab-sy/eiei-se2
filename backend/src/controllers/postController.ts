@@ -9,9 +9,16 @@ import postDetailService from '../services/postDetailService';
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
     try {
-      const posts = await postService.getAllPosts();
+      //Handler Query
+      const reqQuery= {...req.query}
+      const removeFields=['select','sort']
+      removeFields.forEach(param=> delete reqQuery[param])
+      let queryStr=JSON.stringify(req.query);
+      //Handler Compare
+      queryStr=queryStr.replace(/\b(gt|gte|lt|lte|e)\b/g,match=>`$${match}`)
+      const posts = await postService.getAllPosts(queryStr);
       // console.log('Fetched posts:', posts);  // Log fetched posts
-      sendResponse(res, 'success', posts, 'Successfully retrieved posts');
+      sendResponse(res, 'success',posts , 'Successfully retrieved posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
@@ -46,34 +53,52 @@ class PostController {
     }
   };
   
-  async createPost(req: Request, res: Response): Promise<void> {
+  //@Private Request from Producer Role only and userID from frontEnd isMatch
+  async createPost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const posts = await postService.createPost(req.body);
-      sendResponse(res, 'success', posts, 'Successfully created posts');
+      //unauthorize
+      if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+          sendResponse(res.status(401),'error', 'Unauthorize to create post');
+          return;
+      }
+      const post= await postService.createPost(req.body)
+      sendResponse(res.status(201), 'success', post , 'Successfully created posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to created posts');
     }
   };
-
-  async updatePost(req: Request, res: Response): Promise<void> {
+  
+//@Private Request from Producer Role only and userID from frontEnd isMatch
+  async updatePost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const postId = req.params.id
-      const posts = await postService.updatePost(req.body,postId);
- 
       
+      if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+        sendResponse(res.status(401), 'error', 'Unauthorize to update post');
+        return;
+      } 
       if(req.body.postStatus!="created" && req.body.postStatus!="in-progress" && req.body.postStatus!="cancel" && req.body.postStatus!="success"){
         sendResponse(res, 'error', 'Failed PostStatus');
         return;
       }
+ 
+      
+      
+      const posts = await postService.updatePost(req.body,postId);
+      
       sendResponse(res, 'success', posts, 'Successfully updated posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to updated posts at controller');
     }
   };
 
-  async deletePost(req: Request, res: Response): Promise<void> {
+  async deletePost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const postId = req.params.id
+      if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+        sendResponse(res.status(401), 'error', 'Unauthorize to delete post');
+        return;
+      } 
       const posts = await postService.deletePost(req.body,postId);
       sendResponse(res, 'success', posts, 'Successfully deleted posts');
     } catch (err) {
