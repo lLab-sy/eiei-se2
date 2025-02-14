@@ -130,7 +130,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
-      await postRepository.updatePost(postModel,id);
+      await postRepository.updatePost(postData,id);
       return postModel;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);

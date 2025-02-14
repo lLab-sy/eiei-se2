@@ -103,9 +103,9 @@ class PostRepository {
         }
     }
 
-    public async updatePost(postData: IPost,id:string) {
+    public async updatePost(postData: PostDTO,id:string) {
         try {
-            console.log(postData)
+            // console.log("HELlo",postData)
   
             const objectId = new ObjectId(id);
             console.log(objectId)

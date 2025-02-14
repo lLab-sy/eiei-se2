@@ -7,8 +7,8 @@ export interface IPost extends Document {
     postMediaType: mongoose.Schema.Types.ObjectId;
     postProjectRoles: mongoose.Schema.Types.ObjectId[]; // Updated type
     postStatus:'created'| 'in-progress'| 'success'|'cancel';
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
     postDetailID: mongoose.Schema.Types.ObjectId;
     userID: mongoose.Schema.Types.ObjectId;
 }
