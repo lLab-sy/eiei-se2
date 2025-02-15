@@ -17,6 +17,7 @@ export interface IUser extends Document {
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
+  url? : string;
 }
 
 export interface IBankAccount extends Document {

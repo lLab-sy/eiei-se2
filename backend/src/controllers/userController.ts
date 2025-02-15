@@ -1,4 +1,5 @@
 import { searchReqDTO } from "../dtos/userDTO";
+import cloudService from "../services/cloudService";
 import userService from "../services/userService";
 import { sendResponse } from "../utils/responseHelper";
 import { Request, Response } from 'express';
@@ -62,7 +63,46 @@ class UserController {
             sendResponse(res, 'error', err?.message ?? "Failed to update user")
         }
     }
+    async uploadProfileImage(req : Request, res : Response) : Promise<void> {
+        try{
+            const profileImage = req?.file;
+            const id = req.params.id
+            if(!profileImage){
+                sendResponse(res, 'error', "Failed to find Image")
+                return;
+            }
+            const buffer = profileImage?.buffer
+            const mimetype = profileImage?.mimetype
+            const imageKey = cloudService.getKeyName()
+            const returnData = await cloudService.uploadImageToGetURLWithDeleteCondition(buffer!, mimetype!, imageKey, id)
+            
+            sendResponse(res, 'success', returnData, "Successfully Upload Image")
+        }catch(err : any){
+            console.log(err)
+            sendResponse(res, 'error', err?.message ?? "Failed to upload profile")
+        }
+    }
+    async getSignedURL(req : Request, res: Response) : Promise<void> {
+        try{
+            const id = req.params.id
+            if(!id){
+                sendResponse(res, 'error', "Failed to find Id")
+            }
+            const user = await userService.getUserById(id)
+            // console.log(user)
+            if(!user){
+                sendResponse(res, 'error', 'Failed to Find User')
+            }
+            const key = user?.profileImage ?? ""
+            const url = await cloudService.getSignedUrlImageCloud(key)
+            sendResponse(res, 'success', url, "Successfully Find Image Key")
 
+            // const returnSignedURL = await cloudService.getSignedUrlImageCloud()
+        }catch(err : any){
+            sendResponse(res, 'error', err?.message ?? "Failed to get signed url")
+
+        }
+    }
     async search(req: Request, res: Response): Promise<void>  {
         try {
             const minExperience = req.query.minExperience ? Number(req.query.minExperience): undefined

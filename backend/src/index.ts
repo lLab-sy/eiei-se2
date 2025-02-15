@@ -13,6 +13,7 @@ import setupSwagger from './config/swagger';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes'
+import cloudRouter from './routes/cloudRoutes'
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use('/api', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes,mediaTypeRoutes);
 app.use('/api/users', userRoutes)
+app.use('/api/cloud', cloudRouter)
 
 // Server
 app.listen(port, () => {

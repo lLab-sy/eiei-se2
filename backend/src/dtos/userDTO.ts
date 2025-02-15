@@ -60,6 +60,8 @@ export class UserDTO {
   @IsOptional()
   @IsString()
   profileImage?: string;
+
+  file?: any;
 }
 
 export interface searchReqDTO {

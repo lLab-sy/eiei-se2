@@ -1,8 +1,28 @@
-import { Router } from "express";
+import { Request, Router } from "express";
 import userController from "../controllers/userController";
-
+import multer from "multer";
+const path = require('path')
 const router = Router()
+const storage = multer.memoryStorage()
+const fileFilter = (req: Request, file: any, cb: Function) => {
+    const filetypes = /png|jpeg|gif/;
+    
+    // Check file extension
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    
+    // Check MIME type
+    const mimeType = file.mimetype.startsWith('image/');
+    if (extname && mimeType) {
+        return cb(null, true);
+    } else {
+        cb('Error: Only PNG, JPEG files are allowed!');
+    }
+};
 
+const upload = multer({
+    storage: storage,
+    fileFilter
+})
 /**
  * @swagger
  * components:
@@ -167,7 +187,10 @@ const router = Router()
  *         description: Server error
  */
 router.put('/update-user/:id', userController.updateUser)
-
+// upload Image
+router.post('/upload-profile/:id',upload.single('profileImage'), userController.uploadProfileImage)
+// get Signed Profile URL
+router.get('/signed-profile/:id', userController.getSignedURL)
 /**
  * @swagger
  * /api/users/search:

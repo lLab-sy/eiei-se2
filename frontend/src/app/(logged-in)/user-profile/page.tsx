@@ -40,7 +40,7 @@ import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Rating from "@mui/material/Rating";
 import axios from "axios";
-import { setUser } from "@/redux/user/user.slice";
+import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 
 //missing
 //sort position form error
@@ -179,7 +179,7 @@ export default function UserPage() {
       phoneNumber: data.phone,
       gender: data.gender,
       bankAccount: bankAccount,
-      profileImage: "",
+      profileImage: userData?.profileImage ?? "",
       role: user?.user?.role,
       // password: data.password,
       email: data.email,
@@ -230,19 +230,34 @@ export default function UserPage() {
     dispatch(setUser((userData.role === 'producer') ? producerData : productionData))
     setIsEdit(false);
   };
+
   const [img, setImageState] = useState({
-    image: "",
+    image: user.profileImageURL??"",
   });
 
-  const onImageChange = (e: any) => {
+  const onImageChange = async (e: any) => {
     if (e.target.files && e.target.files[0]) {
+      
+      const id = user.user._id;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/upload-profile/${id}`;
+      const formImage = new FormData()
+      formImage.append('profileImage', e.target.files[0])
+      const response = await axios.post(apiUrl, formImage, {
+        headers: {
+          "Content-Type" : "multipart/form-data"
+        }
+      })
+      console.log('response', response)
+      const url = await response?.data?.data?.url
       // setImgState(e.target.files[0])
+      dispatch(setProfileImageURL(url))
       setImageState({
-        image: URL.createObjectURL(e.target.files[0]),
+        image: url,
       });
       // console.log(e.target.files)
     }
   };
+  console.log('profileImageURL', user.profileImageURL)
   // mock data
   const OPTIONS: Option[] = [
     { label: "Cameraman", value: "cameraman" },
@@ -259,7 +274,7 @@ export default function UserPage() {
   ];
 
   return (
-    <main className="font-serif min-h-screen flex bg-blue-400 relative items-center justify-center">
+    <main className="font-serif min-h-screen flex bg-mainblue-light relative items-center justify-center">
       <div className="flex justify-around w-[60%] h-[800px]">
         <Card className="w-[400px] flex flex-col">
           <CardHeader>

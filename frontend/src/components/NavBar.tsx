@@ -6,10 +6,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { setUser } from "@/redux/user/user.slice";
+import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import axios from "axios";
 import { signOut } from "next-auth/react";
 import { Button } from "./ui/button";
+import { Avatar, AvatarImage } from "./ui/avatar";
 
 const NavBar = (session: any) => {
   const token = session?.session?.user?.token ?? ''
@@ -36,6 +37,14 @@ const NavBar = (session: any) => {
       return;
     }
     // set token and set user from fetch data
+    const handleFetchProfileURL = async (id : string) => {
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/signed-profile/${id}`
+      const res= await axios.get(apiUrl)
+      const imageUrl = res?.data?.data ?? ""
+
+      dispatch(setProfileImageURL(imageUrl))
+      return imageUrl
+    }
     const handleFetch = async (fetchToken : string) => {
 
       const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`
@@ -54,6 +63,9 @@ const NavBar = (session: any) => {
         throw new Error('Failed Data')
       }
       const returnUser = await res.data
+      // console.log('returnUser', returnUser)
+      await handleFetchProfileURL(returnUser.data._id)
+
       dispatch(setUser(returnUser.data))
       console.log('setuser', user.user)
       return () => controller.abort()
@@ -111,9 +123,12 @@ const NavBar = (session: any) => {
               await handleLogout()
               await signOut()
             }}>Logout</Button> : ''} */}
-            <span className="text-sm">Gender: {user?.user?.gender ?? "None"} {session.session ? 'In session' : 'out session'} {user?.user?.username ?? "Username"}</span>
+            <span className="text-sm">{session?.session?.user?.username ?? "Username"}</span>
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-gray-600" />
+              {/* <User className="w-5 h-5 text-gray-600"/> */}
+              <Avatar>
+                <AvatarImage src={(!token) ? "" : user?.profileImageURL??""}/>
+              </Avatar>
             </div>
           </div>
 
