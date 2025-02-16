@@ -61,21 +61,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-export const fetchPostData = async (postId: string) => {
-  // จำลองข้อมูลจาก backend
-  return {
-    postName: `The Amazing Rujroot: ${postId}`,
-    description:
-      "This is a short film about life, dreams, and reality. Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan",
-    mediaType: "short",
-    roles: [
-      { label: "Director", value: "director" },
-      { label: "Editor", value: "editor" },
-    ],
-    images: [{ imgSrc: "/image/logo.jpg", imgFile: null }],
-  };
-};
+import getPostById from "@/libs/getPostById";
 
 const optionSchema = z.object({
   label: z.string(),
@@ -95,15 +81,15 @@ const formSchema = z.object({
     .min(50, { message: "Description must be at least 50 characters." })
     .max(1000, { message: "Description must not exceed 1000 characters." }),
   //mock type, roles -> will need API to be updatable
-  type: z.enum(["media", "short", "drama", "ads"], {
-    required_error: "Please select your media type",
-  }),
+  type: z
+    .string({required_error: "Please select your media type"})
+    .min(1,{message:"Please Select mediaType"}),
   roles: z
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
 //mock options -> will use API in later stage
-const OPTIONS: Option[] = [
+/*const OPTIONS: Option[] = [
   { label: "Producer", value: "producer" },
   { label: "Camera Operator", value: "camera operator" },
   { label: "Director", value: "director" },
@@ -112,7 +98,7 @@ const OPTIONS: Option[] = [
   { label: "Sound Mixer", value: "sound mixer" },
   { label: "Prop Master", value: "prop master" },
   { label: "Audio Technician", value: "audio technician" },
-];
+];*/
 
 
 export default function EditPostPage({
@@ -123,10 +109,12 @@ export default function EditPostPage({
   const { data: session } = useSession();
 
   if (!session) {
-    return <>Loading</>;
+    return <div className="flex justify-center py-10">No session...</div>;
   }
 
   const token = session.user?.token;
+  //console.log(token)
+
 
   interface imagePair {
     imgSrc: string;
@@ -138,36 +126,32 @@ export default function EditPostPage({
   const [postRoles,setPostRoles]=useState<Option[]|null>(null)
   const [mediaTypes,setMediaTypes]=useState<Option[]|null>(null)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await getPostRoles();
-      const tmp = response.data.data;
-      let options: Option[] = [];
-      tmp.map((eachRole: PostRolesResponse) => {
-        options.push({ label: eachRole.roleName, value: eachRole.id });
-      });
-      setPostRoles(options);
-      // console.log("Option",options)
-    };
-    fetchData();
-  }, []);
+  
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await getMediaTypes();
-      const tmp = response.data.data;
-      let options: Option[] = [];
-      tmp.map((eachMediaType: MediaTypesResponse) => {
-        options.push({
-          label: eachMediaType.mediaName,
-          value: eachMediaType.id,
-        });
-      });
-      setMediaTypes(options);
-      // console.log("MediaType",options)
-    };
-    fetchData();
+    async function fetchOptions() {
+      try {
+        const [rolesResponse, mediaResponse] = await Promise.all([
+          getPostRoles(),
+          getMediaTypes()
+        ]);
+        
+        setPostRoles(rolesResponse.data.data.map((role: PostRolesResponse) => ({
+          label: role.roleName,
+          value: role.id
+        })));
+  
+        setMediaTypes(mediaResponse.data.data.map((media: MediaTypesResponse) => ({
+          label: media.mediaName,
+          value: media.id
+        })));
+      } catch (error) {
+        console.error("Failed to fetch options:", error);
+      }
+    }
+    fetchOptions();
   }, []);
+  
 
   const { postId } = useParams();
   const { toast } = useToast();
@@ -178,41 +162,38 @@ export default function EditPostPage({
     defaultValues: {
       postname: "",
       description: "",
-      type: "media",
+      type: "",
       roles: [],
     },
   });
 
   useEffect(() => {
-    async function loadPostData() {
-      if (!postId) return; // ป้องกัน undefined
-
-      try {
-        setLoading(true);
-        console.log("Fetching post with ID:", postId);
-
-        const data = await fetchPostData(postId.toString());
-
-        const validTypes = ["media", "short", "drama", "ads"] as const;
-        const type = validTypes.includes(data.mediaType as any)
-          ? (data.mediaType as "media" | "short" | "drama" | "ads")
-          : "media"; // fallback
-
-        form.reset({
-          postname: data.postName,
-          description: data.description,
-          type,
-          roles: data.roles,
-        });
-      } catch (error) {
-        console.error("Failed to fetch post data", error);
-      } finally {
-        setLoading(false);
-      }
+    if (typeof postId === "string") {
+      getPostById(postId, token)
+        .then((post) => console.log("Post Data:", post))
+        .catch((error) => console.error("Error:", error));
     }
+  }, [postId, token]);
 
-    loadPostData();
-  }, [initialPostId, form]);
+  useEffect(() => {
+    if (postRoles && mediaTypes && typeof postId === "string") {
+      getPostById(postId, token).then((data) => {
+        form.reset({
+          postname: data.postName || "",
+          description: data.postDescription || "",
+          type: data.postMediaType || "",
+          roles: data.postProjectRoles.map((role: string) => {
+            const foundRole = postRoles.find(r => r.value === role);
+            return foundRole || { label: role, value: role };
+          }),
+        });
+      }).catch((error) => {
+        console.error("Error loading post:", error);
+      });
+    }
+  }, [postRoles, mediaTypes, postId, token, form]);
+  
+  
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const imageList = img.map((img) => img.imgFile);
@@ -278,8 +259,9 @@ export default function EditPostPage({
       setMostRecentImg(img[img.length - 2].imgSrc);
   };
 
-  if (loading)
-    return <div className="flex justify-center py-10">Loading...</div>;
+  if(!postRoles || !mediaTypes){
+    return <div className="flex justify-center py-60">No postRoles or mediaTypes...</div>;
+  }
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
@@ -340,10 +322,11 @@ export default function EditPostPage({
                             </SelectTrigger>
                             <SelectContent>
                               <SelectGroup>
-                                <SelectItem value="media">Media</SelectItem>
-                                <SelectItem value="short">Short</SelectItem>
-                                <SelectItem value="drama">Drama</SelectItem>
-                                <SelectItem value="ads">Ads</SelectItem>
+                                {
+                                  mediaTypes.map((eachMediaType:Option)=>(
+                                    <SelectItem key={eachMediaType.value} value={eachMediaType.value}>{eachMediaType.label}</SelectItem>
+                                  ))
+                                }
                               </SelectGroup>
                             </SelectContent>
                           </Select>
@@ -361,7 +344,7 @@ export default function EditPostPage({
                         <FormControl>
                           <MultipleSelector
                             {...field}
-                            defaultOptions={OPTIONS}
+                            defaultOptions={postRoles}
                             placeholder="Choose roles required for your project"
                             hidePlaceholderWhenSelected
                             emptyIndicator={
@@ -378,6 +361,7 @@ export default function EditPostPage({
                   <Button type="submit">Edit Post</Button>
                 </form>
               </Form>
+              
             </CardContent>
             <CardContent className="w-[40%] py-5">
               <CardTitle className="text-sm">Your Post Picture</CardTitle>
