@@ -1,10 +1,10 @@
 import Image from "next/image";
-import { Project } from "../../interface";
+import { PostDataHistory } from "../../interface";
 import { Clock, Calendar, User, Film } from "lucide-react";
  
  
 
-export default function PostHistoryCard({ post,userName }: { post: Project,userName:string }) {
+export default function PostHistoryCard({ post,userName,role }: { post: PostDataHistory, userName:string, role:string }) {
   const endDateDayJS = new Date(post.endDate)
   const EndDate = endDateDayJS.toDateString();
 
@@ -30,27 +30,45 @@ export default function PostHistoryCard({ post,userName }: { post: Project,userN
           <h3 className="text-xl font-semibold text-mainblue mb-2 group-hover:text-mainblue-light transition-colors">
             {post.postName}
           </h3>
-          <div className="space-y-2">
-            <div className="flex items-center text-gray-600">
-              <User className="w-4 h-4 mr-2" />
-              <p className="text-sm">{userName}</p>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Calendar className="w-4 h-4 mr-2" />
-              <p className="text-sm">Start Date: {StartDate}</p>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Calendar className="w-4 h-4 mr-2" />
-              <p className="text-sm">End Date: {EndDate}</p>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Film className="w-4 h-4 mr-2" />
-              <p className="text-sm">Your Role: {post.postProjectRoles}</p>
-            </div>
+          {role === "producer" ? (
+              // Producer View
+              <>
+                <div className="flex items-center text-gray-600">
+                  <Film className="w-4 h-4 mr-2 text-mainblue-light" />
+                  <p className="text-sm">Type: {post.postMediaType}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <User className="w-4 h-4 mr-2 text-mainblue-light" />
+                  <p className="text-sm">Roles: {post.postProjectRoles.join(', ')}
+                  </p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
+                  <p className="text-sm">
+                    Period: {StartDate} - {EndDate}
+                  </p>
+                </div>
+              </>
+            ) : (
+              // Production Professional View
+              <>
+                <div className="flex items-center text-gray-600">
+                  <User className="w-4 h-4 mr-2 text-mainblue-light" />
+                  {/* <p className="text-sm">Producer: {post.}</p> */}
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <Film className="w-4 h-4 mr-2 text-mainblue-light" />
+                  <p className="text-sm">Role: {post.postProjectRoles}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
+                  <p className="text-sm">Completed: {EndDate}</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
-    </div>
   );
 }
 function dayjs(endday: Date) {

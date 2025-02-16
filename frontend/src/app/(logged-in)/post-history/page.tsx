@@ -1,6 +1,6 @@
 'use client'
 import PostHistoryList from "@/components/PostHistoryList";
-import { Project } from "../../../../interface";
+import { PostDataHistory} from "../../../../interface";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import getHistoryPost from "@/libs/getHistoryPosts";
@@ -26,7 +26,7 @@ import { useSession } from "next-auth/react";
 
 
 export default function HistoryPostPage(){
-  const [postHistoryResponse,setPostHistoryResponse]= useState<Project[]|null>(null)
+  const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
   const {data:session} = useSession()
   
   if(!session){
@@ -35,6 +35,7 @@ export default function HistoryPostPage(){
 
   const token=session.user?.token
   const userName=session.user?.username
+  const role= session.user.role
 
   useEffect(()=>{
       const fetchData=async()=>{
@@ -56,7 +57,7 @@ export default function HistoryPostPage(){
 
       {/* Project History */}
       {/* <h2 className="text-2xl font-bold text-center my-4">Post-History</h2> */}
-      <PostHistoryList postLists={postHistoryResponse} userName={userName}/>
+      <PostHistoryList postLists={postHistoryResponse} userName={userName} role={role}/>
     
     </div>
   );
