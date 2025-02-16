@@ -1,64 +1,94 @@
 [
   {
+      "userID": {
+        "$oid": "67ae18a37c7f8482264c2ae8"
+      },
       "postName": "Graphic Design for Branding",
       "postDescription": "Creating branding materials including logos and brochures.",
       "postImages": ["https://example.com/design1.jpg"],
-      "postMediaType": "graphic",
+      "postMediaType":{
+        "$oid": "67ae18ad7c7f8482264c2ae9"
+      },
       "postProjectRoles": [{ "$oid": "65b1234567abcd1234ef5678" }],
-      "postStatus": "in-progress",
+      "postStatus": "created",
       "startDate": "2025-01-20T00:00:00.000Z",
       "endDate": "2025-02-25T00:00:00.000Z",
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b126" }
   },
   {
+      "userID": {
+        "$oid": "67ae18a37c7f8482264c2ae8"
+      },
       "postName": "Video Editing for Commercial",
       "postDescription": "Editing a high-quality commercial for a new product launch.",
       "postImages": ["https://example.com/video1.jpg"],
-      "postMediaType": "video",
+      "postMediaType": {
+        "$oid": "67ae18ad7c7f8482264c2ae9"
+      },
       "postProjectRoles": [{ "$oid": "65b8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
+      "postStatus": "created",
       "startDate": "2025-02-10T00:00:00.000Z",
       "endDate": "2025-03-05T00:00:00.000Z",
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b127" }
   },
   {
+      "userID": {
+        "$oid": "67ae18a37c7f8482264c2ae8"
+      },
       "postName": "Photography Session for Magazine",
       "postDescription": "A fashion photoshoot for a well-known magazine.",
       "postImages": ["https://example.com/photo1.jpg"],
-      "postMediaType": "photo",
+      "postMediaType": {
+        "$oid": "67ae18ad7c7f8482264c2ae9"
+      },
       "postProjectRoles": [{ "$oid": "65a1234567abcd1234ef5678" }],
-      "postStatus": "in-progress",
+      "postStatus": "success",
       "startDate": "2025-02-15T00:00:00.000Z",
       "endDate": "2025-03-10T00:00:00.000Z",
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b128" }
   },
   {
+      "userID": {
+        "$oid": "67ae18a37c7f8482264c2ae8"
+      },
       "postName": "Script Writing for TV Series",
       "postDescription": "Writing an engaging script for a new drama series.",
       "postImages": ["https://example.com/script1.jpg"],
-      "postMediaType": "text",
+      "postMediaType": {
+        "$oid": "67ae18c07c7f8482264c2aec"
+      },
       "postProjectRoles": [{ "$oid": "65c8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
+      "postStatus": "success",
       "startDate": "2025-03-01T00:00:00.000Z",
       "endDate": "2025-04-15T00:00:00.000Z",
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b129" }
   },
   {
+      "userID": {
+        "$oid": "67a39c05991daabf54e84338"
+      },
       "postName": "Animation for Kids Show",
       "postDescription": "Creating engaging animations for an educational kids show.",
       "postImages": ["https://example.com/animation1.jpg"],
-      "postMediaType": "animation",
+      "postMediaType": {
+        "$oid": "67ae18c07c7f8482264c2aec"
+      },
       "postProjectRoles": [{ "$oid": "65b8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
+      "postStatus": "success",
       "startDate": "2025-04-01T00:00:00.000Z",
       "endDate": "2025-05-10T00:00:00.000Z",
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b130" }
   },
-  {
+  {   
+      "userID": {
+        "$oid": "67a39c05991daabf54e84338"
+       },
       "postName": "Voice Acting for Animated Movie",
       "postDescription": "Recording voiceovers for a newly released animated feature.",
       "postImages": ["https://example.com/voice1.jpg"],
-      "postMediaType": "audio",
+      "postMediaType": {
+        "$oid": "67ae18c07c7f8482264c2aec"
+      },
       "postProjectRoles": [{ "$oid": "65b1234567abcd1234ef5678" }],
       "postStatus": "in-progress",
       "startDate": "2025-05-10T00:00:00.000Z",
@@ -66,10 +96,15 @@
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b131" }
   },
   {
+     "userID": {
+        "$oid": "67a39c05991daabf54e84338"
+       },
       "postName": "Music Composition for Indie Film",
       "postDescription": "Composing original music for an independent film.",
       "postImages": ["https://example.com/music1.jpg"],
-      "postMediaType": "audio",
+      "postMediaType": {
+        "$oid": "67ae18c07c7f8482264c2aec"
+      },
       "postProjectRoles": [{ "$oid": "65c8765432abcd5678ef1234" }],
       "postStatus": "in-progress",
       "startDate": "2025-06-01T00:00:00.000Z",
@@ -77,10 +112,15 @@
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b132" }
   },
   {
+      "userID": {
+        "$oid": "67a39c05991daabf54e84338"
+       },
       "postName": "Website UI Design",
       "postDescription": "Creating an intuitive user interface for a startup website.",
       "postImages": ["https://example.com/ui1.jpg"],
-      "postMediaType": "graphic",
+      "postMediaType": {
+        "$oid": "67ae18c07c7f8482264c2aec"
+      },
       "postProjectRoles": [{ "$oid": "65b8765432abcd5678ef1234" }],
       "postStatus": "in-progress",
       "startDate": "2025-07-05T00:00:00.000Z",
@@ -88,23 +128,33 @@
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b133" }
   },
   {
+      "userID": {
+        "$oid": "67a39c05991daabf54e84338"
+       },
       "postName": "Podcast Editing",
       "postDescription": "Editing and mixing audio for a popular podcast series.",
       "postImages": ["https://example.com/podcast1.jpg"],
-      "postMediaType": "audio",
+      "postMediaType": {
+        "$oid": "67ae18c07c7f8482264c2aec"
+      },
       "postProjectRoles": [{ "$oid": "65a1234567abcd1234ef5678" }],
-      "postStatus": "in-progress",
+      "postStatus": "success",
       "startDate": "2025-08-01T00:00:00.000Z",
       "endDate": "2025-09-10T00:00:00.000Z",
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b134" }
   },
   {
+     "userID": {
+        "$oid": "67a39c05991daabf54e84338"
+       },
       "postName": "Game Character Design",
       "postDescription": "Designing 3D characters for an upcoming game release.",
       "postImages": ["https://example.com/game1.jpg"],
-      "postMediaType": "graphic",
+      "postMediaType": {
+        "$oid": "67ae18c07c7f8482264c2aec"
+      },
       "postProjectRoles": [{ "$oid": "65c8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
+      "postStatus": "success",
       "startDate": "2025-09-15T00:00:00.000Z",
       "endDate": "2025-11-01T00:00:00.000Z",
       "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b135" }
