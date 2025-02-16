@@ -29,12 +29,13 @@ export default function PostHistoryList({
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-mainblue mb-4">
-            Project History
             {role === "producer" ? "Project History" : "Work History"}
           </h1>
           <div className="h-1 w-24 bg-mainblue-light mx-auto rounded-full mb-6" />
           <p className="text-lg text-gray-600">
-            {role === "producer" ? "Project History" : "Work History"}
+            {role === "producer"
+              ? "Explore your creative projects and collaborations"
+              : "View your completed projects and achievements"}
           </p>
         </div>
 
@@ -57,7 +58,7 @@ export default function PostHistoryList({
           <PaginationBar
             currentPage={currentPage}
             projectsPerPage={projectsPerPage}
-            postListLength={postLists.length}
+            postListLenght={postLists.length}
             setCurrentPage={setCurrentPage}
           />
         </div>
