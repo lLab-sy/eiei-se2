@@ -71,9 +71,12 @@ class UserController {
                 sendResponse(res, 'error', "Failed to find Image")
                 return;
             }
+            const user = await userService.getUserById(id)
+            console.log('user', user)
             const buffer = profileImage?.buffer
             const mimetype = profileImage?.mimetype
-            const imageKey = cloudService.getKeyName()
+            const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName()
+            console.log('imageKey',imageKey)
             const returnData = await cloudService.uploadImageToGetURLWithDeleteCondition(buffer!, mimetype!, imageKey, id)
             
             sendResponse(res, 'success', returnData, "Successfully Upload Image")
@@ -93,6 +96,7 @@ class UserController {
             if(!user){
                 sendResponse(res, 'error', 'Failed to Find User')
             }
+            
             const key = user?.profileImage ?? ""
             const url = await cloudService.getSignedUrlImageCloud(key)
             sendResponse(res, 'success', url, "Successfully Find Image Key")

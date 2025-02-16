@@ -43,6 +43,7 @@ class CloudService {
   }
   async uploadImageToGetURLWithDeleteCondition(buffer : Buffer, mimetype:string, imageKey : string, id: string){
     try{
+        
         const key = await this.uploadImageToCloud(buffer, mimetype, imageKey);
         const url = await this.getSignedUrlImageCloud(key)
         const user = await userRepository.updateImageKey(key, id)

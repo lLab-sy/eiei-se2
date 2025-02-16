@@ -41,6 +41,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Rating from "@mui/material/Rating";
 import axios from "axios";
 import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
+import { CircularProgress } from "@mui/material";
 
 //missing
 //sort position form error
@@ -152,11 +153,7 @@ export default function UserPage() {
       setPaymentState(userData?.paymentType ?? "qrCode")
     }
   }, [userData, form.reset]);
-  /*
-  Image
 
-  use axios to post into database return it back and use that image to show
-  */
   const [isEdit, setIsEdit] = useState(false);
   const [click, setClick] = useState(0);
   const { toast } = useToast();
@@ -230,14 +227,15 @@ export default function UserPage() {
     dispatch(setUser((userData.role === 'producer') ? producerData : productionData))
     setIsEdit(false);
   };
-
+  // Loading State
+  const [loadingImage, setLoadingImage] = useState(false)
   const [img, setImageState] = useState({
     image: user.profileImageURL??"",
   });
 
   const onImageChange = async (e: any) => {
     if (e.target.files && e.target.files[0]) {
-      
+      setLoadingImage(true)
       const id = user.user._id;
       const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/upload-profile/${id}`;
       const formImage = new FormData()
@@ -248,12 +246,14 @@ export default function UserPage() {
         }
       })
       console.log('response', response)
+      console.log('loadingImage', loadingImage)
       const url = await response?.data?.data?.url
       // setImgState(e.target.files[0])
       dispatch(setProfileImageURL(url))
       setImageState({
         image: url,
       });
+      setLoadingImage(false)
       // console.log(e.target.files)
     }
   };
@@ -274,32 +274,48 @@ export default function UserPage() {
   ];
 
   return (
-    <main className="font-serif min-h-screen flex bg-mainblue-light relative items-center justify-center">
+    <main className=" min-h-screen flex bg-mainblue-light relative items-center justify-center">
       <div className="flex justify-around w-[60%] h-[800px]">
         <Card className="w-[400px] flex flex-col">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <div className="text-md text-center font-serif font-bold flex justify-center h-[50px] items-center">
+            <div className="text-md text-center font-bold flex justify-center h-[50px] items-center">
               {userData.firstName} {userData.middleName} {userData.lastName}
             </div>
             {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
               <Image src={} alt=''/>
             </div> */}
+            {
+              (loadingImage) ? 
+              <Avatar className='size-60 bg-slate-400 flex justify-center items-center'>
+                <CircularProgress  size={60}/>
+              </Avatar> : 
+              <Avatar className="size-60">
+                <AvatarImage src={img.image} alt="" />
+                <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
+              </Avatar>
+            }
+            {/* <CircularProgress size={60}/>
             <Avatar className="size-60">
               <AvatarImage src={img.image} alt="" />
               <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
-            </Avatar>
-            <div className="w-[100%] flex justify-center">
-              <Input
-                id="picture"
-                type="file"
-                className="mt-5  bg-black w-[50%]  after:content-['Upload'] cursor-pointer after:text-white after:text-xl after:absolute relative after:left-[50%] after:translate-x-[-50%] after:translate-y-[-50%] after:top-[50%]"
-                placeholder="Upload New Photo"
-                onChange={onImageChange}
-              />
-            </div>
+            </Avatar> */}
+            <div className="w-full flex justify-center">
+            <label 
+              htmlFor="picture" 
+              className="mt-5 w-[50%] bg-blue-500 text-white text-xl py-2 px-4 rounded-lg cursor-pointer text-center"
+            >
+              Upload File
+            </label>
+            <input
+              id="picture"
+              type="file"
+              className="hidden"
+              onChange={onImageChange}
+            />
+          </div>
           </CardContent>
         </Card>
         <Card className=" relative w-[500px] flex flex-col">
