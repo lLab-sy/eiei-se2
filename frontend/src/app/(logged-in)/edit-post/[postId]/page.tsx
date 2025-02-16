@@ -37,13 +37,37 @@ import {
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import uploadImage from "@/hooks/upload-image";
+import { useSession } from "next-auth/react";
+import {
+  imagePair,
+  MediaTypesResponse,
+  PostData,
+  PostRolesResponse,
+} from "../../../../../interface";
+import getPostRoles from "@/libs/getPostRoles";
+//import createPost from "@/libs/postPost";
+import getMediaTypes from "@/libs/getMediaTypes";
+import router, { useRouter } from "next/navigation";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const fetchPostData = async (postId: string) => {
   // จำลองข้อมูลจาก backend
   return {
     postName: `The Amazing Rujroot: ${postId}`,
-    description: "This is a short film about life, dreams, and reality. Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan",
+    description:
+      "This is a short film about life, dreams, and reality. Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan",
     mediaType: "short",
     roles: [
       { label: "Director", value: "director" },
@@ -90,14 +114,64 @@ const OPTIONS: Option[] = [
   { label: "Audio Technician", value: "audio technician" },
 ];
 
+
 export default function EditPostPage({
   initialPostId,
 }: {
   initialPostId: string;
 }) {
-    const { postId } = useParams();
-    const { toast } = useToast();
-    const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
+
+  if (!session) {
+    return <>Loading</>;
+  }
+
+  const token = session.user?.token;
+
+  interface imagePair {
+    imgSrc: string;
+    imgFile: File;
+  }
+
+  const [img, setImg] = useState<imagePair[]>([]);
+  const [mostRecentImg, setMostRecentImg] = useState<string>("");
+  const [postRoles,setPostRoles]=useState<Option[]|null>(null)
+  const [mediaTypes,setMediaTypes]=useState<Option[]|null>(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getPostRoles();
+      const tmp = response.data.data;
+      let options: Option[] = [];
+      tmp.map((eachRole: PostRolesResponse) => {
+        options.push({ label: eachRole.roleName, value: eachRole.id });
+      });
+      setPostRoles(options);
+      // console.log("Option",options)
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getMediaTypes();
+      const tmp = response.data.data;
+      let options: Option[] = [];
+      tmp.map((eachMediaType: MediaTypesResponse) => {
+        options.push({
+          label: eachMediaType.mediaName,
+          value: eachMediaType.id,
+        });
+      });
+      setMediaTypes(options);
+      // console.log("MediaType",options)
+    };
+    fetchData();
+  }, []);
+
+  const { postId } = useParams();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -112,18 +186,18 @@ export default function EditPostPage({
   useEffect(() => {
     async function loadPostData() {
       if (!postId) return; // ป้องกัน undefined
-  
+
       try {
         setLoading(true);
         console.log("Fetching post with ID:", postId);
-        
+
         const data = await fetchPostData(postId.toString());
-  
+
         const validTypes = ["media", "short", "drama", "ads"] as const;
         const type = validTypes.includes(data.mediaType as any)
           ? (data.mediaType as "media" | "short" | "drama" | "ads")
           : "media"; // fallback
-  
+
         form.reset({
           postname: data.postName,
           description: data.description,
@@ -136,11 +210,10 @@ export default function EditPostPage({
         setLoading(false);
       }
     }
-    
+
     loadPostData();
   }, [initialPostId, form]);
 
-  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const imageList = img.map((img) => img.imgFile);
 
@@ -157,13 +230,7 @@ export default function EditPostPage({
     console.log(JSON.stringify(postData));
   }
 
-  interface imagePair {
-    imgSrc: string;
-    imgFile: File;
-  }
-
-  const [img, setImg] = useState<imagePair[]>([]);
-  const [mostRecentImg, setMostRecentImg] = useState<string>("");
+  
 
   const onImgChange = (e: any) => {
     if (e.target.files && e.target.files[0]) {
@@ -203,6 +270,7 @@ export default function EditPostPage({
       setImg(newImg);
     }
   };
+  
   const removeImg = (imgSrc: string) => {
     setImg(img.filter((img) => img.imgSrc !== imgSrc));
     console.log(img.length);
@@ -210,7 +278,8 @@ export default function EditPostPage({
       setMostRecentImg(img[img.length - 2].imgSrc);
   };
 
-  if (loading) return <div className="flex justify-center py-10">Loading...</div>;
+  if (loading)
+    return <div className="flex justify-center py-10">Loading...</div>;
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
