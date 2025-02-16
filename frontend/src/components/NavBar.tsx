@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn } from "lucide-react";
+import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn, SearchCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import { Button } from "./ui/button";
 
 const NavBar = (session: any) => {
   const token = session?.session?.user?.token ?? ''
+  const role = session?.session?.user?.role ?? ''
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // const {data: session, status} = useSession()
@@ -62,12 +63,34 @@ const NavBar = (session: any) => {
   }, [session.session, token])
 
   const menuItems = [
-    { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },
+    { 
+      icon: <User className="w-5 h-5" />, 
+      label: "Profile", 
+      href: "/user-profile" },
     {
       icon: <FileText className="w-5 h-5" />,
-      label: "My Post",
-      href: "/my-post",
+      label: role === "producer" ? "My Post" : "Work History",
+      href: "/post-history",
     },
+    ...(role === "producer" ? 
+    [{
+      icon: <Gift className="w-5 h-5" />,
+      label: "Create Post",
+      href: "/create-post",
+    },
+    {
+      icon: <SearchCheck className="w-5 h-5" />,
+      label: "Search for Professionals",
+      href: "/professionals", 
+    }] : 
+    []),
+    ...(role === "production professional" ? 
+    [{
+        icon: <SearchCheck className="w-5 h-5" />,
+        label: "Search for Posts",
+        href: "/posts", 
+    }] : 
+    []),
     {
       icon: <Gift className="w-5 h-5" />,
       label: "My Offering",
@@ -78,7 +101,6 @@ const NavBar = (session: any) => {
       label: "Setting",
       href: "/setting",
     },
-    // { icon: (session) ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />, label: (session) ? "Logout" : "Login", href: (session) ? "/api/auth/signout" : "/login" },
   ];
 
   return (
@@ -148,9 +170,7 @@ const NavBar = (session: any) => {
             <Link
               key={index}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                item.label === "Logout" ? "text-red-600 hover:text-red-700" : ""
-              }`}
+              className={"flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100"}
               onClick={() => setIsMenuOpen(false)}
             >
               {item.icon}

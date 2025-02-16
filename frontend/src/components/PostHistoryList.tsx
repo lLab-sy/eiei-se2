@@ -38,6 +38,14 @@ export default function PostHistoryList({
               : "View your completed projects and achievements"}
           </p>
         </div>
+        {/* Create Post for Producer*/}
+        { role === "producer" ?
+        <div className="">
+          <Link
+          className={"w-10 h-10 p-3 rounded-full transition-all duration-200 bg-mainblue text-white hover:bg-mainblue-light"}
+          href = "/create-post"
+        > Create Post </Link>
+        </div> : <></>}
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
