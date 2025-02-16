@@ -13,32 +13,41 @@ import { Project } from "../../interface";
 
   
 export default function PostSelect({postData,postSelectData,changePostSelect}:{postData:Project[],postSelectData:Project,changePostSelect:Function}){
-    const [selectPostID,setSelectPostID]= useState() //may be use handler function
+    const handleSelectChange= (selectID:string)=>{{
+        const selectedPost = postData.find(post=>post.id===selectID);
+        if(selectedPost && selectedPost.id!==postSelectData?.id){
+            console.log("ChangPost")
+            changePostSelect(selectedPost);
+        }
+    }}
     return(
-        <div>
+        <div className="flex flex-col w-[80%] m-auto">
+            <h1>{postSelectData.postName}</h1>
             <Image src="/image/logo.png"
-                width={100}
-                height={100}
-                className="w-100 h-100" 
+                width={parent.innerWidth}
+                height={parent.innerHeight}
+                className="object-fill w-[80%] h-[40%] m-auto" 
                 alt="Project Picture"
             />
             
-            <Select
-                // onValueChange={field.onChange}
-                // value={field.value}
+            <Select 
+                onValueChange={handleSelectChange}
+                value={postSelectData?.id || ""}
             >
-                <SelectTrigger>
-                    <SelectValue placeholder="Choose your media type." />
+                <SelectTrigger >
+                    <SelectValue placeholder="Choose your Post"/>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value="media">Media</SelectItem>
-                        <SelectItem value="short">Short</SelectItem>
-                        <SelectItem value="drama">Drama</SelectItem>
-                        <SelectItem value="ads">Ads</SelectItem>
+                          {
+                            postData.map((eachPost:Project)=>(
+                            <SelectItem key={eachPost.id} value={eachPost.id}>{eachPost.postName}</SelectItem>
+                            ))
+                            }
                     </SelectGroup>
                 </SelectContent>
             </Select>
+            
 
 
         </div>
