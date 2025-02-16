@@ -72,6 +72,7 @@ async getPost(id:string): Promise<PostDTO|null> {
       if(posts){
         const result = posts.map((post) => {
           const postId = post._id?post._id.toString():'';
+          // console.log(post.postMediaType)
           return new PostWithRoleCountDTO({
               id: postId,
               postName: post.postName as string,
