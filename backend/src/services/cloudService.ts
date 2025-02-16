@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { createSignedURL, deleteFile, uploadFile } from "../cloud/s3";
+import s3Client from '../cloud/s3'
 import sharp from 'sharp'
 import userRepository from '../repositories/userRepository';
 
@@ -17,7 +17,7 @@ class CloudService {
           fit: "contain",
         })
         .toBuffer();
-      await uploadFile(resizeBuffer, imageName, mimetype);
+      await s3Client.uploadFile(resizeBuffer, imageName, mimetype);
       return imageName
     } catch (err: any) {
       throw new Error(err);
@@ -25,7 +25,7 @@ class CloudService {
   }
   async deleteImageCloud(key: string){
         try {
-            await deleteFile(key)
+            await s3Client.deleteFile(key)
             return {
                 success: true
             }
@@ -35,7 +35,7 @@ class CloudService {
   }
   async getSignedUrlImageCloud(key:string){
     try{
-        const url = await createSignedURL(key)
+        const url = await s3Client.createSignedURL(key)
         return url
     }catch(err){
         throw new Error(err as string)
@@ -54,6 +54,15 @@ class CloudService {
     }catch(err){
         await this.deleteImageCloud(imageKey)
         throw new Error(err as string)
+    }
+  }
+  async uploadToCloudFromEditUser(buffer : Buffer, mimetype:string, imageKey : string){
+    try{
+      const key = await this.uploadImageToCloud(buffer, mimetype, imageKey)
+      const url = await this.getSignedUrlImageCloud(key)
+      return url
+    }catch(err){
+      throw new Error(err as string)
     }
   }
 }

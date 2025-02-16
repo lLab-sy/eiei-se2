@@ -61,7 +61,7 @@ export class UserDTO {
   @IsString()
   profileImage?: string;
 
-  file?: any;
+  file?: Express.Multer.File;
 }
 
 export interface searchReqDTO {

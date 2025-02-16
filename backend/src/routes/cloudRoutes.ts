@@ -1,10 +1,10 @@
 import { Router } from "express";
 import multer from 'multer'
 import crypto from 'crypto'
-import { createSignedURL, deleteFile, uploadFile } from "../cloud/s3";
+import path from 'path'
+import s3Client from '../cloud/s3'
 import { Request, Response } from "express";
 import sharp from 'sharp'
-const path = require('path')
 const router = Router()
 // For Testing
 const storage = multer.memoryStorage()
@@ -43,7 +43,7 @@ router.post('/upload', upload.single('img') ,async (req, res) => {
         })
         .toBuffer()
         const imageName = crypto.randomBytes(32).toString('hex')
-        await uploadFile(resizeBuffer, imageName, image?.mimetype!)
+        await s3Client.uploadFile(resizeBuffer, imageName, image?.mimetype!)
         res.status(201).json({success: true})
     }catch(err : any){
         throw new Error(err)
@@ -53,7 +53,7 @@ router.post('/upload', upload.single('img') ,async (req, res) => {
 router.delete('/delete', async (req : Request, res : Response) => {
     try {
         const key = req.query.key;
-        await deleteFile(key as string)
+        await s3Client.deleteFile(key as string)
         res.status(201).json({success: true})
     }catch(err){
         throw new Error(err as string)
@@ -63,7 +63,7 @@ router.delete('/delete', async (req : Request, res : Response) => {
 router.get('/getUrl', async (req : Request, res : Response) => {
     try{
         const key = req.query.key
-        const url = await createSignedURL(key as string)
+        const url = await s3Client.createSignedURL(key as string)
         res.status(201).json({
             success: true,
             signedUrl : url,

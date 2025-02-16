@@ -1,7 +1,7 @@
 import { Request, Router } from "express";
 import userController from "../controllers/userController";
 import multer from "multer";
-const path = require('path')
+import path from 'path'
 const router = Router()
 const storage = multer.memoryStorage()
 const fileFilter = (req: Request, file: any, cb: Function) => {
@@ -186,7 +186,7 @@ const upload = multer({
  *       500:
  *         description: Server error
  */
-router.put('/update-user/:id', userController.updateUser)
+router.put('/update-user/:id',upload.single('profileImage') , userController.updateUser)
 // upload Image
 router.post('/upload-profile/:id',upload.single('profileImage'), userController.uploadProfileImage)
 // get Signed Profile URL
