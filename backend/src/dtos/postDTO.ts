@@ -1,6 +1,14 @@
 import { IsString, IsNotEmpty, MaxLength, IsEnum, IsDate, IsArray, ArrayNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+class PostProjectRoleDTO {
+    @ApiProperty({ description: 'Role ID', type: String })
+    id!: string;
+
+    @ApiProperty({ description: 'Role name', type: String })
+    roleName!: string;
+}
+
 export class PostDTO {
     @ApiProperty({ description: 'The unique identifier of the post', type: String })
     @IsString()
@@ -34,6 +42,11 @@ export class PostDTO {
     @IsArray()
     @IsString({ each: true }) 
     postProjectRoles!: string[];
+
+    @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
+    @IsArray()
+    @IsString({ each: true }) 
+    postProjectRolesOut!: PostProjectRoleDTO[];
 
     @ApiProperty({ description: 'The status of the post', enum: ['created', 'in-progress', 'success', 'cancel'] })
     @IsString()

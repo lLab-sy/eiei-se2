@@ -17,6 +17,9 @@ export interface PostDataHistory {
     postDescription: string;
     postImages: string[];
     postMediaType: string;
+    postProjectRoles?: string[];
+    postProjectRolesOut?: PostRolesResponse[]
+    postStatus: string;
     startDate: string; 
     endDate: string;   
     postProjectRoles: string[]; 
