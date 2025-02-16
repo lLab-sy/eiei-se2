@@ -62,6 +62,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import getPostById from "@/libs/getPostById";
+import editPostById from "@/libs/editPostById";
 
 const optionSchema = z.object({
   label: z.string(),
@@ -88,17 +89,6 @@ const formSchema = z.object({
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
-//mock options -> will use API in later stage
-/*const OPTIONS: Option[] = [
-  { label: "Producer", value: "producer" },
-  { label: "Camera Operator", value: "camera operator" },
-  { label: "Director", value: "director" },
-  { label: "Cinematographer", value: "cinematographer" },
-  { label: "Editor", value: "editor" },
-  { label: "Sound Mixer", value: "sound mixer" },
-  { label: "Prop Master", value: "prop master" },
-  { label: "Audio Technician", value: "audio technician" },
-];*/
 
 
 export default function EditPostPage({
@@ -115,7 +105,6 @@ export default function EditPostPage({
   const token = session.user?.token;
   //console.log(token)
 
-
   interface imagePair {
     imgSrc: string;
     imgFile: File;
@@ -125,8 +114,6 @@ export default function EditPostPage({
   const [mostRecentImg, setMostRecentImg] = useState<string>("");
   const [postRoles,setPostRoles]=useState<Option[]|null>(null)
   const [mediaTypes,setMediaTypes]=useState<Option[]|null>(null)
-
-  
 
   useEffect(() => {
     async function fetchOptions() {
@@ -152,7 +139,6 @@ export default function EditPostPage({
     fetchOptions();
   }, []);
   
-
   const { postId } = useParams();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -166,14 +152,6 @@ export default function EditPostPage({
       roles: [],
     },
   });
-
-  useEffect(() => {
-    if (typeof postId === "string") {
-      getPostById(postId, token)
-        .then((post) => console.log("Post Data:", post))
-        .catch((error) => console.error("Error:", error));
-    }
-  }, [postId, token]);
 
   useEffect(() => {
     if (postRoles && mediaTypes && typeof postId === "string") {
@@ -198,17 +176,36 @@ export default function EditPostPage({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const imageList = img.map((img) => img.imgFile);
 
-    const postImage = imageList.map((img) => URL.createObjectURL(img));
+    const userID = session?.user.id
+    if(!userID) return;
+    if(!postId) return;
 
+    const postImage = imageList.map((img)=>(URL.createObjectURL(img)))
     const postData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
       postDescription: values.description,
       postImages: postImage,
+      postStatus:"created",
+      userID: session?.user.id
     };
     console.log(postData);
-    console.log(JSON.stringify(postData));
+
+    const postCreateResponse = await editPostById(postId.toString(),postData,token)
+        if (postCreateResponse === null) {
+          toast({
+            variant: "destructive",
+            title: "Image uploading failed",
+            description: "Please try again.",
+          })
+          return
+        }
+          toast({
+          variant: "default",
+          title: "Successful post creation",
+          description: "Redirecting you...",
+        })
   }
 
   
