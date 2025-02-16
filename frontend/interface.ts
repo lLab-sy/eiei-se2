@@ -10,23 +10,37 @@ export interface PostData {
     userID: string;
 }
 
-export interface Project {
-    id: string;
+
+export interface PostDataHistory {
+    id:string,
     postName: string;
     postDescription: string;
     postImages: string[];
     postMediaType: string;
-    postProjectRoles: string[];
-    postStatus: string;
     startDate: string; 
-    endDate: string;    
+    endDate: string;   
+    postProjectRoles: string[]; 
+    postStatus: string;
+    roleCount:number;
 }
 
-export interface ProjectResponse {
-    status: string;
-    data: Project[];
-    message: string;
-}
+// export interface Project {
+//     id: string;
+//     postName: string;
+//     postDescription: string;
+//     postImages: string[];
+//     postMediaType: string;
+//     postProjectRoles: string[];
+//     postStatus: string;
+//     startDate: string; 
+//     endDate: string;    
+// }
+
+// export interface ProjectResponse {
+//     status: string;
+//     data: Project[];
+//     message: string;
+// }
 
 export interface PostRolesResponse{
     roleName: string,

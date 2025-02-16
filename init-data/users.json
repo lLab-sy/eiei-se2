@@ -1,5 +1,8 @@
 [
     {
+      "_id": {
+        "$oid": "67ae18a37c7f8482264c2ae8"
+      },
       "username": "johndoe",
       "role": "production professional",
       "email": "johndoe@example.com",
@@ -168,5 +171,49 @@
         { "ratingScore": 4.5, "comment": "Works great under pressure." }
       ],
       "createdAt": "2024-02-01T07:25:00.000Z"
+    },
+    {
+      "_id": {
+        "$oid": "67a39c05991daabf54e84338"
+      },
+      "username": "user05",
+      "password": "$2b$10$PmDDxMgHIWbVRAu//8hfh.3SKgZMlbgpJprVNGnTx6.38Pn9OalJC",
+      "role": "producer",
+      "createdAt": {
+        "$date": "2025-02-05T17:12:37.540Z"
+      },
+      "skill": [
+        "cameraman",
+        "lighting",
+        "editing",
+        "Programming",
+        "nuxt",
+        "vue",
+        "angular",
+        "astro",
+        "svelte"
+      ],
+      "rating": [],
+      "updatedAt": {
+        "$date": "2025-02-09T12:19:42.581Z"
+      },
+      "__v": 0,
+      "bankAccount": {
+        "bankName": "Krunthept",
+        "accountHolderName": "",
+        "accountNumber": "",
+        "_id": {
+          "$oid": "67a89d5e4e6bd37be4a7421c"
+        }
+      },
+      "email": "eiei@gmail.com",
+      "experience": 10000,
+      "firstName": "Thitivuthi",
+      "gender": "Male",
+      "lastName": "Khunavuthi",
+      "middleName": "",
+      "occupation": "",
+      "phoneNumber": "0893051874",
+      "profileImage": ""
     }
   ]

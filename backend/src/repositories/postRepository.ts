@@ -18,52 +18,65 @@ class PostRepository {
     public async getPostsByUser(id:string) {
         try {
             const objectId = new mongoose.Types.ObjectId(id);
-            const posts= await Post.aggregate([
+            const posts = await Post.aggregate([
                 {
-                    $match:{
+                    $match: {
                         userID: objectId,
                         postStatus: 'success'
                     }
                 },
                 {
-                    $addFields:{
-                        roleCount:{ $size: "$postProjectRoles" },
-                        postProjectRoles:{ $slice: ["$postProjectRoles", 3]}
+                    $addFields: {
+                        roleCount: { $size: "$postProjectRoles" },
+                        postProjectRoles: { $slice: ["$postProjectRoles", 3] }
                     }
                 },
                 {
-                    $lookup:{
+                    $lookup: {
                         from: "postRoleTypes",
                         localField: "postProjectRoles",
                         foreignField: "_id",
                         as: "roleDetails"
                     }
                 },
-                { 
+                {
                     $addFields: {
                         postProjectRoles: "$roleDetails.roleName" // Extract role names only
                     }
-                },{
-                    $sort:{
-                        roleCount:-1
+                },
+                {
+                    $lookup: {
+                        from: "mediaTypes",
+                        localField: "postMediaType",
+                        foreignField: "_id",
+                        as: "mediaDetails"
+                    }
+                },
+                {
+                    $addFields: {
+                        postMediaType: { $arrayElemAt: ["$mediaDetails.mediaName", 0] } // Extract first mediaName
+                    }
+                },
+                {
+                    $sort: {
+                        roleCount: -1
                     }
                 },
                 {
                     $project: {
-                        _id: 1, // Include post's _id
+                        _id: 1,
                         postName: 1,
                         postDescription: 1,
                         postImages: 1,
-                        postMediaType: 1,
+                        postMediaType: 1, // Show mediaName instead of postMediaType
                         postStatus: 1,
                         startDate: 1,
                         endDate: 1,
-                        postProjectRoles: 1, // Keep the original role references if needed
-                        roleCount: 1,
-                        roleDetails: 1
+                        postProjectRoles: 1,
+                        roleCount: 1
                     }
                 }
-             ]);
+            ]);
             console.log('Posts from database:', posts);
             return posts
         } catch (error) {
