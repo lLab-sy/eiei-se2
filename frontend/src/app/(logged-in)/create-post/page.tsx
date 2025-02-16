@@ -78,13 +78,13 @@ const formSchema = z.object({
  
 export default function CreatePostPage() {
 
-  const {data:session} = useSession()
+  const {data:session,status} = useSession()
   
-  if(!session){
+  if(status === "loading"){
     return <>Loading</>
   }
 
-  const token=session.user?.token
+  const token=session?.user?.token ?? ''
 
   useEffect(()=>{
       const fetchData=async()=>{
@@ -98,7 +98,7 @@ export default function CreatePostPage() {
           // console.log("Option",options)
       }
       fetchData()
-  },[])
+  },[status])
   useEffect(()=>{
     const fetchData=async()=>{
         const response= await getMediaTypes()

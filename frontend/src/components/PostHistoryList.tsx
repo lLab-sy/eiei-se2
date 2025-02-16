@@ -10,7 +10,7 @@ import { useSession } from "next-auth/react";
 export default function PostHistoryList({
   postLists,userName,role
 }: {
-  postLists: PostDataHistory[],
+  postLists: PostDataHistory[]|null,
   userName:string,
   role:string
 }) {
@@ -18,11 +18,11 @@ export default function PostHistoryList({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
-  const currentProjects = postLists.slice(
+  const currentProjects = postLists ?  postLists.slice(
     //เอาอันไหนมาแสดงบ้าง
     startIndex,
     startIndex + projectsPerPage, //projectPerPage
-  );
+  ) : null ;
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-slate-200">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -49,7 +49,7 @@ export default function PostHistoryList({
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {currentProjects.map((project,index) => (
+          {currentProjects ? currentProjects.map((project,index) => (
             <div
               key={index}
               className="transform hover:-translate-y-1 transition-transform duration-300"
@@ -58,7 +58,7 @@ export default function PostHistoryList({
                 <PostHistoryCard post={project} userName={userName} role={role} />
               </Link>
             </div>
-          ))}
+          )): <div></div>}
         </div>
 
         {/* Pagination Section */}
@@ -66,7 +66,7 @@ export default function PostHistoryList({
           <PaginationBar
             currentPage={currentPage}
             projectsPerPage={projectsPerPage}
-            postListLenght={postLists.length}
+            postListLenght={postLists? postLists.length : 0}
             setCurrentPage={setCurrentPage}
           />
         </div>

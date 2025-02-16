@@ -39,7 +39,9 @@ export default async function RootLayout({
         <ReduxProvider>
           <AuthContext session={session}>
               <NavBar session={session}/>
-            {children}
+              <div className="pt-16">
+                {children}
+              </div>
             <Footer />
             <Toaster />
           </AuthContext>

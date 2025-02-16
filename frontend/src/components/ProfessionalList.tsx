@@ -1,8 +1,9 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface Professional {
   name: string;
@@ -10,6 +11,7 @@ interface Professional {
   id: string;
   role?: string;
 }
+
 
 const professionals: Professional[] = Array(4)
   .fill({
@@ -24,7 +26,11 @@ const professionals: Professional[] = Array(4)
   }));
 
 const ProfessionalList: FC = () => {
+  const {data:session} = useSession()
+  const role = session?.user?.role ?? ''
+
   return (
+    role === "production professional" ? <></>:
     <section className="container mx-auto py-4 sm:py-6 md:py-8 px-4">
       <div className="flex justify-between items-center mb-4 sm:mb-6 text-gray-600">
         <h2 className="text-xl sm:text-2xl font-bold">
@@ -65,7 +71,7 @@ const ProfessionalList: FC = () => {
         ))}
       </div>
     </section>
-  );
+  ) ;
 };
 
 export default ProfessionalList;
