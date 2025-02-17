@@ -10,6 +10,18 @@ export interface PostData {
     userID: string;
 }
 
+export interface SearchPosts{
+    data: PostData[];
+    meta: MetaData;
+}
+
+export interface MetaData{
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+}
+
 export interface Project {
     id: string;
     postName: string;
