@@ -21,12 +21,12 @@ export default function PostSelect({postData,postSelectData,changePostSelect}:{p
         }
     }}
     return(
-        <div className="flex flex-col w-[80%] m-auto">
-            <h1>{postSelectData.postName}</h1>
+        <div className="flex flex-col w-[75%] lg:w-[60%] m-auto">
+            {/* <h1>{postSelectData.postName}</h1> */}
             <Image src="/image/logo.png"
                 width={parent.innerWidth}
                 height={parent.innerHeight}
-                className="object-fill w-[80%] h-[40%] m-auto" 
+                className="object-fill w-[100%] h-[40%] m-auto" 
                 alt="Project Picture"
             />
             
@@ -34,7 +34,7 @@ export default function PostSelect({postData,postSelectData,changePostSelect}:{p
                 onValueChange={handleSelectChange}
                 value={postSelectData?.id || ""}
             >
-                <SelectTrigger >
+                <SelectTrigger className="shadow-lg">
                     <SelectValue placeholder="Choose your Post"/>
                 </SelectTrigger>
                 <SelectContent>

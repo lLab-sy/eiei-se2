@@ -51,11 +51,28 @@ export interface PostRolesResponse{
 }
 
 export interface MediaTypesResponse{
-    mediaName: string,
-    id: string
+    mediaName: string;
+    id: string;
 }
 
 export interface imagePair {
     imgSrc: string
     imgFile: File
   }
+
+export interface OfferData{
+    paticipantID:string;
+    price: Number;
+    description: string;
+    role: string;
+}
+
+
+export interface OfferHistoryData{
+    roleName: string; //populate
+    price: Number;
+    offerBy: Number;
+    createdAt: string;
+    detail: string
+}
+
