@@ -5,11 +5,17 @@ import userRepository from '../repositories/userRepository';
 
 class CloudService {
   getKeyName(){
-    const imageName = crypto.randomBytes(32).toString("hex");
-    return imageName
+    const imageKey = crypto.randomBytes(32).toString("hex");
+    return imageKey
   }
-  async uploadImageToCloud(buffer: Buffer, mimetype : string, imageName : string) : Promise<string> {
+  async uploadImageToCloud(buffer: Buffer, mimetype : string, imageKey : string) : Promise<{
+    imageKey: string,
+    url: string
+  }> {
     try {
+      if(!imageKey){ // check null undefined or empty string
+        imageKey = this.getKeyName()
+      }
       const resizeBuffer = await sharp(buffer)
         .resize({
           height: 1920,
@@ -17,8 +23,12 @@ class CloudService {
           fit: "contain",
         })
         .toBuffer();
-      await s3Client.uploadFile(resizeBuffer, imageName, mimetype);
-      return imageName
+      await s3Client.uploadFile(resizeBuffer, imageKey, mimetype);
+      const url = await s3Client.createSignedURL(imageKey)
+      return {
+        imageKey,
+        url
+      }
     } catch (err: any) {
       throw new Error(err);
     }
@@ -44,7 +54,7 @@ class CloudService {
   async uploadImageToGetURLWithDeleteCondition(buffer : Buffer, mimetype:string, imageKey : string, id: string){
     try{
         
-        const key = await this.uploadImageToCloud(buffer, mimetype, imageKey);
+        const {imageKey : key} = await this.uploadImageToCloud(buffer, mimetype, imageKey);
         const url = await this.getSignedUrlImageCloud(key)
         const user = await userRepository.updateImageKey(key, id)
         return {
@@ -56,11 +66,13 @@ class CloudService {
         throw new Error(err as string)
     }
   }
-  async uploadToCloudFromEditUser(buffer : Buffer, mimetype:string, imageKey : string){
+  async getUrlWithImageNameAndUploadToCloud(buffer : Buffer, mimetype:string, imageKey : string){
     try{
-      const key = await this.uploadImageToCloud(buffer, mimetype, imageKey)
-      const url = await this.getSignedUrlImageCloud(key)
-      return url
+      const {url, imageKey : imageName} = await this.uploadImageToCloud(buffer, mimetype, imageKey)
+      return {
+        url,
+        imageName //get imageName in case of sending invalid imageKey or don't need to check user imageKey
+      }
     }catch(err){
       throw new Error(err as string)
     }

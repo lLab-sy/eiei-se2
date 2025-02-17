@@ -362,17 +362,17 @@ export default function UserPage() {
               <Link
                 href={"#"}
                 onClick={() => setClick(1)}
-                className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[150px] after:h-[4px] after:absolute after:left-[31%] after:top-[4.8%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[147px] after:h-[4px] after:absolute after:left-[29%] after:top-[4.8%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 Billing Information
               </Link>
               {user && user?.user?.role === "producer" ? (
-                ""
+                <div className='ml-[24%]'></div>
               ) : (
                 <Link
                   href={"#"}
                   onClick={() => setClick(2)}
-                  className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[60px] after:h-[4px] after:absolute after:left-[69%] after:top-[4.8%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
+                  className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[55px] after:h-[4px] after:absolute after:left-[67%] after:top-[4.8%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
                 >
                   Skill
                 </Link>

@@ -58,7 +58,7 @@ class UserController {
                 }
                 const user = await userService.getUserById(id)
                 const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName()
-                const signedUrl = await cloudService.uploadToCloudFromEditUser(buffer!, mimetype!, imageKey)
+                const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, imageKey)
                 const userDataWithImageKey = {
                     ...userData,
                     profileImage: imageKey
@@ -70,7 +70,7 @@ class UserController {
                 }
                 const updatedUserWithSignedURL = {
                     updatedUser,
-                    url: signedUrl
+                    url
 
                 }
                 sendResponse(res, 'success', updatedUserWithSignedURL, 'Successfully updated User')
