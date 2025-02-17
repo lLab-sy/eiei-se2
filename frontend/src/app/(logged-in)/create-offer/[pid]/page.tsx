@@ -2,7 +2,7 @@
 import { use } from "react";
 import PostSelect from "@/components/PostSelect";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { OfferHistoryData, Project } from "../../../../../interface";
+import { OfferHistoryData, PostData } from "../../../../../interface";
 import { useEffect, useState } from "react";
 import OfferInformation from "@/components/OfferInformation";
 import getPostUser from "@/libs/getPostsUser";
@@ -65,8 +65,8 @@ export default function CreateOfferPage({params}:{params:Promise<{pid:string}>})
     const {data:session} = useSession()
     const { pid } = use(params);
     const producerID= session?.user.id //เจ้าของโพสต์
-    const [postData,setPostData]= useState<Project[]|null>()
-    const [postSelect,setPostSelect] = useState<Project|null>()
+    const [postData,setPostData]= useState<PostData[]|null>()
+    const [postSelect,setPostSelect] = useState<PostData|null>()
     const [showOfferHistory, setShowOfferHistory] = useState(false); // State for OfferHistoryMinimal
     if(!producerID){
       return <>Loading...</>
