@@ -23,8 +23,6 @@ import { useSession } from "next-auth/react";
 //     postImages: "/path-to-image.jpg",
 //   }));
 
-
-
 export default function HistoryPostPage(){
   const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
   const {data:session} = useSession()
@@ -45,8 +43,6 @@ export default function HistoryPostPage(){
       fetchData()
   },[])
   
- 
-
   if(!postHistoryResponse){
     return <>Loading</>
   }

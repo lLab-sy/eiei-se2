@@ -5,10 +5,15 @@ import { useState } from "react";
 
 const MAX_STARS = 5;
 
-const SearchBar = () => {
-  const [experience, setExperience] = useState(0);
+interface SearchBarProps {
+  onSearch: (filter: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
+  const [minExp, setMinExp] = useState(0);
+  const [maxExp, setMaxExp] = useState(0);
   const [rating, setRating] = useState(0);
-  const [query, setQuery] = useState("");
+  const [text, setText] = useState("");
 
   interface HandleStarClickParams {
     value: number;
@@ -16,7 +21,15 @@ const SearchBar = () => {
   }
 
   const handleSearch = () => {
-    console.log("Search " + query + " with experience " + experience + " and rating " + rating);
+    var result = "";
+
+    if(text != "") result += "&searchText="+text;
+    if(minExp != 0) result += "&minExperience="+minExp.toString();
+    if(maxExp != 0) result += "&maxExperience="+minExp.toString();
+    if(rating != 0) result += "&avgRating" + rating.toString();
+
+    if(result != "") result = "?" + result;
+    onSearch(result);
   };
 
   return (
@@ -27,7 +40,7 @@ const SearchBar = () => {
           type="text"
           placeholder="Search..."
           className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500"
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
         />
         <button
           onClick={handleSearch}
@@ -41,10 +54,21 @@ const SearchBar = () => {
         <div className="flex items-center bg-gray-200 rounded-full px-4 py-2 w-full">
           <input
             type="number"
-            placeholder="Minimum Year..."
-            className="bg-transparent outline-none w-auto text-gray-700 placeholder-gray-500"
-            onChange={(e) => setExperience(Number(e.target.value))}
+            placeholder="Min"
+            className="bg-transparent outline-none w-12 text-gray-700 placeholder-gray-500"
+            onChange={(e) => setMinExp(Number(e.target.value))}
           />
+
+        </div>
+        <span className="font-bold text-white">-</span>
+        <div className="flex items-center bg-gray-200 rounded-full px-4 py-2 w-full">
+          <input
+            type="number"
+            placeholder="Max"
+            className="bg-transparent outline-none w-12 text-gray-700 placeholder-gray-500"
+            onChange={(e) => setMaxExp(Number(e.target.value))}
+          />
+
         </div>
         <span className="font-bold text-white">Rating:</span>
         {[...Array(MAX_STARS)].map((_, i) => (
