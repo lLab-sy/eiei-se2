@@ -1,39 +1,70 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 
 import Footer from "@/components/Footer";
 import SearchPostBar from "@/components/SearchPostBar";
 import Pagination from "@/components/Pagination";
 import PostCrad from "@/components/PostCard";
+import { PostData, SearchPosts } from "../../../../interface";
+import getPosts from "@/libs/getPosts";
 
-const PAGE_SIZE = 32;
-
-////////// For testing
-const posts = Array.from({ length: 259 }, (_, index) => ({
-  title: `Post ${index + 1}`,
-  role: ["Editor", "Videographer"],
-  description: "This is post description.",
-  mediaType: "Video Production",
-  price: `฿${(Math.random() * 10000 + 1000).toFixed(0)}`,
-  imageUrl: "https://via.placeholder.com/150",
-  id: `${index + 1}`,
-}));
+const PAGE_SIZE = 12;
 
 const ProfessionalsPage = () => {
 
+  // requestFilter
+  const [requestFilter, setRequestFilter] = useState("");
+
+  //page
+  const [requestPage, setRequestPage] = useState("?limit="+PAGE_SIZE.toString()+"&page=1");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const totalPages = Math.ceil(posts.length / PAGE_SIZE);
+  // data
+  const [dataResponse,setDataResponse]= useState<SearchPosts|null>(null);
+  const [PostsCurrentPage, setPostsCurrentPage] = useState<PostData[]|null>(null)
 
-  const paginatedServices = posts.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  useEffect(()=>{
+    const fetchData=async()=>{
+        
+        var response;
+        console.log(requestPage + requestFilter);
+        try{
+          response= await getPosts(requestPage + requestFilter)
+        }catch(error){
+          setTotalPages(1);
+          handlePageChange(1);
+          setDataResponse(null);
+          setPostsCurrentPage(null);
+          console.log("Request Not Found");
+        }
+
+        if (response) {
+          setDataResponse(response);
+        }
+        
+    }
+    fetchData()
+},[requestFilter, requestPage])
+
+  useEffect(() => {
+    if (dataResponse) {
+      setTotalPages(dataResponse.meta.totalPages);
+      setPostsCurrentPage(dataResponse.data); // Update professionals list
+    }
+  }, [dataResponse]);
 
   const handlePageChange = (page: number) => {
+    setRequestPage("?limit="+PAGE_SIZE.toString()+"&page="+page.toString());
     setCurrentPage(page);
   };
+
+  const handleFilterChange = (filter: string) => {
+    handlePageChange(1);
+    setRequestFilter(filter);
+  };
+
 
   return (
     <div className="sticky min-h-screen bg-gray-50 ">
@@ -41,7 +72,7 @@ const ProfessionalsPage = () => {
       {/*Header*/}
       <div className="sticky top-0 bg-mainblue-light z-10 py-4">
         <div className="flex justify-center items-center space-x-4 mt-20">
-          <SearchPostBar />
+          <SearchPostBar onSearch = {handleFilterChange}/>
         </div>
       </div>
 
@@ -51,20 +82,25 @@ const ProfessionalsPage = () => {
       
       {/* Grid Layout */}
       <div className="min-h-screen p-14 bg-gray-50 px-8 lg:px-20">
+      {PostsCurrentPage ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
-          {paginatedServices.map((professional, index) => (
+          {PostsCurrentPage.map((post, index) => (
             <PostCrad
               key={index}
-              title={professional.title}
-              description={professional.description}
-              price={professional.price}
-              imageUrl={professional.imageUrl} 
-              role={professional.role} 
-              mediaType={professional.mediaType}
-              id={professional.id}          
+              title={post.postName}
+              description={post.postDescription}
+              imageUrl={post.postImages? post.postImages[0] : ""} 
+              role={post.postProjectRoles} 
+              mediaType={post.postMediaType}
+              id={post.userID}          
               />
           ))}
         </div>
+        ) : (
+          <div className="flex justify-center items-center text-xl text-gray-600">
+            Data not found
+          </div>
+        )}
       </div>
 
       {/* Pagination */}

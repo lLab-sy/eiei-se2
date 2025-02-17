@@ -29,6 +29,20 @@ export interface ReceivedReview{
 export interface ReceivedReviews{
     receivedReviews: ReceivedReview[];
 }
+export interface SearchPosts{
+    data: PostData[];
+    meta: MetaData;
+}
+
+export interface MetaData{
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export interface Project {
+    id: string;
 
 export interface PostDataHistory {
     id:string,
