@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn, SearchCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,12 +10,20 @@ import { setUser } from "@/redux/user/user.slice";
 import axios from "axios";
 import { signOut } from "next-auth/react";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
+
+type menuItem = {
+  icon: JSX.Element;
+  label: string;
+  href: string;
+}
 
 const NavBar = (session: any) => {
-  const token = session?.session?.user?.token ?? ''
-  const role = session?.session?.user?.role ?? ''
-
+  const token = session?.session?.user?.token ?? '';
+  const role = session?.session?.user?.role ?? '';
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuItems, setMenuItems] = useState<menuItem[]>([])
   // const {data: session, status} = useSession()
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
@@ -62,46 +70,49 @@ const NavBar = (session: any) => {
     handleFetch(token)
   }, [session.session, token])
 
-  const menuItems = [
-    { 
-      icon: <User className="w-5 h-5" />, 
-      label: "Profile", 
-      href: "/user-profile" },
-    {
-      icon: <FileText className="w-5 h-5" />,
-      label: role === "producer" ? "My Post" : "Work History",
-      href: "/post-history",
-    },
-    ...(role === "producer" ? 
-    [{
-      icon: <Gift className="w-5 h-5" />,
-      label: "Create Post",
-      href: "/create-post",
-    },
-    {
-      icon: <SearchCheck className="w-5 h-5" />,
-      label: "Search for Professionals",
-      href: "/professionals", 
-    }] : 
-    []),
-    ...(role === "production professional" ? 
-    [{
+  useEffect(()=>{
+    if(!session.session || token === '') return;
+    const sessionMenuItems: menuItem[] = [
+      { 
+        icon: <User className="w-5 h-5" />, 
+        label: "Profile", 
+        href: "/user-profile" },
+      {
+        icon: <FileText className="w-5 h-5" />,
+        label: role === "producer" ? "My Post" : "Work History",
+        href: "/post-history",
+      },
+      ...(role === "producer" ? 
+      [{
+        icon: <Gift className="w-5 h-5" />,
+        label: "Create Post",
+        href: "/create-post",
+      },
+      {
         icon: <SearchCheck className="w-5 h-5" />,
-        label: "Search for Posts",
-        href: "/posts", 
-    }] : 
-    []),
-    {
-      icon: <Gift className="w-5 h-5" />,
-      label: "My Offering",
-      href: "/my-offering",
-    },
-    {
-      icon: <Settings className="w-5 h-5" />,
-      label: "Setting",
-      href: "/setting",
-    },
-  ];
+        label: "Search for Professionals",
+        href: "/professionals", 
+      }] : 
+      []),
+      ...(role === "production professional" ? 
+      [{
+          icon: <SearchCheck className="w-5 h-5" />,
+          label: "Search for Posts",
+          href: "/posts", 
+      }] : 
+      []),
+      {
+        icon: <Gift className="w-5 h-5" />,
+        label: "My Offering",
+        href: "/my-offering",
+      },
+      {
+        icon: <Settings className="w-5 h-5" />,
+        label: "Setting",
+        href: "/setting",
+      },
+    ]
+    setMenuItems(sessionMenuItems)},[session.session,token]);
 
   return (
     <header className="bg-[#2B428C] text-white fixed m-auto w-[100%] z-50">
@@ -167,15 +178,18 @@ const NavBar = (session: any) => {
         {/* Menu Items */}
         <div className="pt-2">
           {menuItems.map((item, index) => (
-            <Link
+            <button
               key={index}
-              href={item.href}
               className={"flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100"}
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() => {
+                setIsMenuOpen(false)
+                router.push(item.href)  
+              }
+              }
             >
               {item.icon}
               <span>{item.label}</span>
-            </Link>
+            </button>
           ))}
           <Link
               href={(session.session) ? '/api/auth/signout' : "/login"}

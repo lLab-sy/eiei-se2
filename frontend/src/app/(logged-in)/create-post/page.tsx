@@ -85,8 +85,10 @@ export default function CreatePostPage() {
   }
 
   const token=session?.user?.token ?? ''
+  console.log(token)
 
   useEffect(()=>{
+      console.log(session)
       const fetchData=async()=>{
           const response= await getPostRoles()
           const tmp= response.data.data
@@ -98,7 +100,7 @@ export default function CreatePostPage() {
           // console.log("Option",options)
       }
       fetchData()
-  },[status])
+  },[session])
   useEffect(()=>{
     const fetchData=async()=>{
         const response= await getMediaTypes()

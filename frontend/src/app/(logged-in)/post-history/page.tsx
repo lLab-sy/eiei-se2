@@ -26,35 +26,28 @@ import { useSession } from "next-auth/react";
 
 export default function HistoryPostPage(){
   const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
-  const [token, setToken]  = useState<string>('')
-  const [userName, setUserName] = useState<string>('') 
-  const [role, setRole]  = useState<string>('')
   const {data:session,status} = useSession()
+  const token = session?.user?.token ?? ''
+  const role = session?.user?.role ?? ''
+  const userName = session?.user?.username ?? ''
   
   useEffect(()=>{
-    if (!session) return;
-    setToken(session.user.token)
-    setRole(session.user.role)
-    setUserName(session.user.username)
-  },[status])
-
-  useEffect(()=>{
-      if (!token) return ;
-
-      const fetchData=async()=>{
-          const response= await getHistoryPosts(token)
-          setPostHistoryResponse(response.data.data)
-      }
-      fetchData()
-  },[]) 
-  console.log("Token", token)
+    if(!session || token === ''){
+      return;
+    }
+    const fetchData=async()=>{
+      if (!token) return;
+      const response= await getHistoryPosts(token)
+      setPostHistoryResponse(response.data.data)
+    }
+        fetchData()
+    },[session, token])
  
 
   if(status === "loading"){
     return <>Loading</>
   } 
 
-  console.log(postHistoryResponse)
   return (
     <div className="pt-10 min-h">
 
