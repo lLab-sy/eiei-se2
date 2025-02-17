@@ -6,10 +6,8 @@ import Footer from "@/components/Footer";
 import SearchPostBar from "@/components/SearchPostBar";
 import Pagination from "@/components/Pagination";
 import PostCrad from "@/components/PostCard";
-import { MediaType, PostData, RoleType, SearchPosts } from "../../../../interface";
+import { PostData, SearchPosts } from "../../../../interface";
 import getPosts from "@/libs/getPosts";
-import getMediaTypes from "@/libs/getMediaTypes";
-import getPostRoles from "@/libs/getPostRoles";
 
 const PAGE_SIZE = 12;
 
@@ -19,38 +17,13 @@ const ProfessionalsPage = () => {
   const [requestFilter, setRequestFilter] = useState("");
 
   //page
-  const [requestPage, setRequestPage] = useState("limit="+PAGE_SIZE.toString()+"&page=1");
+  const [requestPage, setRequestPage] = useState("?limit="+PAGE_SIZE.toString()+"&page=1");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   // data
   const [dataResponse,setDataResponse]= useState<SearchPosts|null>(null);
   const [PostsCurrentPage, setPostsCurrentPage] = useState<PostData[]|null>(null)
-
-  const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
-  const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
-
-  useEffect(() => {
-    const fetchData=async()=>{
-        
-      var medias, roles;
-      
-      try{
-        medias = await getMediaTypes();
-        setMediaTypes(medias.data.data);
-      }catch(error){
-        console.log("MediaTypes Not Found");
-      }
-      try{
-        roles = await getPostRoles();
-        setRoleTypes(roles.data.data);
-      }catch(error){
-        console.log("Post Role Not Found");
-      }
-
-    }
-    fetchData()
-  }, []);
 
   useEffect(()=>{
     const fetchData=async()=>{
@@ -73,7 +46,7 @@ const ProfessionalsPage = () => {
         
     }
     fetchData()
-  },[requestFilter, requestPage])
+},[requestFilter, requestPage])
 
   useEffect(() => {
     if (dataResponse) {
@@ -83,7 +56,7 @@ const ProfessionalsPage = () => {
   }, [dataResponse]);
 
   const handlePageChange = (page: number) => {
-    setRequestPage("limit="+PAGE_SIZE.toString()+"&page="+page.toString());
+    setRequestPage("?limit="+PAGE_SIZE.toString()+"&page="+page.toString());
     setCurrentPage(page);
   };
 
@@ -92,27 +65,6 @@ const ProfessionalsPage = () => {
     setRequestFilter(filter);
   };
 
-  const getMedia = (id: string) => {
-    var result = "Unknow";
-    mediaTypes.forEach(element => {
-      if(element.id == id) result = element.mediaName;
-    });
-    return result;
-  }
-
-  const getRole = (id: string) => {
-    var result = "Unknow";
-    roleTypes.forEach(element => {
-      if(element.id == id) result = element.roleName;
-    });
-    return result;
-  }
-
-  const getRoles = (ids: string[]) => {
-    var roles: string[] = [];
-    ids.forEach(id => roles.push(getRole(id)));
-    return roles;
-  }
 
   return (
     <div className="sticky min-h-screen bg-gray-50 ">
@@ -134,13 +86,13 @@ const ProfessionalsPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
           {PostsCurrentPage.map((post, index) => (
             <PostCrad
-              key={post.id}
+              key={index}
               title={post.postName}
               description={post.postDescription}
               imageUrl={post.postImages? post.postImages[0] : ""} 
-              role={getRoles(post.postProjectRoles)} 
-              mediaType={getMedia(post.postMediaType)}
-              id={post.id}          
+              role={post.postProjectRoles} 
+              mediaType={post.postMediaType}
+              id={post.userID}          
               />
           ))}
         </div>
