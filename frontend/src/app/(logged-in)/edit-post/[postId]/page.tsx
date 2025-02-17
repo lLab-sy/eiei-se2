@@ -397,7 +397,32 @@ export default function EditPostPage({
                         </FormItem>
                       )}
                     />
-                    <Button type="submit">Edit Post</Button>
+                    {/*<Button type="submit">Edit Post</Button> */}
+                    <AlertDialog>
+                      <AlertDialogTrigger className=" bg-mainblue text-white p-3 rounded-md hover:bg-sky-700">
+                        Edit Post
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This post will be edited.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction className="bg-green-700" asChild>
+                            <Button
+                              onClick={() => form.handleSubmit(onSubmit)()}
+                            >
+                              Confirm
+                            </Button>
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </form>
                 </Form>
               </CardContent>
