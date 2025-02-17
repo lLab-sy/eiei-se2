@@ -7,36 +7,34 @@ import ProfessionalCard from "@/components/ProfessionalCrad";
 import Pagination from "@/components/Pagination";
 import getProfessionals from "@/libs/getProfessionals";
 
-const PAGE_SIZE = 32;
-
-////////// For testing 
-/*const professionals = Array.from({ length: 259 }, (_, index) => ({
-  title: `John Doe ${index + 1}`,
-  skill: ["Cameraman", "Lighting", "Editing"],
-  description: "My name is John Doe and I am a professional videographer.",
-  ratings: (Math.random() * 5),
-  occupation: "Videographer",
-  imageUrl: "https://via.placeholder.com/150",
-  experience: 10,
-  id: index.toString(),
-}));*/
+const PAGE_SIZE = 12;
 
 const ProfessionalsPage = () => {
 
-  const [request, setRequest] = useState("");
-  const [dataResponse,setDataResponse]= useState<ProfessionalsData|null>(null);
+  // requestFilter
+  const [requestFilter, setRequestFilter] = useState("");
+
+  // page
+  const [requestPage, setRequestPage] = useState("?limit="+PAGE_SIZE.toString()+"&page=1");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  // data
+  const [dataResponse,setDataResponse]= useState<ProfessionalsData|null>(null);
   const [professtionalsCurrentPage, setProfesstionalsCurrentPage] = useState<Professionals[]|null>(null)
 
   useEffect(()=>{
     const fetchData=async()=>{
         
         var response;
+        console.log(requestPage + requestFilter);
         try{
-          response= await getProfessionals(request)
+          response= await getProfessionals(requestPage + requestFilter)
         }catch(error){
-          response = await getProfessionals("");
+          setTotalPages(1);
+          handlePageChange(1);
+          setDataResponse(null);
+          setProfesstionalsCurrentPage(null);
           console.log("Request Not Found");
         }
 
@@ -46,35 +44,23 @@ const ProfessionalsPage = () => {
         
     }
     fetchData()
-},[request])
+},[requestFilter, requestPage])
 
   useEffect(() => {
     if (dataResponse) {
       setTotalPages(dataResponse.meta.totalPages);
-      // console.log(dataResponse)
       setProfesstionalsCurrentPage(dataResponse.data); // Update professionals list
-      //console.log("Updated Data Response:", dataResponse);
     }
   }, [dataResponse]);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
   const handlePageChange = (page: number) => {
+    setRequestPage("?limit="+PAGE_SIZE.toString()+"&page="+page.toString());
     setCurrentPage(page);
   };
 
   const handleFilterChange = (filter: string) => {
-    setRequest(filter);
+    handlePageChange(1);
+    setRequestFilter(filter);
   };
 
   return (
@@ -93,21 +79,27 @@ const ProfessionalsPage = () => {
       
       {/* Grid Layout */}
       <div className="min-h-screen p-14 bg-gray-50 px-8 lg:px-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
-          {professtionalsCurrentPage && professtionalsCurrentPage.map((professional, index) => (
-            <ProfessionalCard
-              key={index}
-              title={professional?.firstName + " " + professional?.lastName}
-              description={professional?.description || ""}
-              imageUrl={professional?.imageUrl || ""} 
-              skill={professional?.skill} 
-              ratings={Number(professional?.ratingAvg) || 0} 
-              occupation={professional?.occupation}
-              experience={professional?.experience}
-              id={professional?._id}          
+      {professtionalsCurrentPage ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
+            {professtionalsCurrentPage.map((professional, index) => (
+              <ProfessionalCard
+                key={index}
+                title={professional?.firstName + " " + professional?.lastName}
+                description={professional?.description || ""}
+                imageUrl={professional?.imageUrl || ""}
+                skill={professional?.skill}
+                ratings={Number(professional?.ratingAvg) || 0}
+                occupation={professional?.occupation}
+                experience={professional?.experience}
+                id={professional?._id}
               />
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center text-xl text-gray-600">
+            Data not found
+          </div>
+        )}
       </div>
 
       {/* Pagination */}
