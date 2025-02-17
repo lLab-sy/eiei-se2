@@ -1,4 +1,5 @@
 export interface PostData {
+    id:string
     postName: string;
     postDescription: string;
     postImages?: string[];
@@ -17,9 +18,7 @@ export interface PostDataHistory {
     postDescription: string;
     postImages: string[];
     postMediaType: string;
-    postProjectRoles?: string[];
     postProjectRolesOut?: PostRolesResponse[]
-    postStatus: string;
     startDate: string; 
     endDate: string;   
     postProjectRoles: string[]; 

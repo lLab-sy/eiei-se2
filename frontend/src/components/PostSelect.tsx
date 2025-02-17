@@ -9,10 +9,10 @@ import {
     SelectValue,
   } from "@/components/ui/select";
 import { useState } from "react";
-import { Project } from "../../interface";
+import { PostData } from "../../interface";
 
   
-export default function PostSelect({postData,postSelectData,changePostSelect}:{postData:Project[],postSelectData:Project,changePostSelect:Function}){
+export default function PostSelect({postData,postSelectData,changePostSelect}:{postData:PostData[],postSelectData:PostData,changePostSelect:Function}){
     const handleSelectChange= (selectID:string)=>{{
         const selectedPost = postData.find(post=>post.id===selectID);
         if(selectedPost && selectedPost.id!==postSelectData?.id){
@@ -40,7 +40,7 @@ export default function PostSelect({postData,postSelectData,changePostSelect}:{p
                 <SelectContent>
                     <SelectGroup>
                           {
-                            postData.map((eachPost:Project)=>(
+                            postData.map((eachPost:PostData)=>(
                             <SelectItem key={eachPost.id} value={eachPost.id}>{eachPost.postName}</SelectItem>
                             ))
                             }
