@@ -24,9 +24,9 @@ const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
     var result = "";
 
     if(text != "") result += "&searchText="+text;
-    if(minExp != 0) result += "&minExperience="+minExp.toString();
+    if(minExp != 0 && rating==0) result += "&minExperience="+minExp.toString();
     if(maxExp != 0) result += "&maxExperience="+maxExp.toString();
-    if(rating != 0) result += "&avgRating" + rating.toString();
+    if(rating != 0) result += "&avgRating=" + rating.toString();
 
     onSearch(result);
   };
