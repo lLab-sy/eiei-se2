@@ -27,23 +27,46 @@ export interface PostDataHistory {
     roleCount:number;
 }
 
-// export interface Project {
-//     id: string;
-//     postName: string;
-//     postDescription: string;
-//     postImages: string[];
-//     postMediaType: string;
-//     postProjectRoles: string[];
-//     postStatus: string;
-//     startDate: string; 
-//     endDate: string;    
-// }
+export interface Rating{
+    ratingScore: number;
+    comment: string;
+}
 
-// export interface ProjectResponse {
-//     status: string;
-//     data: Project[];
-//     message: string;
-// }
+export interface Professionals{
+    _id: string;
+    username: string;
+    role: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    gender: string;
+    occupation: string;
+    skill: string[];
+    experience: number;
+    rating: Rating[];
+    description?: string;
+    imageUrl?: string;
+    ratingAvg?: number;
+}
+
+export interface MetaData{
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export interface ProfessionalsData{
+    data: Professionals[];
+    meta: MetaData;
+}
+
+export interface ProjectResponse {
+    status: string;
+    data: Project[];
+    message: string;
+}
 
 export interface PostRolesResponse{
     roleName: string,
