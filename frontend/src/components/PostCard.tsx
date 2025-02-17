@@ -6,7 +6,6 @@ interface PostCradProp {
   role: string[];
   description: string;
   mediaType: string;
-  price: string;
   imageUrl: string;
   id: string;
 }
@@ -16,7 +15,6 @@ const PostCrad: React.FC<PostCradProp> = ({
   role,
   description,
   mediaType,
-  price,
   imageUrl,
   id,
 }) => {
@@ -44,7 +42,6 @@ const PostCrad: React.FC<PostCradProp> = ({
             <span className="italic flex-grow text-right">{mediaType}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-mainblue-lightest font-bold">{price}</span>
             <Link href={`/posts/${id}`}>
               <button className="bg-mainblue-lightest text-white px-4 py-2 rounded-full text-sm hover:bg-mainblue-dark">
                 View More
