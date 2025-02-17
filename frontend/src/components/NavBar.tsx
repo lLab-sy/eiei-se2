@@ -65,8 +65,8 @@ const NavBar = (session: any) => {
     { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },
     {
       icon: <FileText className="w-5 h-5" />,
-      label: "My Post",
-      href: "/my-post",
+      label: "PostHistory",
+      href: "/post-history",
     },
     {
       icon: <Gift className="w-5 h-5" />,
@@ -152,6 +152,7 @@ const NavBar = (session: any) => {
                 item.label === "Logout" ? "text-red-600 hover:text-red-700" : ""
               }`}
               onClick={() => setIsMenuOpen(false)}
+              prefetch={true}
             >
               {item.icon}
               <span>{item.label}</span>
