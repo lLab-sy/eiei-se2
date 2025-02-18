@@ -13,7 +13,7 @@ class CloudService {
     url: string
   }> {
     try {
-      if(!imageKey){ // check null undefined or empty string
+      if(!imageKey){ // check null undefined or empty strings
         imageKey = this.getKeyName()
       }
       const resizeBuffer = await sharp(buffer)
