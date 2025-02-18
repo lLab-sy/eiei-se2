@@ -71,7 +71,7 @@ class CloudService {
       const {url, imageKey : imageName} = await this.uploadImageToCloud(buffer, mimetype, imageKey)
       return {
         url,
-        imageName //get imageName in case of sending invalid imageKey or don't need to check user imageKey
+        imageName //get imageName in case of sending invalid imageKey or don't need to check user imageKeys
       }
     }catch(err){
       throw new Error(err as string)
