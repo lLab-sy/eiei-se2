@@ -40,7 +40,8 @@ import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Rating from "@mui/material/Rating";
 import axios from "axios";
-import { setUser } from "@/redux/user/user.slice";
+import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
+import { CircularProgress } from "@mui/material";
 
 //missing
 //sort position form error
@@ -124,7 +125,7 @@ export default function UserPage() {
       skill: userData?.skill ?? [],
       experience: userData?.experience ?? 0,
       company: userData?.company ??"",
-      gender: userData.gender
+      gender: userData?.gender
     },
   });
   useEffect(() => {
@@ -152,68 +153,81 @@ export default function UserPage() {
       setPaymentState(userData?.paymentType ?? "qrCode")
     }
   }, [userData, form.reset]);
-  /*
-  Image
 
-  use axios to post into database return it back and use that image to show
-  */
   const [isEdit, setIsEdit] = useState(false);
   const [click, setClick] = useState(0);
   const { toast } = useToast();
   // redux to dispatch changes
   const [paymentState, setPaymentState] = useState(userData?.paymentType ?? "qrCode");
   const handleSubmit = async (data: formType) => {
-    //dispatch to update each case or change only display to none else hidden
-    // console.log(form.getValues());
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    const formData = new FormData()
+
     const bankAccount = {
-      bankName: data.bankName,
-      accountHolderName: data.accountHolderName,
-      accountNumber: data.accountNumber,
+      bankName: data.bankName,              
+      accountHolderName: data.accountHolderName, 
+      accountNumber: data.accountNumber,   
     };
+    
     const sendUserData = {
       ...userData,
-      firstName: data.firstName,
-      middleName: data.middleName,
-      lastName: data.lastName,
-      phoneNumber: data.phone,
-      gender: data.gender,
-      bankAccount: bankAccount,
-      profileImage: "",
-      role: user?.user?.role,
-      // password: data.password,
-      email: data.email,
+      firstName: data.firstName,          
+      middleName: data.middleName,        
+      lastName: data.lastName,            
+      phoneNumber: data.phone,           
+      gender: data.gender,               
+      bankAccount: bankAccount,           
+      profileImage: userData?.profileImage ?? "",  
+      role: user?.user?.role,             
+      email: data.email                   
     };
+    
     const producerData = {
       ...sendUserData,
-      company: data.company,
-      paymentType: data.payment_type,
-      nameOnCard: data.card_name,
-      cardNumber: data.card_number,
+      company: data.company,              
+      paymentType: data.payment_type,     
+      nameOnCard: data.card_name,         
+      cardNumber: data.card_number        
     };
+    
     const productionData = {
       ...sendUserData,
-      occupation: data.occupation,
-      skill: data.skill,
-      experience: data.experience,
+      occupation: data.occupation,        
+      skill: data.skill,                  
+      experience: data.experience         
     };
+    if(profileImageState){
+      formData.append('profileImage', profileImageState)
+    }
+    const formDataProducer = formData;
+    formDataProducer.append('userData',JSON.stringify(producerData))
     // console.log("production data", productionData);
+    const formDataProductionProfessional = formData
+    formDataProductionProfessional.append('userData', productionData)
     const id = user.user._id;
     const token = user.token
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/update-user/${id}`;
     const returnUser = await axios.put(
       apiUrl,
-      user.user.role === "producer" ? producerData : productionData,{
+      user.user.role === "producer" ? formDataProducer : formDataProductionProfessional,{
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          "Content-Type" : "multipart/form-data"
         }
       }
     );
+    
+    console.log('returnUser', returnUser)
     if (!returnUser) {
-      throw new Error("Failed Api");
+      toast({
+        variant: "destructive",
+        title: "Edit Profile",
+        description: "Failed to Edit User",
+      });
+      return;
     }
-    if (returnUser.data.status == "error") {
+    if (returnUser.data.data.status == "error") {
       toast({
         variant: "destructive",
         title: "Edit Profile",
@@ -227,22 +241,51 @@ export default function UserPage() {
       title: "Edit Profile",
       description: "Edit Profile Successful",
     });
-    dispatch(setUser((userData.role === 'producer') ? producerData : productionData))
+    dispatch(setUser(returnUser.data.data.updatedUser))
+    if(returnUser?.data?.data?.url){
+      dispatch(setProfileImageURL(returnUser?.data?.data?.url))
+      setImageState({
+        image: returnUser?.data?.data?.url ?? ""
+      })
+      setProfileImageState(null)
+      // console.log('user?.profileImageURL ', user?.profileImageURL )
+    }
+    // dispatch(setProfileImageURL(url))
     setIsEdit(false);
   };
+  // Loading State
+  const [loadingImage, setLoadingImage] = useState(false)
   const [img, setImageState] = useState({
-    image: "",
+    image: user.profileImageURL??"",
   });
-
-  const onImageChange = (e: any) => {
+  const [profileImageState, setProfileImageState] = useState<File | null>(null)
+  const onImageChange = async (e: any) => {
     if (e.target.files && e.target.files[0]) {
-      // setImgState(e.target.files[0])
+      setProfileImageState(e.target.files[0])
+      // setLoadingImage(true)
+      // const id = user.user._id;
+      // const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/upload-profile/${id}`;
+      // const formImage = new FormData()
+      // formImage.append('profileImage', e.target.files[0])
+      // const response = await axios.post(apiUrl, formImage, {
+      //   headers: {
+      //     "Content-Type" : "multipart/form-data"
+      //   }
+      // })
+      // console.log('response', response)
+      // console.log('loadingImage', loadingImage)
+      // const url = await response?.data?.data?.url
+      // // setImgState(e.target.files[0])
+      // dispatch(setProfileImageURL(url))
       setImageState({
         image: URL.createObjectURL(e.target.files[0]),
       });
+      setIsEdit(true)
+      // setLoadingImage(false)
       // console.log(e.target.files)
     }
   };
+  console.log('profileImageURL', user.profileImageURL)
   // mock data
   const OPTIONS: Option[] = [
     { label: "Cameraman", value: "cameraman" },
@@ -259,32 +302,48 @@ export default function UserPage() {
   ];
 
   return (
-    <main className="font-serif min-h-screen flex bg-blue-400 relative items-center justify-center">
+    <main className=" min-h-screen flex bg-mainblue-light relative items-center justify-center">
       <div className="flex justify-around w-[60%] h-[800px]">
         <Card className="w-[400px] flex flex-col">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <div className="text-md text-center font-serif font-bold flex justify-center h-[50px] items-center">
+            <div className="text-md text-center font-bold flex justify-center h-[50px] items-center">
               {userData.firstName} {userData.middleName} {userData.lastName}
             </div>
             {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
               <Image src={} alt=''/>
             </div> */}
+            {
+              (loadingImage) ? 
+              <Avatar className='size-60 bg-slate-400 flex justify-center items-center'>
+                <CircularProgress  size={60}/>
+              </Avatar> : 
+              <Avatar className="size-60">
+                <AvatarImage src={img.image} alt="" />
+                <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
+              </Avatar>
+            }
+            {/* <CircularProgress size={60}/>
             <Avatar className="size-60">
               <AvatarImage src={img.image} alt="" />
               <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
-            </Avatar>
-            <div className="w-[100%] flex justify-center">
-              <Input
-                id="picture"
-                type="file"
-                className="mt-5  bg-black w-[50%]  after:content-['Upload'] cursor-pointer after:text-white after:text-xl after:absolute relative after:left-[50%] after:translate-x-[-50%] after:translate-y-[-50%] after:top-[50%]"
-                placeholder="Upload New Photo"
-                onChange={onImageChange}
-              />
-            </div>
+            </Avatar> */}
+            <div className="w-full flex justify-center">
+            <label 
+              htmlFor="picture" 
+              className="mt-5 w-[50%] bg-blue-500 text-white text-xl py-2 px-4 rounded-lg cursor-pointer text-center"
+            >
+              Upload File
+            </label>
+            <input
+              id="picture"
+              type="file"
+              className="hidden"
+              onChange={onImageChange}
+            />
+          </div>
           </CardContent>
         </Card>
         <Card className=" relative w-[500px] flex flex-col">
@@ -303,17 +362,17 @@ export default function UserPage() {
               <Link
                 href={"#"}
                 onClick={() => setClick(1)}
-                className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[150px] after:h-[4px] after:absolute after:left-[31%] after:top-[4.8%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[147px] after:h-[4px] after:absolute after:left-[29%] after:top-[4.8%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 Billing Information
               </Link>
               {user && user?.user?.role === "producer" ? (
-                ""
+                <div className='ml-[24%]'></div>
               ) : (
                 <Link
                   href={"#"}
                   onClick={() => setClick(2)}
-                  className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[60px] after:h-[4px] after:absolute after:left-[69%] after:top-[4.8%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
+                  className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[55px] after:h-[4px] after:absolute after:left-[67%] after:top-[4.8%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
                 >
                   Skill
                 </Link>

@@ -1,8 +1,30 @@
-import { Router } from "express";
+import { Request, Router } from "express";
 import userController from "../controllers/userController";
-
+import multer from "multer";
+import path from 'path'
 const router = Router()
-
+const storage = multer.memoryStorage()
+const fileFilter = (req: Request, file: any, cb: Function) => {
+    const filetypes = /png|jpeg|gif|webp/;
+    // Check file extension
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // const sizeCheck = file.size < maxSize
+    // console.log(file.size)
+    // Check MIME type
+    const mimeType = file.mimetype.startsWith('image/');
+    if (extname && mimeType) {
+        return cb(null, true);
+    }
+    else {
+        return cb(new Error("Error: Only PNG, JPEG, and GIF files are allowed!"));
+    }
+};
+const maxSize = 5 * 1024 * 1024 // bytes / 5mb
+const upload = multer({
+    storage: storage,
+    fileFilter,
+    limits : {fileSize : maxSize}
+})
 /**
  * @swagger
  * components:
@@ -166,8 +188,11 @@ const router = Router()
  *       500:
  *         description: Server error
  */
-router.put('/update-user/:id', userController.updateUser)
-
+router.put('/update-user/:id',upload.single('profileImage') , userController.updateUser)
+// upload Image
+router.post('/upload-profile/:id',upload.single('profileImage'), userController.uploadProfileImage)
+// get Signed Profile URL
+router.get('/signed-profile/:id', userController.getSignedURL)
 /**
  * @swagger
  * /api/users/search:
