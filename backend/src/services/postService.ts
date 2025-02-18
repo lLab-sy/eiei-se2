@@ -10,15 +10,17 @@ class PostService {
         const posts = await postRepository.getAllPosts(queryStr);
   
         const result = posts.map((post) => {
+            console.log(post.postProjectRoles)
             return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: post.postImages as [string],
                 postMediaType: post.postMediaType.toString() as string,
-                postProjectRoles: post.postProjectRoles.map(eachRole=>(
-                  eachRole.toString()
-                )) as [string],
+                postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
+                  id: (eachRole as any)._id.toString(),
+                  roleName: (eachRole as any).roleName
+                })),
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 userID: post.userID.toString() as string,
                 startDate: post.startDate? post.startDate.toString():"",
@@ -46,9 +48,10 @@ async getPost(id:string): Promise<PostDTO|null> {
             postDescription: post.postDescription as string,
             postImages: post.postImages as [string],
             postMediaType: post.postMediaType.toString() as string,
-            postProjectRoles: post.postProjectRoles.map(eachRole=>(
-              eachRole.toString()
-            )) as [string],
+            postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
+              id: (eachRole as any)._id.toString(),
+              roleName: (eachRole as any).roleName
+            })),
             postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
             // postDetailID: post.postDetailID.toString() as string,
             userID: post.userID.toString() as string,

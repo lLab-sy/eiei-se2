@@ -8,8 +8,8 @@ class PostRepository {
     public async getAllPosts(queryStr:string) {
         try {
             console.log(queryStr)
-             const posts= await Post.find(JSON.parse(queryStr));
-             console.log('Posts from database:', posts);
+             const posts= await Post.find(JSON.parse(queryStr)).populate('postProjectRoles');
+            //  console.log('Posts from database:', posts);
              return posts
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);

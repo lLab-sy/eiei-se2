@@ -37,12 +37,12 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       > 
         <ReduxProvider>
-          <AuthContext session={session}>
+          {/* <AuthContext session={session}> */}
               <NavBar session={session}/>
             {children}
             <Footer />
             <Toaster />
-          </AuthContext>
+          {/* </AuthContext> */}
         </ReduxProvider>
       </body>
     </html>

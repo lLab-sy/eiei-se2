@@ -43,7 +43,7 @@ export default function HistoryPostPage(){
           setPostHistoryResponse(response.data.data)
       }
       fetchData()
-  },[session])
+  },[])
   
  
 
