@@ -38,12 +38,12 @@ export interface IPost extends Document {
 const offerHistorySchema = new Schema<OfferHistory>({
     role: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Role',
+        ref: 'postRoleTypes',
         required: true,
     },
     offeredBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'users',
         required: true,
     },
     price: {
@@ -59,7 +59,7 @@ const offerHistorySchema = new Schema<OfferHistory>({
 const participantDetailSchema = new Schema<ParticipantDetail>({
     participantID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'ProductionProfessional',
+        ref: 'users',
         required: true,
     },
     status: {
@@ -117,12 +117,12 @@ const postSchema = new Schema<IPost>({
     },
     postMediaType: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'MediaType',
+        ref: 'mediaTypes',
         required: [true, 'Post media type is required'],
     },
     postProjectRoles: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'PostRoleType', // Reference to the Role model
+        ref: 'postRoleTypes', // Reference to the Role model
         required: [true, "Post project roles are required"],
         validate: {
             validator: function (roles: mongoose.Schema.Types.ObjectId[]) {
@@ -144,11 +144,11 @@ const postSchema = new Schema<IPost>({
     },
     postDetailID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'PostDetail',
+        ref: 'postDetail',
     },
     userID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'users',
         required: true,
     },
     participants: [participantDetailSchema],

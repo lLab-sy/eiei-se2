@@ -166,7 +166,7 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
   rating: [{
     postID: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
+      ref: "postTypes",
       required: true,
     },
     ratingScore: {
