@@ -79,12 +79,22 @@ const formSchema = z.object({
 export default function CreatePostPage() {
 
   const {data:session} = useSession()
-  
+
   if(!session){
     return <>Loading</>
   }
-
   const token=session.user?.token
+  const role= session?.user.role
+
+  if(role!="producer"){
+    return (
+      <div className="flex bg-mainblue-light justify-center">
+        <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18 justify-center">
+          <h1 className="mt-5 text-center text-white">You don't have permission in this page.</h1>
+        </div>
+      </div>
+    )
+  }
 
   useEffect(()=>{
       const fetchData=async()=>{
