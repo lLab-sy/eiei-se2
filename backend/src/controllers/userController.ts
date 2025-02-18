@@ -38,7 +38,7 @@ class UserController {
                 sendResponse(res, 'error', 'Cannot Find Username')
                 return;
             }
-            const user = await userService.getUserByID(username)
+            const user = await userService.getUserById(username)
             sendResponse(res, 'success', user, "Successfully get User")
         }catch(err){
             console.log(err)
