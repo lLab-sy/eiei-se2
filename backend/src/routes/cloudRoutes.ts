@@ -22,10 +22,11 @@ const fileFilter = (req: Request, file: any, cb: Function) => {
         cb('Error: Only PNG, JPEG ,JPG files are allowed!');
     }
 };
-
+const maxSize = 5242880 // bytes / 5mb
 const upload = multer({
     storage: storage,
-    fileFilter
+    fileFilter,
+    limits : {fileSize : maxSize}
 })
 router.post('/uploads', upload.array('imgArray'), async(req,res) => {
     console.log(req.files)
