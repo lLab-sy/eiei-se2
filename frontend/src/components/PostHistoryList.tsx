@@ -1,3 +1,5 @@
+// frontend/src/components/PostHistoryList.tsx
+
 "use client";
 
 import { useState, useReducer } from "react";
@@ -8,13 +10,14 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 
 export default function PostHistoryList({
-  postLists,userName,role
+  postLists,
+  userName,
+  role,
 }: {
-  postLists: PostDataHistory[],
-  userName:string,
-  role:string
+  postLists: PostDataHistory[];
+  userName: string;
+  role: string;
 }) {
-
   const [currentPage, setCurrentPage] = useState<number>(1);
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
@@ -41,13 +44,17 @@ export default function PostHistoryList({
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {currentProjects.map((project,index) => (
+          {currentProjects.map((project, index) => (
             <div
               key={index}
               className="transform hover:-translate-y-1 transition-transform duration-300"
             >
               <Link href={`/post/${project.id}`}>
-                <PostHistoryCard post={project} userName={userName} role={role} />
+                <PostHistoryCard
+                  post={project}
+                  userName={userName}
+                  role={role}
+                />
               </Link>
             </div>
           ))}

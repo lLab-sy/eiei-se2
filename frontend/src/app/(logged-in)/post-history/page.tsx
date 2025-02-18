@@ -1,13 +1,13 @@
-'use client'
+// frontend/src/app/(logged-in)/post-history/page.tsx
+
+"use client";
 import PostHistoryList from "@/components/PostHistoryList";
-import { PostDataHistory} from "../../../../interface";
+import { PostDataHistory } from "../../../../interface";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import getHistoryPost from "@/libs/getHistoryPosts";
 import getHistoryPosts from "@/libs/getHistoryPosts";
 import session from "redux-persist/lib/storage/session";
 import { useSession } from "next-auth/react";
-
 
 //Mock Data
 // const projects: Project[] = Array.from({ length: 45 }, (_, i) => ({
@@ -23,44 +23,69 @@ import { useSession } from "next-auth/react";
 //     postImages: "/path-to-image.jpg",
 //   }));
 
+export default function HistoryPostPage() {
+  const [postHistoryResponse, setPostHistoryResponse] = useState<
+    PostDataHistory[] | null
+  >(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { data: session, status } = useSession();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (status === "loading") return;
 
-export default function HistoryPostPage(){
-  const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
-  const {data:session} = useSession()
-  
-  if(!session){
-    return <>Loading</>
-  }
-
-  const token=session.user?.token
-  const userName=session.user?.username
-  const role= session.user.role
-
-  useEffect(()=>{
-      const fetchData=async()=>{
-          const response= await getHistoryPosts(token)
-          setPostHistoryResponse(response.data.data)
+      if (!session?.user?.token) {
+        setError("No authentication token found");
+        setIsLoading(false);
+        return;
       }
-      fetchData()
-  },[session])
-  
- 
 
-  if(!postHistoryResponse){
-    return <>Loading</>
+      try {
+        const response = await getHistoryPosts(session.user.token);
+        setPostHistoryResponse(response.data.data);
+      } catch (err) {
+        console.error("Error fetching post history:", err);
+        setError("Failed to fetch post history");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [session, status]);
+
+  if (status === "loading" || isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
-  console.log(postHistoryResponse)
+  if (error) {
+    return (
+      <div className="p-4 text-center text-mainred">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!postHistoryResponse) {
+    return (
+      <div className="p-4 text-center">
+        <p>No history posts found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4">
-
-      {/* Project History */}
-      {/* <h2 className="text-2xl font-bold text-center my-4">Post-History</h2> */}
-      <PostHistoryList postLists={postHistoryResponse} userName={userName} role={role}/>
-    
+      <PostHistoryList
+        postLists={postHistoryResponse}
+        userName={session?.user?.username || ""}
+        role={session?.user?.role || ""}
+      />
     </div>
   );
-};
-
- 
+}
