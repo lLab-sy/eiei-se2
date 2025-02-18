@@ -30,6 +30,22 @@ class UserController {
             sendResponse(res, 'error', 'Failed to get User')
         }
     }
+
+    async getUserByID(req: Request, res: Response): Promise<void> {
+        try{
+            const username = req.params.id;
+            if(!username){
+                sendResponse(res, 'error', 'Cannot Find Username')
+                return;
+            }
+            const user = await userService.getUserByID(username)
+            sendResponse(res, 'success', user, "Successfully get User")
+        }catch(err){
+            console.log(err)
+            sendResponse(res, 'error', 'Failed to get User')
+        }
+    }
+
     async updateUser(req: Request, res: Response): Promise<void> {
         try {
 

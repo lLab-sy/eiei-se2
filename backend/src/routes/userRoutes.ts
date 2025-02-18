@@ -239,4 +239,27 @@ router.get('/signed-profile/:id', userController.getSignedURL)
  */
 router.get("/search", userController.search);
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the user
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A single user object
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.get("/:id", userController.getUserByID);
+
 export default router
