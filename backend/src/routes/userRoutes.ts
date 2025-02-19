@@ -267,6 +267,29 @@ router.get("/search", userController.search);
 
 /**
  * @swagger
+ * /api/users/reviews/{id}:
+ *   get:
+ *     summary: Get a user reviews by ID
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the user
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: reviews of the user
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.get("/reviews/:id", userController.getUserReviewsByID);
+
+/**
+ * @swagger
  * /api/users/{id}/addReview:
  *   put:
  *     summary: Add new review to production professional by ID

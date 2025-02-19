@@ -87,7 +87,7 @@ class UserService {
                 return new reviewWithRatingDTO({
                    rating: r._id as number,
                    amount: r.amount as number,
-                   reviews: r.reviews.map((review)=>{
+                   reviews: r.reviews.map((review: reviewDTO)=>{
                     return new reviewDTO({
                         postName: review.postName as string,
                         producer: review.producer as string,
