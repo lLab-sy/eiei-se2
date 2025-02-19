@@ -54,3 +54,13 @@ export interface imagePair {
     imgSrc: string
     imgFile: File
   }
+
+export  interface RoleType{
+    id: string; 
+    roleName: string;
+}
+  
+export interface MediaType{
+    id: string;
+    mediaName: string;
+}
