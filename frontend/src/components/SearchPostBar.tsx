@@ -4,32 +4,23 @@ import getMediaTypes from "@/libs/getMediaTypes";
 import getPostRoles from "@/libs/getPostRoles";
 import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
+import { RoleType, MediaType } from "../../interface";
 
 interface SearchPostBarProps {
   onSearch: (filter: string) => void;
 }
 
-interface RoleOptions{
-  id: string; 
-  mediaName: string
-}
-
-interface MediaOptions{
-  id: string;
-  roleName: string
-}
-
 const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
-  const [filter, setFilter] = useState("");
   const [openType, setOpenType] = useState("");
+  const [text, setText] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [selectedMedia, setSelectedMedia] = useState<MediaOptions[]>([]);
-  const [selectedRole, setSelectedRole] = useState<RoleOptions[]>([]);
+  const [selectedMedia, setSelectedMedia] = useState<MediaType[]>([]);
+  const [selectedRole, setSelectedRole] = useState<RoleType[]>([]);
 
-  const [mediaOptions, setMediaOptions] = useState<MediaOptions[]>([]);
-  const [roleOptions, setRoleOptions] = useState<RoleOptions[]>([]);
+  const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
+  const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
 
   useEffect(() => {
     const fetchData=async()=>{
@@ -48,10 +39,10 @@ const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
       }
 
       if (medias) {
-        setMediaOptions(medias.data.data);
+        setMediaTypes(medias.data.data);
       }
       if(roles){
-        setRoleOptions(roles.data.data);
+        setRoleTypes(roles.data.data);
       }
       
     }
@@ -59,36 +50,50 @@ const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
   }, []);
 
   useEffect(() => {
-    console.log(mediaOptions);
-    console.log(roleOptions);
-  }, [mediaOptions, roleOptions]);
+    console.log(selectedMedia);
+    console.log(selectedRole);
+  }, [selectedMedia, selectedRole]);
 
   const toggleModal = (type: string) => {
-    if(type === "Media") setOptions(mediaOptions);
-    else setOptions(roleOptions);
-
     setOpenType(type);
     setIsModalOpen(!isModalOpen);
   };
 
-  const handleOptionSelection = (option: string) => {
-    setSelectedOptions((prev) =>
+  const handleSelectionMedia = (option: MediaType) => {
+    setSelectedMedia((prev) =>
+      prev.includes(option) ? prev.filter((m) => m !== option) : [...prev, option]
+    );
+  };
+
+  const handleSelectionRole = (option: RoleType) => {
+    setSelectedRole((prev) =>
       prev.includes(option) ? prev.filter((m) => m !== option) : [...prev, option]
     );
   };
 
   function confirmButton(openType: string): void {
-    //console.log(`Selected ${openType}:`, selectedOptions);
     setIsModalOpen(false);
+    handleSearch();
   }
 
   const handleSearch = () => {
-    onSearch(filter);
-  };
+    var result = "";
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setFilter(value);
+    if(text != "") result += "&searchText="+text;
+
+    if(selectedMedia.length != 0){
+      selectedMedia.forEach(select => {
+        result += "&postMediaTypes=" + select.id;
+      });
+    }
+
+    if(selectedRole.length != 0){
+      selectedRole.forEach(select => {
+        result += "&roleRequirements=" + select.id;
+      })
+    }
+
+    onSearch(result);
   };
 
   return (
@@ -99,7 +104,7 @@ const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
           type="text"
           placeholder="Search..."
           className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500"
-          onChange={handleSearchChange}
+          onChange={(e) => setText(e.target.value)}
         />
         <button
           onClick={handleSearch}
@@ -128,25 +133,25 @@ const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
               <h2 className="text-lg font-semibold mb-4">Select {openType}</h2>
               { openType === "Media" ? (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  { mediaOptions.map((id: string, name: string) => (
+                  { mediaTypes.map((option: MediaType) => (
                     <button
-                      key={name}
-                      className={`px-3 py-1 rounded-full border ${selectedOptions.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                      onClick={() => handleOptionSelection(option)}
+                      key={option.mediaName}
+                      className={`px-3 py-1 rounded-full border ${selectedMedia.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                      onClick={() => handleSelectionMedia(option)}
                     >
-                      {option}
+                      {option.mediaName}
                     </button>
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2 mb-4">
-                { options.map((option) => (
+                { roleTypes.map((option: RoleType) => (
                   <button
-                    key={option}
-                    className={`px-3 py-1 rounded-full border ${selectedOptions.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => handleOptionSelection(option)}
+                    key={option.roleName}
+                    className={`px-3 py-1 rounded-full border ${selectedRole.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => handleSelectionRole(option)}
                   >
-                    {option}
+                    {option.roleName}
                   </button>
                 ))}
               </div>

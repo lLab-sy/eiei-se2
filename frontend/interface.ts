@@ -114,6 +114,15 @@ export interface imagePair {
     imgFile: File
   }
 
+export  interface RoleType{
+    id: string; 
+    roleName: string;
+}
+  
+export interface MediaType{
+    id: string;
+    mediaName: string;
+}
 export interface OfferData{
     roleID:string;
     productionProfessionalID:string;

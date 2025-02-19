@@ -255,9 +255,13 @@ class PostRepository {
             }
 
             if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
                 matchStage.push({
                     $match: {
-                        postMediaType: { $in: postMediaTypes}
+                        postMediaType: { $in: postMediaTypesID}
                     }
                 })
             }
