@@ -146,6 +146,54 @@ router.get('/posts/search', postController.searchPost);
 
 /**
  * @swagger
+ * /api/v1/posts/get-offer:
+ *   get:
+ *     summary: get offer
+ *     tags: [Post]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: The id of the user
+ *       - in: query
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         description: The id of the post
+ *       - in: query
+ *         name: postStatus
+ *         schema:
+ *           type: string
+ *         description: The status of post
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of posts per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The current page number
+ *     responses:
+ *       200:
+ *         description: The retrieved posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/PostDTO"
+ *       404:
+ *         description: Posts not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/get-offer', postController.getOffer);
+
+/**
+ * @swagger
  * /api/v1/posts:
  *   get:
  *     summary: Get all posts
