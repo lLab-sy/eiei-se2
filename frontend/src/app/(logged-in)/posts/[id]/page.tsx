@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const PostDetail = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [img, setImg] = useState<string[]>([]);
   const { toast } = useToast();
 
@@ -175,7 +176,7 @@ const PostDetail = () => {
               className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
             >
               Send Offer
-            </a>
+            </button>
           </div>
         </CardContent>
       </Card>
