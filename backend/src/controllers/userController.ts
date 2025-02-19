@@ -190,6 +190,21 @@ class UserController {
             sendResponse(res, 'error', error)
         }
     }
+
+    async getUserReviewsByID(req: Request, res: Response): Promise<void> {
+        try{
+            const username = req.params.id;
+            if(!username){
+                sendResponse(res, 'error', 'Cannot Find Username')
+                return;
+            }
+            const userReviews = await userService.getUserReviewsById(username)
+            sendResponse(res, 'success', userReviews, "Successfully get User reviews")
+        }catch(err){
+            console.log(err)
+            sendResponse(res, 'error', 'Failed to get User reviews')
+        }
+    }
 }
 
 

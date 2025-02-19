@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import { IProductionProfessional } from "../models/userModel"
 import ProducerRespository from '../repositories/producerRepository';
 import ProductionProfessionalRespository from "../repositories/productionProfessionalRespository";
-import { searchReqDTO } from "../dtos/userDTO";
+import { searchReqDTO, reviewDTO, reviewWithRatingDTO } from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
 import userRepository from "../repositories/userRepository";
 
@@ -72,6 +72,34 @@ class UserService {
             return response;
         } catch (error) {
             throw new Error("Error in service layer when search Production Professional: " + (error as Error).message);
+        }
+    }
+
+    async getUserReviewsById(id:string){
+        try{
+
+            const userReviews = await userRepository.getUserReviewsByID(id)
+
+            const result = userReviews.map((r)=>{
+                return new reviewWithRatingDTO({
+                   rating: r._id as number,
+                   amount: r.amount as number,
+                   reviews: r.reviews.map((review)=>{
+                    return new reviewDTO({
+                        postName: review.postName as string,
+                        producer: review.producer as string,
+                        role: review.role as string,
+                        comment: review.comment as string,
+                        reviewAt: review.reviewAt as Date
+                    })
+                   })
+                });
+            })
+            
+            return result
+        }catch(err){
+            console.error("Error in service layer:", err);
+            throw new Error("Error in service layer: " + (err as Error).message);
         }
     }
 }
