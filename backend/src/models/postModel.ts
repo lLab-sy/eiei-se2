@@ -207,3 +207,15 @@ export interface GetOfferResponse {
     data: OfferHistoryForGetOfferResponse[],
     totalItems: number
 }
+
+export interface getPostByProfRequestModel {
+    userId: string;
+    postStatus: string;
+    limit: number;
+    page: number;
+}
+
+export interface GetPostByProfResponse {
+    data: IPost[];
+    totalItems: number;
+}
