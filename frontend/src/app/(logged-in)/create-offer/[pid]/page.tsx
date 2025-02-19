@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { use } from "react";
 import PostSelect from "@/components/PostSelect";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { OfferHistoryData, PostData } from "../../../../../interface";
 import { useEffect, useState } from "react";
 import OfferInformation from "@/components/OfferInformation";
 import getPostUser from "@/libs/getPostsUser";
+import getPostById from "@/libs/getPostById";
 import { useSession } from "next-auth/react";
 import { FaHistory } from "react-icons/fa";
 import OfferHistoryMinimal from "@/components/OfferHistoryMinimal";
@@ -78,36 +80,80 @@ export default function CreateOfferPage({params}:{params:Promise<{pid:string}>})
           setPostData(posts)
           setPostSelect(posts[0])
       }
-      fetchData()
-  },[])
+    };
+    if (userID && pid) fetchData();
+  }, [userID, userRole, pid, token]); // ใช้ pid และ token ใน dependency array
 
-    if(!postSelect || !postData){
-        return <>Loading...</>
-    }
-    return(
-        <div className="flex bg-mainblue-light justify-center min-h-screen">
-            <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18">
-            <Card className="w-[100%] shadow-xl mt-10">
-                <CardHeader className="justify-between flex flex-row">
-                    <CardTitle className="flex">Name of Prodcution</CardTitle>
-                    <FaHistory className="cursor-pointer" onClick={() => setShowOfferHistory(true)} />
-                </CardHeader>
-                {/* Drag Line */}
-                <hr className="h-px bg-black border-0 dark:bg-gray-700"></hr> 
-                
-                <PostSelect postData={postData} postSelectData={postSelect} changePostSelect={setPostSelect}/>
-                
-                <div className="flex flex-row">
-                    <CardContent className="flex flex-col py-5 w-[100%]">
-                        <CardTitle className="justify-start flex mb-5">Offer Information</CardTitle>
-                        <hr className="h-px bg-black border-0 dark:bg-gray-700"></hr>
-                        <OfferInformation postSelectData={postSelect} productionProfessionalID={pid}/>
-                    </CardContent>
-                </div>
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Card className="p-6 max-w-md">
+          <CardTitle className="text-mainred mb-4">Error</CardTitle>
+          <p>{error}</p>
+        </Card>
+      </div>
+    );
+  }
 
-            </Card>
-            </div>
-            {showOfferHistory && <OfferHistoryMinimal productionProfessionalName={pid} offerHistoryDatas={mockOfferHistory} onCloseWindow={() => setShowOfferHistory(false)} />}
-        </div>
-    )
+  if (!postSelect || !postData) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-lg">Loading posts...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex bg-mainblue-light justify-center min-h-screen">
+      <div className="flex flex-wrap flex-row sm:w-4/5 w-full my-12 px-4">
+        <Card className="w-full shadow-xl mt-10">
+          <CardHeader className="justify-between flex flex-row">
+            <CardTitle className="flex">
+              {userRole === "producer"
+                ? "Create Offer"
+                : "Producer name (Owner)"}
+              {/* รอแก้ Project Owner */}
+            </CardTitle>
+            <FaHistory
+              className="cursor-pointer hover:text-mainblue transition-colors"
+              onClick={() => setShowOfferHistory(true)}
+            />
+          </CardHeader>
+
+          <hr className="h-px bg-gray-300 border-0" />
+
+          <PostSelect
+            postData={postData}
+            postSelectData={postSelect}
+            changePostSelect={setPostSelect}
+            userRole={userRole}
+          />
+
+          <div className="flex flex-row">
+            <CardContent className="flex flex-col py-5 w-full">
+              <CardTitle className="justify-start flex mb-5">
+                Offer Information
+              </CardTitle>
+              <hr className="h-px bg-gray-300 border-0" />
+              <OfferInformation
+                postSelectData={postSelect}
+                productionProfessionalID={
+                  userRole === "producer" ? pid : userID
+                }
+                userRole={userRole}
+              />
+            </CardContent>
+          </div>
+        </Card>
+      </div>
+
+      {showOfferHistory && (
+        <OfferHistoryMinimal
+          productionProfessionalName={pid}
+          offerHistoryDatas={mockOfferHistory}
+          onCloseWindow={() => setShowOfferHistory(false)}
+        />
+      )}
+    </div>
+  );
 }
