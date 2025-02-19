@@ -207,3 +207,53 @@ export class PostWithRoleCountDTO extends PostDTO{
         this.roleCount = data.roleCount!;
     }
 }
+
+export class OfferRequestDTO {
+    @ApiProperty({ description: 'The id of user', type: String })
+    @IsString()
+    @IsNotEmpty()
+    userId!: string;
+
+    @ApiProperty({ description: 'The id of post', type: String })
+    @IsString()
+    postId!: string;
+
+    @ApiProperty({ description: 'The status of post', type: String })
+    @IsString()  
+    postStatus!: string;
+
+    @ApiProperty({ description: 'The number of post per page' })
+    @IsNumber()  
+    limit!: number;
+
+    @ApiProperty({ description: 'The current page' })
+    @IsNumber() 
+    page!: number;
+}
+
+export class OfferResponseDTO {
+    _id!: string;
+    postName!: string;
+    roleName!: string; // Role offered to the participant
+    currentWage!: number; // The amount offered for the role
+    reason!: string;
+    offeredBy!: number; // User ID should be better than 0/1 ?
+    createdAt!: Date;
+    constructor(
+        init : {_id: string,
+        postName: string,
+        roleName: string,
+        currentWage: number,
+        reason: string,
+        offeredBy: number,
+        createdAt: Date}
+      ) {
+        this._id = init._id;
+        this.postName = init.postName;
+        this.roleName = init.roleName;
+        this.currentWage = init.currentWage;
+        this.reason = init.reason;
+        this.offeredBy = init.offeredBy;
+        this.createdAt = init.createdAt;
+      }
+}

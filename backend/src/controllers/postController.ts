@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
-import { PostSearchRequestDTO } from '../dtos/postDTO';
+import { PostSearchRequestDTO, OfferRequestDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
 import cloudService from '../services/cloudService';
@@ -210,6 +210,55 @@ class PostController {
       sendResponse(res, 'success', posts, 'Successfully search posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
+    }
+  };
+
+  async getOffer(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.query.userId? req.query.userId as string: false;
+      const limit = req.query.limit ? Number(req.query.limit): 10;
+      const page = req.query.page ? Number(req.query.page): 1;
+      const status = ['created', 'in-progress', 'success', 'cancel'];
+      
+      if (limit < 1 || page < 1 || !userId ) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+      
+      let postStatus;
+      if (!req.query.postStatus){
+        postStatus = '';
+      }else{
+        if(!status.includes(req.query.postStatus as string)){
+          sendResponse(res, 'error', '', 'bad request', 400)
+        }else{
+          postStatus = req.query.postStatus as string
+        }
+          
+      }
+
+      const offerReqDTO: OfferRequestDTO = {
+        page: page,
+        limit: limit,
+        userId: userId,
+        postId: req.query.postId? req.query.postId as string: "",
+        postStatus: postStatus as string
+      }
+
+      const offers = await postService.getOffer(offerReqDTO);
+      // console.log(offers.meta.totalPages)
+      if (!offers.meta.totalPages){
+        sendResponse(res, 'error', '', 'You have no offer.', 400);
+        return
+      }
+      if (offers.meta.totalPages < page) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+
+      sendResponse(res, 'success', offers, 'Successfully get offers');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to get offers at controller', 500);
     }
   };
 }

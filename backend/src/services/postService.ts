@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO } from '../dtos/postDTO';
-import Post, { ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO } from '../dtos/postDTO';
+import Post, { GetOfferRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
@@ -254,6 +254,38 @@ async getPost(id:string): Promise<PostDTO|null> {
             limit: postSearchReq.limit,
             totalItems: res.totalItems,
             totalPages: Math.ceil(res.totalItems / postSearchReq.limit)
+        } as PaginationMetaDTO
+      }
+      return response;
+
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  async getOffer(offerReq: OfferRequestDTO): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
+    try {
+      const offerRequest: GetOfferRequestModel = offerReq
+
+      const res = await postRepository.getOffer(offerRequest);
+      const resDTO = res.data.map((offer) => {
+        return new OfferResponseDTO({
+          _id: offer._id as string,
+          postName: offer.postName,
+          roleName: offer.roleName, // Role offered to the participant
+          currentWage: offer.currentWage, // The amount offered for the role
+          reason: offer.reason,
+          offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
+          createdAt: offer.createdAt
+        })         
+      });
+      const response: PaginatedResponseDTO<OfferResponseDTO> = {
+        data: resDTO,
+        meta: {
+            page: offerReq.page,
+            limit: offerReq.limit,
+            totalItems: res.totalItems,
+            totalPages: Math.ceil(res.totalItems / offerReq.limit)
         } as PaginationMetaDTO
       }
       return response;

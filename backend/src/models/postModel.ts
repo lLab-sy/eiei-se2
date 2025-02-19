@@ -184,3 +184,26 @@ export interface PostSearchResponse {
     data: IPost[],
     totalItems: number
 }
+
+export interface GetOfferRequestModel {
+    userId?: string;
+    postId?: string;
+    postStatus?: string;
+    limit?: number;
+    page?: number;     
+}
+
+export interface OfferHistoryForGetOfferResponse {
+    _id: string;
+    postName: string;
+    roleName: string; // Role offered to the participant
+    currentWage: number; // The amount offered for the role
+    reason: string;
+    offeredBy: number; // User ID should be better than 0/1 ?
+    createdAt: Date; // Date when the offer was created
+}
+
+export interface GetOfferResponse {
+    data: OfferHistoryForGetOfferResponse[],
+    totalItems: number
+}

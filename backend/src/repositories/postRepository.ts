@@ -1,8 +1,9 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, GetOfferRequestModel, GetOfferResponse } from '../models/postModel';
 import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
+import { Pipe } from 'stream';
 
 class PostRepository {
     public async getAllPosts(queryStr:string) {
@@ -282,6 +283,98 @@ class PostRepository {
 
             const results = await Post.aggregate(matchStage)
             const response: PostSearchResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            console.log("ANSWER",response)
+            return response
+        } catch (error) {
+            throw new Error('Error search post in repository: ' + error);
+        }
+    }
+
+    public async getOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
+        try {
+            const { userId, postId, postStatus, limit, page } = getOfferReq;
+
+            const matchStage: PipelineStage.Match = {
+                $match: {
+                  ...(userId && { 'participants.participantID': new ObjectId(userId) }),
+                  ...(postId && { _id: new ObjectId(postId) }),
+                  ...(postStatus && { postStatus }),
+                },
+              };
+
+            const pipeline: PipelineStage[] = [matchStage];
+
+            //unwind participants
+            const unwind1: PipelineStage.Unwind = {
+                 $unwind: { path: '$participants' } 
+            }
+            pipeline.push(unwind1);
+
+            //unwind participants.offer
+            const unwind2: PipelineStage.Unwind = {
+                $unwind: { path: '$participants.offer' } 
+            }
+            pipeline.push(unwind2);
+
+            //lookup to postRoleTypes
+            const lookup: PipelineStage.Lookup ={
+                $lookup: {
+                    from: 'postRoleTypes',
+                    localField: 'participants.offer.role',
+                    foreignField: '_id',
+                    as: 'roleName'
+                  }
+            }
+            pipeline.push(lookup);
+
+            //set field
+            const setStage: PipelineStage.Set = {
+                $set: {
+                    roleName: {
+                      $arrayElemAt: ['$roleName.roleName', 0]
+                    },
+                    currentWage: '$participants.offer.price',
+                    reason: '$participants.offer.reason',
+                    offeredBy: '$participants.offer.offerBy',
+                    createdAt: '$participants.offer.createdAt'
+                  }
+            }
+            pipeline.push(setStage);
+
+            //project
+            const projectStage: PipelineStage.Project = {
+                $project: {
+                    postName: 1,
+                    roleName: 1,
+                    currentWage: 1,
+                    reason: 1,
+                    offeredBy: 1,
+                    createdAt: 1
+                  }
+            }
+            pipeline.push(projectStage);
+
+            console.log("Check2",matchStage)
+            const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            //sort by date from new to old, push skip and limit
+            const sortStage: PipelineStage.Sort = {
+                $sort: { createdAt: -1 }
+            }
+            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+
+            const results = await Post.aggregate(pipeline)
+            const response: GetOfferResponse = {
                 data: results,
                 totalItems: totalItems
             }
