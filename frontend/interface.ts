@@ -31,7 +31,7 @@ export interface Rating{
     comment: string;
 }
 
-export interface Professionals{
+export interface Professional{
     _id: string;
     username: string;
     role: string;
@@ -44,9 +44,9 @@ export interface Professionals{
     skill: string[];
     experience: number;
     rating: Rating[];
+    avgRating: number;
     description?: string;
     imageUrl?: string;
-    ratingAvg?: number;
 }
 
 export interface MetaData{
@@ -57,15 +57,15 @@ export interface MetaData{
 }
 
 export interface ProfessionalsData{
-    data: Professionals[];
+    data: Professional[];
     meta: MetaData;
 }
 
-export interface ProjectResponse {
-    status: string;
-    data: Project[];
-    message: string;
-}
+// export interface ProjectResponse {
+//     status: string;
+//     data: Project[];
+//     message: string;
+// }
 
 export interface PostRolesResponse{
     roleName: string,

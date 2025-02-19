@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import React from "react";
-import { ProfessionalsData, Professionals } from "../../../../interface";
+import { ProfessionalsData, Professional } from "../../../../interface";
 import SearchBar from "@/components/SearchBar";
 import ProfessionalCard from "@/components/ProfessionalCrad";
 import Pagination from "@/components/Pagination";
@@ -21,7 +21,7 @@ const ProfessionalsPage = () => {
 
   // data
   const [dataResponse,setDataResponse]= useState<ProfessionalsData|null>(null);
-  const [professtionalsCurrentPage, setProfesstionalsCurrentPage] = useState<Professionals[]|null>(null)
+  const [professtionalsCurrentPage, setProfesstionalsCurrentPage] = useState<Professional[]|null>(null)
 
   useEffect(()=>{
     const fetchData=async()=>{
@@ -44,12 +44,23 @@ const ProfessionalsPage = () => {
         
     }
     fetchData()
-},[requestFilter, requestPage])
+},[requestFilter, requestPage]);
 
   useEffect(() => {
     if (dataResponse) {
       setTotalPages(dataResponse.meta.totalPages);
+
+      //Cal avg rating
+      dataResponse.data.forEach((e) => {
+        var sum = 0;
+        e.rating.forEach((rate) => {
+          sum += rate.ratingScore;
+        })
+        if(e.rating.length != 0) e.avgRating = sum / e.rating.length;
+      });
+
       setProfesstionalsCurrentPage(dataResponse.data); // Update professionals list
+
     }
   }, [dataResponse]);
 
@@ -88,7 +99,7 @@ const ProfessionalsPage = () => {
                 description={professional?.description || ""}
                 imageUrl={professional?.imageUrl || ""}
                 skill={professional?.skill}
-                ratings={Number(professional?.ratingAvg) || 0}
+                ratings={Number(professional?.avgRating) || 0}
                 occupation={professional?.occupation}
                 experience={professional?.experience}
                 id={professional?._id}

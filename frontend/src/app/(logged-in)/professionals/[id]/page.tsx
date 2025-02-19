@@ -2,28 +2,59 @@
 
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Mail, Phone, Briefcase, Star, User, Award } from "lucide-react";
+import { Professional} from "../../../../../interface";
+import getUser from "@/libs/getUser";
 
 const ProfessionalDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
+  const [dataResponse,setDataResponse]= useState<Professional|null>(null);
+
+    useEffect(()=>{
+      const fetchData=async()=>{
+          var response;
+          try{
+            response= await getUser(id);
+            setDataResponse(response);
+          }catch(error){
+            console.log("User Not Found");
+          }
+      }
+      fetchData()
+  },[id]);
+
+  if (!dataResponse) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }else{
+    var sum = 0;
+      dataResponse?.rating.forEach((rate) => {
+          sum += rate.ratingScore;
+      })
+      dataResponse.avgRating = dataResponse.rating.length ? Math.ceil((sum / dataResponse.rating.length) * 10) / 10 : 0.0;
+  }
 
   const ProfessionalInfo = {
-    id,
-    firstName: "John",
-    lastName: "Doe",
-    email: "test@email.com",
-    phoneNumber: "123-456-7890",
-    gender: "Male",
-    profileImage: ["/image/logo.png"],
-    description: "Seasoned media professional with extensive expertise in cinematography, lighting design, and advanced video editing techniques. Adept at creating visually compelling content for various media formats, from films and commercials to digital campaigns and documentaries. Skilled in operating high-end camera systems, setting up intricate lighting schemes to enhance mood and aesthetics, and crafting seamless, engaging narratives through meticulous post-production editing.",
-    occupation: "Videographer",
-    skill: ["Cameraman", "Lighting", "Editing"],
-    experience: "10", // Years of experience
-    rating: 5.0,
+    id: dataResponse,
+    firstName: dataResponse.firstName,
+    lastName: dataResponse.lastName,
+    email: dataResponse.email,
+    phoneNumber: dataResponse.phoneNumber,
+    gender: dataResponse.gender,
+    profileImage: dataResponse.imageUrl,
+    description: dataResponse.description,
+    occupation: dataResponse.occupation,
+    skill: dataResponse.skill,
+    experience: dataResponse.experience,
+    rating: dataResponse.rating,
+    avgRating: dataResponse.avgRating,
   };
 
   return (
@@ -39,11 +70,10 @@ const ProfessionalDetail = () => {
           <div className="w-full flex justify-center">
             <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
               <CarouselContent>
-                {ProfessionalInfo.profileImage.length !== 0 ? (
-                  ProfessionalInfo.profileImage.map((imgSrc) => (
-                    <CarouselItem key={imgSrc} className="flex justify-center">
+                {ProfessionalInfo.profileImage ? (
+                    <CarouselItem key={JSON.stringify(ProfessionalInfo.profileImage)} className="flex justify-center">
                       <Image
-                        src={imgSrc}
+                        src={JSON.stringify(ProfessionalInfo.profileImage)}
                         alt="Project Image"
                         width={300}
                         height={300}
@@ -51,7 +81,6 @@ const ProfessionalDetail = () => {
                         priority
                       />
                     </CarouselItem>
-                  ))
                 ) : (
                   <CarouselItem className="flex justify-center">
                     <Image
@@ -95,7 +124,7 @@ const ProfessionalDetail = () => {
               <h2 className="text-xl font-bold text-gray-900">Experience</h2>
               <div className="grid grid-cols-1 gap-4 text-gray-700">
                 <p className="flex items-center gap-2 font-medium"><Award className="h-5 w-5 text-mainblue-lightest" /> Experience: {ProfessionalInfo.experience} years</p>
-                <p className="flex items-center gap-2 font-medium"><Star className="h-5 w-5 text-mainyellow" /> Rating: {ProfessionalInfo.rating}</p>
+                <p className="flex items-center gap-2 font-medium"><Star className="h-5 w-5 text-mainyellow" /> Rating: {ProfessionalInfo.avgRating}</p>
               </div>
             </div>
           </div>
