@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
-import { PostSearchRequestDTO, OfferRequestDTO } from '../dtos/postDTO';
+import { PostSearchRequestDTO, OfferRequestDTO, GetPostByProfDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
 import cloudService from '../services/cloudService';
@@ -259,6 +259,60 @@ class PostController {
       sendResponse(res, 'success', offers, 'Successfully get offers');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to get offers at controller', 500);
+    }
+  };
+
+  async getPostsByProf(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const role=req.user.role
+      if(role=="production professional"){
+      const userId = req.user.userId? req.user.userId as string: false;
+      const limit = req.query.limit ? Number(req.query.limit): 10;
+      const page = req.query.page ? Number(req.query.page): 1;
+      const status = ['created', 'in-progress', 'success', 'cancel'];
+      
+      if (limit < 1 || page < 1 || !userId ) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+      
+      let postStatus;
+      if (!req.query.postStatus){
+        postStatus = '';
+      }else{
+        if(!status.includes(req.query.postStatus as string)){
+          sendResponse(res, 'error', '', 'bad request', 400)
+        }else{
+          postStatus = req.query.postStatus as string
+        }
+          
+      }
+
+      const getPostByProfDTO: GetPostByProfDTO = {
+        page: page,
+        limit: limit,
+        userId: userId,
+        postStatus: postStatus as string
+      }
+
+      const posts = await postService.getPostsByProf(getPostByProfDTO);
+      // console.log(offers.meta.totalPages)
+      if (!posts.meta.totalPages){
+        sendResponse(res, 'error', '', 'You have no relate posts.', 400);
+        return
+      }
+      if (posts.meta.totalPages < page) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+      sendResponse(res, 'success', posts, 'Successfully get posts', 200);
+      }else {      
+        sendResponse(res, 'error', "", `unauthorized`, 400);
+        return;
+      }
+      
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
     }
   };
 }

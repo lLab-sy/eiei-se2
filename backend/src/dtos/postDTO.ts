@@ -257,3 +257,22 @@ export class OfferResponseDTO {
         this.createdAt = init.createdAt;
       }
 }
+
+export class GetPostByProfDTO {
+    @ApiProperty({ description: 'The id of user', type: String })
+    @IsString()
+    @IsNotEmpty()
+    userId!: string;
+
+    @ApiProperty({ description: 'The status of post', type: String })
+    @IsString()  
+    postStatus!: string;
+
+    @ApiProperty({ description: 'The number of post per page' })
+    @IsNumber()  
+    limit!: number;
+
+    @ApiProperty({ description: 'The current page' })
+    @IsNumber() 
+    page!: number;
+}

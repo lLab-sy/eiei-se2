@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, GetOfferRequestModel, GetOfferResponse } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, getPostByProfRequestModel } from '../models/postModel';
 import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
@@ -382,6 +382,65 @@ class PostRepository {
             return response
         } catch (error) {
             throw new Error('Error search post in repository: ' + error);
+        }
+    }
+
+    public async getPostsByProf(getPostByProfReq: getPostByProfRequestModel): Promise<GetPostByProfResponse>{
+        try {
+            const { userId, postStatus, limit, page } = getPostByProfReq;
+            const objectId = new mongoose.Types.ObjectId(userId);
+
+            const postStatusMatchStage: PipelineStage.Match = {
+                $match: {
+                  ...(postStatus && { postStatus }),
+                },
+            };
+            
+            const pipeline: PipelineStage[] = [postStatusMatchStage];
+
+            const matchStage1: PipelineStage.Match ={
+                $match: {
+                      'participants.participantID': objectId
+                    }
+            }
+            pipeline.push(matchStage1);
+
+            const unwindStage: PipelineStage.Unwind = {
+                $unwind: { path: '$participants' }
+            }
+            pipeline.push(unwindStage)
+            
+            const matchStage2: PipelineStage.Match ={
+                $match: {
+                    'participants.participantID': objectId
+                  }
+            }
+            pipeline.push(matchStage2);
+
+            const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            //sort by date from new to old, push skip and limit
+            const sortStage: PipelineStage.Sort = {
+                $sort: { createdAt: -1 }
+            }
+            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+
+            const results = await Post.aggregate(pipeline)
+            const response: GetPostByProfResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            console.log("ANSWER",response)
+            return response
+        } catch (error) {
+            throw new Error('Error fetching user posts from repository: ' + error);
         }
     }
 }
