@@ -63,6 +63,106 @@ class UserRepository {
         }
     }
 
+    async getUserReviewsByID(userID: string){
+        try{
+            const userId = new ObjectId(userID);
+            const userReviews = await User.aggregate(
+                [
+                  {
+                    $match: {
+                      _id: userId
+                    }
+                  },
+                  { $unwind: { path: '$rating' } },
+                  {
+                    $lookup: {
+                      from: 'posts',
+                      localField: 'rating.postID',
+                      foreignField: '_id',
+                      as: 'rating.post',
+                      pipeline: [
+                        {
+                          $project: {
+                            _id: 1,
+                            postName: 1,
+                            userID: 1,
+                            participants: 1
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    $set: {
+                      'rating.post': {
+                        $arrayElemAt: ['$rating.post', 0]
+                      }
+                    }
+                  },
+                  {
+                    $match: {
+                      'rating.post.participants': {
+                        $elemMatch: {
+                          participantID: userId,
+                          status: 'candidate'
+                        }
+                      }
+                    }
+                  },
+                  {
+                    $lookup: {
+                      from: 'postroles',
+                      localField:
+                        'rating.post.participants.offer.role',
+                      foreignField: '_id',
+                      as: 'rating.role'
+                    }
+                  },
+                  { $unwind: { path: '$rating.role' } },
+                  {
+                    $lookup: {
+                      from: 'users',
+                      localField: 'rating.post.userID',
+                      foreignField: '_id',
+                      as: 'rating.producer',
+                      pipeline: [{ $project: { username: 1 } }]
+                    }
+                  },
+                  {
+                    $set: {
+                      'rating.producer': {
+                        $arrayElemAt: ['$rating.producer', 0]
+                      }
+                    }
+                  },
+                  {
+                    $group: {
+                      _id: '$rating.ratingScore',
+                      amount: { $sum: 1 },
+                      reviews: {
+                        $addToSet: {
+                          postName: '$rating.post.postName',
+                          producer: '$rating.producer.username',
+                          role: '$rating.role.roleName',
+                          comment: '$rating.comment',
+                          reviewAt: '$rating.createdAt'
+                        }
+                      }
+                    }
+                  },
+                  { $sort: { _id: -1 } }
+                ],
+                { maxTimeMS: 60000, allowDiskUse: true }
+              );
+            if(!userReviews){
+                throw new Error("User Reviews not found.")
+            }
+            return userReviews;
+        } catch(err){
+            throw new Error('Error fetching user reviews in repository: ' + err);
+        }
+    }
+    
     async getUserReceivedReviewsByID(userID:string){
         try{
             const userId = new ObjectId(userID);
