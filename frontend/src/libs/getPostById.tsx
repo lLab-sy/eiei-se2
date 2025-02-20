@@ -1,22 +1,10 @@
 import axios from "axios";
-
-interface PostResponse {
-  id: string;
-  postName: string;
-  postDescription: string;
-  postImages: string[];
-  postMediaType: string;
-  postProjectRoles: string[];
-  postStatus: string;
-  userID: string;
-  startDate: string;
-  endDate: string;
-}
+import { PostData } from "../../interface";
 
 export default async function getPostById(
   postId: string,
   token: string
-): Promise<PostResponse> {
+): Promise<PostData> {
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
 
   try {

@@ -29,30 +29,25 @@ const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
       
       try{
         medias = await getMediaTypes();
+        setMediaTypes(medias.data.data);
       }catch(error){
         console.log("MediaTypes Not Found");
       }
       try{
         roles = await getPostRoles();
+        setRoleTypes(roles.data.data);
       }catch(error){
         console.log("Post Role Not Found");
       }
 
-      if (medias) {
-        setMediaTypes(medias.data.data);
-      }
-      if(roles){
-        setRoleTypes(roles.data.data);
-      }
-      
     }
     fetchData()
   }, []);
 
-  useEffect(() => {
-    console.log(selectedMedia);
-    console.log(selectedRole);
-  }, [selectedMedia, selectedRole]);
+  // useEffect(() => {
+  //   console.log(selectedMedia);
+  //   console.log(selectedRole);
+  // }, [selectedMedia, selectedRole]);
 
   const toggleModal = (type: string) => {
     setOpenType(type);

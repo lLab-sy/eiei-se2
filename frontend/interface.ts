@@ -5,6 +5,7 @@ export interface PostData {
     postImages?: string[];
     postMediaType: string;
     postProjectRoles: string[];
+    postProjectRolesOut?: PostRolesResponse[]
     postStatus: string;
     startDate?: string; 
     endDate?: string;  
@@ -22,9 +23,6 @@ export interface MetaData{
     totalItems: number;
     totalPages: number;
 }
-
-export interface Project {
-    id: string;
 
 export interface PostDataHistory {
     id:string,
@@ -88,7 +86,6 @@ export interface OfferData{
     description: string;
     role: string;
 }
-
 
 export interface OfferHistoryData{
     roleName: string; //populate
