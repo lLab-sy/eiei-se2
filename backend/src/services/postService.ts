@@ -23,6 +23,7 @@ class PostService {
                 postDescription: post.postDescription as string,
                 postImages: postImages as string[],
                 postMediaType: post.postMediaType.toString() as string,
+                postImagesKey: post.postImages,
                 postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
                   id: (eachRole as any)._id.toString(),
                   roleName: (eachRole as any).roleName
@@ -62,6 +63,7 @@ async getPost(id:string): Promise<PostDTO|null> {
               id: (eachRole as any)._id.toString(),
               roleName: (eachRole as any).roleName
             })),
+            postImagesKey: post.postImages,
             postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
             // postDetailID: post.postDetailID.toString() as string,
             userID: post.userID.toString() as string,
@@ -93,6 +95,7 @@ async getPost(id:string): Promise<PostDTO|null> {
               postImages: post.postImages as [string],
               postMediaType: post.postMediaType as string,
               roleCount: post.roleCount as number,
+              postImagesKey: post.postImages,
               postProjectRoles: post.postProjectRoles as string[],
               postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
               startDate: post.startDate? post.startDate.toString():"",

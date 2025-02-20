@@ -277,7 +277,7 @@ router.get('/posts/:id', postController.getPost);
  *       500:
  *         description: Server error
  */
-router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postController.updatePost as RequestHandler);
+router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, upload.array('postImagesSend'), postController.updatePost as RequestHandler);
 
 /**
  * @swagger

@@ -33,6 +33,12 @@ export class PostDTO {
     @IsString({ each: true })  // Ensures that each item in the array is a string
     postImages!: string[];
 
+    @ApiProperty({ description: 'The images of the post', type: [String] })
+    @IsArray()
+    @ArrayNotEmpty({ message: 'At least one image is required' })
+    @IsString({ each: true })  // Ensures that each item in the array is a string
+    postImagesKey!: string[];
+
     @ApiProperty({ description: 'The media type of the post', type: String })
     @IsString()
     @IsNotEmpty()
