@@ -1,23 +1,29 @@
 import postRepository from '../repositories/postRepository';
-import { PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO } from '../dtos/postDTO';
+import { ImageDisplayDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO } from '../dtos/postDTO';
 import Post, { PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 
 class PostService {
-
+  
   async getAllPosts(queryStr:string): Promise<PostDTO[]> {
     
     try {
         const posts = await postRepository.getAllPosts(queryStr);
   
         const result = await Promise.all(posts.map(async (post) => {
-          const postImages = await Promise.all(
-            post.postImages.map(async (eachImg) => {
+        const postImages:string[] = await Promise.all(
+        post.postImages.map(async (eachImg) => {
                 return await cloudService.getSignedUrlImageCloud(eachImg);
             })
-        );
-            return new PostDTO({
+          );
+
+        var postImageDisplay:ImageDisplayDTO[]=[];
+        for (let i = 0; i < postImages.length; i++) {
+          postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
+        }
+
+        return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
@@ -28,6 +34,7 @@ class PostService {
                   id: (eachRole as any)._id.toString(),
                   roleName: (eachRole as any).roleName
                 })),
+                postImageDisplay:postImageDisplay as ImageDisplayDTO[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 userID: post.userID.toString() as string,
                 startDate: post.startDate? post.startDate.toString():"",
@@ -53,6 +60,12 @@ async getPost(id:string): Promise<PostDTO|null> {
           post.postImages.map(async (eachImg) => {
               return await cloudService.getSignedUrlImageCloud(eachImg);
           }));
+
+          var postImageDisplay:ImageDisplayDTO[]=[];
+          for (let i = 0; i < postImages.length; i++) {
+            postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
+          }
+
           const result = new PostDTO({
             id: post.id.toString(),
             postName: post.postName as string,
@@ -63,6 +76,7 @@ async getPost(id:string): Promise<PostDTO|null> {
               id: (eachRole as any)._id.toString(),
               roleName: (eachRole as any).roleName
             })),
+            postImageDisplay:postImageDisplay as ImageDisplayDTO[],
             postImagesKey: post.postImages,
             postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
             // postDetailID: post.postDetailID.toString() as string,
