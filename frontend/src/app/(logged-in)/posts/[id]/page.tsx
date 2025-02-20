@@ -6,12 +6,27 @@ import { useState } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Mail, Phone, Star, User, Calendar } from "lucide-react";
+import { PostData } from "../../../../../interface";
 
 const PostDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
+  const [dataResponse,setDataResponse]= useState<PostData|null>(null);
 
-  const PostInfo = {
+    useEffect(()=>{
+      const fetchData=async()=>{
+          var response;
+          try{
+            response= await getUser(id);
+            setDataResponse(response);
+          }catch(error){
+            console.log("User Not Found");
+          }
+      }
+      fetchData()
+  },[id]);
+
+  /*const PostInfo = {
     postName: "Marvel Studios",
     postDescription: "We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We’re looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we’d love to hear from you.",
     postImages: [],
@@ -25,7 +40,7 @@ const PostDetail = () => {
     lastName: "Doe",
     email: "realMarvelStudio@yahoo.com",
     phoneNumber: "123-456-7890",
-  };
+  };*/
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
