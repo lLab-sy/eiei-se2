@@ -1,10 +1,33 @@
-import { Router } from 'express';
+import { Router,Request } from 'express';
 import postController from '../controllers/postController';
 import AuthMiddleware from '../middlewares/authMiddleware'
 import { RequestHandler } from '@nestjs/common/interfaces';
+import multer from 'multer';
+import path from 'path';
 
 const router = Router();
-
+const storage = multer.memoryStorage()
+const fileFilter = (req: Request, file: any, cb: Function) => {
+    const filetypes = /png|jpeg|gif|webp|jpg/;
+    // Check file extension
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // const sizeCheck = file.size < maxSize
+    // console.log(file.size)
+    // Check MIME type
+    const mimeType = file.mimetype.startsWith('image/');
+    if (extname && mimeType) {
+        return cb(null, true);
+    }
+    else {
+        return cb(new Error("Error: Only PNG, JPEG, and GIF files are allowed!"));
+    }
+};
+const maxSize = 5 * 1024 * 1024 // bytes / 5mb
+const upload = multer({
+    storage: storage,
+    fileFilter,
+    limits : {fileSize : maxSize}
+})
 /**
  * @swagger
  * tags:
@@ -168,8 +191,8 @@ router.get('/posts', postController.getAllPosts);
  *         description: Server error
  */
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
-router.post('/posts', AuthMiddleware.authenticate as RequestHandler, postController.createPost as RequestHandler);
-
+router.post('/posts', AuthMiddleware.authenticate as RequestHandler, upload.array('postImagesSend'), postController.createPost as RequestHandler);
+// router.post('/upload-profile/:id',upload.single('profileImage'), userController.uploadProfileImage)
 /**
  * @swagger
  * /api/v1/posts/user:

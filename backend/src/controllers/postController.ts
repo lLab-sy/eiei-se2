@@ -5,6 +5,7 @@ import { sendResponse } from '../utils/responseHelper';
 import { PostSearchRequestDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
+import cloudService from '../services/cloudService';
 
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
@@ -52,17 +53,45 @@ class PostController {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
   };
-  
+  // 
   //@Private Request from Producer Role only and userID from frontEnd isMatch
   async createPost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
+
+      //
+      req.body=JSON.parse(req.body.userData)
+
+
       //unauthorize
       if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+          console.log(req.user.role,req.body.userID,req.user.userId)
           sendResponse(res.status(401),'error', 'Unauthorize to create post');
           return;
       }
+
+      const profileImageFile = req?.files as Express.Multer.File[];
+      // console.log("PICT",profileImageFile)
+      var postImages:string[]=[];
+      profileImageFile?.map(async (eachImageBuffer)=>{
+        const buffer = eachImageBuffer?.buffer
+        const mimetype = eachImageBuffer?.mimetype
+        // FOR EDIT 
+        // const post = await postService.getPost(id)
+        // const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName() //
+        const imageKey = cloudService.getKeyName()
+        postImages.push(imageKey)
+        const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, imageKey)
+       })
+      // console.log("BODY",req.body)
+      req.body.postImages= postImages
+      // console.log(postImages)
+
+      //POST MAN TEST
+
+      // req.body.postProjectRoles= JSON.parse(req.body.postProjectRoles)
+
       const post= await postService.createPost(req.body)
-      sendResponse(res.status(201), 'success', post , 'Successfully created posts');
+      sendResponse(res.status(201), 'success', 'Successfully created posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to created posts');
     }
