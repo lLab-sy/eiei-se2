@@ -16,10 +16,12 @@ import {
 import { Mail, Phone, Star, User, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
+import { useToast } from "@/hooks/use-toast";
 
 const PostDetail = () => {
   const { id } = useParams();
   const [img, setImg] = useState<string[]>([]);
+  const { toast } = useToast();
 
   const PostInfo = {
     postName: "Marvel Studios",
@@ -28,7 +30,7 @@ const PostDetail = () => {
     postImages: [],
     postMediaType: "Video",
     postProjectRoles: ["Videographer", "Editor"],
-    postStatus: "Created",
+    postStatus: "Success",
     startDate: "2022-10-01",
     endDate: "2022-10-31",
     price: "100",
@@ -38,7 +40,7 @@ const PostDetail = () => {
     phoneNumber: "123-456-7890",
     professionalId: "123",
   };
-
+  // to-do: move handleSubmitReview, toastmsgs to posts/id -> PostHistoryCard
   const handleSubmitReview = async (data: {
     rating: number;
     comment: string;
@@ -58,14 +60,23 @@ const PostDetail = () => {
       });
 
       if (!response.ok) {
+        toast({
+          variant: "default",
+          title: "Successful review submission",
+          description: "Your review has been submitted!",
+          })
         throw new Error("Failed to submit review");
       }
 
       // Refresh the page or update UI state
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Error submitting review:", error);
-      alert("Failed to submit review. Please try again.");
+      toast({
+        variant: "destructive",
+        title: "Failed to submit review",
+        description: "Failed to submit review. Please try again.",
+        })
     }
   };
 
@@ -171,7 +182,7 @@ const PostDetail = () => {
                   {PostInfo.endDate}
                 </p>
                 {/* Add Review Button if project is completed */}
-                {PostInfo.postStatus === "Completed" && (
+                {PostInfo.postStatus === "Success" && (
                   <ReviewSubmissionForm
                     trigger={
                       <Button variant="outline" className="w-full mt-2">
@@ -179,6 +190,7 @@ const PostDetail = () => {
                       </Button>
                     }
                     onSubmit={handleSubmitReview}
+                    toast = {toast}
                   />
                 )}
               </div>

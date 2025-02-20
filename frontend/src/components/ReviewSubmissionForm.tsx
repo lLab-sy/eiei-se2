@@ -14,12 +14,13 @@ import { Textarea } from "@/components/ui/textarea";
 interface ReviewSubmissionFormProps {
   trigger?: React.ReactNode;
   onSubmit?: (data: { rating: number; comment: string }) => void;
+  toast: (msg: {variant: "default" | "destructive" | null | undefined, title: string, description: string}) => void;
 }
 
 const ReviewSubmissionForm = ({
   trigger,
   onSubmit,
-}: ReviewSubmissionFormProps) => {
+toast}: ReviewSubmissionFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -29,12 +30,22 @@ const ReviewSubmissionForm = ({
     e.preventDefault();
 
     if (rating === 0) {
-      alert("Please select a rating");
+      //console.log("Rating === 0")
+      toast({
+        variant: "destructive",
+        title: "No rating provided",
+        description: "Please provide a rating between 1 to 5 star(s).",
+        })
       return;
     }
 
     if (comment.length < 10) {
-      alert("Please provide a more detailed review (minimum 10 characters)");
+      //console.log("Short comment")
+      toast({
+        variant: "destructive",
+        title: "Comment too short",
+        description: "Comment must have at least 10 characters.",
+        })
       return;
     }
 

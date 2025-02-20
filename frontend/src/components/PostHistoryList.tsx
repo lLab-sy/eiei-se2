@@ -46,7 +46,7 @@ export default function PostHistoryList({
               key={index}
               className="transform hover:-translate-y-1 transition-transform duration-300"
             >
-              <Link href={`/post/${project.id}`}>
+              <Link href={`/posts/${project.id}`}>
                 <PostHistoryCard post={project} userName={userName} role={role} />
               </Link>
             </div>
