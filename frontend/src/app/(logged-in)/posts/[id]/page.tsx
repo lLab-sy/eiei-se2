@@ -4,7 +4,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Carousel,
@@ -15,41 +15,64 @@ import {
 } from "@/components/ui/carousel";
 import { Mail, Phone, Star, User, Calendar } from "lucide-react";
 import { PostData } from "../../../../../interface";
+import getPostById from "@/libs/getPostById";
+import { useSession } from "next-auth/react";
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
   const [dataResponse,setDataResponse]= useState<PostData|null>(null);
 
-    useEffect(()=>{
-      const fetchData=async()=>{
-          var response;
-          try{
-            response= await getUser(id);
-            setDataResponse(response);
-          }catch(error){
-            console.log("User Not Found");
-          }
-      }
-      fetchData()
+  const {data:session} = useSession();
+  
+  if(!session){
+    return <>Loading</>
+  }
+
+  const token=session.user?.token
+  const userName=session.user?.username
+  const role= session.user.role
+
+  useEffect(()=>{
+    const fetchData=async()=>{
+        var response;
+        try{
+          response= await getPostById(id, token);
+          setDataResponse(response);
+        }catch(error){
+          console.log("User Not Found");
+        }
+    }
+    fetchData()
   },[id]);
 
-  /*const PostInfo = {
-    postName: "Marvel Studios",
-    postDescription:
-      "We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We're looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we'd love to hear from you.",
-    postImages: [],
-    postMediaType: "Video",
-    postProjectRoles: ["Videographer", "Editor"],
-    postStatus: "success",
-    startDate: "2022-10-01",
-    endDate: "2022-10-31",
-    price: "100",
+  if (!dataResponse) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }else{
+    dataResponse.postProjectRoles = [];
+    dataResponse.postProjectRolesOut?.forEach((e) => {
+      dataResponse.postProjectRoles.push(e.id);
+    })
+  }
+
+  const PostInfo = {
+    postName: dataResponse.postName,
+    postDescription: dataResponse.postDescription,
+    postImages: dataResponse.postImages,
+    postMediaType: dataResponse.postMediaType,
+    postProjectRoles: dataResponse.postProjectRoles,
+    postStatus: dataResponse.postStatus,
+    startDate: dataResponse.startDate,
+    endDate: dataResponse.endDate,
     firstName: "John",
     lastName: "Doe",
     email: "realMarvelStudio@yahoo.com",
     phoneNumber: "123-456-7890",
-  };*/
+  };
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
@@ -66,11 +89,11 @@ const PostDetail = () => {
           <div className="w-full flex justify-center">
             <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
               <CarouselContent>
-                {PostInfo.postImages.length !== 0 ? (
+                {(PostInfo.postImages && PostInfo.postImages.length != 0) ? (
                   PostInfo.postImages.map((imgSrc) => (
                     <CarouselItem key={imgSrc} className="flex justify-center">
                       <Image
-                        src={imgSrc}
+                        src={"/image/logo.png"}//imgSrc}
                         alt="Project Image"
                         width={300}
                         height={300}
@@ -127,10 +150,7 @@ const PostDetail = () => {
                   </span>
                 ))}
               </div>
-            </div>
-            <h3 className="text- font-semibold text-maingrey text-center">
-              Budget : {PostInfo.price} Bath
-            </h3>
+              {/*<h3 className="text- font-semibold text-maingrey text-center">Budget : {PostInfo.price} Bath</h3>*/}
           </div>
 
           <div className="place-content-center grid grid-cols-2 gap-4 place-items-center h-full">

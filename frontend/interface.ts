@@ -41,9 +41,6 @@ export interface MetaData{
     totalPages: number;
 }
 
-export interface Project {
-    id: string;
-
 export interface PostDataHistory {
     id:string,
     postName: string;
@@ -132,7 +129,6 @@ export interface OfferData{
     createdAt: Date;
     postID: string;
 }
-
 
 export interface OfferHistoryData{
     roleName: string; //populate
