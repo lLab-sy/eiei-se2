@@ -2,6 +2,7 @@ import { Request, Router } from "express";
 import userController from "../controllers/userController";
 import multer from "multer";
 import path from 'path'
+
 const router = Router()
 const storage = multer.memoryStorage()
 const fileFilter = (req: Request, file: any, cb: Function) => {

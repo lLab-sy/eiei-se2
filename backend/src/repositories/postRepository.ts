@@ -87,7 +87,7 @@ class PostRepository {
     public async getPost(id:string) {
         try {
              const objectId = new ObjectId(id);
-             const posts= await Post.findById(objectId);
+             const posts= await Post.findById(objectId).populate(['postProjectRoles']);
         
              return posts
         } catch (error) {

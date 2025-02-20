@@ -28,6 +28,7 @@ class S3ClientClass {
   
 
     public async uploadFile(fileBuffer: Buffer, fileName: string, mimetype: string) {
+      console.log("cloud check")
       const params = {
         Bucket: this.bucketName,
         Key: fileName,

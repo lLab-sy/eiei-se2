@@ -26,8 +26,8 @@ class CloudService {
       await s3Client.uploadFile(resizeBuffer, imageKey, mimetype);
       const url = await s3Client.createSignedURL(imageKey)
       return {
-        imageKey,
-        url
+        imageKey, //เก็บ แค่อันนี้พอ
+        url //gen ใหม่ทุกครั้ง
       }
     } catch (err: any) {
       throw new Error(err);

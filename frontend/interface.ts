@@ -3,6 +3,7 @@ export interface PostData {
     postName: string;
     postDescription: string;
     postImages?: string[];
+    postImagesSend?: File[];
     postMediaType: string;
     postProjectRoles: string[];
     postStatus: string;

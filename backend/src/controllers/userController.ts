@@ -89,6 +89,7 @@ class UserController {
                     url
 
                 }
+                // 
                 sendResponse(res, 'success', updatedUserWithSignedURL, 'Successfully updated User')
             }else{
                 const role = userData.role

@@ -33,6 +33,19 @@ export class PostDTO {
     @IsString({ each: true })  // Ensures that each item in the array is a string
     postImages!: string[];
 
+    @ApiProperty({ description: 'The images of the post', type: [String] })
+    @IsArray()
+    @ArrayNotEmpty({ message: 'At least one image is required' })
+    @IsString({ each: true })  // Ensures that each item in the array is a string
+    postImagesKey!: string[];
+
+
+    @ApiProperty({ description: 'The images of the post', type: [String] })
+    @IsArray()
+    @ArrayNotEmpty({ message: 'At least one image is required' })
+    @IsString({ each: true })  // Ensures that each item in the array is a string
+    postImageDisplay!: ImageDisplayDTO[];
+
     @ApiProperty({ description: 'The media type of the post', type: String })
     @IsString()
     @IsNotEmpty()
@@ -74,6 +87,11 @@ export class PostDTO {
     constructor(init?: Partial<PostDTO>) {
         Object.assign(this, init);
     }
+}
+
+export interface ImageDisplayDTO{
+    imageURL: string;
+    imageKey: string;
 }
 
 export class PostSearchRequestDTO {

@@ -5,6 +5,7 @@ import { sendResponse } from '../utils/responseHelper';
 import { PostSearchRequestDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
+import cloudService from '../services/cloudService';
 
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
@@ -52,17 +53,43 @@ class PostController {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
   };
-  
+  // 
   //@Private Request from Producer Role only and userID from frontEnd isMatch
   async createPost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
+
+      //
+      req.body=JSON.parse(req.body.postData)
+
+
       //unauthorize
       if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
+          console.log(req.user.role,req.body.userID,req.user.userId)
           sendResponse(res.status(401),'error', 'Unauthorize to create post');
           return;
       }
+
+      const postImageFiles = req?.files as Express.Multer.File[];
+      var postImages:string[]=[];
+      postImageFiles?.map(async (eachImageBuffer)=>{
+        const buffer = eachImageBuffer?.buffer
+        const mimetype = eachImageBuffer?.mimetype
+        // FOR EDIT 
+        // const post = await postService.getPost(id)
+        // const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName() //
+        const imageKey = cloudService.getKeyName()
+        postImages.push(imageKey)
+        const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, imageKey)
+       })
+      // console.log("BODY",req.body.userID)
+      req.body.postImages= postImages
+      // console.log(postImages)
+
+      //POST MAN TEST
+      // req.body.postProjectRoles= JSON.parse(req.body.postProjectRoles)
+
       const post= await postService.createPost(req.body)
-      sendResponse(res.status(201), 'success', post , 'Successfully created posts');
+      sendResponse(res.status(201), 'success',post, 'Successfully created posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to created posts');
     }
@@ -71,8 +98,20 @@ class PostController {
 //@Private Request from Producer Role only and userID from frontEnd isMatch
   async updatePost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
+      //TODO: add params to send keyImagesDelete, make sure that you have postImages that have only image on clound
+
       const postId = req.params.id
-      
+
+      //POST MAN TEST
+      // req.body.postImagesKey=JSON.parse(req.body.postImagesKey)
+      // req.body.keyImagesDelete=JSON.parse(req.body.keyImagesDelete)
+      // req.body.postProjectRoles= JSON.parse(req.body.postProjectRoles)
+
+      //FrontEND
+      req.body=JSON.parse(req.body.postData)
+      // console.log(req.body)
+
+      //authorization
       if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
         sendResponse(res.status(401), 'error', 'Unauthorize to update post');
         return;
@@ -81,12 +120,31 @@ class PostController {
         sendResponse(res, 'error', 'Failed PostStatus');
         return;
       }
- 
-      
-      
+      console.log("CHECK JJ")
+      //Check Picuture Key that were deleted
+      const keyImagesDelete:string[]=req.body.keyImagesDelete //มันจะเป็น list ของ key ที่โดนลบไปแล้ว
+      const postImageFiles = req?.files as Express.Multer.File[];
+      var   postImages:string[]= req.body.postImagesKey; //เป็น list ของ key รูปภาพที่จะถูกเพิ่ม
+      // console.log("keyImagesDelete",keyImagesDelete)
+      if(keyImagesDelete.length+ postImages.length>3){
+        console.log("มึงแอดมาได้ยังไงว่ะ",keyImagesDelete.length+ postImages.length)
+        sendResponse(res, 'error', 'No more 3 pictures update');
+        return;
+      }
+
+      postImageFiles?.map(async (eachImageBuffer)=>{
+        const buffer = eachImageBuffer?.buffer
+        const mimetype = eachImageBuffer?.mimetype
+        let keyImage = keyImagesDelete.length > 0 ? keyImagesDelete.pop()! : cloudService.getKeyName();
+        postImages.push(keyImage)
+        const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, keyImage)
+       })
+       console.log("PostIMAGE",postImages)
+       req.body.postImages= postImages
+
       const posts = await postService.updatePost(req.body,postId);
       
-      sendResponse(res, 'success', posts, 'Successfully updated posts');
+      sendResponse(res, 'success',posts, 'Successfully updated posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to updated posts at controller');
     }
