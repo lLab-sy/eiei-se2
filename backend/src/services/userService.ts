@@ -8,6 +8,7 @@ import ProductionProfessionalRespository from "../repositories/productionProfess
 import { searchReqDTO, reviewDTO, reviewWithRatingDTO } from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
 import userRepository from "../repositories/userRepository";
+import cloudService from "./cloudService";
 
 class UserService {
     async getUser(username:string){
@@ -85,9 +86,16 @@ class UserService {
                    rating: r._id as number,
                    amount: r.amount as number,
                    reviews: r.reviews.map((review: reviewDTO)=>{
+                    let producerProfileImage;
+                    if(!review.producerProfileImage){
+                        producerProfileImage = '';
+                    }else{
+                        producerProfileImage = cloudService.getSignedUrlImageCloud(review.producerProfileImage)
+                    }                 
                     return new reviewDTO({
                         postName: review.postName as string,
                         producer: review.producer as string,
+                        producerProfileImage: producerProfileImage as string,
                         role: review.role as string,
                         comment: review.comment as string,
                         reviewAt: review.reviewAt as Date
