@@ -78,38 +78,40 @@ class UserService {
         }
     }
 
-    async getUserReviewsById(id:string){
-        try{
-
-            const userReviews = await userRepository.getUserReviewsByID(id)
-
-            const result = userReviews.map((r)=>{
-                return new reviewWithRatingDTO({
-                   rating: r._id as number,
-                   amount: r.amount as number,
-                   reviews: r.reviews.map((review: reviewDTO)=>{
-                    let producerProfileImage;
-                    if(!review.producerProfileImage){
-                        producerProfileImage = '';
-                    }else{
-                        producerProfileImage = cloudService.getSignedUrlImageCloud(review.producerProfileImage)
-                    }                 
-                    return new reviewDTO({
-                        postName: review.postName as string,
-                        producer: review.producer as string,
-                        producerProfileImage: producerProfileImage as string,
-                        role: review.role as string,
-                        comment: review.comment as string,
-                        reviewAt: review.reviewAt as Date
-                    })
-                   })
-                });
-            })
-            
-            return result
-        }catch(err){
-            console.error("Error in service layer:", err);
-            throw new Error("Error in service layer: " + (err as Error).message);
+    async getUserReviewsById(id: string) {
+        try {
+            const userReviews = await userRepository.getUserReviewsByID(id);
+    
+            const result = await Promise.all(
+                userReviews.map(async (r) => {
+                    return new reviewWithRatingDTO({
+                        rating: r._id as number,
+                        amount: r.amount as number,
+                        reviews: await Promise.all(
+                            r.reviews.map(async (review: reviewDTO) => {
+                                let producerProfileImage = review.producerProfileImage
+                                    ? await cloudService.getSignedUrlImageCloud(review.producerProfileImage)
+                                    : '';
+                                console.log('reviewProducerProfileImage', review.producerProfileImage)
+                                console.log('producerProfileImage', producerProfileImage)
+                                return new reviewDTO({
+                                    postName: review.postName as string,
+                                    producer: review.producer as string,
+                                    producerProfileImage: producerProfileImage,
+                                    role: review.role as string,
+                                    comment: review.comment as string,
+                                    reviewAt: review.reviewAt as Date
+                                });
+                            })
+                        ),
+                    });
+                })
+            );
+    
+            return result;
+        } catch (error) {
+            console.error("Error fetching user reviews:", error);
+            throw error;
         }
     }
     
