@@ -15,6 +15,7 @@ import getUser from "@/libs/getUser";
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
+  
   const [img, setImg] = useState<string[]>([]);
   // post data
   const [dataResponse,setDataResponse]= useState<PostData|null>(null);

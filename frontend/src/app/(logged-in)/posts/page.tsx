@@ -115,7 +115,7 @@ const ProfessionalsPage = () => {
   }
 
   return (
-    <div className="sticky min-h-screen bg-gray-50 ">
+    <div className="min-h-screen bg-gray-50 ">
 
       {/*Header*/}
       <div className="sticky top-0 bg-mainblue-light z-10 py-4">

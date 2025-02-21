@@ -103,6 +103,7 @@ export interface MediaType{
     id: string;
     mediaName: string;
 }
+
 export interface OfferData{
     paticipantID:string;
     price: Number;
