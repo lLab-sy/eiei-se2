@@ -42,76 +42,76 @@ import Rating from "@mui/material/Rating";
 import axios from "axios";
 import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import { CircularProgress } from "@mui/material";
+import ReviewProfessional from "@/components/ReviewProfessional";
 
 //missing
 //sort position form error
 //upload photo functionality
 
-const formSchema = z
-  .object({
-    firstName: z.string().optional(),
-    middleName: z.string().optional(),
-    lastName: z.string().optional(),
-    email: z.string().email().max(100, ""),
-    phone: z
-      .string()
-      .length(10, "Phone Number must contain exactly to 10 characters"),
-    gender: z.enum(["Male", "Female", "Non-Binary", "Other"]).optional(),
-    bankName: z.string().optional(),
-    accountHolderName: z.string().optional(),
-    accountNumber: z.string().optional(),
-    payment_type: z.enum(["creditDebit", "qrCode"], {
-      required_error: "Select Your Payment Type",
-    }),
-    card_name: z.string().optional(),
-    card_number: z.string().optional(),
-    company: z.string().optional(),
-    // password: z
-    //   .string()
-    //   .min(8, "Password must contain at least 8 characters")
-    //   .max(20, "Password must contain at most 20 characters")
-    //   .regex(new RegExp(".*[ -/:-@[-`{-~].*"), {
-    //     message: "Password should contain at least one special characters",
-    //   }),
-    // confirmPassword: z.string(),
-    occupation: z.string().optional(),
-    skill: z.array(z.any()).optional(),
-    experience: z.coerce.number().optional(),
-    rating: z
-      .array(
-        z.object({
-          ratingScore: z.number().optional(),
-          comment: z.string().optional(),
-        }),
-      )
-      .optional(),
-  })
-  // .superRefine((val, ctx) => {
-  //   if (val.password != val.confirmPassword) {
-  //     ctx.addIssue({
-  //       code: z.ZodIssueCode.custom,
-  //       path: ["confirmPassword"],
-  //       message: "Password do not match",
-  //     });
-  //   }
-  // });
+const formSchema = z.object({
+  firstName: z.string().optional(),
+  middleName: z.string().optional(),
+  lastName: z.string().optional(),
+  email: z.string().email().max(100, ""),
+  phone: z
+    .string()
+    .length(10, "Phone Number must contain exactly to 10 characters"),
+  gender: z.enum(["Male", "Female", "Non-Binary", "Other"]).optional(),
+  bankName: z.string().optional(),
+  accountHolderName: z.string().optional(),
+  accountNumber: z.string().optional(),
+  payment_type: z.enum(["creditDebit", "qrCode"], {
+    required_error: "Select Your Payment Type",
+  }),
+  card_name: z.string().optional(),
+  card_number: z.string().optional(),
+  company: z.string().optional(),
+  // password: z
+  //   .string()
+  //   .min(8, "Password must contain at least 8 characters")
+  //   .max(20, "Password must contain at most 20 characters")
+  //   .regex(new RegExp(".*[ -/:-@[-`{-~].*"), {
+  //     message: "Password should contain at least one special characters",
+  //   }),
+  // confirmPassword: z.string(),
+  occupation: z.string().optional(),
+  skill: z.array(z.any()).optional(),
+  experience: z.coerce.number().optional(),
+  rating: z
+    .array(
+      z.object({
+        ratingScore: z.number().optional(),
+        comment: z.string().optional(),
+      }),
+    )
+    .optional(),
+});
+// .superRefine((val, ctx) => {
+//   if (val.password != val.confirmPassword) {
+//     ctx.addIssue({
+//       code: z.ZodIssueCode.custom,
+//       path: ["confirmPassword"],
+//       message: "Password do not match",
+//     });
+//   }
+// });
 
 type formType = z.infer<typeof formSchema>;
 export default function UserPage() {
   // Redux State
   const user: any = useSelector<RootState>((state) => state.user);
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
 
-  const userData : any = user.user
-  console.log('userData' ,userData)
-  console.log('user', user)
+  const userData: any = user.user;
+  console.log("userData", userData);
+  console.log("user", user);
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: userData?.email ?? "",
       phone: userData?.phoneNumber ?? "",
-      bankName: userData?.bankAccount?.bankName ??"",
-      accountHolderName: userData?.bankAccount?.accountHolderName ??"Tien",
+      bankName: userData?.bankAccount?.bankName ?? "",
+      accountHolderName: userData?.bankAccount?.accountHolderName ?? "Tien",
       accountNumber: userData?.bankAccount?.accountNumber ?? "12345678",
       card_name: userData?.nameOnCard ?? "",
       card_number: userData?.cardNumber ?? "",
@@ -124,8 +124,8 @@ export default function UserPage() {
       occupation: userData?.occupation ?? "",
       skill: userData?.skill ?? [],
       experience: userData?.experience ?? 0,
-      company: userData?.company ??"",
-      gender: userData?.gender
+      company: userData?.company ?? "",
+      gender: userData?.gender,
     },
   });
   useEffect(() => {
@@ -148,9 +148,9 @@ export default function UserPage() {
         skill: userData.skill ?? [],
         experience: userData.experience ?? 0,
         company: userData.company ?? "",
-        gender: userData.gender
+        gender: userData.gender,
       });
-      setPaymentState(userData?.paymentType ?? "qrCode")
+      setPaymentState(userData?.paymentType ?? "qrCode");
     }
   }, [userData, form.reset]);
 
@@ -158,67 +158,71 @@ export default function UserPage() {
   const [click, setClick] = useState(0);
   const { toast } = useToast();
   // redux to dispatch changes
-  const [paymentState, setPaymentState] = useState(userData?.paymentType ?? "qrCode");
+  const [paymentState, setPaymentState] = useState(
+    userData?.paymentType ?? "qrCode",
+  );
   const handleSubmit = async (data: formType) => {
-    
-    const formData = new FormData()
+    const formData = new FormData();
 
     const bankAccount = {
-      bankName: data.bankName,              
-      accountHolderName: data.accountHolderName, 
-      accountNumber: data.accountNumber,   
+      bankName: data.bankName,
+      accountHolderName: data.accountHolderName,
+      accountNumber: data.accountNumber,
     };
-    
+
     const sendUserData = {
       ...userData,
-      firstName: data.firstName,          
-      middleName: data.middleName,        
-      lastName: data.lastName,            
-      phoneNumber: data.phone,           
-      gender: data.gender,               
-      bankAccount: bankAccount,           
-      profileImage: userData?.profileImage ?? "",  
-      role: user?.user?.role,             
-      email: data.email                   
+      firstName: data.firstName,
+      middleName: data.middleName,
+      lastName: data.lastName,
+      phoneNumber: data.phone,
+      gender: data.gender,
+      bankAccount: bankAccount,
+      profileImage: userData?.profileImage ?? "",
+      role: user?.user?.role,
+      email: data.email,
     };
-    
+
     const producerData = {
       ...sendUserData,
-      company: data.company,              
-      paymentType: data.payment_type,     
-      nameOnCard: data.card_name,         
-      cardNumber: data.card_number        
+      company: data.company,
+      paymentType: data.payment_type,
+      nameOnCard: data.card_name,
+      cardNumber: data.card_number,
     };
-    
+
     const productionData = {
       ...sendUserData,
-      occupation: data.occupation,        
-      skill: data.skill,                  
-      experience: data.experience         
+      occupation: data.occupation,
+      skill: data.skill,
+      experience: data.experience,
     };
-    if(profileImageState){
-      formData.append('profileImage', profileImageState)
+    if (profileImageState) {
+      formData.append("profileImage", profileImageState);
     }
     const formDataProducer = formData;
-    formDataProducer.append('userData',JSON.stringify(producerData))
+    formDataProducer.append("userData", JSON.stringify(producerData));
     // console.log("production data", productionData);
-    const formDataProductionProfessional = formData
-    formDataProductionProfessional.append('userData', productionData)
+    const formDataProductionProfessional = formData;
+    formDataProductionProfessional.append("userData", productionData);
     const id = user.user._id;
-    const token = user.token
+    const token = user.token;
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/update-user/${id}`;
     const returnUser = await axios.put(
       apiUrl,
-      user.user.role === "producer" ? formDataProducer : formDataProductionProfessional,{
+      user.user.role === "producer"
+        ? formDataProducer
+        : formDataProductionProfessional,
+      {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type" : "multipart/form-data"
-        }
-      }
+          "Content-Type": "multipart/form-data",
+        },
+      },
     );
-    
-    console.log('returnUser', returnUser)
+
+    console.log("returnUser", returnUser);
     if (!returnUser) {
       toast({
         variant: "destructive",
@@ -241,27 +245,35 @@ export default function UserPage() {
       title: "Edit Profile",
       description: "Edit Profile Successful",
     });
-    dispatch(setUser(returnUser.data.data.updatedUser))
-    if(returnUser?.data?.data?.url){
-      dispatch(setProfileImageURL(returnUser?.data?.data?.url))
+    dispatch(setUser(returnUser.data.data.updatedUser));
+    if (returnUser?.data?.data?.url) {
+      dispatch(setProfileImageURL(returnUser?.data?.data?.url));
       setImageState({
-        image: returnUser?.data?.data?.url ?? ""
-      })
-      setProfileImageState(null)
+        image: returnUser?.data?.data?.url ?? "",
+      });
+      setProfileImageState(null);
       // console.log('user?.profileImageURL ', user?.profileImageURL )
     }
     // dispatch(setProfileImageURL(url))
     setIsEdit(false);
   };
   // Loading State
-  const [loadingImage, setLoadingImage] = useState(false)
+  const [loadingImage, setLoadingImage] = useState(false);
   const [img, setImageState] = useState({
-    image: user.profileImageURL??"",
+    image: user.profileImageURL ?? "",
   });
-  const [profileImageState, setProfileImageState] = useState<File | null>(null)
+  const [profileImageState, setProfileImageState] = useState<File | null>(null);
   const onImageChange = async (e: any) => {
     if (e.target.files && e.target.files[0]) {
-      setProfileImageState(e.target.files[0])
+      if (e.target.files[0].size > 5 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "Limit File Size",
+          description: "File Size Exceed 5 Mb",
+        });
+        return;
+      }
+      setProfileImageState(e.target.files[0]);
       // setLoadingImage(true)
       // const id = user.user._id;
       // const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/upload-profile/${id}`;
@@ -280,12 +292,12 @@ export default function UserPage() {
       setImageState({
         image: URL.createObjectURL(e.target.files[0]),
       });
-      setIsEdit(true)
+      setIsEdit(true);
       // setLoadingImage(false)
       // console.log(e.target.files)
     }
   };
-  console.log('profileImageURL', user.profileImageURL)
+  console.log("profileImageURL", user.profileImageURL);
   // mock data
   const OPTIONS: Option[] = [
     { label: "Cameraman", value: "cameraman" },
@@ -315,35 +327,36 @@ export default function UserPage() {
             {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
               <Image src={} alt=''/>
             </div> */}
-            {
-              (loadingImage) ? 
-              <Avatar className='size-60 bg-slate-400 flex justify-center items-center'>
-                <CircularProgress  size={60}/>
-              </Avatar> : 
+            {loadingImage ? (
+              <Avatar className="size-60 bg-slate-400 flex justify-center items-center">
+                <CircularProgress size={60} />
+              </Avatar>
+            ) : (
               <Avatar className="size-60">
                 <AvatarImage src={img.image} alt="" />
                 <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
               </Avatar>
-            }
+            )}
             {/* <CircularProgress size={60}/>
             <Avatar className="size-60">
               <AvatarImage src={img.image} alt="" />
               <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
             </Avatar> */}
-            <div className="w-full flex justify-center">
-            <label 
-              htmlFor="picture" 
-              className="mt-5 w-[50%] bg-blue-500 text-white text-xl py-2 px-4 rounded-lg cursor-pointer text-center"
-            >
-              Upload File
-            </label>
-            <input
-              id="picture"
-              type="file"
-              className="hidden"
-              onChange={onImageChange}
-            />
-          </div>
+            <div className="w-full flex flex-col items-center justify-center">
+              <label
+                htmlFor="picture"
+                className="mt-5 w-[50%] bg-blue-500 text-white text-xl py-2 px-4 rounded-lg cursor-pointer text-center"
+              >
+                Upload File
+              </label>
+              <input
+                id="picture"
+                type="file"
+                accept=".png, .jpeg, .gif, .webp"
+                className="hidden"
+                onChange={onImageChange}
+              />
+            </div>
           </CardContent>
         </Card>
         <Card className=" relative w-[500px] flex flex-col">
@@ -367,7 +380,7 @@ export default function UserPage() {
                 Billing Information
               </Link>
               {user && user?.user?.role === "producer" ? (
-                <div className='ml-[24%]'></div>
+                <div className="ml-[24%]"></div>
               ) : (
                 <Link
                   href={"#"}
@@ -486,6 +499,15 @@ export default function UserPage() {
                         </FormItem>
                       )}
                     />
+                    <div className=" w-full gap-2">
+                      <Separator className='mt-5 mb-5'/>
+                      <span className=' text-2xl font-bold'>Review</span>
+
+
+                      <div className="mt-5">
+                        <ReviewProfessional id={userData?._id ?? ""} />
+                      </div>
+                    </div>
                     {/* <FormField
                       name="password"
                       control={form.control}
@@ -627,7 +649,7 @@ export default function UserPage() {
                     )}
 
                     {/* <div>{paymentState}</div> */}
-                    {(paymentState === "creditDebit") ? (
+                    {paymentState === "creditDebit" ? (
                       <div className="  flex flex-col justify-around py-4 h-[200px]">
                         <FormField
                           name="card_name"
@@ -739,41 +761,10 @@ export default function UserPage() {
                         </FormItem>
                       )}
                     />
-                    <FormItem className="">
+                    {/* <FormItem className="">
                       <FormLabel>Review</FormLabel>
-                      <ScrollArea className="h-60 rounded-md border">
-                        <div className="cursor-default flex flex-col py-2 px-1 text-left">
-                          <Rating
-                            readOnly
-                            name="half-rating"
-                            defaultValue={2.5}
-                            precision={0.5}
-                          />
-                          <span>
-                            Lorem, ipsum dolor sit amet consectetur adipisicing
-                            elit. Iusto, accusamus. Aperiam cumque suscipit
-                            consequuntur sapiente, delectus fugit, voluptatem
-                            deleniti nulla fugiat magni quis eius voluptas
-                            cupiditate doloribus? Odio, sed beatae!
-                          </span>
-                        </div>
-                        <div className="flex flex-col py-2 px-1 text-left">
-                          <Rating
-                            readOnly
-                            name="half-rating"
-                            defaultValue={2.5}
-                            precision={0.5}
-                          />
-                          <span>
-                            Lorem, ipsum dolor sit amet consectetur adipisicing
-                            elit. Iusto, accusamus. Aperiam cumque suscipit
-                            consequuntur sapiente, delectus fugit, voluptatem
-                            deleniti nulla fugiat magni quis eius voluptas
-                            cupiditate doloribus? Odio, sed beatae!
-                          </span>
-                        </div>
-                      </ScrollArea>
-                    </FormItem>
+                      <ReviewProfessional id={userData?._id ?? ""}/>
+                    </FormItem> */}
                   </div>
                   <div
                     className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
