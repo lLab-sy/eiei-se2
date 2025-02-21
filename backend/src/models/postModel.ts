@@ -200,6 +200,7 @@ export interface OfferHistoryForGetOfferResponse {
     currentWage: number; // The amount offered for the role
     reason: string;
     offeredBy: number; // User ID should be better than 0/1 ?
+    status: string;
     createdAt: Date; // Date when the offer was created
 }
 

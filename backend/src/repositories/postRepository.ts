@@ -335,6 +335,7 @@ class PostRepository {
                     currentWage: '$participants.offer.price',
                     reason: '$participants.offer.reason',
                     offeredBy: '$participants.offer.offerBy',
+                    status: "$participants.status",
                     createdAt: '$participants.offer.createdAt'
                   }
             }
@@ -348,6 +349,7 @@ class PostRepository {
                     currentWage: 1,
                     reason: 1,
                     offeredBy: 1,
+                    status:1,
                     createdAt: 1
                   }
             }

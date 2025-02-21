@@ -240,6 +240,7 @@ export class OfferResponseDTO {
     currentWage!: number; // The amount offered for the role
     reason!: string;
     offeredBy!: number; // User ID should be better than 0/1 ?
+    status!: string;
     createdAt!: Date;
     constructor(
         init : {_id: string,
@@ -248,6 +249,7 @@ export class OfferResponseDTO {
         currentWage: number,
         reason: string,
         offeredBy: number,
+        status: string,
         createdAt: Date}
       ) {
         this._id = init._id;
@@ -256,6 +258,7 @@ export class OfferResponseDTO {
         this.currentWage = init.currentWage;
         this.reason = init.reason;
         this.offeredBy = init.offeredBy;
+        this.status = init.status;
         this.createdAt = init.createdAt;
       }
 }
