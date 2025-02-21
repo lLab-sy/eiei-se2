@@ -133,6 +133,18 @@ export default function EditPostPage({
           })),
         );
 
+        /*setPostRoles(
+          Array.from(
+            new Map(
+              (rolesResponse.data.data as PostRolesResponse[]).map((role) => [
+                role.roleName, // Use roleName as the key to prevent duplicates
+                { label: role.roleName, value: role.id }
+              ])
+            ).values()
+          ) as Option[] // Cast the result to Option[] explicitly
+        );*/  
+        
+
         setMediaTypes(
           mediaResponse.data.data.map((media: MediaTypesResponse) => ({
             label: media.mediaName,
@@ -176,10 +188,10 @@ export default function EditPostPage({
             postname: data.postName || "",
             description: data.postDescription || "",
             type: data.postMediaType || "",
-            roles: data.postProjectRoles.map((role: string) => {
-              const foundRole = postRoles.find((r) => r.value === role);
-              return foundRole || { label: role, value: role };
-            }),
+            roles: data.postProjectRolesOut.map((role: { id: string; roleName: string }) => {
+              const foundRole = postRoles.find((r) => r.value === role.id); // Match by `id`
+              return foundRole || { label: role.roleName, value: role.id }; // Set value to `id`
+            }),                       
           });
         })
         .catch((error) => {

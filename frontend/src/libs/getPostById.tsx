@@ -1,12 +1,25 @@
 import axios from "axios";
 
+interface IpostProjectRolesOut{
+  id:string;
+  roleName:string;
+}
+
+interface IpostImageDisplay{
+  imageURL:string;
+  imageKey:string;
+}
+
 interface PostResponse {
   id: string;
   postName: string;
   postDescription: string;
   postImages: string[];
   postMediaType: string;
-  postProjectRoles: string[];
+  //postProjectRoles: string[];
+  postProjectRolesOut: IpostProjectRolesOut[];
+  postImageDisplay: IpostImageDisplay[];
+  postImagesKey: string[];
   postStatus: string;
   userID: string;
   startDate: string;

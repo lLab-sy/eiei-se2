@@ -13,8 +13,8 @@ export default async function editPostById(
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        "Content-Type" :  "multipart/form-data"
+        //Accept: "application/json",
       },
     });
 
