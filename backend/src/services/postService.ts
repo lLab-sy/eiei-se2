@@ -170,7 +170,7 @@ async getPost(id:string): Promise<PostDTO|null> {
  
 
         return new PostDTO({
-        id: post.id?.toString(),
+        id: post._id?.toString(),
         postName: post.postName as string,
         postDescription: post.postDescription as string,
         postImages: post.postImages as [string],

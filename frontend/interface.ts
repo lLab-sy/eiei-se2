@@ -1,5 +1,5 @@
 export interface PostData {
-    id?:string
+    id:string
     postName: string;
     postDescription: string;
     postImages?: string[];
@@ -36,6 +36,29 @@ export interface PostDataHistory {
     postProjectRoles: string[]; 
     postStatus: string;
     roleCount:number;
+}
+
+export interface UserData{
+    _id: string;
+    username: string;
+    role: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    gender: string;
+    occupation: string;
+    skill: string[];
+    experience: number;
+    rating: Rating[];
+    avgRating: number;
+    description?: string;
+    imageUrl?: string;
+}
+
+export interface Rating{
+    ratingScore: number;
+    comment: string;
 }
 
 // export interface Project {
