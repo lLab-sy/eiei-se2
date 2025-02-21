@@ -19,7 +19,7 @@ export interface ImageDisplayDTO{
 export interface OfferDTO{ //ซ้ำกับบูม
     role: string;
     price: number;
-    offerBy: number;
+    offeredBy: number;
     createdAt: Date;
     reason: string;
 }
@@ -43,7 +43,7 @@ export class ParticipantDetailDTO {
     @ApiProperty({ description: 'User ID of the offer creator', type: Number })
     @IsNumber()
     @IsNotEmpty()
-    offerBy!: number;
+    offeredBy!: number;
 
     offer!: OfferDTO[]; // Array of offers received by the participant
 
@@ -74,7 +74,7 @@ export class ParticipantDetailDTO {
     reason!: string;
 
     @ApiProperty({ description: 'Last update timestamp', type: Date })
-    updateAt!: Date;
+    updatedAt!: Date;
 
     constructor(init?: Partial<ParticipantDetailDTO>) {
         Object.assign(this, init);

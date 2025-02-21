@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 // Offer History Model
 export interface OfferHistory {
     role: mongoose.Schema.Types.ObjectId; // Role offered to the participant
-    offerBy: number; // User ID should be better than 0/1 ? 0,1 beacaus I'm Rock
+    offeredBy: number; // User ID should be better than 0/1 ? 0,1 beacaus I'm Rock
     price: number; // The amount offered for the role
     reason: string;
     createdAt: Date; // Date when the offer was created
@@ -42,7 +42,7 @@ const offerHistorySchema = new Schema<OfferHistory>({
         ref: 'postRoleType',
         required: true,
     },
-    offerBy: {
+    offeredBy: {
         type: Number,
         ref: 'user',
         required: true,

@@ -196,7 +196,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         var offerModel:OfferDTO={
             price: offerInput.price,
             role: offerInput.roleID,
-            offerBy: offerInput.offerBy,
+            offeredBy: offerInput.offeredBy,
             createdAt: new Date() ,
             reason: offerInput.reason
         }
@@ -213,7 +213,7 @@ async getPost(id:string): Promise<PostDTO|null> {
             comment:"",
             reviewedAt:null,
             createdAt:new Date(),
-            updateAt: new Date()
+            updatedAt: new Date()
           })
             response= await postRepository.createOffer(participantData,postID,productionProfessionalID)
         }

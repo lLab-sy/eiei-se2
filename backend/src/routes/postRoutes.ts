@@ -322,7 +322,7 @@ router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postC
  *               - roleID
  *               - productionProfessionalID
  *               - price
- *               - offerBy
+ *               - offeredBy
  *               - createdAt
  *               - reason
  *               - postID
@@ -336,7 +336,7 @@ router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postC
  *               price:
  *                 type: number
  *                 description: The amount offered
- *               offerBy:
+ *               offeredBy:
  *                 type: number
  *                 description: The user making the offer (0 = system, 1 = user)
  *               createdAt:

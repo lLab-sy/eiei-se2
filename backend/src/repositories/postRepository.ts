@@ -178,7 +178,7 @@ class PostRepository {
                     $push: {
                         "participants.$.offer": {
                             role: new ObjectId(offerData.role), // Role ID reference
-                            offerBy: offerData.offerBy, 
+                            offeredBy: offerData.offeredBy, 
                             price: offerData.price,
                             reason: offerData.reason,
                             createdAt: new Date()
