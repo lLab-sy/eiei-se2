@@ -19,7 +19,7 @@ const ProfessionalsPage = () => {
   const [requestFilter, setRequestFilter] = useState("");
 
   //page
-  const [requestPage, setRequestPage] = useState("?limit="+PAGE_SIZE.toString()+"&page=1");
+  const [requestPage, setRequestPage] = useState("limit="+PAGE_SIZE.toString()+"&page=1");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -83,7 +83,7 @@ const ProfessionalsPage = () => {
   }, [dataResponse]);
 
   const handlePageChange = (page: number) => {
-    setRequestPage("?limit="+PAGE_SIZE.toString()+"&page="+page.toString());
+    setRequestPage("limit="+PAGE_SIZE.toString()+"&page="+page.toString());
     setCurrentPage(page);
   };
 
@@ -134,13 +134,13 @@ const ProfessionalsPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
           {PostsCurrentPage.map((post, index) => (
             <PostCrad
-              key={index}
+              key={post.id}
               title={post.postName}
               description={post.postDescription}
               imageUrl={post.postImages? post.postImages[0] : ""} 
               role={getRoles(post.postProjectRoles)} 
               mediaType={getMedia(post.postMediaType)}
-              id={post.userID}          
+              id={post.id}          
               />
           ))}
         </div>

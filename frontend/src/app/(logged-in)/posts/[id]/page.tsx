@@ -14,39 +14,79 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Mail, Phone, Star, User, Calendar } from "lucide-react";
-import { PostData } from "../../../../../interface";
+import { MediaType, PostData, RoleType, UserData } from "../../../../../interface";
 import getPostById from "@/libs/getPostById";
 import { useSession } from "next-auth/react";
+import getMediaTypes from "@/libs/getMediaTypes";
+import getPostRoles from "@/libs/getPostRoles";
+import getUser from "@/libs/getUser";
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
+  // post data
   const [dataResponse,setDataResponse]= useState<PostData|null>(null);
 
-  const {data:session} = useSession();
-  
-  if(!session){
-    return <>Loading</>
-  }
+  //Owner Data
+  const [ownerResponse, setOwnerResponse] = useState<UserData|null>(null);
 
+  // all types
+  const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
+  const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
+
+  const { data: session } = useSession();
+
+  if(!session){
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
   const token=session.user?.token
   const userName=session.user?.username
   const role= session.user.role
 
-  useEffect(()=>{
-    const fetchData=async()=>{
-        var response;
-        try{
-          response= await getPostById(id, token);
-          setDataResponse(response);
-        }catch(error){
-          console.log("User Not Found");
-        }
-    }
-    fetchData()
-  },[id]);
+  const fetchData = async() => {
 
-  if (!dataResponse) {
+    var response;
+    var userResponse;
+    try{
+      response = await getPostById(id, token);
+      setDataResponse(response);
+      
+      try{
+        userResponse = await getUser(response.userID);
+        setOwnerResponse(userResponse);
+      }catch(error){
+        console.log("Owner Not Found");
+      }
+
+
+    }catch(error){
+      console.log("Post Not Found");
+    }
+
+    var medias, roles;
+      
+    try{
+      medias = await getMediaTypes();
+      setMediaTypes(medias.data.data);
+    }catch(error){
+      console.log("MediaTypes Not Found");
+    }
+
+    try{
+      roles = await getPostRoles();
+      setRoleTypes(roles.data.data);
+    }catch(error){
+      console.log("Post Role Not Found");
+    }
+  }
+
+  if (!dataResponse || !ownerResponse) {
+    fetchData();
     return (
       <div className="flex justify-center items-center min-h-screen">
         <p>Loading...</p>
@@ -59,19 +99,45 @@ const PostDetail = () => {
     })
   }
 
+  const getMedia = (id: string) => {
+    var result = "Unknow";
+    mediaTypes.forEach(element => {
+      if(element.id == id) result = element.mediaName;
+    });
+    return result;
+  }
+
+  const getRole = (id: string) => {
+    var result = "Unknow";
+    roleTypes.forEach(element => {
+      if(element.id == id) result = element.roleName;
+    });
+    return result;
+  }
+
+  const getRoles = (ids: string[]) => {
+    var roles: string[] = [];
+    ids.forEach(id => roles.push(getRole(id)));
+    return roles;
+  }
+
+  const getDate = (date: string) => {
+    return date.split("T")[0];
+  }
+
   const PostInfo = {
     postName: dataResponse.postName,
     postDescription: dataResponse.postDescription,
     postImages: dataResponse.postImages,
-    postMediaType: dataResponse.postMediaType,
-    postProjectRoles: dataResponse.postProjectRoles,
-    postStatus: dataResponse.postStatus,
-    startDate: dataResponse.startDate,
-    endDate: dataResponse.endDate,
-    firstName: "John",
-    lastName: "Doe",
-    email: "realMarvelStudio@yahoo.com",
-    phoneNumber: "123-456-7890",
+    postMediaType: getMedia(dataResponse.postMediaType) ,
+    postProjectRoles: getRoles(dataResponse.postProjectRoles),
+    postStatus: dataResponse.postStatus ,
+    startDate: getDate(dataResponse.startDate || "N/AT") ,
+    endDate: getDate(dataResponse.endDate || "N/AT"),
+    firstName: ownerResponse?.firstName || "N/A",
+    lastName: ownerResponse?.lastName || "N/A",
+    email: ownerResponse?.email || "N/A",
+    phoneNumber: ownerResponse?.phoneNumber || "N/A",
   };
 
   return (
@@ -132,23 +198,19 @@ const PostDetail = () => {
               </span>
             </div>
           </div>
-          <p>&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
+          <p className="text-main-gery break-words whitespace-normal">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
 
           {/* Project Detail Section */}
           <div className="place-content-center grid grid-cols-1 gap-3">
-            <div className="flex items-center gap-2 justify-center">
-              <div className="flex flex-wrap gap-2 ">
-                <h3 className="font-semibold text-maingrey text-center">
-                  Roles :{" "}
-                </h3>
-                {PostInfo.postProjectRoles.map((skill) => (
-                  <span
-                    key={skill}
-                    className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-1 rounded-full shadow-sm"
-                  >
-                    {skill}
-                  </span>
-                ))}
+             <div className="flex items-center gap-2 justify-center">
+                <div className="flex flex-wrap gap-2 ">
+                  <h3 className="font-semibold text-maingrey text-center">Roles : </h3>
+                  {PostInfo.postProjectRoles.map((skill, index) => (
+                    <span key={index} className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-1 rounded-full shadow-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
               {/*<h3 className="text- font-semibold text-maingrey text-center">Budget : {PostInfo.price} Bath</h3>*/}
           </div>
@@ -211,3 +273,7 @@ const PostDetail = () => {
 };
 
 export default PostDetail;
+function useSessionContext(): { session: any; } {
+  throw new Error("Function not implemented.");
+}
+

@@ -1,5 +1,5 @@
 export interface PostData {
-    id?:string
+    id:string
     postName: string;
     postDescription: string;
     postImages?: string[];
