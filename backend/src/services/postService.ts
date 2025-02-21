@@ -276,6 +276,7 @@ async getPost(id:string): Promise<PostDTO|null> {
           currentWage: offer.currentWage, // The amount offered for the role
           reason: offer.reason,
           offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
+          status: offer.status,
           createdAt: offer.createdAt
         })         
       });
