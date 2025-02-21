@@ -72,3 +72,31 @@ export interface searchReqDTO {
   limit: number;
   page: number;
 }
+
+export class producerReviewedDTO {
+  postName!: string; //name of the post
+  productionprofessional!: string; //who review
+  productionProfessionalProfileImage?: string; //profile image of reviewer(production professional)
+  role!: string; //role of the production prof in that project
+  comment!: string;
+  reviewAt!: Date;
+  constructor(init: {postName: string, productionprofessional: string, productionProfessionalProfileImage: string, role: string, comment: string, reviewAt:Date}){
+    this.postName = init.postName;
+    this.productionprofessional = init.productionprofessional;
+    this.productionProfessionalProfileImage = init.productionProfessionalProfileImage;
+    this.role = init.role;
+    this.comment = init.comment;
+    this.reviewAt = init.reviewAt;
+  }
+}
+
+export class producerReviewedWithRatingDTO {
+  rating!: number;
+  amount!: number;
+  reviews!: producerReviewedDTO[];
+  constructor(init: {rating: number, amount: number, reviews: producerReviewedDTO[]}) {
+    this.rating = init.rating;
+    this.amount = init.amount;
+    this.reviews = init.reviews;
+  }
+}
