@@ -33,26 +33,20 @@ interface reviewDataInterface {
   reviews: Array<reviewInterface>;
 }
 export interface reviewInterface {
+  rating?: number;
   comment: string;
   postName: string;
   producer: string;
   reviewAt: string;
   role: string;
   producerProfileImage : string;
+
 }
 export default function ReviewProfessional({ id }: { id: string }) {
-  const [previewReviewRating, setPreviewReviewRating] = useState<number>(0)
-  const [previewReview, setPreviewReview] = useState<reviewInterface>({
-    comment: "",
-    postName : "",
-    producer : "",
-    reviewAt : "",
-    role : "",
-    producerProfileImage : "",
-  })
+  
   const [reviewData, setReviewData] = useState<Array<reviewDataInterface>>([]);
   const [showReview, setShowReview] = useState<Array<reviewInterface>>([]);
-  const [ratingState, setRatingState] = useState<number>(5)
+  const [ratingState, setRatingState] = useState<number>(0)
   let ratingCounter : ratingCounterInterface = {
     "5": 0,
     "4": 0,
@@ -94,6 +88,7 @@ export default function ReviewProfessional({ id }: { id: string }) {
   const percentageRating = calculatePercentage(ratingCounter);
   console.log("percentage", percentageRating);
   const {data : session, status} = useSession()
+  const [allReviews, setAllReviews] = useState<Array<reviewInterface>>([])
   useEffect(() => {
     if(!session){
       return;
@@ -106,23 +101,27 @@ export default function ReviewProfessional({ id }: { id: string }) {
       console.log("ReviewResponse", reviewResponse);
       const newReviewData = reviewResponse?.data?.data
       setReviewData(newReviewData ?? []);
+      const allReviewArray :Array<reviewInterface> = []
       for(const reviewObject of newReviewData){
-        if(reviewObject.reviews.length > 0){
-          console.log('reviewObject', reviewObject)
-          setPreviewReview(reviewObject.reviews[0])
-          setPreviewReviewRating(reviewObject.rating)
-          break;
+        for (const review of reviewObject.reviews){
+          allReviewArray.push({...review, rating : reviewObject.rating})
         }
       }
+      setAllReviews(allReviewArray)
+      
     };
     fetchReviews(id);
 
   }, []);
-  console.log('previewReview', previewReview)
   console.log("reviewData", reviewData);
-  
+  console.log('allReview', allReviews)
   const groupOnClick = (rating: number) => {
     setRatingState(rating)
+    if(rating === 0){
+      setShowReview(allReviews)
+      return;
+    }
+
     for (const review of reviewData) {
       if (review.rating === rating) {
         setShowReview(review.reviews)
@@ -131,33 +130,35 @@ export default function ReviewProfessional({ id }: { id: string }) {
       setShowReview([])
     }
   };
-  
+  useEffect(() => {
+    groupOnClick(0)
+  }, [allReviews])
   return (
-    <Dialog>
-      <DialogTrigger
-        asChild
-        className="h-30 w-full rounded-md border border-black overflow-hidden"
-      >
-        <Button
-          onClick={() => groupOnClick(5)}
-          variant="outlined"
-          className="bg-gray-400 text-left border border-black overflow-hidden"
-        >
-          {/* <ReviewContent data={mockReviews[0] ?? ""}/> */}
-          {/* <span>Your Review</span> */}
-          {
-            (previewReviewRating === 0) ? "No Review" : <ReviewContent rating={previewReviewRating} data={previewReview}/>
-          }
+    // <Dialog>
+    //   <DialogTrigger
+    //     asChild
+    //     className="h-30 w-full rounded-md border border-black overflow-hidden"
+    //   >
+    //     <Button
+    //       onClick={() => groupOnClick(5)}
+    //       variant="outlined"
+    //       className="bg-gray-400 text-left border border-black overflow-hidden"
+    //     >
+    //       {/* <ReviewContent data={mockReviews[0] ?? ""}/> */}
+    //       {/* <span>Your Review</span> */}
+    //       {
+    //         (previewReviewRating === 0) ? "No Review" : <ReviewContent rating={previewReviewRating} data={previewReview}/>
+    //       }
             
-          {/* {reviewData.length > 0 ? <ReviewContent rating={rating} data={showReview[0]} /> : "No Review"} */}
-        </Button>
-      </DialogTrigger>
-      <DialogContent
+    //       {/* {reviewData.length > 0 ? <ReviewContent rating={rating} data={showReview[0]} /> : "No Review"} */}
+    //     </Button>
+    //   </DialogTrigger>
+      <div
 
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        className="bg-mainblue border-mainblue border  overflow-y-auto scroll-p-0 h-[70%] flex flex-col"
+        className=" h-full overflow-y-auto scroll-p-0 flex flex-col"
       >
-        <DialogTitle className="text-2xl bg-mainblue text-white h-[5%]">Your Review</DialogTitle>
+        <title className="text-2xl bg-mainblue text-white h-[5%]">Your Review</title>
         <div className="flex px-3 py-2 my-1 bg-white rounded-lg border justify-around items-center">
           <div className=" w-[30%] items-center flex flex-col">
             {/* <Star size={90} color="#ffbb00" strokeWidth={3} /> */}
@@ -208,31 +209,35 @@ export default function ReviewProfessional({ id }: { id: string }) {
             </span>
           </div>
         </div>
-        <div className="flex justify-around">
-          <span onClick={() => groupOnClick(5)} className={`${ratingState == 5 ? "bg-white" : "bg-slate-300"} hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
-            5 <Rating size="medium" className="" max={1} value={1} readOnly />
+        <div className="mt-5 flex justify-around after:content-[''] relative after:absolute after:w-[90%] after:h-[5px] after:bg-slate-200 after:translate-y-[28.5px] ">
+          <span onClick={() => groupOnClick(0)} className={`${ratingState == 0 ? "after:w-[100%]  z-10" : "after:bg-slate-200 after:w-[100%]"} relative after:absolute after:translate-y-4 after:content-['']  after:h-[5px] after:rounded-md after:bg-mainblue hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
+            All 
           </span>
-          <span onClick={() => groupOnClick(4)} className={`${ratingState == 4 ? "bg-white" : "bg-slate-300"} hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
-            4 <Rating size="medium"  className="" max={1} value={1} readOnly />
+          <span onClick={() => groupOnClick(5)} className={`${ratingState == 5 ? "after:w-[100%] z-10" : "after:bg-slate-200 after:w-[100%]"} relative after:absolute after:translate-y-4 after:content-['']  after:h-[5px] after:rounded-md after:bg-mainblue hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
+            5 
           </span>
-          <span onClick={() => groupOnClick(3)} className={`${ratingState == 3 ? "bg-white" : "bg-slate-300"} hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
-            3 <Rating size="medium" className="" max={1} value={1} readOnly />
+          <span onClick={() => groupOnClick(4)} className={`${ratingState == 4 ? "after:w-[100%] z-10" : "after:bg-slate-200 after:w-[100%]"} relative after:absolute after:translate-y-4 after:content-['']  after:h-[5px] after:rounded-md after:bg-mainblue hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
+            4 
           </span>
-          <span onClick={() => groupOnClick(2)} className={`${ratingState == 2 ? "bg-white" : "bg-slate-300"} hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
-            2 <Rating size="medium" className="" max={1} value={1} readOnly />
+          <span onClick={() => groupOnClick(3)} className={`${ratingState == 3 ? "after:w-[100%] z-10" : "after:bg-slate-200 after:w-[100%]"} relative after:absolute after:translate-y-4 after:content-['']  after:h-[5px] after:rounded-md after:bg-mainblue hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
+            3 
           </span>
-          <span onClick={() => groupOnClick(1)} className={`${ratingState == 1 ? "bg-white" : "bg-slate-300"} hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
-            1 <Rating size="medium"  className="" max={1} value={1} readOnly />
+          <span onClick={() => groupOnClick(2)} className={`${ratingState == 2 ? "after:w-[100%] z-10" : "after:bg-slate-200 after:w-[100%]"} relative after:absolute after:translate-y-4 after:content-['']  after:h-[5px] after:rounded-md after:bg-mainblue hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
+            2 
+          </span>
+          <span onClick={() => groupOnClick(1)} className={`${ratingState == 1 ? "after:w-[100%] z-10" : "after:bg-slate-200 after:w-[100%]"} relative after:absolute after:translate-y-4 after:content-['']  after:h-[5px] after:rounded-md after:bg-mainblue hover:bg-white flex cursor-pointer justify-center rounded-lg w-[9%] h-[30px] items-center`}>
+            1 
           </span>
         </div>
-        <div className={`flex flex-col items-center ${(showReview.length > 0) ? "" : "justify-center"} bg-slate-200 rounded-2xl h-full`}>
+
+        <div className={`mt-5 flex flex-col items-center ${(showReview.length > 0) ? "" : "justify-center"} rounded-2xl h-full`}>
           {
             (showReview.length > 0) ? 
-            showReview.map((review, index) => <ReviewContent key={index} rating={ratingState} data={review}/>)
+            showReview.map((review, index) => <ReviewContent key={index} rating={(ratingState === 0) ? review.rating ?? 0 : ratingState} data={review}/>)
             : <div className='text-mainblue text-3xl'>No Review</div>
           }
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    // </Dialog>
   );
 }

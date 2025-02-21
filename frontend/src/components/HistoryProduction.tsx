@@ -14,7 +14,8 @@ export interface historyStateInterface {
   postName : string,
   currentWage : number,
   offeredBy : boolean,
-  createdAt : string
+  createdAt : string,
+  status: string,
 }
 export default function HistoryProduction({userId, session} : {userId: string, session : any}) {
   const mockData = [
