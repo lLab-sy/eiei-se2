@@ -12,7 +12,7 @@ const PAGE_SIZE = 12;
 const ProfessionalsPage = () => {
 
   // requestFilter
-  const [requestFilter, setRequestFilter] = useState("");
+  const [requestFilter, setRequestFilter] = useState("&minRating=0");
 
   // page
   const [requestPage, setRequestPage] = useState("?limit="+PAGE_SIZE.toString()+"&page=1");
@@ -49,18 +49,7 @@ const ProfessionalsPage = () => {
   useEffect(() => {
     if (dataResponse) {
       setTotalPages(dataResponse.meta.totalPages);
-
-      //Cal avg rating
-      dataResponse.data.forEach((e) => {
-        var sum = 0;
-        e.rating.forEach((rate) => {
-          sum += rate.ratingScore;
-        })
-        if(e.rating.length != 0) e.avgRating = sum / e.rating.length;
-      });
-
       setProfesstionalsCurrentPage(dataResponse.data); // Update professionals list
-
     }
   }, [dataResponse]);
 
@@ -69,9 +58,9 @@ const ProfessionalsPage = () => {
     setCurrentPage(page);
   };
 
-  const handleFilterChange = (filter: string) => {
+  const handleFilterChange = (filter: string, rating: number) => {
     handlePageChange(1);
-    setRequestFilter(filter);
+    setRequestFilter(filter + "&minRating=" + rating.toString());
   };
 
   return (

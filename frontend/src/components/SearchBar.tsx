@@ -6,7 +6,7 @@ import { useState } from "react";
 const MAX_STARS = 5;
 
 interface SearchBarProps {
-  onSearch: (filter: string) => void;
+  onSearch: (filter: string, rating: number) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
@@ -15,20 +15,14 @@ const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
   const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
 
-  interface HandleStarClickParams {
-    value: number;
-    type: "experience" | "rating";
-  }
-
-  const handleSearch = () => {
+  const handleSearch = (rating: number) => {
     var result = "";
 
     if(text != "") result += "&searchText="+text;
-    if(minExp != 0 && rating==0) result += "&minExperience="+minExp.toString();
+    if(minExp != 0) result += "&minExperience="+minExp.toString();
     if(maxExp != 0) result += "&maxExperience="+maxExp.toString();
-    if(rating != 0) result += "&avgRating=" + rating.toString();
 
-    onSearch(result);
+    onSearch(result, rating);
   };
 
   return (
@@ -42,7 +36,7 @@ const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
           onChange={(e) => setText(e.target.value)}
         />
         <button
-          onClick={handleSearch}
+          onClick={() => handleSearch(rating)}
           className="bg-blue-500 text-white rounded-full px-4 py-2 ml-2 hover:bg-blue-600 transition-colors"
         >
           Search
@@ -74,7 +68,7 @@ const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
           <span
             key={i}
             className={`cursor-pointer text-xl ${i < rating ? "text-yellow-500" : "text-gray-300"}`}
-            onClick={() => setRating(i + 1)}
+            onClick={() => {setRating(i + 1); handleSearch(i + 1);}}
           >
             ★
           </span>
