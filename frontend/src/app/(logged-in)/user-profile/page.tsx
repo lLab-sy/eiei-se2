@@ -315,13 +315,13 @@ export default function UserPage() {
 
   return (
     <main className=" min-h-screen flex bg-mainblue-light relative items-center justify-center">
-      <div className="flex justify-around w-[60%] h-[800px]">
-        <Card className="w-[400px] flex flex-col">
+      <div className="flex justify-around w-[80%] h-[800px]">
+        <Card className="w-[400px] h-[700px] flex flex-col">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <div className="text-md text-center font-bold flex justify-center h-[50px] items-center">
+            <div className="text-xl text-center font-bold flex justify-center h-[50px] items-center">
               {userData.firstName} {userData.middleName} {userData.lastName}
             </div>
             {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
@@ -499,15 +499,7 @@ export default function UserPage() {
                         </FormItem>
                       )}
                     />
-                    <div className=" w-full gap-2">
-                      <Separator className='mt-5 mb-5'/>
-                      <span className=' text-2xl font-bold'>Review</span>
-
-
-                      <div className="mt-5">
-                        <ReviewProfessional id={userData?._id ?? ""} />
-                      </div>
-                    </div>
+                    
                     {/* <FormField
                       name="password"
                       control={form.control}
@@ -788,6 +780,18 @@ export default function UserPage() {
                 </fieldset>
               </form>
             </Form>
+          </CardContent>
+        </Card>
+        <Card className='w-[535px] h-[800px] relative'>
+          <CardHeader>
+              <CardTitle>Your Review</CardTitle>
+          </CardHeader>
+          <CardContent className='h-full'>
+            <Separator className="mt-1"/>
+            <div className='mt-5 h-[80%]'>
+              <ReviewProfessional id={userData?._id ?? ""} />
+            </div>
+
           </CardContent>
         </Card>
       </div>

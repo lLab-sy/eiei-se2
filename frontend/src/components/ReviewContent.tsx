@@ -13,7 +13,7 @@ export default function ReviewContent({data, rating} : {data : reviewInterface, 
   const diffDays: number = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   console.log("Reviewdata", data)
   return (
-    <div className="flex flex-col p-3 my-2 w-[97%] bg-white rounded-lg">
+    <div className="flex flex-col p-3 my-2 w-[97%] bg-slate-50 rounded-lg">
       <div className="flex justify-between">
         <div className='flex'>
           {
