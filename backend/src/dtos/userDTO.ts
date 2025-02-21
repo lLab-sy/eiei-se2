@@ -76,12 +76,14 @@ export interface searchReqDTO {
 export class reviewDTO {
   postName!: string;
   producer!: string;
+  producerProfileImage?: string;
   role!: string;
   comment!: string;
   reviewAt!: Date;
-  constructor(init: {postName: string, producer: string, role: string, comment: string, reviewAt:Date}){
+  constructor(init: {postName: string, producer: string, producerProfileImage: string, role: string, comment: string, reviewAt:Date}){
     this.postName = init.postName;
     this.producer = init.producer;
+    this.producerProfileImage = init.producerProfileImage;
     this.role = init.role;
     this.comment = init.comment;
     this.reviewAt = init.reviewAt;

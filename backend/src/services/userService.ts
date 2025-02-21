@@ -88,9 +88,16 @@ class UserService {
                    rating: r._id as number,
                    amount: r.amount as number,
                    reviews: r.reviews.map((review: reviewDTO)=>{
+                    let producerProfileImage;
+                    if(!review.producerProfileImage){
+                        producerProfileImage = '';
+                    }else{
+                        producerProfileImage = cloudService.getSignedUrlImageCloud(review.producerProfileImage)
+                    }                 
                     return new reviewDTO({
                         postName: review.postName as string,
                         producer: review.producer as string,
+                        producerProfileImage: producerProfileImage as string,
                         role: review.role as string,
                         comment: review.comment as string,
                         reviewAt: review.reviewAt as Date

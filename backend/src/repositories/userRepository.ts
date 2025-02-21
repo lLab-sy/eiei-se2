@@ -132,7 +132,7 @@ class UserRepository {
                           localField: 'rating.post.userID',
                           foreignField: '_id',
                           as: 'rating.producer',
-                          pipeline: [{ $project: { username: 1 } }]
+                          pipeline: [{ $project: { username: 1, profileImage: 1 } }]
                         }
                       },
                       {
@@ -150,6 +150,7 @@ class UserRepository {
                             $addToSet: {
                               postName: '$rating.post.postName',
                               producer: '$rating.producer.username',
+                              producerProfileImage: "$rating.producer.profileImage",
                               role: '$rating.role.roleName',
                               comment: '$rating.comment',
                               reviewAt: '$rating.createdAt'
