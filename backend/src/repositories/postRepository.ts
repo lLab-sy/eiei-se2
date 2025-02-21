@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, PostSearchRequestModel, PostSearchResponse } from '../models/postModel';
-import { PostDTO } from '../dtos/postDTO';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse } from '../models/postModel';
+import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -146,6 +146,83 @@ class PostRepository {
             return post;
         } catch (error) {
             throw new Error('Error deleting post in repository: ' + error);
+        }
+    }
+
+    public async createOffer(offerData:ParticipantDetailDTO,postID:string,productionProfessionalID:string){
+        console.log("OKAY CREATE  participant")
+        try{
+            const productionProfessionalObjectID= new ObjectId(productionProfessionalID)
+            const postObjectID= new ObjectId(postID)
+            const updatePost= await Post.findByIdAndUpdate(
+                { _id: postObjectID},  
+                { $addToSet: {participants:offerData} }, 
+            )
+            return updatePost;
+        }catch(error){
+            throw new Error('Error create offer in repository: ' + error);
+        }
+    }
+
+    public async addNewOffer(offerData:OfferDTO,postID:string,productionProfessionalID:string){
+        console.log("OKAY Add  participant")
+        try{
+            const productionProfessionalObjectID= new ObjectId(productionProfessionalID)
+            const postObjectID= new ObjectId(postID)
+            const result = await Post.updateOne(
+                {
+                    _id: postObjectID,
+                    "participants.participantID": productionProfessionalObjectID
+                },
+                {
+                    $push: {
+                        "participants.$.offer": {
+                            role: new ObjectId(offerData.role), // Role ID reference
+                            offerBy: offerData.offerBy, 
+                            price: offerData.price,
+                            reason: offerData.reason,
+                            createdAt: new Date()
+                        }
+                    },
+                    $set: {
+                        "participants.$.updatedAt": new Date() // Update the timestamp
+                    }
+                }
+            );
+            return offerData
+        }catch(error){
+            throw new Error('Error create offer in repository: ' + error);
+        }
+    }
+
+    public async checkProductionProInPost(postID:string,productionProfessionalID:string){
+        try{
+            console.log(postID)
+            const productionProfessionalObjectID= new ObjectId(productionProfessionalID)
+            const postObjectID= new ObjectId(postID)
+            const matchStage: PipelineStage[] = [];
+
+            matchStage.push({
+                    $match: {
+                      _id: postObjectID
+                    }
+                })
+            matchStage.push({
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+            matchStage.push({
+                $match: {
+                    'participants.participantID': productionProfessionalObjectID
+                  }
+            })
+            const totalItemsResult = await Post.aggregate(matchStage);
+            return totalItemsResult
+        }catch(error){
+            throw new Error('Error find production professional in repository: ' + error);
         }
     }
 
