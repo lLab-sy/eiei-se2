@@ -11,6 +11,7 @@ import axios from "axios";
 import { signOut } from "next-auth/react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "./ui/avatar";
+import HistoryProduction from "./HistoryProduction";
 
 const NavBar = (session: any) => {
   const token = session?.session?.user?.token ?? ''
@@ -114,7 +115,7 @@ const NavBar = (session: any) => {
             </span>
           </div>
         </Link>
-
+        
         {/* Right Section */}
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
@@ -123,6 +124,9 @@ const NavBar = (session: any) => {
               await handleLogout()
               await signOut()
             }}>Logout</Button> : ''} */}
+            <div className={`${session?.session ? "" : "hidden"}`}>
+             <HistoryProduction session={session} userId={session?.session?.user?.id}/>
+            </div>
             <span className="text-sm">{session?.session?.user?.username ?? "Username"}</span>
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               {/* <User className="w-5 h-5 text-gray-600"/> */}
