@@ -113,7 +113,14 @@ export default function EditPostPage({
     imgFile: File;
   }
 
+  interface IpostImageDisplay{
+    imageURL:string;
+    imageKey:string;
+  }
+  
+
   const [img, setImg] = useState<imagePair[]>([]);
+  const [postImages, setPostImages] = useState<IpostImageDisplay[]>([]);
   const [mostRecentImg, setMostRecentImg] = useState<string>("");
   const [postRoles, setPostRoles] = useState<Option[] | null>(null);
   const [mediaTypes, setMediaTypes] = useState<Option[] | null>(null);
@@ -184,6 +191,11 @@ export default function EditPostPage({
             setErrorMessage("You are not the producer of this post.");
           }
 
+          if(data.postImageDisplay.length > 0){
+            setPostImages(data.postImageDisplay);
+            setMostRecentImg(data.postImageDisplay[data.postImageDisplay.length-1].imageURL);
+          }
+
           form.reset({
             postname: data.postName || "",
             description: data.postDescription || "",
@@ -202,23 +214,34 @@ export default function EditPostPage({
   }, [postRoles, mediaTypes, postId, token, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const imageList = img.map((img) => img.imgFile);
+    
 
     const userID = session?.user.id;
     if (!userID) return;
     if (!postId) return;
 
-    const postImage = imageList.map((img) => URL.createObjectURL(img));
+    //const postImage = imageList.map((img) => URL.createObjectURL(img));
     const postData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
       postDescription: values.description,
-      postImages: postImage,
+      //postImages: postImage,
       postStatus: "created",
       userID: session?.user.id,
     };
     console.log(postData);
+
+    const formData = new FormData()
+    const imageList = img.map((img) => img.imgFile);
+    if (imageList.length > 0) {
+      imageList.forEach((file) => {
+        formData.append("postImagesSend", file);  
+      });
+    }
+    formData.append('postData',JSON.stringify(postData))
+
+    console.log("FormData")
 
     const postEditResponse = await editPostById(
       postId.toString(),
@@ -442,7 +465,7 @@ export default function EditPostPage({
                 <CardTitle className="text-sm">Your Post Picture</CardTitle>
                 <div className="flex flex-col items-center">
                   <div className="h-1/2">
-                    {img.length !== 0 ? (
+                    {postImages.length !== 0 ? (
                       <Image
                         src={mostRecentImg}
                         alt="Post Image Here"
@@ -476,26 +499,26 @@ export default function EditPostPage({
                   <div className="w-[80%] justify-center flex">
                     <Carousel>
                       <CarouselContent>
-                        {img.length !== 0 ? (
-                          img.map((img) => (
+                        {postImages.length !== 0 ? (
+                          postImages.map((img) => (
                             <CarouselItem
-                              key={img.imgSrc}
+                              key={img.imageKey}
                               className="relative pt-1 justify-center inline-flex flex-col group"
                             >
                               <Image
-                                src={img.imgSrc}
+                                src={img.imageURL}
                                 alt="Post Image Here"
                                 width={parent.innerWidth}
                                 height={parent.innerHeight}
                                 className="max-h-48 object-contain aspect-square cursor-pointer bg-maingrey "
                                 priority
                                 placeholder="empty"
-                                onClick={() => setMostRecentImg(img.imgSrc)}
+                                onClick={() => setMostRecentImg(img.imageURL)}
                               />
                               <X
                                 className="absolute top-1 right-1 hidden group-hover:block
                            bg-mainblue-lightest cursor-pointer"
-                                onClick={() => removeImg(img.imgSrc)}
+                                onClick={() => removeImg(img.imageURL)}
                               />
                             </CarouselItem>
                           ))
@@ -515,7 +538,7 @@ export default function EditPostPage({
                           </CarouselItem>
                         )}
                       </CarouselContent>
-                      <Label>Total item: {img.length}</Label>
+                      <Label>Total item: {postImages.length}</Label>
                       <CarouselPrevious />
                       <CarouselNext />
                     </Carousel>
