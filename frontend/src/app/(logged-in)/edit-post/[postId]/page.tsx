@@ -121,6 +121,7 @@ export default function EditPostPage({
 
   const [img, setImg] = useState<imagePair[]>([]);
   const [postImages, setPostImages] = useState<IpostImageDisplay[]>([]);
+  const [deletedImageKey, setDeletedImageKey] = useState<string[]>([]);
   const [mostRecentImg, setMostRecentImg] = useState<string>("");
   const [postRoles, setPostRoles] = useState<Option[] | null>(null);
   const [mediaTypes, setMediaTypes] = useState<Option[] | null>(null);
@@ -305,14 +306,37 @@ export default function EditPostPage({
       setMostRecentImg(filenames[filenames.length - 1].imgSrc);
       const newImg = [...img, ...filenames];
       setImg(newImg);
+      //setMostRecentImg(img[img.length-1].imgSrc);
     }
   };
 
   const removeImg = (imgSrc: string) => {
-    setImg(img.filter((img) => img.imgSrc !== imgSrc));
-    console.log(img.length);
-    if (mostRecentImg === imgSrc && img.length > 1)
-      setMostRecentImg(img[img.length - 2].imgSrc);
+    const isUploadedImg = img.some((img) => img.imgSrc === imgSrc);
+    if(isUploadedImg){
+      const updatedImg = img.filter((img) => img.imgSrc !== imgSrc);
+      setImg(updatedImg);
+      if (mostRecentImg === imgSrc && updatedImg.length > 0) {
+        setMostRecentImg(updatedImg[updatedImg.length - 1].imgSrc);
+      }else if(postImages.length>0){
+        setMostRecentImg(postImages[postImages.length - 1].imageURL);
+      }
+    }else{
+      const removedImage = postImages.find((img) => img.imageURL === imgSrc);
+      if (removedImage) {
+        setDeletedImageKey((prev) => [...prev, removedImage.imageKey]);
+      }
+      const updatedPostImages = postImages.filter((img) => img.imageURL !== imgSrc);
+      setPostImages(updatedPostImages);
+      if (mostRecentImg === imgSrc && updatedPostImages.length > 0) {
+        setMostRecentImg(updatedPostImages[updatedPostImages.length - 1].imageURL);
+      }else if(img.length>0){
+        setMostRecentImg(img[img.length-1].imgSrc);
+      }
+    }
+    // setImg(img.filter((img) => img.imgSrc !== imgSrc));
+    // console.log(img.length);
+    // if (mostRecentImg === imgSrc && img.length > 1)
+    //   setMostRecentImg(img[img.length - 2].imgSrc);
   };
 
   if (!postRoles || !mediaTypes) {
@@ -471,7 +495,7 @@ export default function EditPostPage({
                 <CardTitle className="text-sm">Your Post Picture</CardTitle>
                 <div className="flex flex-col items-center">
                   <div className="h-1/2">
-                    {postImages.length !== 0 ? (
+                    {(postImages.length !== 0 || img.length!==0 )? (
                       <Image
                         src={mostRecentImg}
                         alt="Post Image Here"
