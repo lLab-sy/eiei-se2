@@ -278,7 +278,7 @@ export default function EditPostPage({
   const onImgChange = (e: any) => {
     if (e.target.files && e.target.files[0]) {
       const files: File[] = Array.from(e.target.files);
-      if (files.length + img.length > 3) {
+      if (files.length + img.length + postImages.length > 3) {
         toast({
           variant: "destructive",
           title: "Picture count limit",
