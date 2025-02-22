@@ -246,12 +246,12 @@ export default function EditPostPage({
     }
     formData.append('postData',JSON.stringify(postData))
 
-    console.log("FormData")
-    console.log(postData);
+    // console.log("FormData")
+    // console.log(postData);
 
     const postEditResponse = await editPostById(
       postId.toString(),
-      postData,
+      formData,
       token,
     );
     if (postEditResponse === null) {
