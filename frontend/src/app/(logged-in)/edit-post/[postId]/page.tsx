@@ -227,7 +227,7 @@ export default function EditPostPage({
     const postData = {
       postName: values.postname,
       postDescription: values.description,
-      postImagesKey: postImagesKey,
+      postImagesKey: postImagesKey.filter((key) => !deletedImageKey.includes(key)),
       postStatus: "created",
       userID: session?.user.id,
       postMediaType: values.type,
