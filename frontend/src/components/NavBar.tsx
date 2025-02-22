@@ -1,21 +1,26 @@
 "use client";
 
-import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn, SearchCheck } from "lucide-react";
+import { JSX, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import axios from "axios";
-import { signOut } from "next-auth/react";
-import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "./ui/avatar";
 
-const NavBar = (session: any) => {
-  const token = session?.session?.user?.token ?? ''
+type menuItem = {
+  icon: JSX.Element;
+  label: string;
+  href: string;
+}
 
+const NavBar = (session: any) => {
+  const token = session?.session?.user?.token ?? '';
+  const role = session?.session?.user?.role ?? '';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuItems, setMenuItems] = useState<menuItem[]>([])
   // const {data: session, status} = useSession()
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
@@ -73,25 +78,49 @@ const NavBar = (session: any) => {
     handleFetch(token)
   }, [session.session, token])
 
-  const menuItems = [
-    { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },
-    {
-      icon: <FileText className="w-5 h-5" />,
-      label: "PostHistory",
-      href: "/post-history",
-    },
-    {
-      icon: <Gift className="w-5 h-5" />,
-      label: "My Offering",
-      href: "/my-offering",
-    },
-    {
-      icon: <Settings className="w-5 h-5" />,
-      label: "Setting",
-      href: "/setting",
-    },
-    // { icon: (session) ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />, label: (session) ? "Logout" : "Login", href: (session) ? "/api/auth/signout" : "/login" },
-  ];
+  useEffect(()=>{
+    if(!session.session || token === '') return;
+    const sessionMenuItems: menuItem[] = [
+      { 
+        icon: <User className="w-5 h-5" />, 
+        label: "Profile", 
+        href: "/user-profile" },
+      {
+        icon: <FileText className="w-5 h-5" />,
+        label: role === "producer" ? "My Post" : "Work History",
+        href: "/post-history",
+      },
+      ...(role === "producer" ? 
+      [{
+        icon: <Gift className="w-5 h-5" />,
+        label: "Create Post",
+        href: "/create-post",
+      },
+      {
+        icon: <SearchCheck className="w-5 h-5" />,
+        label: "Search for Professionals",
+        href: "/professionals", 
+      }] : 
+      []),
+      ...(role === "production professional" ? 
+      [{
+          icon: <SearchCheck className="w-5 h-5" />,
+          label: "Search for Posts",
+          href: "/posts", 
+      }] : 
+      []),
+      {
+        icon: <Gift className="w-5 h-5" />,
+        label: "My Offering",
+        href: "/my-offering",
+      },
+      {
+        icon: <Settings className="w-5 h-5" />,
+        label: "Setting",
+        href: "/setting",
+      },
+    ]
+    setMenuItems(sessionMenuItems)},[session.session,token]);
 
   return (
     <header className="bg-[#2B428C] text-white fixed m-auto w-[100%] z-50">
@@ -100,7 +129,7 @@ const NavBar = (session: any) => {
         <Link href="/" className="flex items-center gap-2 pl-2">
           <div className="relative w-10 h-10">
             <Image
-              src="/BualoiDev-logo.png"
+              src="/image/logo-preview.png"
               alt="BualoiDev Logo"
               fill
               className="object-contain"

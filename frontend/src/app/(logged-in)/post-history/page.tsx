@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import getHistoryPost from "@/libs/getHistoryPosts";
 import getHistoryPosts from "@/libs/getHistoryPosts";
-import session from "redux-persist/lib/storage/session";
 import { useSession } from "next-auth/react";
 
 
@@ -27,16 +26,11 @@ import { useSession } from "next-auth/react";
 
 export default function HistoryPostPage(){
   const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
-  const {data:session} = useSession()
+  const {data:session,status} = useSession()
+  const token = session?.user?.token ?? ''
+  const role = session?.user?.role ?? ''
+  const userName = session?.user?.username ?? ''
   
-  if(!session){
-    return <>Loading</>
-  }
-
-  const token=session.user?.token
-  const userName=session.user?.username
-  const role= session.user.role
-
   useEffect(()=>{
       const fetchData=async()=>{
           const response= await getHistoryPosts(token)
@@ -49,11 +43,10 @@ export default function HistoryPostPage(){
 
   if(!postHistoryResponse){
     return <>Loading</>
-  }
+  } 
 
-  console.log(postHistoryResponse)
   return (
-    <div className="p-4">
+    <div className="pt-10 min-h">
 
       {/* Project History */}
       {/* <h2 className="text-2xl font-bold text-center my-4">Post-History</h2> */}
