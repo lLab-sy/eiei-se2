@@ -121,6 +121,7 @@ export default function EditPostPage({
 
   const [img, setImg] = useState<imagePair[]>([]);
   const [postImages, setPostImages] = useState<IpostImageDisplay[]>([]);
+  const [postImagesKey, setPostImagesKey] = useState<string[]>([]);
   const [deletedImageKey, setDeletedImageKey] = useState<string[]>([]);
   const [mostRecentImg, setMostRecentImg] = useState<string>("");
   const [postRoles, setPostRoles] = useState<Option[] | null>(null);
@@ -194,6 +195,7 @@ export default function EditPostPage({
 
           if(data.postImageDisplay.length > 0){
             setPostImages(data.postImageDisplay);
+            setPostImagesKey(data.postImagesKey);
             setMostRecentImg(data.postImageDisplay[data.postImageDisplay.length-1].imageURL);
           }
 
@@ -223,13 +225,15 @@ export default function EditPostPage({
 
     //const postImage = imageList.map((img) => URL.createObjectURL(img));
     const postData = {
-      postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
-      postMediaType: values.type,
       postDescription: values.description,
-      //postImages: postImage,
+      postImagesKey: postImagesKey,
       postStatus: "created",
       userID: session?.user.id,
+      postMediaType: values.type,
+      //postImagesSend: be appended below,
+      keyImagesDelete: deletedImageKey,
+      postProjectRoles: values.roles.map((obj) => obj.value),  
     };
     console.log(postData);
 
@@ -243,6 +247,7 @@ export default function EditPostPage({
     formData.append('postData',JSON.stringify(postData))
 
     console.log("FormData")
+    console.log(postData);
 
     const postEditResponse = await editPostById(
       postId.toString(),
