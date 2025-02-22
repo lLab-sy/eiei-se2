@@ -31,11 +31,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { OfferData, PostRolesResponse, Project } from "../../interface";
+import { OfferData, PostRolesResponse, PostData } from "../../interface";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
-export default function OfferInformation({postSelectData,productionProfessionalID}:{postSelectData:Project,productionProfessionalID:string}){
+export default function OfferInformation({postSelectData,productionProfessionalID,userRole}:{postSelectData:PostData,productionProfessionalID:string,userRole:string}){
     
     const {data:session}=useSession();
     const userID= session?.user.id
@@ -47,7 +47,7 @@ export default function OfferInformation({postSelectData,productionProfessionalI
 
     const formSchema = z.object({
         price: z
-          .number().int()
+          .number()
           .min(1, { message: "Price more than 0." })
           .max(5000000000),
         description: z
@@ -175,7 +175,7 @@ export default function OfferInformation({postSelectData,productionProfessionalI
                           <SelectGroup>
                             {
                                 (postSelectData?.postProjectRolesOut ?? []).map((eachRole: PostRolesResponse) => (
-                                <SelectItem key={eachRole.id} value={eachRole.id}>
+                                <SelectItem key={eachRole.id} value={(eachRole.id).toString()}>
                                     {eachRole.roleName}
                                 </SelectItem>
                                 ))

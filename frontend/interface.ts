@@ -5,7 +5,8 @@ export interface PostData {
     postImages?: string[];
     postImagesSend?: File[];
     postMediaType: string;
-    postProjectRoles: string[];
+    postProjectRoles?: string[];
+    postProjectRolesOut?: PostRolesResponse[]
     postStatus: string;
     startDate?: string; 
     endDate?: string;  
