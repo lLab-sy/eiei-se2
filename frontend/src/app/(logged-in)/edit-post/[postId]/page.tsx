@@ -494,7 +494,7 @@ export default function EditPostPage({
                     placeholder="Your post picture"
                     onChange={onImgChange}
                     multiple
-                    disabled={img.length >= 3 ? true : false}
+                    disabled={img.length+postImages.length >= 3 ? true : false}
                   />
                   <div className="w-[80%] justify-center flex">
                     <Carousel>
@@ -538,7 +538,7 @@ export default function EditPostPage({
                           </CarouselItem>
                         )}
                       </CarouselContent>
-                      <Label>Total item: {postImages.length}</Label>
+                      <Label>Total item: {img.length+postImages.length}</Label>
                       <CarouselPrevious />
                       <CarouselNext />
                     </Carousel>
