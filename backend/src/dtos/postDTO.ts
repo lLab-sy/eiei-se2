@@ -1,6 +1,14 @@
 import { IsString, IsNotEmpty, MaxLength, IsEnum, IsDate, IsArray, ArrayNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+class PostProjectRoleDTO {
+    @ApiProperty({ description: 'Role ID', type: String })
+    id!: string;
+
+    @ApiProperty({ description: 'Role name', type: String })
+    roleName!: string;
+}
+
 export class PostDTO {
     @ApiProperty({ description: 'The unique identifier of the post', type: String })
     @IsString()
@@ -25,6 +33,19 @@ export class PostDTO {
     @IsString({ each: true })  // Ensures that each item in the array is a string
     postImages!: string[];
 
+    @ApiProperty({ description: 'The images of the post', type: [String] })
+    @IsArray()
+    @ArrayNotEmpty({ message: 'At least one image is required' })
+    @IsString({ each: true })  // Ensures that each item in the array is a string
+    postImagesKey!: string[];
+
+
+    @ApiProperty({ description: 'The images of the post', type: [String] })
+    @IsArray()
+    @ArrayNotEmpty({ message: 'At least one image is required' })
+    @IsString({ each: true })  // Ensures that each item in the array is a string
+    postImageDisplay!: ImageDisplayDTO[];
+
     @ApiProperty({ description: 'The media type of the post', type: String })
     @IsString()
     @IsNotEmpty()
@@ -34,6 +55,11 @@ export class PostDTO {
     @IsArray()
     @IsString({ each: true }) 
     postProjectRoles!: string[];
+
+    @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
+    @IsArray()
+    @IsString({ each: true }) 
+    postProjectRolesOut!: PostProjectRoleDTO[];
 
     @ApiProperty({ description: 'The status of the post', enum: ['created', 'in-progress', 'success', 'cancel'] })
     @IsString()
@@ -61,6 +87,11 @@ export class PostDTO {
     constructor(init?: Partial<PostDTO>) {
         Object.assign(this, init);
     }
+}
+
+export interface ImageDisplayDTO{
+    imageURL: string;
+    imageKey: string;
 }
 
 export class PostSearchRequestDTO {

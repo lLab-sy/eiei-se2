@@ -20,6 +20,17 @@ class UserService {
             throw new Error("Error in service layer: " + (err as Error).message);
         }
     }
+    async getUserById(id:string){
+        try{
+
+            const getUser = await userRepository.getUserByID(id)
+            
+            return getUser
+        }catch(err){
+            console.error("Error in service layer:", err);
+            throw new Error("Error in service layer: " + (err as Error).message);
+        }
+    }
     async updateProducer(producerDTO: ProducerDto, id: string) {
         try {
             // const hashedPassword = await bcrypt.hash(producerDTO.password, 10)

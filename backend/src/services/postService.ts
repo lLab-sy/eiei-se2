@@ -1,30 +1,46 @@
 import postRepository from '../repositories/postRepository';
-import { PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO } from '../dtos/postDTO';
+import { ImageDisplayDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO } from '../dtos/postDTO';
 import Post, { PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
+import cloudService from './cloudService';
 
 class PostService {
-
+  
   async getAllPosts(queryStr:string): Promise<PostDTO[]> {
+    
     try {
         const posts = await postRepository.getAllPosts(queryStr);
   
-        const result = posts.map((post) => {
-            return new PostDTO({
+        const result = await Promise.all(posts.map(async (post) => {
+        const postImages:string[] = await Promise.all(
+        post.postImages.map(async (eachImg) => {
+                return await cloudService.getSignedUrlImageCloud(eachImg);
+            })
+          );
+
+        var postImageDisplay:ImageDisplayDTO[]=[];
+        for (let i = 0; i < postImages.length; i++) {
+          postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
+        }
+
+        return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
-                postImages: post.postImages as [string],
+                postImages: postImages as string[],
                 postMediaType: post.postMediaType.toString() as string,
-                postProjectRoles: post.postProjectRoles.map(eachRole=>(
-                  eachRole.toString()
-                )) as [string],
+                postImagesKey: post.postImages,
+                postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
+                  id: (eachRole as any)._id.toString(),
+                  roleName: (eachRole as any).roleName
+                })),
+                postImageDisplay:postImageDisplay as ImageDisplayDTO[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 userID: post.userID.toString() as string,
                 startDate: post.startDate? post.startDate.toString():"",
                 endDate: post.endDate?post.endDate.toString():""
             });
-        });
+        }));
  
         return result;
     } catch (error) {
@@ -40,15 +56,28 @@ async getPost(id:string): Promise<PostDTO|null> {
     
       //console.log("Fetched posts:", posts); // Check the structure of the fetched posts
       if (post!=null){
+        const postImages = await Promise.all(
+          post.postImages.map(async (eachImg) => {
+              return await cloudService.getSignedUrlImageCloud(eachImg);
+          }));
+
+          var postImageDisplay:ImageDisplayDTO[]=[];
+          for (let i = 0; i < postImages.length; i++) {
+            postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
+          }
+
           const result = new PostDTO({
             id: post.id.toString(),
             postName: post.postName as string,
             postDescription: post.postDescription as string,
-            postImages: post.postImages as [string],
+            postImages: postImages as [string],
             postMediaType: post.postMediaType.toString() as string,
-            postProjectRoles: post.postProjectRoles.map(eachRole=>(
-              eachRole.toString()
-            )) as [string],
+            postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
+              id: (eachRole as any)._id.toString(),
+              roleName: (eachRole as any).roleName
+            })),
+            postImageDisplay:postImageDisplay as ImageDisplayDTO[],
+            postImagesKey: post.postImages,
             postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
             // postDetailID: post.postDetailID.toString() as string,
             userID: post.userID.toString() as string,
@@ -80,6 +109,7 @@ async getPost(id:string): Promise<PostDTO|null> {
               postImages: post.postImages as [string],
               postMediaType: post.postMediaType as string,
               roleCount: post.roleCount as number,
+              postImagesKey: post.postImages,
               postProjectRoles: post.postProjectRoles as string[],
               postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
               startDate: post.startDate? post.startDate.toString():"",

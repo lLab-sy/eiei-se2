@@ -78,14 +78,23 @@ const formSchema = z.object({
  
 export default function CreatePostPage() {
 
-  const {data:session,status} = useSession()
-  
-  if(status === "loading"){
+  const {data:session} = useSession()
+
+  if(!session){
     return <>Loading</>
   }
+  const token=session.user?.token
+  const role= session?.user.role
 
-  const token=session?.user?.token ?? ''
-  console.log(token)
+  if(role!="producer"){
+    return (
+      <div className="flex bg-mainblue-light justify-center">
+        <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18 justify-center">
+          <h1 className="mt-5 text-center text-white">You don't have permission in this page.</h1>
+        </div>
+      </div>
+    )
+  }
 
   useEffect(()=>{
       console.log(session)
@@ -136,7 +145,6 @@ export default function CreatePostPage() {
   //For CREATE POST 
 
   async function onSubmit (values: z.infer<typeof formSchema>) {
-    const imageList = img.map((img)=>(img.imgFile))
     const userID= session?.user.id
     if(!userID){
       return;
@@ -153,20 +161,27 @@ export default function CreatePostPage() {
     // const postImage: string[] = response.data
 
     //mock image
-    const postImage = imageList.map((img)=>(URL.createObjectURL(img)))
     const postData:PostData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
-      postImages:["Picture.png"],
       postStatus: "created",
       userID: session?.user.id,
       postDescription: values.description
     };
  
+    const formData = new FormData()
 
+    const imageList = img.map((eachImg) => eachImg.imgFile);
 
-    const postCreateResponse = await createPost(postData,token)
+    if (imageList.length > 0) {
+      imageList.forEach((file) => {
+        formData.append("postImagesSend", file);  
+      });
+    }
+    formData.append('postData',JSON.stringify(postData))
+    console.log("FormData")
+    const postCreateResponse = await createPost(formData,token)
     if (postCreateResponse === null) {
       toast({
         variant: "destructive",
@@ -190,7 +205,6 @@ export default function CreatePostPage() {
   const [postRoles,setPostRoles]=useState<Option[]|null>(null)
   const [mediaTypes,setMediaTypes]=useState<Option[]|null>(null)
   const [mostRecentImg, setMostRecentImg] = useState<string>("")
-
 
   const onImgChange = (e:any) => {
     if (e.target.files && e.target.files[0]) {

@@ -40,7 +40,7 @@ const ProfessionalsPage = () => {
 
       {/*Header*/}
       <div className="sticky top-0 bg-mainblue-light z-10 py-4">
-        <div className="flex justify-center items-center space-x-4">
+        <div className="flex justify-center items-center space-x-4 mt-20">
           <SearchPostBar />
         </div>
       </div>

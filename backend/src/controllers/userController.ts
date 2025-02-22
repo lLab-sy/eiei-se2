@@ -1,4 +1,5 @@
 import { searchReqDTO } from "../dtos/userDTO";
+import cloudService from "../services/cloudService";
 import userService from "../services/userService";
 import { sendResponse } from "../utils/responseHelper";
 import { Request, Response } from 'express';
@@ -29,10 +30,30 @@ class UserController {
             sendResponse(res, 'error', 'Failed to get User')
         }
     }
+
+    async getUserByID(req: Request, res: Response): Promise<void> {
+        try{
+            const username = req.params.id;
+            if(!username){
+                sendResponse(res, 'error', 'Cannot Find Username')
+                return;
+            }
+            const user = await userService.getUserById(username)
+            sendResponse(res, 'success', user, "Successfully get User")
+        }catch(err){
+            console.log(err)
+            sendResponse(res, 'error', 'Failed to get User')
+        }
+    }
+
     async updateUser(req: Request, res: Response): Promise<void> {
         try {
-            
-            const userData = req.body;
+
+            // sent data from frontend FormData({'userData' : stringify json, 'profileImage' : File})
+            // after pass by middleware => file
+            const profileImageFile = req?.file;
+            console.log('parse user data', req.body.userData[0])
+            const userData = JSON.parse(req.body.userData[0]); 
             if((userData.password && userData.password.length < 8)){
                 sendResponse(res, 'error', 'Password Length should be more than 8')
                 return;
@@ -42,27 +63,99 @@ class UserController {
                 sendResponse(res, 'error', 'password should contain at least one special character')
                 return;
             }
-            const role = userData.role
-            const id = req.params.id
+            if(profileImageFile){
+                const buffer = profileImageFile?.buffer
+                const mimetype = profileImageFile?.mimetype
+                const role = userData.role
+                const id = req.params.id
+                if (!role || !id) {
+                    sendResponse(res, 'error', 'Missing required fields: role or id');
+                    return;
+                }
+                const user = await userService.getUserById(id)
+                const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName()
+                const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, imageKey)
+                const userDataWithImageKey = {
+                    ...userData,
+                    profileImage: imageKey
+                }
+                const updatedUser = (role === 'producer') ? await userService.updateProducer(userDataWithImageKey, id) : await userService.updateProductionProfessional(userDataWithImageKey, id)
+                if(!updatedUser){
+                    sendResponse(res, 'error', 'Failed to update User updated User')
+                    return;
+                }
+                const updatedUserWithSignedURL = {
+                    updatedUser,
+                    url
 
-            if (!role || !id) {
-                sendResponse(res, 'error', 'Missing required fields: role or id');
-                return;
+                }
+                // 
+                sendResponse(res, 'success', updatedUserWithSignedURL, 'Successfully updated User')
+            }else{
+                const role = userData.role
+                const id = req.params.id
+                if (!role || !id) {
+                    sendResponse(res, 'error', 'Missing required fields: role or id');
+                    return;
+                }
+                const updatedUser = (role === 'producer') ? await userService.updateProducer(userData, id) : await userService.updateProductionProfessional(userData, id)
+                if(!updatedUser){
+                    sendResponse(res, 'error', 'Failed to update User updated User')
+                    return;
+                }
+                sendResponse(res, 'success', {updatedUser}, 'Successfully updated User')
+
             }
-
-            const updatedUser = (role === 'producer') ? await userService.updateProducer(userData, id) : await userService.updateProductionProfessional(userData, id)
-            if(!updatedUser){
-                sendResponse(res, 'error', 'Failed to update User updated User')
-                return;
-            }
-
-            sendResponse(res, 'success', updatedUser, 'Successfully updated User')
+            
         }catch(err : any){
             console.log(err)
             sendResponse(res, 'error', err?.message ?? "Failed to update user")
         }
     }
+    async uploadProfileImage(req : Request, res : Response) : Promise<void> {
+        try{
+            const profileImage = req?.file;
+            const id = req.params.id
+            if(!profileImage){
+                sendResponse(res, 'error', "Failed to find Image")
+                return;
+            }
+            const user = await userService.getUserById(id)
+            console.log('user', user)
+            const buffer = profileImage?.buffer
+            const mimetype = profileImage?.mimetype
+            const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName()
+            console.log('imageKey',imageKey)
+            const returnData = await cloudService.uploadImageToGetURLWithDeleteCondition(buffer!, mimetype!, imageKey, id)
+            
+            sendResponse(res, 'success', returnData, "Successfully Upload Image")
+        }catch(err : any){
+            console.log(err)
+            sendResponse(res, 'error', err?.message ?? "Failed to upload profile")
+        }
+    }
+    async getSignedURL(req : Request, res: Response) : Promise<void> {
+        try{
+            const id = req.params.id
+            if(!id){
+                sendResponse(res, 'error', "Failed to find Id")
+            }
+            const user = await userService.getUserById(id)
+            // console.log(user)
+            if(!user){
+                sendResponse(res, 'error', 'Failed to Find User')
+            }
+            
+            const key = user?.profileImage ?? ""
+            const url = await cloudService.getSignedUrlImageCloud(key)
+            sendResponse(res, 'success', url, "Successfully Find Image Key")
 
+            // const returnSignedURL = await cloudService.getSignedUrlImageCloud()
+        }catch(err : any){
+            sendResponse(res, 'error', err?.message ?? "Failed to get signed url")
+
+        }
+    }
     async search(req: Request, res: Response): Promise<void>  {
         try {
             const minExperience = req.query.minExperience ? Number(req.query.minExperience): undefined

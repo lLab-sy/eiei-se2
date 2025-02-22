@@ -9,7 +9,7 @@ export default async function InLayout({children} : {children : React.ReactNode}
         redirect('/login')
     }
     return (
-        <AuthContext session = {session}>
+        <AuthContext session={session}>
             {children}
         </AuthContext>
     )

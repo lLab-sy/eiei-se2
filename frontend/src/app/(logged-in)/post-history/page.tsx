@@ -32,19 +32,16 @@ export default function HistoryPostPage(){
   const userName = session?.user?.username ?? ''
   
   useEffect(()=>{
-    if(!session || token === ''){
-      return;
-    }
-    const fetchData=async()=>{
-      if (!token) return;
-      const response= await getHistoryPosts(token)
-      setPostHistoryResponse(response.data.data)
-    }
-        fetchData()
-    },[session, token])
+      const fetchData=async()=>{
+          const response= await getHistoryPosts(token)
+          setPostHistoryResponse(response.data.data)
+      }
+      fetchData()
+  },[])
+  
  
 
-  if(status === "loading"){
+  if(!postHistoryResponse){
     return <>Loading</>
   } 
 

@@ -1,7 +1,9 @@
 export interface PostData {
+    id?:string
     postName: string;
     postDescription: string;
     postImages?: string[];
+    postImagesSend?: File[];
     postMediaType: string;
     postProjectRoles: string[];
     postStatus: string;
@@ -17,6 +19,7 @@ export interface PostDataHistory {
     postDescription: string;
     postImages: string[];
     postMediaType: string;
+    postProjectRolesOut?: PostRolesResponse[]
     startDate: string; 
     endDate: string;   
     postProjectRoles: string[]; 
@@ -48,11 +51,28 @@ export interface PostRolesResponse{
 }
 
 export interface MediaTypesResponse{
-    mediaName: string,
-    id: string
+    mediaName: string;
+    id: string;
 }
 
 export interface imagePair {
     imgSrc: string
     imgFile: File
   }
+
+export interface OfferData{
+    paticipantID:string;
+    price: Number;
+    description: string;
+    role: string;
+}
+
+
+export interface OfferHistoryData{
+    roleName: string; //populate
+    price: Number;
+    offerBy: Number;
+    createdAt: string;
+    detail: string
+}
+

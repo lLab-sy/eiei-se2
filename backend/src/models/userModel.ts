@@ -17,6 +17,7 @@ export interface IUser extends Document {
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
+  url? : string;
 }
 
 export interface IBankAccount extends Document {
@@ -163,6 +164,11 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
     min: 0, // Minimum 0 years of experience
   },
   rating: [{
+    postID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "postTypes",
+      required: true,
+    },
     ratingScore: {
       type: Number,
       min: 0,
@@ -170,6 +176,10 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
     },
     comment: {
       type: String,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now, // Automatically sets the current timestamp when the review is created
     },
   }],
 });
