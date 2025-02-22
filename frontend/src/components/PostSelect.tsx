@@ -17,6 +17,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useState } from "react";
 
 export default function PostSelect({
   postData,
@@ -31,7 +32,6 @@ export default function PostSelect({
 }) {
   // Mock images array for demonstration
   const mockImages = ["/image/logo.png", "/image/logo.png", "/image/logo.png"];
-
   const handleSelectChange = (selectID: string) => {
     const selectedPost = postData.find((post) => post.id === selectID);
     if (selectedPost && selectedPost.id !== postSelectData?.id) {
@@ -39,12 +39,11 @@ export default function PostSelect({
       changePostSelect(selectedPost);
     }
   };
-
   return (
     <div className="flex flex-col w-4/5 lg:w-3/5 m-auto space-y-4">
       <Carousel className="w-full">
         <CarouselContent>
-          {mockImages.map((image, index) => (
+          {postSelectData?.postImages.map((image, index) => (
             <CarouselItem key={index}>
               <Card className="relative w-full aspect-video">
                 <Image

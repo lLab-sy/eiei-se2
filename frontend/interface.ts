@@ -95,10 +95,13 @@ export interface imagePair {
   }
 
 export interface OfferData{
-    paticipantID:string;
+    roleID:string;
+    productionProfessionalID:string;
+    offeredBy: Number;
     price: Number;
-    description: string;
-    role: string;
+    reason: string;
+    createdAt: Date;
+    postID: string;
 }
 
 

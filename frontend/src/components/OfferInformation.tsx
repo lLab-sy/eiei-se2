@@ -7,6 +7,7 @@ import {
     FormMessage,
   } from "@/components/ui/form";
   import { Button } from "@/components/ui/button";
+  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
   import {
     Select,
     SelectContent,
@@ -15,6 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
+import { toast, useToast } from "@/hooks/use-toast";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -34,16 +36,30 @@ import { Input } from "@/components/ui/input";
 import { OfferData, PostRolesResponse, PostData } from "../../interface";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import createOffer from "@/libs/postOffer";
 
 export default function OfferInformation({postSelectData,productionProfessionalID,userRole}:{postSelectData:PostData,productionProfessionalID:string,userRole:string}){
     
     const {data:session}=useSession();
     const userID= session?.user.id
+    const token = session?.user.token
     const optionSchema = z.object({
         label: z.string(),
         value: z.string(),
         disable: z.boolean().optional(),
       });
+    if(!postSelectData.postProjectRolesOut || !token){
+        return (
+          <div className="flex justify-center items-center min-h-screen">
+              <Card className="p-6 max-w-md">
+                <CardTitle className="text-mainred mb-4">
+                  Unauthorized Access
+                </CardTitle>
+                <p>This page is only available for producers and professionals.</p>
+              </Card>
+            </div>
+        )
+    }
 
     const formSchema = z.object({
         price: z
@@ -74,46 +90,40 @@ export default function OfferInformation({postSelectData,productionProfessionalI
 
       async function onSubmit (values: z.infer<typeof formSchema>) {
           const userID= session?.user.id
-          if(!userID){
+          if(!userID || !postSelectData.id){
             return;
           }
       
           const offerData:OfferData = {
-            paticipantID: productionProfessionalID,
-            description: values.description,
-            role: values.postRole,
-            price: values.price
+            roleID: values.postRole,
+            productionProfessionalID: productionProfessionalID,
+            price: values.price,
+            offeredBy: userRole==="Producer"?1:0,
+            createdAt: new Date(),
+            reason: values.description,
+            postID: postSelectData.id
           };
        
       
           console.log(offerData)
-          // const postCreateResponse = await createPost(postData,token)
-          // if (postCreateResponse === null) {
-          //   toast({
-          //     variant: "destructive",
-          //     title: "Image uploading failed",
-          //     description: "Please try again.",
-          //   })
-          //   return
-          // }
-          //   toast({
-          //   variant: "default",
-          //   title: "Successful post creation",
-          //   description: "Redirecting you...",
-          // })
+          const postCreateResponse = await createOffer(offerData,token)
+          if (postCreateResponse === null) {
+            toast({
+              variant: "destructive",
+              title: "Image uploading failed",
+              description: "Please try again.",
+            })
+            return
+          }
+            toast({
+            variant: "default",
+            title: "Successful post creation",
+            description: "Redirecting you...",
+          })
           // TODO: await for API to finish then renavigate
           // router.push(`/my-post`); 
         }
-      
-
-
-    if(!postSelectData.postProjectRolesOut){
-        return <>Loading...</>
-    }
-    const handleSelectChange= (selectID:string)=>{{
-        console.log("change")
-        return;
-    }}
+ 
     return(
         <div className="mb-12 mt-10">
             <Form {...form}>
@@ -147,8 +157,8 @@ export default function OfferInformation({postSelectData,productionProfessionalI
                         <FormItem>
                         <FormLabel className="font-bold">Price</FormLabel>
                         <FormControl>
-                            <Input className="shadow-lg" min={0} max={5000000} type="number" placeholder="200" {...field} value={field.value ?? ""} 
-                              onChange={(e) => {field.onChange(e.target.value === "" ? undefined : parseInt(e.target.value)); console.log(typeof e.target.value)}}   
+                            <Input className="shadow-lg" type="number" placeholder="200" {...field} value={field.value ?? ""} 
+                              onChange={(e) => {field.onChange(e.target.value === "" ? undefined : parseInt(e.target.value)); console.log(e.target.value)}}   
                             />
                         </FormControl>
                         <FormMessage />

@@ -63,45 +63,89 @@ const mockOfferHistory: OfferHistoryData[] = [
       detail: "Energetic and organized for on-set coordination."
     }
   ];
-export default function CreateOfferPage({params}:{params:Promise<{pid:string}>}){
-    const {data:session} = useSession()
+  export default function CreateOfferPage({
+    params,
+  }: {
+    params: Promise<{ pid: string }>;
+  }) {
+    const { data: session } = useSession();
     const { pid } = use(params);
-    const producerID= session?.user.id //เจ้าของโพสต์
-    const [postData,setPostData]= useState<PostData[]|null>()
-    const [postSelect,setPostSelect] = useState<PostData|null>()
-    const [showOfferHistory, setShowOfferHistory] = useState(false); // State for OfferHistoryMinimal
-    if(!producerID){
-      return <>Loading...</>
+    const userID = session?.user.id;
+    const userRole = session?.user.role;
+    const token = session?.user?.token;
+    // console.log("token", token);
+
+    const mockImages = ["/image/logo.png", "/image/logo.png", "/image/logo.png"];
+    const [postData, setPostData] = useState<PostData[] | null>();
+    const [postSelect, setPostSelect] = useState<PostData | null>();
+    const [showOfferHistory, setShowOfferHistory] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+  
+    // Return early if no user is logged in
+    if (!userID || !token) {
+      return (
+        <div className="flex justify-center items-center min-h-screen">
+          <p className="text-lg">Loading...</p>
+        </div>
+      );
     }
-    useEffect(()=>{
-      const fetchData=async()=>{
-          const response= await getPostUser(producerID)
-          const posts=response.data.data
-          setPostData(posts)
-          setPostSelect(posts[0])
-      }
-    };
-    if (userID && pid) fetchData();
-  }, [userID, userRole, pid, token]); // ใช้ pid และ token ใน dependency array
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Card className="p-6 max-w-md">
-          <CardTitle className="text-mainred mb-4">Error</CardTitle>
-          <p>{error}</p>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!postSelect || !postData) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-lg">Loading posts...</p>
-      </div>
-    );
-  }
+  
+    // Check if user role is valid
+    if (userRole !== "producer" && userRole !== "production professional") {
+      return (
+        <div className="flex justify-center items-center min-h-screen">
+          <Card className="p-6 max-w-md">
+            <CardTitle className="text-mainred mb-4">
+              Unauthorized Access
+            </CardTitle>
+            <p>This page is only available for producers and professionals.</p>
+          </Card>
+        </div>
+      );
+    }
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          let response;
+          if (userRole === "producer") {
+            response = await getPostUser(userID); // ดึงโพสต์ของ producer
+          } else if (userRole === "production professional") {
+            response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+          }
+          console.log("respons",response)
+          if (response) {
+            const posts =
+              userRole === "producer" ? response : [response];
+            setPostData(posts);
+            console.log("OKAY",posts[0].postImages)
+            setPostSelect(posts[0] || null);
+          }
+        } catch (err) {
+          setError("Failed to load posts. Please try again later.");
+        }
+      };
+      if (userID && pid) fetchData();
+    }, [userID, userRole, pid, token]); // ใช้ pid และ token ใน dependency array
+  
+    if (error) {
+      return (
+        <div className="flex justify-center items-center min-h-screen">
+          <Card className="p-6 max-w-md">
+            <CardTitle className="text-mainred mb-4">Error</CardTitle>
+            <p>{error}</p>
+          </Card>
+        </div>
+      );
+    }
+  
+    if (!postSelect || !postData) {
+      return (
+        <div className="flex justify-center items-center min-h-screen">
+          <p className="text-lg">Loading posts...</p>
+        </div>
+      );
+    }
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
