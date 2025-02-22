@@ -8,8 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import axios from "axios";
-import { signOut } from "next-auth/react";
-import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "./ui/avatar";
 
 type menuItem = {
@@ -21,7 +19,6 @@ type menuItem = {
 const NavBar = (session: any) => {
   const token = session?.session?.user?.token ?? '';
   const role = session?.session?.user?.role ?? '';
-  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<menuItem[]>([])
   // const {data: session, status} = useSession()
