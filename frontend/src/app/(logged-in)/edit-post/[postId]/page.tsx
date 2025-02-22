@@ -263,6 +263,12 @@ export default function EditPostPage({
     });
   }
 
+  // ตรวจสอบว่าเป็น IpostImageDisplay หรือไม่
+  const isIpostImageDisplay = (imgData: IpostImageDisplay | imagePair): imgData is IpostImageDisplay => {
+    return (imgData as IpostImageDisplay).imageKey !== undefined;  // เช็คว่า 'imageKey' มีอยู่ในข้อมูล
+  };
+
+
   const onImgChange = (e: any) => {
     if (e.target.files && e.target.files[0]) {
       const files: File[] = Array.from(e.target.files);
@@ -499,26 +505,26 @@ export default function EditPostPage({
                   <div className="w-[80%] justify-center flex">
                     <Carousel>
                       <CarouselContent>
-                        {postImages.length !== 0 ? (
-                          postImages.map((img) => (
+                        {(postImages.length > 0 || img.length > 0) ? (
+                          [...postImages, ...img].map((imgData, index) => (
                             <CarouselItem
-                              key={img.imageKey}
+                            key={isIpostImageDisplay(imgData) ? imgData.imageKey : imgData.imgSrc}
                               className="relative pt-1 justify-center inline-flex flex-col group"
                             >
                               <Image
-                                src={img.imageURL}
+                                src={isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc}
                                 alt="Post Image Here"
                                 width={parent.innerWidth}
                                 height={parent.innerHeight}
                                 className="max-h-48 object-contain aspect-square cursor-pointer bg-maingrey "
                                 priority
                                 placeholder="empty"
-                                onClick={() => setMostRecentImg(img.imageURL)}
+                                onClick={() => setMostRecentImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
                               />
                               <X
                                 className="absolute top-1 right-1 hidden group-hover:block
                            bg-mainblue-lightest cursor-pointer"
-                                onClick={() => removeImg(img.imageURL)}
+                                onClick={() => removeImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
                               />
                             </CarouselItem>
                           ))
