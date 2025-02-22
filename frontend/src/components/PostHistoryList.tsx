@@ -5,7 +5,6 @@ import { PostDataHistory } from "../../interface";
 import PostHistoryCard from "./PostHistoryCard";
 import PaginationBar from "./PostHistoryPaginationBar";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 
 export default function PostHistoryList({
   postLists,userName,role
@@ -14,7 +13,6 @@ export default function PostHistoryList({
   userName:string,
   role:string
 }) {
-
   const [currentPage, setCurrentPage] = useState<number>(1);
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
@@ -40,6 +38,7 @@ export default function PostHistoryList({
         </div>
 
         {/* Projects Grid */}
+        {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
           {currentProjects.map((project,index) => (
             <div
@@ -52,13 +51,13 @@ export default function PostHistoryList({
             </div>
           ))}
         </div>
-
+          }
         {/* Pagination Section */}
         <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
           <PaginationBar
             currentPage={currentPage}
             projectsPerPage={projectsPerPage}
-            postListLenght={postLists.length}
+            postListLength={postLists.length}
             setCurrentPage={setCurrentPage}
           />
         </div>

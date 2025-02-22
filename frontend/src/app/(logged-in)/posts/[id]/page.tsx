@@ -31,7 +31,7 @@ const PostDetail = () => {
     postImages: [],
     postMediaType: "Video",
     postProjectRoles: ["Videographer", "Editor"],
-    postStatus: "Success",
+    postStatus: "success",
     startDate: "2022-10-01",
     endDate: "2022-10-31",
     price: "100",
@@ -146,16 +146,6 @@ const PostDetail = () => {
                   <Calendar className="w-5 h-5 text-red-500" /> End Date:{" "}
                   {PostInfo.endDate}
                 </p>
-                {/* Add PostHistoryCard component for handling review */}
-                {PostInfo.postStatus === "Success" && (
-                  <div className="hidden">
-                    <PostHistoryCard
-                      post={PostInfo}
-                      userName="John"
-                      role="producer"
-                    />
-                  </div>
-                )}
               </div>
             </div>
 

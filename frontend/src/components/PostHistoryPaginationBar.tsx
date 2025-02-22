@@ -1,16 +1,16 @@
 export default function PaginationBar({
-  postListLenght,
+  postListLength,
   projectsPerPage,
   setCurrentPage,
   currentPage,
 }: {
-  postListLenght: number;
+  postListLength: number;
   projectsPerPage: number;
   setCurrentPage: Function;
   currentPage: number;
 }) {
   const pagesToShow = 3;
-  const totalPages = Math.ceil(postListLenght / projectsPerPage);
+  const totalPages = Math.ceil(postListLength / projectsPerPage);
   const handlePageClick = (page: number): void => {
     setCurrentPage(page);
   };

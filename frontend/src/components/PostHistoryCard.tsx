@@ -3,6 +3,7 @@ import { PostDataHistory } from "../../interface";
 import { Clock, Calendar, User, Film } from "lucide-react";
 import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function PostHistoryCard({
   post,
@@ -14,6 +15,7 @@ export default function PostHistoryCard({
   role: string;
 }) {
   const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
   const endDateDayJS = new Date(post.endDate);
   const EndDate = endDateDayJS.toDateString();
@@ -63,7 +65,7 @@ export default function PostHistoryCard({
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden">
-      <div className="absolute inset-0 bg-mainblue opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+      {/* <div className="absolute inset-0 bg-mainblue opacity-0 group-hover:opacity-10 transition-opacity duration-300" /> */}
       <div className="flex p-6">
         <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
           <Image
@@ -84,21 +86,7 @@ export default function PostHistoryCard({
             <h3 className="text-xl font-semibold text-mainblue mb-2 group-hover:text-mainblue-light transition-colors">
               {post.postName}
             </h3>
-
-            {/* Add Review Button for Producer role if project is completed */}
-            {role === "producer" && post.postStatus === "Success" && (
-              <ReviewSubmissionForm
-                trigger={
-                  <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md hover:bg-mainblue-light transition-colors">
-                    Review Professional
-                  </button>
-                }
-                onSubmit={handleSubmitReview}
-                toast={toast}
-              />
-            )}
           </div>
-
           {role === "producer" ? (
             // Producer View
             <>
@@ -118,6 +106,17 @@ export default function PostHistoryCard({
                   Period: {StartDate} - {EndDate}
                 </p>
               </div>
+              {post.postStatus === "success" && (
+            <div className="flex justify-end z-50">
+              <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
+                     hover:bg-mainblue-light transition-colors" onClick={(e)=>{
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setIsOpen(true)}}>
+                      {role === "producer" ? "Review Professional" : "Review Project"}
+                    </button>
+            </div>
+            )}
             </>
           ) : (
             // Production Professional View
@@ -139,25 +138,16 @@ export default function PostHistoryCard({
                 <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
                 <p className="text-sm">Completed: {EndDate}</p>
               </div>
-
-              {/* For Production Professionals, add a review button for the project itself */}
-              {post.postStatus === "Success" && (
-                <div className="mt-3">
-                  <ReviewSubmissionForm
-                    trigger={
-                      <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md hover:bg-mainblue-light transition-colors">
-                        Review Project
-                      </button>
-                    }
-                    onSubmit={handleSubmitReview}
-                    toast={toast}
-                  />
-                </div>
-              )}
             </>
           )}
         </div>
       </div>
+      <ReviewSubmissionForm
+                isOpen = {isOpen}
+                setIsOpen={setIsOpen}
+                onSubmit={handleSubmitReview}
+                toast={toast}
+              />
     </div>
   );
 }

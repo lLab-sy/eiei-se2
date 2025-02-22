@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, SetStateAction, Dispatch } from "react";
 import { Star } from "lucide-react";
 import {
   Dialog,
@@ -12,16 +12,17 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ReviewSubmissionFormProps {
-  trigger?: React.ReactNode;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   onSubmit?: (data: { rating: number; comment: string }) => void;
   toast: (msg: {variant: "default" | "destructive" | null | undefined, title: string, description: string}) => void;
 }
 
 const ReviewSubmissionForm = ({
-  trigger,
+  isOpen,
+  setIsOpen,
   onSubmit,
 toast}: ReviewSubmissionFormProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -55,17 +56,17 @@ toast}: ReviewSubmissionFormProps) => {
     setComment("");
   };
 
-  const handleClose = () => {
+  const handleClose = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setIsOpen(false);
     setRating(0);
     setComment("");
   };
 
+  const handleClick = (e:React.MouseEvent<HTMLDivElement>) => {e.stopPropagation()}
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger || <Button>Submit Review</Button>}
-      </DialogTrigger>
+    <div onClick = {handleClick}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}  > 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Submit Review</DialogTitle>
@@ -122,6 +123,7 @@ toast}: ReviewSubmissionFormProps) => {
         </form>
       </DialogContent>
     </Dialog>
+    </div>
   );
 };
 
