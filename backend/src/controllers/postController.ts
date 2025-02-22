@@ -98,7 +98,6 @@ class PostController {
   async updatePost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       //TODO: add params to send keyImagesDelete, make sure that you have postImages that have only image on clound
-
       const postId = req.params.id
 
       //POST MAN TEST
@@ -107,8 +106,10 @@ class PostController {
       // req.body.postProjectRoles= JSON.parse(req.body.postProjectRoles)
 
       //FrontEND
+      console.log("BEFORE CHECK pass parse")
+      console.log(req.body.postData)
       req.body=JSON.parse(req.body.postData)
-      // console.log(req.body)
+      console.log("CHECK pass parse")
 
       //authorization
       if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
@@ -138,8 +139,8 @@ class PostController {
         postImages.push(keyImage)
         const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, keyImage)
        })
-       console.log("PostIMAGE",postImages)
        req.body.postImages= postImages
+       console.log("CheckBody",req.body)
 
       const posts = await postService.updatePost(req.body,postId);
       
