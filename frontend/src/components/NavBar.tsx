@@ -129,7 +129,7 @@ const NavBar = (session: any) => {
         <Link href="/" className="flex items-center gap-2 pl-2">
           <div className="relative w-10 h-10">
             <Image
-              src="/BualoiDev-logo.png"
+              src="/image/logo-preview.png"
               alt="BualoiDev Logo"
               fill
               className="object-contain"
