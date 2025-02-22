@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, MaxLength, IsEnum, IsDate, IsArray, ArrayNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import mongoose from 'mongoose';
 
 class PostProjectRoleDTO {
     @ApiProperty({ description: 'Role ID', type: String })
@@ -8,6 +9,78 @@ class PostProjectRoleDTO {
     @ApiProperty({ description: 'Role name', type: String })
     roleName!: string;
 }
+
+export interface ImageDisplayDTO{
+    imageURL: string;
+    imageKey: string;
+}
+
+
+export interface OfferDTO{ //ซ้ำกับบูม
+    role: string;
+    price: number;
+    offeredBy: number;
+    createdAt: Date;
+    reason: string;
+}
+
+export class ParticipantDetailDTO {  
+    @ApiProperty({ description: 'Unique identifier of the participant', type: String })
+    @IsString()
+    @IsNotEmpty()
+    participantID!: string;
+
+    @ApiProperty({ description: 'Current status of the participant', enum: ['candidate', 'reject', 'in-progress'] })
+    @IsString()
+    @IsEnum(['candidate', 'reject', 'in-progress'], { message: 'Status must be one of: candidate, reject, in-progress' })
+    status!: 'candidate' | 'reject' | 'in-progress';
+
+    @ApiProperty({ description: 'Role ID associated with the participant', type: String })
+    @IsString()
+    @IsNotEmpty()
+    roleID!: string;
+
+    @ApiProperty({ description: 'User ID of the offer creator', type: Number })
+    @IsNumber()
+    @IsNotEmpty()
+    offeredBy!: number;
+
+    offer!: OfferDTO[]; // Array of offers received by the participant
+
+    @ApiProperty({ description: 'Participant rating score', type: Number })
+    @IsNumber()
+    @IsNotEmpty()
+    ratingScore!: number;
+
+    @ApiProperty({ description: 'Comments about the participant', type: String })
+    @IsString()
+    @IsNotEmpty()
+    comment!: string;
+
+    @ApiProperty({ description: 'Date of the last review', type: Date, nullable: true })
+    reviewedAt!: Date | null;
+
+    @ApiProperty({ description: 'The offered price', type: Number })
+    @IsNumber()
+    @IsNotEmpty()
+    price!: number;
+
+    @ApiProperty({ description: 'Date when the participant was first added', type: Date })
+    createdAt!: Date;
+
+    @ApiProperty({ description: 'Reason for the offer', type: String })
+    @IsString()
+    @IsNotEmpty()
+    reason!: string;
+
+    @ApiProperty({ description: 'Last update timestamp', type: Date })
+    updatedAt!: Date;
+
+    constructor(init?: Partial<ParticipantDetailDTO>) {
+        Object.assign(this, init);
+    }
+}
+
 
 export class PostDTO {
     @ApiProperty({ description: 'The unique identifier of the post', type: String })
@@ -89,10 +162,6 @@ export class PostDTO {
     }
 }
 
-export interface ImageDisplayDTO{
-    imageURL: string;
-    imageKey: string;
-}
 
 export class PostSearchRequestDTO {
     @ApiProperty({ description: 'The name of the post or project detail', type: String })
@@ -119,6 +188,10 @@ export class PostSearchRequestDTO {
     @IsNumber() 
     page!: number;
 }
+
+
+
+
 
 export class PostWithRoleCountDTO extends PostDTO{
     @ApiProperty({ description: 'The count of all role in post' })

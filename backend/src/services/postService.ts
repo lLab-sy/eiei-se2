@@ -1,8 +1,9 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO } from '../dtos/postDTO';
-import Post, { PostSearchRequestModel } from '../models/postModel';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO } from '../dtos/postDTO';
+import Post, { ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
+import { OfferHistory } from '../models/postModel';
 
 class PostService {
   
@@ -187,7 +188,42 @@ async getPost(id:string): Promise<PostDTO|null> {
       throw new Error('Error in service layer: ' + error);
     }
   }
+  async createOffer(offerInput:ParticipantDetailDTO,postID:string,productionProfessionalID:string){
+    try{
 
+        //first find that have this production professional send offer to this first before
+        const offerEvidence= await postRepository.checkProductionProInPost(postID,productionProfessionalID)
+        var offerModel:OfferDTO={
+            price: offerInput.price,
+            role: offerInput.roleID,
+            offeredBy: offerInput.offeredBy,
+            createdAt: new Date() ,
+            reason: offerInput.reason
+        }
+        var response;
+        //1 = Add OfferHistory
+        if(offerEvidence.length>0){
+          response= await postRepository.addNewOffer(offerModel,postID,productionProfessionalID)
+        }else{//Create New Object
+          var participantData= new ParticipantDetailDTO({
+            participantID: productionProfessionalID,
+            status: 'in-progress',
+            offer: [offerModel],
+            ratingScore: 0,
+            comment:"",
+            reviewedAt:null,
+            createdAt:new Date(),
+            updatedAt: new Date()
+          })
+            response= await postRepository.createOffer(participantData,postID,productionProfessionalID)
+        }
+        return response
+        // const offer
+        // const res = await postRepository.createOffer(offerData,postID,productionProfessionalID)
+    }catch(error){
+      throw new Error('Error create offer in service layer: ' + error);
+    }
+  }
   async searchPost(postSearchReq: PostSearchRequestDTO): Promise<PaginatedResponseDTO<PostDTO>> {
     try {
       const postM: PostSearchRequestModel = postSearchReq

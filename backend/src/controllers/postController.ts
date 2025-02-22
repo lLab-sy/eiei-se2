@@ -61,7 +61,6 @@ class PostController {
       //
       req.body=JSON.parse(req.body.postData)
 
-
       //unauthorize
       if(req.user.userId!=req.body.userID || req.user.role=="production professional"){
           console.log(req.user.role,req.body.userID,req.user.userId)
@@ -158,11 +157,26 @@ class PostController {
         return;
       } 
       const posts = await postService.deletePost(req.body,postId);
-      sendResponse(res, 'success', posts, 'Successfully deleted posts');
+      sendResponse(res, 'success', posts, 'Successfully deleted post');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to deleted posts at controller');
     }
   };
+
+//@Private Request from Producer Role or Production Professional can create offer
+  async createOffer(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try{
+      const myRole = req.user.role
+      // console.log(req.body)
+      // if(!req.body.roleID || !req.body.productionProfessionalID || !req.body.price){
+      //     sendResponse(res, 'error', 'Failed to deleted offer');
+      // }
+      const offer = await postService.createOffer(req.body,req.body.postID,req.body.productionProfessionalID)
+      sendResponse(res, 'success',offer, 'Successfully create offer');
+    }catch(error){
+      sendResponse(res, 'error', error, 'Failed to created offer');
+    }
+  }
 
   async searchPost(req: Request, res: Response): Promise<void> {
     try {

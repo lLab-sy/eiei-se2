@@ -304,7 +304,62 @@ router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, upload.a
  */
 router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postController.deletePost as RequestHandler);
 
-
+/**
+ * @swagger
+ * /api/v1/create-offer:
+ *   post:
+ *     summary: Create a new offer for a participant in a post
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - roleID
+ *               - productionProfessionalID
+ *               - price
+ *               - offeredBy
+ *               - createdAt
+ *               - reason
+ *               - postID
+ *             properties:
+ *               roleID:
+ *                 type: string
+ *                 description: The ID of the role being offered
+ *               productionProfessionalID:
+ *                 type: string
+ *                 description: The ID of the professional receiving the offer
+ *               price:
+ *                 type: number
+ *                 description: The amount offered
+ *               offeredBy:
+ *                 type: number
+ *                 description: The user making the offer (0 = system, 1 = user)
+ *               createdAt:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The date and time when the offer was made
+ *               reason:
+ *                 type: string
+ *                 description: The reason for the offer
+ *               postID:
+ *                 type: string
+ *                 description: The ID of the post associated with the offer
+ *     responses:
+ *       201:
+ *         description: Offer created successfully
+ *       400:
+ *         description: Bad request, invalid input
+ *       404:
+ *         description: Post or participant not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/create-offer', AuthMiddleware.authenticate as RequestHandler, postController.createOffer as RequestHandler);
 
 
 export default router;

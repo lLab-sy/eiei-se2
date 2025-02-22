@@ -71,7 +71,7 @@ export interface OfferData{
 export interface OfferHistoryData{
     roleName: string; //populate
     price: Number;
-    offerBy: Number;
+    offeredBy: Number;
     createdAt: string;
     detail: string
 }
