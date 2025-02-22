@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/carousel";
 import { Mail, Phone, Star, User, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
+import PostHistoryCard from "@/components/PostHistoryCard"; // Import the PostHistoryCard component
 import { useToast } from "@/hooks/use-toast";
 
 const PostDetail = () => {
@@ -24,9 +24,10 @@ const PostDetail = () => {
   const { toast } = useToast();
 
   const PostInfo = {
+    id: id as string, // Add id from params
     postName: "Marvel Studios",
     postDescription:
-      "We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We’re looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we’d love to hear from you.",
+      "We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We're looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we'd love to hear from you.",
     postImages: [],
     postMediaType: "Video",
     postProjectRoles: ["Videographer", "Editor"],
@@ -39,46 +40,10 @@ const PostDetail = () => {
     email: "realMarvelStudio@yahoo.com",
     phoneNumber: "123-456-7890",
     professionalId: "123",
+    roleCount: 2, // Added the missing roleCount property
   };
-  // to-do: move handleSubmitReview, toastmsgs to posts/id -> PostHistoryCard
-  const handleSubmitReview = async (data: {
-    rating: number;
-    comment: string;
-  }) => {
-    try {
-      // In real app, make API call to submit review
-      const response = await fetch("/api/reviews", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          postId: id,
-          professionalId: PostInfo.professionalId,
-          ...data,
-        }),
-      });
 
-      if (!response.ok) {
-        toast({
-          variant: "default",
-          title: "Successful review submission",
-          description: "Your review has been submitted!",
-          })
-        throw new Error("Failed to submit review");
-      }
-
-      // Refresh the page or update UI state
-      // window.location.reload();
-    } catch (error) {
-      console.error("Error submitting review:", error);
-      toast({
-        variant: "destructive",
-        title: "Failed to submit review",
-        description: "Failed to submit review. Please try again.",
-        })
-    }
-  };
+  // handleSubmitReview removed and moved to PostHistoryCard
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
@@ -181,17 +146,15 @@ const PostDetail = () => {
                   <Calendar className="w-5 h-5 text-red-500" /> End Date:{" "}
                   {PostInfo.endDate}
                 </p>
-                {/* Add Review Button if project is completed */}
+                {/* Add PostHistoryCard component for handling review */}
                 {PostInfo.postStatus === "Success" && (
-                  <ReviewSubmissionForm
-                    trigger={
-                      <Button variant="outline" className="w-full mt-2">
-                        Review Professional
-                      </Button>
-                    }
-                    onSubmit={handleSubmitReview}
-                    toast = {toast}
-                  />
+                  <div className="hidden">
+                    <PostHistoryCard
+                      post={PostInfo}
+                      userName="John"
+                      role="producer"
+                    />
+                  </div>
                 )}
               </div>
             </div>

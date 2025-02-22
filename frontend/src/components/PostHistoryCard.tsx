@@ -1,17 +1,65 @@
 import Image from "next/image";
 import { PostDataHistory } from "../../interface";
 import { Clock, Calendar, User, Film } from "lucide-react";
- 
- 
+import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
+import { useToast } from "@/hooks/use-toast";
 
-export default function PostHistoryCard({ post,userName,role }: { post: PostDataHistory, userName:string, role:string }) {
-  const endDateDayJS = new Date(post.endDate)
+export default function PostHistoryCard({
+  post,
+  userName,
+  role,
+}: {
+  post: PostDataHistory;
+  userName: string;
+  role: string;
+}) {
+  const { toast } = useToast();
+
+  const endDateDayJS = new Date(post.endDate);
   const EndDate = endDateDayJS.toDateString();
 
-  const startDateDayJS = new Date(post.endDate)
+  const startDateDayJS = new Date(post.startDate);
   const StartDate = startDateDayJS.toDateString();
-  //to-add: review button (modal) ref: ReviewSubmissionForm.tsx
 
+  // Handle review submission - fixed logic issue
+  const handleSubmitReview = async (data: {
+    rating: number;
+    comment: string;
+  }) => {
+    try {
+      // In real app, make API call to submit review
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: post.id,
+          // professionalId needs to be passed from elsewhere or hardcoded
+          professionalId: "", // This needs to be provided from props or parent component
+          ...data,
+        }),
+      });
+
+      if (response.ok) {
+        // Fixed condition - show success message when response is OK
+        toast({
+          variant: "default",
+          title: "Successful review submission",
+          description: "Your review has been submitted!",
+        });
+      } else {
+        throw new Error("Failed to submit review");
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to submit review",
+        description: "Failed to submit review. Please try again.",
+      });
+    }
+  };
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden">
@@ -19,7 +67,11 @@ export default function PostHistoryCard({ post,userName,role }: { post: PostData
       <div className="flex p-6">
         <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
           <Image
-            src={`/${post.postImages[0]}`}
+            src={
+              post.postImages && post.postImages.length > 0
+                ? `/${post.postImages[0]}`
+                : "/image/logo.png"
+            }
             alt={post.postName}
             width={0}
             height={0}
@@ -28,51 +80,84 @@ export default function PostHistoryCard({ post,userName,role }: { post: PostData
           />
         </div>
         <div className="ml-6 flex-1">
-          <h3 className="text-xl font-semibold text-mainblue mb-2 group-hover:text-mainblue-light transition-colors">
-            {post.postName}
-          </h3>
-          {role === "producer" ? (
-              // Producer View
-              <>
-                <div className="flex items-center text-gray-600">
-                  <Film className="w-4 h-4 mr-2 text-mainblue-light" />
-                  <p className="text-sm">Type: {post.postMediaType}</p>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <User className="w-4 h-4 mr-2 text-mainblue-light" />
-                  <p className="text-sm">Roles: {post.postProjectRoles.join(', ')}
-                  </p>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
-                  <p className="text-sm">
-                    Period: {StartDate} - {EndDate}
-                  </p>
-                </div>
-              </>
-            ) : (
-              // Production Professional View
-              <>
-                <div className="flex items-center text-gray-600">
-                  <User className="w-4 h-4 mr-2 text-mainblue-light" />
-                  {/* <p className="text-sm">Producer: {post.}</p> */}
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Film className="w-4 h-4 mr-2 text-mainblue-light" />
-                  <p className="text-sm">Role: {post.postProjectRoles}</p>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
-                  <p className="text-sm">Completed: {EndDate}</p>
-                </div>
-              </>
+          <div className="flex justify-between items-start">
+            <h3 className="text-xl font-semibold text-mainblue mb-2 group-hover:text-mainblue-light transition-colors">
+              {post.postName}
+            </h3>
+
+            {/* Add Review Button for Producer role if project is completed */}
+            {role === "producer" && post.postStatus === "Success" && (
+              <ReviewSubmissionForm
+                trigger={
+                  <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md hover:bg-mainblue-light transition-colors">
+                    Review Professional
+                  </button>
+                }
+                onSubmit={handleSubmitReview}
+                toast={toast}
+              />
             )}
           </div>
+
+          {role === "producer" ? (
+            // Producer View
+            <>
+              <div className="flex items-center text-gray-600">
+                <Film className="w-4 h-4 mr-2 text-mainblue-light" />
+                <p className="text-sm">Type: {post.postMediaType}</p>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <User className="w-4 h-4 mr-2 text-mainblue-light" />
+                <p className="text-sm">
+                  Roles: {post.postProjectRoles.join(", ")}
+                </p>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
+                <p className="text-sm">
+                  Period: {StartDate} - {EndDate}
+                </p>
+              </div>
+            </>
+          ) : (
+            // Production Professional View
+            <>
+              <div className="flex items-center text-gray-600">
+                <User className="w-4 h-4 mr-2 text-mainblue-light" />
+                {/* <p className="text-sm">Producer: {post.}</p> */}
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Film className="w-4 h-4 mr-2 text-mainblue-light" />
+                <p className="text-sm">
+                  Role:{" "}
+                  {Array.isArray(post.postProjectRoles)
+                    ? post.postProjectRoles.join(", ")
+                    : post.postProjectRoles}
+                </p>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
+                <p className="text-sm">Completed: {EndDate}</p>
+              </div>
+
+              {/* For Production Professionals, add a review button for the project itself */}
+              {post.postStatus === "Success" && (
+                <div className="mt-3">
+                  <ReviewSubmissionForm
+                    trigger={
+                      <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md hover:bg-mainblue-light transition-colors">
+                        Review Project
+                      </button>
+                    }
+                    onSubmit={handleSubmitReview}
+                    toast={toast}
+                  />
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
+    </div>
   );
 }
-function dayjs(endday: Date) {
-  throw new Error("Function not implemented.");
-}
-
