@@ -75,3 +75,10 @@ export interface OfferHistoryData{
     detail: string
 }
 
+export interface ReviewData{
+    postID:string;
+    ratingScore:number;
+    comment:string;
+    createdAt:Date;
+}
+

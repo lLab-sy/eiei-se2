@@ -1,10 +1,11 @@
 import Image from "next/image";
-import { PostDataHistory } from "../../interface";
+import { PostDataHistory, ReviewData } from "../../interface";
 import { Clock, Calendar, User, Film } from "lucide-react";
 import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { z } from "zod";
+import axios from "axios";
 
 export default function PostHistoryCard({
   post,
@@ -42,10 +43,9 @@ export default function PostHistoryCard({
 
   // Handle review submission - fixed logic issue
   async function onSubmit (values: z.infer<typeof formSchema>) {
-      console.log("Submit called")
+      //console.log("Submit called")
       console.log(values)
       if (values.comment.length < 10) {
-        //console.log("Short comment")
         toast({
           variant: "destructive",
           title: "Comment too short",
@@ -54,7 +54,6 @@ export default function PostHistoryCard({
         return;
       }
       if (values.rating < 1 || values.rating > 5) {
-        //console.log("Short comment")
         toast({
           variant: "destructive",
           title: "Invalid Rating",
@@ -62,77 +61,50 @@ export default function PostHistoryCard({
           })
         return;
       }
-      try {
+        const reviewData:ReviewData = {
+          createdAt: new Date(),
+          postID: post.id,
+          ratingScore: values.rating,
+          comment: values.comment
+        }
         // In real app, make API call to submit review
-        const response = await fetch("/api/reviews", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            postId: post.id,
-            // professionalId needs to be passed from elsewhere or hardcoded
-            ...values,
-          }),
-        });
-  
-        if (response.ok) {
+        // idk route for prodprof -> producer  
+        const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/${role === "producer" ? `/users/${values.production}/addReview`:"" }` 
+        const response = await axios.put(
+          apiUrl, reviewData,
+{
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if(!response) {
+          console.log("Post Review Res", response)
+          toast({
+            variant: "destructive",
+            title: "Failed to submit review",
+            description: "Failed to submit review. Please try again.",
+          });
+          return
+        }
+        if (response.data.data.status == "error") {
+          toast({
+            variant: "destructive",
+            title: "Edit Profile",
+            description: response.data.data ?? "Failed to Edit User",
+          });
+          return;
+        }
           // Fixed condition - show success message when response is OK
           toast({
             variant: "default",
             title: "Successful review submission",
             description: "Your review has been submitted!",
           });
-        } else {
-          throw new Error("Failed to submit review");
-        }
-      } catch (error) {
-        console.error("Error submitting review:", error);
-        toast({
-          variant: "destructive",
-          title: "Failed to submit review",
-          description: "Failed to submit review. Please try again.",
-        });
       }
-  }
-  const handleSubmitReview = async (data: {
-    rating: number;
-    comment: string;
-  }) => {
-    try {
-      // In real app, make API call to submit review
-      const response = await fetch("/api/reviews", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          postId: post.id,
-          // professionalId needs to be passed from elsewhere or hardcoded
-          professionalId: "", // This needs to be provided from props or parent component
-          ...data,
-        }),
-      });
+    
 
-      if (response.ok) {
-        // Fixed condition - show success message when response is OK
-        toast({
-          variant: "default",
-          title: "Successful review submission",
-          description: "Your review has been submitted!",
-        });
-      } else {
-        throw new Error("Failed to submit review");
-      }
-    } catch (error) {
-      console.error("Error submitting review:", error);
-      toast({
-        variant: "destructive",
-        title: "Failed to submit review",
-        description: "Failed to submit review. Please try again.",
-      });
-    }
-  };
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden">
