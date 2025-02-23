@@ -154,8 +154,8 @@ const mockOfferHistory: OfferHistoryData[] = [
           <CardHeader className="justify-between flex flex-row">
             <CardTitle className="flex">
               {userRole === "producer"
-                ? "Create Offer"
-                : "Producer name (Owner)"}
+                ? `Create Offer to ${pid} `
+                : `${session.user.username} (Owner)`}
               {/* รอแก้ Project Owner */}
             </CardTitle>
             <FaHistory
