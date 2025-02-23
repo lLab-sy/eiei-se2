@@ -190,6 +190,18 @@ class UserController {
             sendResponse(res, 'error', error)
         }
     }
+
+    async addProductionProfessionalReview(req : Request, res : Response) : Promise<void> {
+        try{
+            const id = req.params.id
+            const newReview = req.body;
+            const user = await userService.addProductionProfessionalReview(id, newReview)
+            
+            sendResponse(res, 'success', user, "Successfully Upload Image")
+        }catch(err){
+            sendResponse(res, 'error', err, err as string, 500)
+        }
+    }
 }
 
 

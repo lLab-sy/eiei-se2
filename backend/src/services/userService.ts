@@ -1,6 +1,6 @@
 import { ProducerDto } from "../dtos/producerDTO";
-import { ProductionProfessionalDtO } from "../dtos/productionProfessionalDTO";
-import { IProducer, searchReqModel } from "../models/userModel"
+import { ProductionProfessionalDtO, RatingDTO } from "../dtos/productionProfessionalDTO";
+import { IProducer, Rating, searchReqModel } from "../models/userModel"
 import bcrypt from 'bcrypt';
 import { IProductionProfessional } from "../models/userModel"
 import ProducerRespository from '../repositories/producerRepository';
@@ -72,6 +72,16 @@ class UserService {
             return response;
         } catch (error) {
             throw new Error("Error in service layer when search Production Professional: " + (error as Error).message);
+        }
+    }
+
+    async addProductionProfessionalReview(id: string, newReviewDTO: RatingDTO): Promise<ProductionProfessionalDtO> {
+        try {
+            const ratingModel: Rating = newReviewDTO
+            const results = await ProductionProfessionalRespository.addProductionProfessionalReview(id, ratingModel)
+            return results;
+        } catch (error) {
+            throw new Error("Error in service layer when add Review to Production Professional: " + (error as Error).message);
         }
     }
 }
