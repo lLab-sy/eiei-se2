@@ -14,6 +14,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes'
 import cloudRouter from './routes/cloudRoutes'
+import hpp from 'hpp';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ const app: Express = express();
 connectDB();
 
 // Middleware
+app.use(hpp());
 app.use(morgan('common'));
 app.use(helmet());
 app.use(cors({origin: true, credentials: true}));
