@@ -13,6 +13,23 @@ export default function PostHistoryList({
   userName:string,
   role:string
 }) {
+  //mock
+  const mockProject: PostDataHistory[] = [{
+      id:"67b1fd4884589ada7fea1918",
+      postName: "rando",
+      postDescription: "guess",
+      postImages: [],
+      postMediaType: "dsdsddd",
+      postProjectRolesOut: [{
+        roleName: "Actor",
+        id: "65b8765432abcd5678ef1234"
+    }],
+      startDate: "2025-02-16T14:59:20.718+00:00", 
+      endDate: "2025-02-16T15:59:20.718+00:00", 
+      postProjectRoles: ["65c8765432abcd5678ef1234"], 
+      postStatus: "success",
+      roleCount:1,
+  }]
   const [currentPage, setCurrentPage] = useState<number>(1);
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
@@ -40,7 +57,8 @@ export default function PostHistoryList({
         {/* Projects Grid */}
         {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {currentProjects.map((project,index) => (
+          {/* {currentProjects.map((project,index) => ( */}
+          {mockProject.map((project,index) => (
             <div
               key={index}
               className="transform hover:-translate-y-1 transition-transform duration-300"

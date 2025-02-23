@@ -4,6 +4,7 @@ import { Clock, Calendar, User, Film } from "lucide-react";
 import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { z } from "zod";
 
 export default function PostHistoryCard({
   post,
@@ -23,7 +24,77 @@ export default function PostHistoryCard({
   const startDateDayJS = new Date(post.startDate);
   const StartDate = startDateDayJS.toDateString();
 
+  const formSchema = z.object({
+    comment: z
+      .string({required_error: "Please type in your comment"})
+      .trim() //prevent case of PURELY whitespace
+      .min(10, { message: "Comment must be at least 10 characters." })
+      .max(1000, { message: "Comment must not exceed 1000 characters." }),
+    rating: z
+      .number({required_error: "Please provide a rating between 1 to 5 star(s)."})
+      .min(1, { message: "Please provide a rating between 1 to 5 star(s)."})
+      .max(5, { message: "Please provide a rating between 1 to 5 star(s)."})
+      .finite(),
+    production: z
+      .string({required_error: "Please select a Production Professional."})
+      .or(z.literal('unneeded')),
+  });
+
   // Handle review submission - fixed logic issue
+  async function onSubmit (values: z.infer<typeof formSchema>) {
+      console.log("Submit called")
+      console.log(values)
+      if (values.comment.length < 10) {
+        //console.log("Short comment")
+        toast({
+          variant: "destructive",
+          title: "Comment too short",
+          description: "Comment must have at least 10 characters.",
+          })
+        return;
+      }
+      if (values.rating < 1 || values.rating > 5) {
+        //console.log("Short comment")
+        toast({
+          variant: "destructive",
+          title: "Invalid Rating",
+          description: "Please provide a rating from 1 to 5 stars.",
+          })
+        return;
+      }
+      try {
+        // In real app, make API call to submit review
+        const response = await fetch("/api/reviews", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            postId: post.id,
+            // professionalId needs to be passed from elsewhere or hardcoded
+            ...values,
+          }),
+        });
+  
+        if (response.ok) {
+          // Fixed condition - show success message when response is OK
+          toast({
+            variant: "default",
+            title: "Successful review submission",
+            description: "Your review has been submitted!",
+          });
+        } else {
+          throw new Error("Failed to submit review");
+        }
+      } catch (error) {
+        console.error("Error submitting review:", error);
+        toast({
+          variant: "destructive",
+          title: "Failed to submit review",
+          description: "Failed to submit review. Please try again.",
+        });
+      }
+  }
   const handleSubmitReview = async (data: {
     rating: number;
     comment: string;
@@ -110,10 +181,13 @@ export default function PostHistoryCard({
             <div className="flex justify-end z-50">
               <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
                      hover:bg-mainblue-light transition-colors" onClick={(e)=>{
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setIsOpen(true)}}>
-                      {role === "producer" ? "Review Professional" : "Review Project"}
+                        e.preventDefault()
+                        e.stopPropagation()
+                        console.log(setIsOpen)
+                        console.log(isOpen)
+                        setIsOpen(true)
+                        }}>
+                      Review Professional
                     </button>
             </div>
             )}
@@ -138,14 +212,26 @@ export default function PostHistoryCard({
                 <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
                 <p className="text-sm">Completed: {EndDate}</p>
               </div>
+              {post.postStatus === "success" && (
+              <div className="flex justify-end z-50">
+                <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
+                     hover:bg-mainblue-light transition-colors" onClick={(e)=>{
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setIsOpen(true)}}>
+                        Review Project
+                    </button>
+              </div>
+              )}
             </>
           )}
         </div>
       </div>
       <ReviewSubmissionForm
+                role = {role}
                 isOpen = {isOpen}
                 setIsOpen={setIsOpen}
-                onSubmit={handleSubmitReview}
+                onSubmit={onSubmit}
                 toast={toast}
               />
     </div>
