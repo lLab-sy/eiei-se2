@@ -71,8 +71,8 @@ async getPost(id:string): Promise<PostDTO|null> {
             id: post.id.toString(),
             postName: post.postName as string,
             postDescription: post.postDescription as string,
-            postImages: postImages as [string],
-            postMediaType: post.postMediaType.toString() as string,
+            postImages: post.postImages as [string],
+            postMediaType: post.postMediaType.toString(),
             postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
               id: (eachRole as any)._id.toString(),
               roleName: (eachRole as any).roleName
