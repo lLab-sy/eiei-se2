@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useState, FormEvent, SetStateAction, Dispatch, useEffect } from "react";
-import { Check, ChevronsUpDown, Command, FileDiff, Link, Star } from "lucide-react";
+import React, { SetStateAction, Dispatch, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,21 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import StarRating from "./StarRating";
 import ReviewComment from "./ReviewComment";
 import ReviewProfessionalList from "./ReviewProfessionalList";
@@ -71,35 +59,6 @@ const ReviewSubmissionForm = ({
   setIsOpen,
   onSubmit,
 toast}: ReviewSubmissionFormProps) => {
-  const [rating, setRating] = useState(0);
-  const [hoveredRating, setHoveredRating] = useState(0);
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (rating === 0) {
-      //console.log("Rating === 0")
-      toast({
-        variant: "destructive",
-        title: "No rating provided",
-        description: "Please provide a rating between 1 to 5 star(s).",
-        })
-      return;
-    }
-
-    if (commentValue.length < 10) {
-      //console.log("Short comment")
-      toast({
-        variant: "destructive",
-        title: "Comment too short",
-        description: "Comment must have at least 10 characters.",
-        })
-      return;
-    }
-    setIsOpen(false);
-    setRating(0);
-  };
-
   const handleClick = (e:React.MouseEvent<HTMLDivElement>) => {e.stopPropagation()}
 
 

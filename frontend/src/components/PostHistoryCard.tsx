@@ -102,6 +102,7 @@ export default function PostHistoryCard({
             title: "Successful review submission",
             description: "Your review has been submitted!",
           });
+          setIsOpen(false)
       }
     
 
