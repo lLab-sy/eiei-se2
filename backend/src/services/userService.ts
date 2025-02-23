@@ -1,7 +1,6 @@
 import { ProducerDto } from "../dtos/producerDTO";
 import { ProductionProfessionalDtO, RatingDTO } from "../dtos/productionProfessionalDTO";
 import { IProducer, Rating, searchReqModel } from "../models/userModel"
-import bcrypt from 'bcrypt';
 import { IProductionProfessional } from "../models/userModel"
 import ProducerRespository from '../repositories/producerRepository';
 import ProductionProfessionalRespository from "../repositories/productionProfessionalRespository";
@@ -38,7 +37,7 @@ class UserService {
 
             const res = await ProducerRespository.updateProducer(producerDTO as IProducer, id);
             return res;
-        } catch (error : any) {
+        } catch (error) {
             console.error("Error in service layer:", error);
             throw new Error("Error in service layer: " + (error as Error).message);
         }
@@ -50,7 +49,7 @@ class UserService {
         //     const professionalObject = { ...productionDTO, password:hashedPassword };
             const res = await ProductionProfessionalRespository.updateProductionProfessional(productionDTO as IProductionProfessional, id);
             return res;
-        } catch (error : any) {
+        } catch (error) {
             console.error("Error updating Production Professional:", error);
             throw new Error("Error in service layer: " + (error as Error).message);
         }
