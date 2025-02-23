@@ -2,19 +2,26 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsArray, IsNumber, Min, Max, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { UserDTO } from './userDTO';
+import { ObjectId } from 'mongoose';
 
-class RatingDto {
+export class RatingDTO {
+  @ApiProperty({ description: 'postID (ObjectID)', required: true })
+  // @IsObject()
+  postID?: ObjectId
+
   @ApiProperty({ description: 'Rating score (0-5)', required: false, minimum: 0, maximum: 5 })
-  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(5)
   ratingScore?: number;
 
   @ApiProperty({ description: 'Comment for the rating', required: false })
-  @IsOptional()
   @IsString()
   comment?: string;
+
+  @ApiProperty({ description: 'Created at', required: false })
+  @IsString()
+  createdAt?: Date;
 }
 
 export class ProductionProfessionalDtO extends UserDTO {
@@ -35,9 +42,9 @@ export class ProductionProfessionalDtO extends UserDTO {
   @Min(0)
   experience?: number;
 
-  @ApiProperty({ description: 'Ratings received', required: false, type: [RatingDto] })
+  @ApiProperty({ description: 'Ratings received', required: false, type: [RatingDTO] })
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => RatingDto)
-  rating?: RatingDto[];
+  @Type(() => RatingDTO)
+  rating?: RatingDTO[];
 }
