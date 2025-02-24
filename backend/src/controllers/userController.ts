@@ -1,3 +1,4 @@
+import { RatingDTO } from "../dtos/productionProfessionalDTO";
 import { searchReqDTO } from "../dtos/userDTO";
 import cloudService from "../services/cloudService";
 import userService from "../services/userService";
@@ -194,7 +195,8 @@ class UserController {
     async addProductionProfessionalReview(req : Request, res : Response) : Promise<void> {
         try{
             const id = req.params.id
-            const newReview = req.body;
+            const newReview: RatingDTO = req.body;
+
             const user = await userService.addProductionProfessionalReview(id, newReview)
             
             sendResponse(res, 'success', user, "Successfully Upload Image")
