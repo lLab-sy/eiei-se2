@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
-import { PostSearchRequestDTO, OfferRequestDTO, GetPostByProfDTO } from '../dtos/postDTO';
+import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
 import cloudService from '../services/cloudService';
@@ -210,6 +210,24 @@ class PostController {
       sendResponse(res, 'success', posts, 'Successfully search posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
+    }
+  };
+
+  async addPostReview(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const postID  = req.params.id
+      const userID = req.user.userId
+      const newRating:PaticipantRatingDTO = req.body
+
+      console.log('this is post id')
+      console.log(postID)
+      console.log('a rai wa')
+      
+      const post = await postService.addPostReview(postID, userID, newRating)
+
+      sendResponse(res, 'success', post, 'Successfully add review to post');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
   };
 

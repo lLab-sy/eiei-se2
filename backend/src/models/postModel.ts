@@ -9,6 +9,12 @@ export interface OfferHistory {
     createdAt: Date; // Date when the offer was created
 }
 
+export interface PaticipantRating {
+    ratingScore: number;
+    comment: string; 
+    reviewedAt: Date|null; // Date of review for the participant
+}
+
 // Participant Detail Model
 export interface ParticipantDetail {
     participantID: mongoose.Schema.Types.ObjectId; // Production Professional ID

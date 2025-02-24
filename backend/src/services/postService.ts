@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO } from '../dtos/postDTO';
-import Post, { GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO } from '../dtos/postDTO';
+import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
@@ -224,28 +224,33 @@ async getPost(id:string): Promise<PostDTO|null> {
       throw new Error('Error create offer in service layer: ' + error);
     }
   }
+
+  convertModelToDTO(post: IPost): PostDTO {
+    const postId = post._id?post._id.toString():'';
+          // console.log(post.postMediaType)
+    return new PostDTO({
+      id: postId,
+      postName: post.postName as string,
+      postDescription: post.postDescription as string,
+      postImages: post.postImages as [string],
+      postMediaType: post.postMediaType.toString() as string,
+      postImagesKey: post.postImages,
+      postProjectRoles: post.postProjectRoles.map(eachRole=>(
+        eachRole.toString()
+      )) as [string],
+      participants: post.participants,
+      postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+      startDate: post.startDate? post.startDate.toString():"",
+      endDate: post.endDate?post.endDate.toString():""
+    });
+  }
+
   async searchPost(postSearchReq: PostSearchRequestDTO): Promise<PaginatedResponseDTO<PostDTO>> {
     try {
       const postM: PostSearchRequestModel = postSearchReq
 
       const res = await postRepository.searchPost(postM);
-      const resDTO = res.data.map((post) => {
- 
-
-        return new PostDTO({
-        id: post.id?.toString(),
-        postName: post.postName as string,
-        postDescription: post.postDescription as string,
-        postImages: post.postImages as [string],
-        postMediaType: post.postMediaType.toString() as string,
-        postProjectRoles: post.postProjectRoles.map(eachRole=>(
-          eachRole.toString()
-        )) as [string],
-        postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-        // postDetailID: post.postDetailID.toString() as string,
-        startDate: post.startDate?post.startDate:"",  
-        endDate: post.endDate?post.endDate:""
-      })})
+      const resDTO = res.data.map((post) => this.convertModelToDTO(post))
 
       const response: PaginatedResponseDTO<PostDTO> = {
         data: resDTO,
@@ -263,6 +268,19 @@ async getPost(id:string): Promise<PostDTO|null> {
     }
   }
 
+  public async addPostReview(postID: string, participantID: string, newRating: PaticipantRatingDTO): Promise<PostDTO> {
+    try {
+      console.log('service!')
+      newRating.reviewedAt = new Date();
+      console.log('can add new date!')
+      console.log(newRating)
+      const rawResult: IPost = await postRepository.addPostReview(postID, participantID, newRating);
+      console.log("kor pan nii")
+      return this.convertModelToDTO(rawResult);
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
   async getOffer(offerReq: OfferRequestDTO): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
     try {
       const offerRequest: GetOfferRequestModel = offerReq
