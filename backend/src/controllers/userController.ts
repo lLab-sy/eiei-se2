@@ -1,3 +1,4 @@
+import { RatingDTO } from "../dtos/productionProfessionalDTO";
 import { searchReqDTO } from "../dtos/userDTO";
 import cloudService from "../services/cloudService";
 import userService from "../services/userService";
@@ -128,7 +129,7 @@ class UserController {
             console.log('imageKey',imageKey)
             const returnData = await cloudService.uploadImageToGetURLWithDeleteCondition(buffer!, mimetype!, imageKey, id)
             
-            sendResponse(res, 'success', returnData, "Successfully Upload Image")
+            sendResponse(res, 'success', returnData, "Successfully Add review")
         }catch(err : any){
             console.log(err)
             sendResponse(res, 'error', err?.message ?? "Failed to upload profile")
@@ -188,6 +189,19 @@ class UserController {
             sendResponse(res, 'success', result)
         } catch (error) {
             sendResponse(res, 'error', error)
+        }
+    }
+
+    async addProductionProfessionalReview(req : Request, res : Response) : Promise<void> {
+        try{
+            const id = req.params.id
+            const newReview: RatingDTO = req.body;
+
+            const user = await userService.addProductionProfessionalReview(id, newReview)
+            
+            sendResponse(res, 'success', user, "Successfully Upload Image")
+        }catch(err){
+            sendResponse(res, 'error', err, err as string, 500)
         }
     }
 }

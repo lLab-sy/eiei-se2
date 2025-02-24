@@ -1,7 +1,5 @@
-import { IsString, IsNotEmpty, MaxLength, IsEnum, IsDate, IsArray, ArrayNotEmpty, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import mongoose from 'mongoose';
-
 class PostProjectRoleDTO {
     @ApiProperty({ description: 'Role ID', type: String })
     id!: string;
