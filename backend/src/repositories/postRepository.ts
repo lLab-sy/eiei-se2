@@ -84,12 +84,16 @@ class PostRepository {
         }
     }
 
-    public async getPost(id:string) {
+    public async getPost(id:string): Promise<IPost> {
         try {
-             const objectId = new ObjectId(id);
-             const posts= await Post.findById(objectId).populate(['postProjectRoles']);
-        
-             return posts
+            const objectId = new ObjectId(id);
+            const post: IPost | null = await Post.findById(objectId).populate(['postProjectRoles']);
+            
+            if (!post) {
+                throw new Error('Error fetching posts from repository: post is null');
+            }
+
+            return post
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);
         }
