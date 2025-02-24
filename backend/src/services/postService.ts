@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
 import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO } from '../dtos/postDTO';
-import Post, { GetOfferRequestModel, getPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import Post, { GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
@@ -296,9 +296,9 @@ async getPost(id:string): Promise<PostDTO|null> {
     }
   }
 
-  async getPostsByProf(getPostReq: getPostByProfRequestModel): Promise<PaginatedResponseDTO<PostDTO>> {
+  async getPostsByProf(getPostReq: GetPostByProfRequestModel): Promise<PaginatedResponseDTO<PostDTO>> {
     try {
-      const postsReq:getPostByProfRequestModel = getPostReq;
+      const postsReq:GetPostByProfRequestModel = getPostReq;
       const res = await postRepository.getPostsByProf(postsReq);
       const resDTO = res.data.map((post) => {
  

@@ -209,7 +209,7 @@ export interface GetOfferResponse {
     totalItems: number
 }
 
-export interface getPostByProfRequestModel {
+export interface GetPostByProfRequestModel {
     userId: string;
     postStatus: string;
     limit: number;
