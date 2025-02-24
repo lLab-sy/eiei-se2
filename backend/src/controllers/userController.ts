@@ -128,7 +128,7 @@ class UserController {
             console.log('imageKey',imageKey)
             const returnData = await cloudService.uploadImageToGetURLWithDeleteCondition(buffer!, mimetype!, imageKey, id)
             
-            sendResponse(res, 'success', returnData, "Successfully Upload Image")
+            sendResponse(res, 'success', returnData, "Successfully Add review")
         }catch(err : any){
             console.log(err)
             sendResponse(res, 'error', err?.message ?? "Failed to upload profile")

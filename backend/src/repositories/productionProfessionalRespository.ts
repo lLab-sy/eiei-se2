@@ -114,14 +114,6 @@ class ProductionProfessionalRespository {
                 throw new Error("Id is required");
             }
 
-            const existingReview = await ProductionProfessional.findOne({
-                _id: id,
-                rating: { $elemMatch: newRatingModel },
-            });
-
-            if (existingReview) {
-                throw new Error('Already haa this review') 
-            }
             const pipelineStage: PipelineStage[] = [];
 
             pipelineStage.push({$match: {_id: new ObjectId(id)}})
