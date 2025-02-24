@@ -143,7 +143,24 @@ const upload = multer({
  *           type: string
  *           format: date-time
  *           description: The end date of the post
+ * 
+ * 
+ *     PaticipantRatingDTO:
+ *       type: object
+ *       required:
+ *         - ratingScore
+ *         - comment
+ *       properties:
+ *         ratingScore:
+ *           type: number
+ *           minimum: 0
+ *           maximum: 5
+ *           description: rating score in range 0-5
+ *         comment:
+ *           type: string
+ *           description: comment about user work
  */
+
 
 
 /**
@@ -197,6 +214,43 @@ const upload = multer({
  *         description: Server error
  */
 router.get('/posts/search', postController.searchPost);
+
+
+/**
+ * @swagger
+ * /api/v1/posts/{id}/addReview:
+ *   post:
+ *     summary: Add review to post by user (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PaticipantRatingDTO'
+ *     responses:
+ *       201:
+ *         description: The created post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PostDTO'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandler, postController.addPostReview as RequestHandler);
 
 /**
  * @swagger
