@@ -84,6 +84,101 @@ class PostRepository {
         }
     }
 
+    public async getHistoryPostsByProductionProfessional(id:string){
+        try{
+            const matchStage: PipelineStage[] = [];
+            matchStage.push({
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({
+                $match: {
+                    $and: [
+                      {
+                        'participants.participantID':
+                          new ObjectId(id)
+                      },
+                      { 'participants.status': 'candidate' }
+                    ]
+                  }
+            })
+
+            matchStage.push({
+                $project: {
+                    endDate: 1,
+                    postDescription: 1,
+                    postImages: 1,
+                    postMediaType: 1,
+                    postName: 1,
+                    postProjectRolesOut: {
+                      $arrayElemAt: [
+                        '$participants.offer.role',
+                        -1
+                      ]
+                    },
+                    postStatus: 1,
+                    startDate: 1,
+                    producerName: '$userID'
+            }})
+
+            matchStage.push({
+                
+                    $lookup: {
+                        from: 'postRoleTypes',
+                        localField: 'postProjectRolesOut',
+                        foreignField: '_id',
+                        as: 'postProjectRolesOut'
+                    }
+            })
+
+            matchStage.push({
+                $lookup: {
+                    from: 'users',
+                    localField: 'producerName',
+                    foreignField: '_id',
+                    as: 'producerName'
+                  }
+            })
+
+            matchStage.push({
+                $project: {
+                    endDate: 1,
+                    postDescription: 1,
+                    postImages: 1,
+                    postMediaType: 1,
+                    postName: 1,
+                    postProjectRolesOut: {
+                      $arrayElemAt: [
+                        '$postProjectRolesOut',
+                        0
+                      ]
+                    },
+                    postStatus: 1,
+                    startDate: 1,
+                    producerName: {
+                      $arrayElemAt: ['$producerName', 0]
+                    }
+                  }
+            })
+            const totalItemsResult = await Post.aggregate(matchStage);
+            return totalItemsResult
+        }catch(error) {
+            throw new Error('Error Get Posts history Production professional from repository: ' + error);
+        }
+    }
+
     public async getPost(id:string) {
         try {
              const objectId = new ObjectId(id);

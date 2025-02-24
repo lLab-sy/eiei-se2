@@ -117,7 +117,7 @@ async getPostDetail(id: string): Promise<PostDetailDTO | null> {
       throw new Error('Error in service layer: ' + error);
     }
   }
-  async getProductionProfessionalPosts(id:string){
+  async getProductionProfessionalPosts(id:string,role:string){
    try {
          const posts = await postDetailRepository.findProductionProfessionalByID(id);
          if(posts){

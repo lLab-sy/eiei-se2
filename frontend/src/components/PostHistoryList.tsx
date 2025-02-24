@@ -48,11 +48,11 @@ export default function PostHistoryList({
         </div> : <></>}
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12 m-auto w-[100%]">
           {currentProjects ? currentProjects.map((project,index) => (
             <div
               key={index}
-              className="transform hover:-translate-y-1 transition-transform duration-300"
+              className="transform hover:-translate-y-1 transition-transform duration-300 m-auto"
             >
               <Link href={`/post/${project.id}`}>
                 <PostHistoryCard post={project} userName={userName} role={role} />

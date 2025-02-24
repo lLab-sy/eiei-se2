@@ -16,10 +16,13 @@ export interface PostData {
 export interface PostDataHistory {
     id:string,
     postName: string;
+    producerName: ProducerResponse;
     postDescription: string;
     postImages: string[];
+    postImagesKey?: string[];
     postMediaType: string;
     postProjectRolesOut?: PostRolesResponse[]
+    postProjectRolesOutProfessional?: PostRolesResponse
     startDate: string; 
     endDate: string;   
     postProjectRoles: string[]; 
@@ -47,6 +50,11 @@ export interface PostDataHistory {
 
 export interface PostRolesResponse{
     roleName: string,
+    id: string
+}
+
+export interface ProducerResponse{
+    producerName: string,
     id: string
 }
 
