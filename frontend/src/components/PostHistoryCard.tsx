@@ -119,10 +119,9 @@ export default function PostHistoryCard({
                 : "/image/logo.png"
             }
             alt={post.postName}
-            width={0}
-            height={0}
-            fill
-            className="object-cover"
+            width={parent.innerWidth}
+            height={parent.innerHeight}
+            className="object-cover w-[40%] h-[50%] rounded-lg"
           />
         </div>
         <div className="ml-6 flex-1">

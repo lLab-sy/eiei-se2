@@ -24,6 +24,11 @@ export interface PaticipantRatingDTO {
     comment: string; 
     reviewedAt: Date|null; // Date of review for the participant
 }
+export interface ProducerDisplayDTO{
+    userID: string;
+    producerName: string;
+}
+
 
 export interface OfferDTO{ //ซ้ำกับบูม
     role: string;
@@ -272,6 +277,9 @@ export class PostWithRoleCountDTO extends PostDTO{
     @IsArray()
     @IsString({ each: true })
     postProjectRoles!: string[];
+
+    producerName!: ProducerDisplayDTO
+    postProjectRolesOutProfessional!: PostRoleDTO
 
     constructor(data: Partial<PostWithRoleCountDTO>){
         super(data);

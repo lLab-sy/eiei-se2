@@ -72,10 +72,13 @@ export interface UserData{
 export interface PostDataHistory {
     id:string,
     postName: string;
+    producerName: ProducerResponse;
     postDescription: string;
     postImages: string[];
+    postImagesKey?: string[];
     postMediaType: string;
     postProjectRolesOut?: PostRolesResponse[]
+    postProjectRolesOutProfessional?: PostRolesResponse
     startDate: string; 
     endDate: string;   
     postProjectRoles: string[]; 
@@ -126,6 +129,11 @@ export interface ProfessionalsData{
 
 export interface PostRolesResponse{
     roleName: string,
+    id: string
+}
+
+export interface ProducerResponse{
+    producerName: string,
     id: string
 }
 

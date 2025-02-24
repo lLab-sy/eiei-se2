@@ -115,31 +115,69 @@ async getPost(id:string): Promise<PostDTO|null> {
   }
 }
 
-  async getPostsbyUser(id:string): Promise<PostWithRoleCountDTO[]|null> {
+  async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null> {
     try {
-      const posts = await postRepository.getPostsByUser(id);
-      if(posts){
-        const result = posts.map((post) => {
-          const postId = post._id?post._id.toString():'';
-          // console.log(post.postMediaType)
-          return new PostWithRoleCountDTO({
-              id: postId,
-              postName: post.postName as string,
-              postDescription: post.postDescription as string,
-              postImages: post.postImages as [string],
-              postMediaType: post.postMediaType as string,
-              roleCount: post.roleCount as number,
-              postImagesKey: post.postImages,
-              postProjectRoles: post.postProjectRoles as string[],
-              postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-              startDate: post.startDate? post.startDate.toString():"",
-              endDate: post.endDate?post.endDate.toString():""
-            });
-        })
+      var result;
+      if(role=="producer"){
+        const posts = await postRepository.getPostsByUser(id);
+        if(posts){
+              result = await Promise.all(posts.map(async (post) => {
+              const postId = post._id?post._id.toString():'';
+              const postImages = await Promise.all(
+                post.postImages.map(async (eachImg: string) => {
+                    return await cloudService.getSignedUrlImageCloud(eachImg);
+                }));
+              // console.log(post.postMediaType)
+              return new PostWithRoleCountDTO({
+                  id: postId,
+                  postName: post.postName as string,
+                  postDescription: post.postDescription as string,
+                  postImages: postImages as string[],
+                  postMediaType: post.postMediaType as string,
+                  roleCount: post.roleCount as number,
+                  postProjectRoles: post.postProjectRoles as string[],
+                  postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                  startDate: post.startDate? post.startDate.toString():"",
+                  endDate: post.endDate?post.endDate.toString():""
+                });
+            }))
+            return result;
+        }
+        return null
         // console.log(result)
-        return result;
+      }else{
+        const posts = await postRepository.getHistoryPostsByProductionProfessional(id);
+        if(posts){
+              result = await Promise.all(posts.map(async (post) => {
+              const postId = post._id?post._id.toString():'';
+              const postImages = await Promise.all(
+                post.postImages.map(async (eachImg: string) => {
+                    return await cloudService.getSignedUrlImageCloud(eachImg);
+                }));
+              // console.log(post.postMediaType)
+              return new PostWithRoleCountDTO({
+                  id: postId,
+                  producerName: {
+                    userID: post.producerName?._id,
+                    producerName: post.producerName?.username
+                  } as ProducerDisplayDTO,
+                  postProjectRolesOutProfessional: post.postProjectRolesOut,
+                  postName: post.postName as string,
+                  postDescription: post.postDescription as string,
+                  postImages: postImages as string[],
+                  postMediaType: post.postMediaType as string,
+                  roleCount: post.roleCount as number,
+                  postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                  startDate: post.startDate? post.startDate.toString():"",
+                  endDate: post.endDate?post.endDate.toString():""
+                });
+            }))
+            console.log("POST",posts)
+            return result;
+        }
+        return null
       }
-        return null 
+      
     }catch (error) {
           console.error('Error in service layer:', error);
           throw new Error('Error in service layer: ' + error);
