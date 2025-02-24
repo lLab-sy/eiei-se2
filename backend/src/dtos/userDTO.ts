@@ -72,3 +72,23 @@ export interface searchReqDTO {
   limit: number;
   page: number;
 }
+
+export class receivedReviewDTO{
+  reviewerName!: string;
+  reviewerProfileImage?: string;
+  ratingScore!: number;
+  comment!: string;
+  constructor(init:{reviewerName: string, reviewerProfileImage:string, ratingScore:number, comment:string}){
+    this.reviewerName = init.reviewerName;
+    this.reviewerProfileImage = init.reviewerProfileImage;
+    this.ratingScore = init.ratingScore;
+    this.comment = init.comment;
+  }
+}
+
+export class receivedReviewsDTO{
+  receivedReviews!: receivedReviewDTO[];
+  constructor(init:{receivedReviews: receivedReviewDTO[]}){
+    this.receivedReviews = init.receivedReviews;
+  }
+}

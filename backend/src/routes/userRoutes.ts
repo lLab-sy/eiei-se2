@@ -263,4 +263,8 @@ router.get("/search", userController.search);
  */
 router.get("/:id", userController.getUserByID);
 
+
+//getUserReceivedReviews
+router.get("/receivedreviews/:id",userController.getUserReceivedReviewsByID);
+
 export default router

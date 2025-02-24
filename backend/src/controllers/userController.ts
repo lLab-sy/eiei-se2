@@ -190,6 +190,23 @@ class UserController {
             sendResponse(res, 'error', error)
         }
     }
+
+
+
+    async getUserReceivedReviewsByID(req: Request, res: Response): Promise<void>{
+        try{
+            const userID = req.params.id;
+            if(!userID){
+                sendResponse(res, 'error', 'No User')
+                return;
+            }
+            const userReceivedReviews = await userService.getUserReceivedReviewsByID(userID)
+            sendResponse(res, 'success', userReceivedReviews, "Successfully get user received reviews")
+        }catch(err){
+            console.log(err)
+            sendResponse(res, 'error', 'control layer Failed to get user received reviews')
+        }
+    }
 }
 
 
