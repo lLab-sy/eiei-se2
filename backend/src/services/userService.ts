@@ -4,7 +4,7 @@ import { IProducer, Rating, searchReqModel } from "../models/userModel"
 import { IProductionProfessional } from "../models/userModel"
 import ProducerRespository from '../repositories/producerRepository';
 import ProductionProfessionalRespository from "../repositories/productionProfessionalRespository";
-import { searchReqDTO } from "../dtos/userDTO";
+import { searchReqDTO ,receivedReviewDTO, receivedReviewsDTO} from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
 import userRepository from "../repositories/userRepository";
 import postRepository from "../repositories/postRepository";
@@ -97,6 +97,37 @@ class UserService {
             return results;
         } catch (error) {
             throw new Error("Error in service layer when add Review to Production Professional: " + (error as Error).message);
+        }
+    }
+}
+    async getUserReceivedReviewsByID(id:string){
+        try{
+            const userReceivedReviews = await userRepository.getUserReceivedReviewsByID(id);
+
+            const result = await Promise.all(
+                userReceivedReviews.map(async (r) => {
+                    return new receivedReviewsDTO({
+                        receivedReviews: await Promise.all(
+                            r.reviews.map(async (review: receivedReviewDTO) => {
+                                let reviewerProfileImageTmp = review.reviewerProfileImage
+                                    ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage)
+                                    : '';
+                                return new receivedReviewDTO({
+                                    reviewerName: review.reviewerName as string,
+                                    reviewerProfileImage: reviewerProfileImageTmp,
+                                    ratingScore: review.ratingScore,
+                                    comment: review.comment as string
+                                })
+                            })
+                        )
+                    })
+                })
+            )
+
+            return result;
+        }catch(error){
+            console.error("Error service layer fetching user received reviews", error);
+            throw error;
         }
     }
 }
