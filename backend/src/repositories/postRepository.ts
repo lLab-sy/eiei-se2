@@ -304,7 +304,10 @@ class PostRepository {
             const result = await Post.findOneAndUpdate(
                 {
                   _id: postID,
+                  "postStatus": "success", // post success
                   "participants.participantID": participantID, // Ensure has paticipant in post
+                  "participants.status": "candidate", // cadidate only
+                  "participants.reviewedAt": { $exists: false }, // make sure that no review when add to this post
                 },
                 { $set: { 
                     "participants.$.ratingScore": newRating.ratingScore,
