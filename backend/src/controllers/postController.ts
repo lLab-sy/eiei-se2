@@ -219,9 +219,6 @@ class PostController {
       const userID = req.user.userId
       const newRating:PaticipantRatingDTO = req.body
 
-      console.log('this is post id')
-      console.log(postID)
-      console.log('a rai wa')
       
       const post = await postService.addPostReview(postID, userID, newRating)
 

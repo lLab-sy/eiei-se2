@@ -270,12 +270,9 @@ async getPost(id:string): Promise<PostDTO|null> {
 
   public async addPostReview(postID: string, participantID: string, newRating: PaticipantRatingDTO): Promise<PostDTO> {
     try {
-      console.log('service!')
       newRating.reviewedAt = new Date();
-      console.log('can add new date!')
-      console.log(newRating)
+
       const rawResult: IPost = await postRepository.addPostReview(postID, participantID, newRating);
-      console.log("kor pan nii")
       return this.convertModelToDTO(rawResult);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
