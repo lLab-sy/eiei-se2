@@ -7,6 +7,9 @@ import ProductionProfessionalRespository from "../repositories/productionProfess
 import { searchReqDTO } from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
 import userRepository from "../repositories/userRepository";
+import postRepository from "../repositories/postRepository";
+import { PostDTO } from "../dtos/postDTO";
+import { IPost } from "../models/postModel";
 
 class UserService {
     async getUser(username:string){
@@ -76,7 +79,20 @@ class UserService {
 
     async addProductionProfessionalReview(id: string, newReviewDTO: RatingDTO): Promise<ProductionProfessionalDtO> {
         try {
+            // check post status
+
+            if (newReviewDTO.postID == undefined) {
+                throw new Error("Error in service layer when add Review to Production Professional : postID is 'undefined'");
+            }
+
+            const post: IPost = await postRepository.getPost(newReviewDTO.postID.toString())
+            if (post.postStatus != "success"){
+                throw new Error("Error in service layer when add Review to Production Professional : postStatus not 'success'");
+            }
+
             const ratingModel: Rating = newReviewDTO
+
+
             const results = await ProductionProfessionalRespository.addProductionProfessionalReview(id, ratingModel)
             return results;
         } catch (error) {
