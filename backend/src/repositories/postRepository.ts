@@ -298,9 +298,6 @@ class PostRepository {
             if (!postID) {
                 throw new Error("Id is required");
             }
-            console.log('repository')
-            console.log(participantID)
-            console.log(postID)
             const result = await Post.findOneAndUpdate(
                 {
                   _id: postID,
