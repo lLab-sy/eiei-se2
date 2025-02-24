@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PaticipantRating, PostSearchRequestModel, PostSearchResponse } from '../models/postModel';
 import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
@@ -289,6 +289,40 @@ class PostRepository {
             return response
         } catch (error) {
             throw new Error('Error search post in repository: ' + error);
+        }
+    }
+
+    public async addPostReview(postID: string, participantID: string, newRating: PaticipantRating) {
+        try {
+            if (!postID) {
+                throw new Error("Id is required");
+            }
+            console.log('repository')
+            console.log(participantID)
+            console.log(postID)
+            const result = await Post.findOneAndUpdate(
+                {
+                  _id: postID,
+                  "participants.participantID": participantID, // Ensure has paticipant in post
+                },
+                { $set: { 
+                    "participants.$.ratingScore": newRating.ratingScore,
+                    "participants.$.comment": newRating.comment,
+                    "participants.$.reviewedAt": newRating.reviewedAt,
+                 }}, // Update the matching element
+                { new: true, runValidators: true }
+            );
+            
+            if (!result) {
+                console.log('not found')
+                throw new Error('Production professional (participantID) not found in this Post');
+            }
+
+            return result
+        }
+        catch(err){
+            console.log(err)
+            throw new Error('Cannot Update this Post: ' + err)
         }
     }
 }
