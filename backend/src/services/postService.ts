@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO } from '../dtos/postDTO';
-import Post, { ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO } from '../dtos/postDTO';
+import Post, { GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
@@ -260,6 +260,76 @@ async getPost(id:string): Promise<PostDTO|null> {
 
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  async getOffer(offerReq: OfferRequestDTO): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
+    try {
+      const offerRequest: GetOfferRequestModel = offerReq
+
+      const res = await postRepository.getOffer(offerRequest);
+      const resDTO = res.data.map((offer) => {
+        return new OfferResponseDTO({
+          _id: offer._id as string,
+          postName: offer.postName,
+          roleName: offer.roleName, // Role offered to the participant
+          currentWage: offer.currentWage, // The amount offered for the role
+          reason: offer.reason,
+          offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
+          status: offer.status,
+          createdAt: offer.createdAt
+        })         
+      });
+      const response: PaginatedResponseDTO<OfferResponseDTO> = {
+        data: resDTO,
+        meta: {
+            page: offerReq.page,
+            limit: offerReq.limit,
+            totalItems: res.totalItems,
+            totalPages: Math.ceil(res.totalItems / offerReq.limit)
+        } as PaginationMetaDTO
+      }
+      return response;
+
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  async getPostsByProf(getPostReq: GetPostByProfRequestModel): Promise<PaginatedResponseDTO<PostDTO>> {
+    try {
+      const postsReq:GetPostByProfRequestModel = getPostReq;
+      const res = await postRepository.getPostsByProf(postsReq);
+      const resDTO = res.data.map((post) => {
+ 
+        return new PostDTO({
+        id: post._id?.toString(),
+        postName: post.postName as string,
+        postDescription: post.postDescription as string,
+        postImages: post.postImages as [string],
+        postMediaType: post.postMediaType.toString() as string,
+        postProjectRoles: post.postProjectRoles.map(eachRole=>(
+          eachRole.toString()
+        )) as [string],
+        postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+        // postDetailID: post.postDetailID.toString() as string,
+        startDate: post.startDate?post.startDate:"",  
+        endDate: post.endDate?post.endDate:""
+      })})
+
+      const response: PaginatedResponseDTO<PostDTO> = {
+        data: resDTO,
+        meta: {
+            page: getPostReq.page,
+            limit: getPostReq.limit,
+            totalItems: res.totalItems,
+            totalPages: Math.ceil(res.totalItems / getPostReq.limit)
+        } as PaginationMetaDTO
+      }
+      return response;
+    }catch (error) {
+          console.error('Error in service layer:', error);
+          throw new Error('Error in service layer: ' + error);
     }
   }
 
