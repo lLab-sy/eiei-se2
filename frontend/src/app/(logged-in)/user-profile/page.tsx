@@ -782,7 +782,9 @@ export default function UserPage() {
             </Form>
           </CardContent>
         </Card>
-        <Card className='w-[535px] h-[800px] relative'>
+        {
+          (user.user.role !== 'producer') ?
+          <Card className='w-[535px] h-[800px] relative'>
           <CardHeader>
               <CardTitle>Your Review</CardTitle>
           </CardHeader>
@@ -793,7 +795,9 @@ export default function UserPage() {
             </div>
 
           </CardContent>
-        </Card>
+        </Card> : ""
+        }
+        
       </div>
     </main>
   );
