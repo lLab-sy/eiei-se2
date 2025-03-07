@@ -499,8 +499,65 @@ class PostRepository {
             }
             pipeline.push(projectStage);
 
+            if(postStatus){ // postStatus If it has
+                matchStage.push({
+                    $match: { postStatus: 'success' }
+                })
+            }
+
+            matchStage.push({ //unwind paticipant
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({ //unwind each offer
+                $unwind: {
+                    path: '$participants.offer',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            if(userId){
+                matchStage.push({ //paticipant in post if it has
+                    $match: {
+                        'participants.participantID': new ObjectId(
+                        userId
+                        )
+                    }
+                    
+                })
+            }
+
+            matchStage.push({ // change roleID -> roleName
+                $lookup: {
+                    from: 'postRoleTypes',
+                    localField: 'participants.offer.role',
+                    foreignField: '_id',
+                    as: 'roleName'
+                }
+            })
+
+            matchStage.push({
+                $project: {
+                    _id: 1,
+                    postName: 1,
+                    roleName: {
+                      $arrayElemAt: ['$roleName.roleName', 0]
+                    },
+                    currentWage: '$participants.offer.price',
+                    reason: '$participants.offer.reason',
+                    offeredBy:
+                      '$participants.offer.offeredBy',
+                    status: '$participants.status',
+                    createdAt: '$participants.createdAt'
+                  }
+            })
             console.log("Check2",matchStage)
-            const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
+            const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
             const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
 
@@ -513,9 +570,9 @@ class PostRepository {
             const sortStage: PipelineStage.Sort = {
                 $sort: { createdAt: -1 }
             }
-            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+            matchStage.push(sortStage, { $skip: skip }, { $limit: pageSize });
 
-            const results = await Post.aggregate(pipeline)
+            const results = await Post.aggregate(matchStage)
             const response: GetOfferResponse = {
                 data: results,
                 totalItems: totalItems
