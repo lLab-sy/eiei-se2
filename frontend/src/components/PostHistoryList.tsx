@@ -5,7 +5,6 @@ import { PostDataHistory } from "../../interface";
 import PostHistoryCard from "./PostHistoryCard";
 import PaginationBar from "./PostHistoryPaginationBar";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 
 export default function PostHistoryList({
   postLists,userName,role
@@ -14,7 +13,23 @@ export default function PostHistoryList({
   userName:string,
   role:string
 }) {
-
+  //mock
+  const mockProject: PostDataHistory[] = [{
+      id:"67b1fd4884589ada7fea1918",
+      postName: "rando",
+      postDescription: "guess",
+      postImages: [],
+      postMediaType: "dsdsddd",
+      postProjectRolesOut: [{
+        roleName: "Actor",
+        id: "65b8765432abcd5678ef1234"
+    }],
+      startDate: "2025-02-16T14:59:20.718+00:00", 
+      endDate: "2025-02-16T15:59:20.718+00:00", 
+      postProjectRoles: ["65c8765432abcd5678ef1234"], 
+      postStatus: "success",
+      roleCount:1,
+  }]
   const [currentPage, setCurrentPage] = useState<number>(1);
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
@@ -48,25 +63,27 @@ export default function PostHistoryList({
         </div> : <></>}
 
         {/* Projects Grid */}
+        {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {currentProjects ? currentProjects.map((project,index) => (
+          {/* {currentProjects.map((project,index) => ( */}
+          {mockProject.map((project,index) => (
             <div
               key={index}
               className="transform hover:-translate-y-1 transition-transform duration-300"
             >
-              <Link href={`/post/${project.id}`}>
+              <Link href={`/posts/${project.id}`}>
                 <PostHistoryCard post={project} userName={userName} role={role} />
               </Link>
             </div>
           )): <div></div>}
         </div>
-
+          }
         {/* Pagination Section */}
         <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
           <PaginationBar
             currentPage={currentPage}
             projectsPerPage={projectsPerPage}
-            postListLenght={postLists? postLists.length : 0}
+            postListLength={postLists.length}
             setCurrentPage={setCurrentPage}
           />
         </div>
