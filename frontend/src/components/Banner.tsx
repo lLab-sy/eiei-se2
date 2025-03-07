@@ -9,7 +9,8 @@ interface BannerProps {
 }
 
 const Banner: FC<BannerProps> = ({
-  title = "ON Recruiting",
+  // title = "ON Recruiting", temp placeholder
+  title = "",
   imageUrl = "/api/placeholder/1200/400",
 }) => {
   return (
@@ -23,7 +24,7 @@ const Banner: FC<BannerProps> = ({
       />
       <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center px-4">
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center">
-          {title}
+          {/*title*/} ON Recruiting {/*temp placeholder for title*/}
         </h1>
       </div>
     </div>

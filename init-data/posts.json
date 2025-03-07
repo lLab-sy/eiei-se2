@@ -18,7 +18,7 @@
           {
             "role": { "$oid": "65b8765432abcd5678ef1234" },
             "price": 1500,
-            "offerBy": 1,
+            "offeredBy": 1,
             "createdAt": "2025-01-19T15:00:00.000Z",
             "reason": "Experienced designer."
           }
@@ -54,7 +54,7 @@
           {
             "role": { "$oid": "65b1234567abcd1234ef5678" },
             "price": 2000,
-            "offerBy": 1,
+            "offeredBy": 1,
             "createdAt": "2025-02-09T14:00:00.000Z",
             "reason": "Experienced video editor."
           }
@@ -90,7 +90,7 @@
           {
             "role": { "$oid": "65a1234567abcd1234ef5678" },
             "price": 1200,
-            "offerBy": 0,
+            "offeredBy": 0,
             "createdAt": "2025-02-14T10:00:00.000Z",
             "reason": "Talented photographer."
           }
@@ -126,7 +126,7 @@
           {
             "role": { "$oid": "65c8765432abcd5678ef1234" },
             "price": 2500,
-            "offerBy": 1,
+            "offeredBy": 1,
             "createdAt": "2025-02-25T16:00:00.000Z",
             "reason": "Experienced scriptwriter."
           }
@@ -162,7 +162,7 @@
           {
             "role": { "$oid": "65c8765432abcd5678ef1234" },
             "price": 1800,
-            "offerBy": 0,
+            "offeredBy": 0,
             "createdAt": "2025-03-30T14:00:00.000Z",
             "reason": "Creative animator."
           }

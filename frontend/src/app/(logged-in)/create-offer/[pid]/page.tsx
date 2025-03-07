@@ -14,49 +14,49 @@ const mockOfferHistory: OfferHistoryData[] = [
     {
       roleName: "Lead Actor",
       price: 5000,
-      offerBy: 1,
+      offeredBy: 1,
       createdAt: "2024-02-17T10:30:00Z",
       detail: "Experienced actor with multiple awards."
     },
     {
       roleName: "Supporting Actor",
       price: 3000,
-      offerBy: 0,
+      offeredBy: 0,
       createdAt: "2024-02-16T15:45:00Z",
       detail: "Trained in theater and on-screen performances."
     },
     {
       roleName: "Cinematographer",
       price: 7000,
-      offerBy: 1,
+      offeredBy: 1,
       createdAt: "2024-02-15T12:00:00Z",
       detail: "Expert in lighting and camera work for films."
     },
     {
       roleName: "Director",
       price: 10000,
-      offerBy: 0,
+      offeredBy: 0,
       createdAt: "2024-02-14T09:20:00Z",
       detail: "Award-winning director with 15 years of experience."
     },
     {
       roleName: "Editor",
       price: 4000,
-      offerBy: 0,
+      offeredBy: 0,
       createdAt: "2024-02-13T18:10:00Z",
       detail: "Specialized in post-production and visual effects."
     },
     {
       roleName: "Sound Designer",
       price: 3500,
-      offerBy: 0,
+      offeredBy: 0,
       createdAt: "2024-02-12T14:30:00Z",
       detail: "Proficient in Foley and sound mixing."
     },
     {
       roleName: "Production Assistant",
       price: 2000,
-      offerBy: 1,
+      offeredBy: 1,
       createdAt: "2024-02-11T16:50:00Z",
       detail: "Energetic and organized for on-set coordination."
     }

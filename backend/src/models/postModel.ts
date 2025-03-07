@@ -3,8 +3,9 @@ import mongoose, { Document, Schema } from 'mongoose';
 // Offer History Model
 export interface OfferHistory {
     role: mongoose.Schema.Types.ObjectId; // Role offered to the participant
-    offeredBy: mongoose.Schema.Types.ObjectId; // User ID should be better than 0/1 ?
+    offeredBy: number; // User ID should be better than 0/1 ? 0,1 beacaus I'm Rock
     price: number; // The amount offered for the role
+    reason: string;
     createdAt: Date; // Date when the offer was created
 }
 
@@ -15,7 +16,7 @@ export interface ParticipantDetail {
     offer: OfferHistory[]; // Array of offer history for the participant
     ratingScore: number;
     comment: string; 
-    reviewedAt: Date; // Date of review for the participant
+    reviewedAt: Date|null; // Date of review for the participant
     createdAt: Date; // Date participant was first added (when first offer was made)
     updatedAt: Date; // Date when participant details were last updated
 }
@@ -42,7 +43,7 @@ const offerHistorySchema = new Schema<OfferHistory>({
         required: true,
     },
     offeredBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Number,
         ref: 'user',
         required: true,
     },
@@ -54,9 +55,13 @@ const offerHistorySchema = new Schema<OfferHistory>({
         type: Date,
         default: Date.now,
     },
+    reason:{
+        type: String,
+        required:true
+    }
 }, { _id: false });
 
-const participantDetailSchema = new Schema<ParticipantDetail>({
+export const participantDetailSchema = new Schema<ParticipantDetail>({
     participantID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',

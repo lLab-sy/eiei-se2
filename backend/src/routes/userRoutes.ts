@@ -2,6 +2,7 @@ import { Request, Router } from "express";
 import userController from "../controllers/userController";
 import multer from "multer";
 import path from 'path'
+
 const router = Router()
 const storage = multer.memoryStorage()
 const fileFilter = (req: Request, file: any, cb: Function) => {
@@ -115,6 +116,9 @@ const upload = multer({
  *           items:
  *             type: object
  *             properties:
+ *               postID:
+ *                 type: string
+ *                 description: postID
  *               ratingScore:
  *                 type: number
  *                 minimum: 0
@@ -123,6 +127,28 @@ const upload = multer({
  *               comment:
  *                 type: string
  *                 description: Rating comment
+ *               createdAt:
+ *                 type: date
+ *                 description: review created date
+ * 
+ *     RatingDTO:
+ *       type: object
+ *       required:
+ *         - postID
+ *         - ratingScore
+ *         - comment
+ *       properties:
+ *         postID:
+ *           type: string
+ *           description: postID that user did
+ *         ratingScore:
+ *           type: number
+ *           minimum: 0
+ *           maximum: 5
+ *           description: rating score in range 0-5
+ *         comment:
+ *           type: string
+ *           description: comment about user work
  */
 
 /**
@@ -241,6 +267,35 @@ router.get("/search", userController.search);
 
 /**
  * @swagger
+ * /api/users/{id}/addReview:
+ *   put:
+ *     summary: Add new review to production professional by ID
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the user
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RatingDTO'
+ *     responses:
+ *       200:
+ *         description: A single user object
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.put("/:id/addReview", userController.addProductionProfessionalReview);
+
+/**
+ * @swagger
  * /api/users/{id}:
  *   get:
  *     summary: Get a user by ID
@@ -261,5 +316,11 @@ router.get("/search", userController.search);
  *         description: Server error
  */
 router.get("/:id", userController.getUserByID);
+
+
+//getUserReceivedReviews
+router.get("/receivedreviews/:id",userController.getUserReceivedReviewsByID);
+
+//get all offers for producer 
 
 export default router

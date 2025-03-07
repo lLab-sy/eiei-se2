@@ -34,16 +34,21 @@ export interface IProducer extends IUser {
   cardNumber?: string; //for Credit/Debit
 }
 
+// review
+export interface Rating {
+  postID?: mongoose.Schema.Types.ObjectId;
+  ratingScore?: number;
+  comment?: string;
+  createdAt?: Date;
+} 
+
 // ProductionProfessional-specific fields
 export interface IProductionProfessional extends IUser {
   occupation?: string;
   description?: string;
   skill?: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
   experience?: number; // Years of experience
-  rating?: Array<{
-    ratingScore?: number
-    comment?: string
-  }>;
+  rating?: Array<Rating>;
 }
 
 export const BankAccountSchema = new Schema<IBankAccount>({

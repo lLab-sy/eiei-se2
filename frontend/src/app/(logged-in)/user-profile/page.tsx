@@ -665,7 +665,7 @@ export default function UserPage() {
                       className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
                     >
                       <Button
-                        className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-green-400 hover:bg-green-500`}
+                        className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-maingreen hover:bg-maingreen-light`}
                         type="submit"
                         onSubmit={form.handleSubmit(handleSubmit)}
                       >
@@ -675,7 +675,7 @@ export default function UserPage() {
                         variant={`${isEdit ? "destructive" : "default"}`}
                         type="reset"
                         onClick={() => setIsEdit(!isEdit)}
-                        className={` w-[30%]`}
+                        className={`w-[30%]`}
                       >
                         {isEdit ? "Cancel" : "Edit"}
                       </Button>
@@ -779,7 +779,7 @@ export default function UserPage() {
                     className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
                   >
                     <Button
-                      className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-green-400 hover:bg-green-500`}
+                      className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-maingreen hover:bg-maingreen-light`}
                       type="submit"
                       onSubmit={form.handleSubmit(handleSubmit)}
                     >

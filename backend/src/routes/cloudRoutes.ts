@@ -10,7 +10,7 @@ const router = Router()
 const storage = multer.memoryStorage()
 
 const fileFilter = (req: Request, file: any, cb: Function) => {
-    const filetypes = /png|jpeg|gif/;
+    const filetypes = /png|jpeg|gif|jpg/;
     
     // Check file extension
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -35,7 +35,9 @@ router.post('/uploads', upload.array('imgArray'), async(req,res) => {
 
 router.post('/upload', upload.single('img') ,async (req, res) => {
     try{
+        console.log("route check1")
         const image = req?.file
+        console.log("route check2")
         const resizeBuffer = await sharp(image?.buffer)
         .resize({
             height: 1920,
@@ -43,6 +45,7 @@ router.post('/upload', upload.single('img') ,async (req, res) => {
             fit: 'contain'
         })
         .toBuffer()
+        console.log("route check",resizeBuffer)
         const imageName = crypto.randomBytes(32).toString('hex')
         await s3Client.uploadFile(resizeBuffer, imageName, image?.mimetype!)
         res.status(201).json({success: true})
