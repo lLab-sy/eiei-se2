@@ -321,4 +321,6 @@ router.get("/:id", userController.getUserByID);
 //getUserReceivedReviews
 router.get("/receivedreviews/:id",userController.getUserReceivedReviewsByID);
 
+//get all offers for producer 
+
 export default router

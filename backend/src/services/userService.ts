@@ -4,7 +4,7 @@ import { IProducer, Rating, searchReqModel } from "../models/userModel"
 import { IProductionProfessional } from "../models/userModel"
 import ProducerRespository from '../repositories/producerRepository';
 import ProductionProfessionalRespository from "../repositories/productionProfessionalRespository";
-import { searchReqDTO ,receivedReviewDTO, receivedReviewsDTO} from "../dtos/userDTO";
+import { searchReqDTO ,ReceivedReviewDTO, ReceivedReviewsDTO} from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
 import userRepository from "../repositories/userRepository";
 import postRepository from "../repositories/postRepository";
@@ -106,13 +106,13 @@ class UserService {
 
             const result = await Promise.all(
                 userReceivedReviews.map(async (r) => {
-                    return new receivedReviewsDTO({
+                    return new ReceivedReviewsDTO({
                         receivedReviews: await Promise.all(
-                            r.reviews.map(async (review: receivedReviewDTO) => {
+                            r.reviews.map(async (review: ReceivedReviewDTO) => {
                                 let reviewerProfileImageTmp = review.reviewerProfileImage
                                     ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage)
                                     : '';
-                                return new receivedReviewDTO({
+                                return new ReceivedReviewDTO({
                                     reviewerName: review.reviewerName as string,
                                     reviewerProfileImage: reviewerProfileImageTmp,
                                     ratingScore: review.ratingScore,
