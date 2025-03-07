@@ -1,67 +1,199 @@
-// frontend/src/app/(logged-in)/my-offers/page.tsx
-
 "use client";
-import OfferCard from "@/components/OfferCard";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { OfferData } from "../../../../interface";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 
-export default function OffersPage() {
+// Define an interface for your offers
+interface OfferData {
+  id: string;
+  postId: string;
+  postName: string;
+  productionProfessionalId: string;
+  producerId: string;
+  role: string;
+  expectation: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  price: number;
+  status: "pending" | "accepted" | "negotiating" | "rejected";
+}
+
+export default function MyOffersPage() {
   const { data: session, status } = useSession();
-  const [offerArray, setOfferArray] = useState<Array<OfferData>>([]);
+  const [offers, setOffers] = useState<Array<OfferData>>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    if (status === "authenticated" && session?.user?.token) {
-      handleFetch(activeTab);
-    }
-  }, [session, status, activeTab]);
-
-  const handleFetch = async (offerStatus: string) => {
-    try {
-      setIsLoading(true);
-      const query = `?offerStatus=${offerStatus}&limit=10&page=1`;
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/offers/producer${query}`;
-      const res = await axios.get(apiUrl, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${session?.user?.token}`,
-        },
-      });
-      console.log("offersRes", res);
-      setOfferArray(res?.data?.data?.data || []);
-    } catch (error) {
-      console.error("Error fetching offers:", error);
-      setOfferArray([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filteredOffers = offerArray.filter(
-    (offer) =>
-      offer.professionalName
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      offer.postName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      offer.roleName?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
   const router = useRouter();
 
-  const handleChangePage = (postID: string) => {
-    router.push(`/my-offers/${postID}`);
+  useEffect(() => {
+    const handleFetch = async () => {
+      try {
+        setIsLoading(true);
+        const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/offers/user`;
+
+        const res = await axios.get(apiUrl, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${session?.user?.token}`,
+          },
+        });
+
+        console.log("Offers response:", res);
+        setOffers(res?.data?.data);
+      } catch (error) {
+        console.error("API Error:", error);
+
+        // Mock data for development
+        const mockOffers = [
+          {
+            id: "offer1",
+            postId: "post123",
+            postName: "โฆษณาผลิตภัณฑ์เสริมอาหาร",
+            productionProfessionalId: "prof456",
+            producerId: "producer789",
+            role: "Director",
+            expectation: "ต้องการผู้กำกับที่มีประสบการณ์ด้านโฆษณาอาหารเสริม",
+            description:
+              "รับผิดชอบการกำกับทีมงานและควบคุมการถ่ายทำให้เป็นไปตามวิสัยทัศน์",
+            startDate: "2024-04-01T00:00:00.000Z",
+            endDate: "2024-04-15T00:00:00.000Z",
+            price: 30000,
+            status: "pending",
+          },
+          {
+            id: "offer2",
+            postId: "post456",
+            postName: "หนังสั้นเพื่อการประกวด",
+            productionProfessionalId: "prof123",
+            producerId: "producer789",
+            role: "Cinematographer",
+            expectation:
+              "ต้องการช่างภาพที่มีประสบการณ์ถ่ายทำในสถานที่จริงและมีผลงานที่ได้รับรางวัล",
+            description:
+              "ดูแลการถ่ายภาพทั้งหมด รวมถึงการเลือกเลนส์และการจัดแสง",
+            startDate: "2024-04-10T00:00:00.000Z",
+            endDate: "2024-04-30T00:00:00.000Z",
+            price: 25000,
+            status: "accepted",
+          },
+          {
+            id: "offer3",
+            postId: "post789",
+            postName: "มิวสิควิดีโอเพลงใหม่",
+            productionProfessionalId: "prof456",
+            producerId: "producer123",
+            role: "Editor",
+            expectation:
+              "ต้องการผู้ตัดต่อที่เชี่ยวชาญด้านเทคนิคพิเศษและการตัดต่อให้เข้ากับจังหวะเพลง",
+            description:
+              "รับผิดชอบการตัดต่อวิดีโอและการใส่เอฟเฟกต์พิเศษให้กับมิวสิควิดีโอ",
+            startDate: "2024-05-01T00:00:00.000Z",
+            endDate: "2024-05-15T00:00:00.000Z",
+            price: 15000,
+            status: "negotiating",
+          },
+          {
+            id: "offer4",
+            postId: "post101",
+            postName: "สารคดีท่องเที่ยวเชิงวัฒนธรรม",
+            productionProfessionalId: "prof789",
+            producerId: "producer456",
+            role: "Sound Designer",
+            expectation:
+              "ต้องการผู้ออกแบบเสียงที่มีความเข้าใจในวัฒนธรรมท้องถิ่นและสามารถบันทึกเสียงภาคสนามได้ดี",
+            description:
+              "ดูแลการบันทึกเสียงและการมิกซ์เสียงทั้งหมดสำหรับสารคดี",
+            startDate: "2024-06-01T00:00:00.000Z",
+            endDate: "2024-06-30T00:00:00.000Z",
+            price: 20000,
+            status: "rejected",
+          },
+        ];
+
+        setOffers(mockOffers);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (status === "authenticated" && session?.user?.token) {
+      handleFetch();
+    } else if (status !== "loading") {
+      // Show mock data if not authenticated or loading finished
+      setTimeout(() => {
+        const mockOffers = [
+          {
+            id: "offer1",
+            postId: "post123",
+            postName: "โฆษณาผลิตภัณฑ์เสริมอาหาร",
+            productionProfessionalId: "prof456",
+            producerId: "producer789",
+            role: "Director",
+            expectation: "ต้องการผู้กำกับที่มีประสบการณ์ด้านโฆษณาอาหารเสริม",
+            description:
+              "รับผิดชอบการกำกับทีมงานและควบคุมการถ่ายทำให้เป็นไปตามวิสัยทัศน์",
+            startDate: "2024-04-01T00:00:00.000Z",
+            endDate: "2024-04-15T00:00:00.000Z",
+            price: 30000,
+            status: "pending",
+          },
+          {
+            id: "offer2",
+            postId: "post456",
+            postName: "หนังสั้นเพื่อการประกวด",
+            productionProfessionalId: "prof123",
+            producerId: "producer789",
+            role: "Cinematographer",
+            expectation:
+              "ต้องการช่างภาพที่มีประสบการณ์ถ่ายทำในสถานที่จริงและมีผลงานที่ได้รับรางวัล",
+            description:
+              "ดูแลการถ่ายภาพทั้งหมด รวมถึงการเลือกเลนส์และการจัดแสง",
+            startDate: "2024-04-10T00:00:00.000Z",
+            endDate: "2024-04-30T00:00:00.000Z",
+            price: 25000,
+            status: "accepted",
+          },
+          {
+            id: "offer3",
+            postId: "post789",
+            postName: "มิวสิควิดีโอเพลงใหม่",
+            productionProfessionalId: "prof456",
+            producerId: "producer123",
+            role: "Editor",
+            expectation:
+              "ต้องการผู้ตัดต่อที่เชี่ยวชาญด้านเทคนิคพิเศษและการตัดต่อให้เข้ากับจังหวะเพลง",
+            description:
+              "รับผิดชอบการตัดต่อวิดีโอและการใส่เอฟเฟกต์พิเศษให้กับมิวสิควิดีโอ",
+            startDate: "2024-05-01T00:00:00.000Z",
+            endDate: "2024-05-15T00:00:00.000Z",
+            price: 15000,
+            status: "negotiating",
+          },
+        ];
+        setOffers(mockOffers);
+        setIsLoading(false);
+      }, 1000); // Simulate loading for 1 second
+    }
+  }, [session, status]);
+
+  const handleOfferClick = (offerId: string) => {
+    router.push(`/my-offers/${offerId}`);
   };
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+  const getStatusBadgeClasses = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-mainyellow text-dark";
+      case "accepted":
+        return "bg-maingreen-light text-white";
+      case "negotiating":
+        return "bg-mainblue-light text-white";
+      case "rejected":
+        return "bg-mainred-light text-white";
+      default:
+        return "bg-gray-400 text-white";
+    }
   };
 
   return (
@@ -71,156 +203,62 @@ export default function OffersPage() {
           My Offers
         </span>
 
-        <div className="relative w-full max-w-md mx-auto mt-2 mb-4">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={18}
-          />
-          <Input
-            placeholder="Search by name, post, or role..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <Tabs
-          defaultValue="all"
-          className="w-full max-w-3xl mx-auto"
-          onValueChange={handleTabChange}
-        >
-          <TabsList className="grid grid-cols-4 mb-8">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="accepted">Accepted</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="all" className="space-y-4">
-            {isLoading ? (
-              <div className="flex flex-col gap-4">
-                {[1, 2, 3].map((item) => (
-                  <div
-                    key={item}
-                    className="h-40 bg-gray-200 animate-pulse rounded-lg"
-                  ></div>
-                ))}
-              </div>
-            ) : filteredOffers.length > 0 ? (
-              <div className="flex flex-col gap-5">
-                {filteredOffers.map((offer, index) => (
-                  <div
-                    key={index}
-                    className="cursor-pointer"
-                    onClick={() => handleChangePage(offer?.postId!)}
-                  >
-                    <OfferCard offer={offer} />
+        <div className="flex flex-col gap-5 max-w-3xl mx-auto w-full">
+          {isLoading ? (
+            // Loading state
+            <div className="flex flex-col gap-4">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="h-40 bg-gray-200 animate-pulse rounded-lg"
+                ></div>
+              ))}
+            </div>
+          ) : offers && offers.length > 0 ? (
+            // Display offers
+            <div className="flex flex-col gap-5">
+              {offers.map((offer) => (
+                <div
+                  key={offer.id}
+                  className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition cursor-pointer"
+                  onClick={() => handleOfferClick(offer.id)}
+                >
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-xl font-semibold text-mainblue">
+                      {offer.postName}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClasses(offer.status)}`}
+                    >
+                      {offer.status.charAt(0).toUpperCase() +
+                        offer.status.slice(1)}
+                    </span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No offers found</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="pending" className="space-y-4">
-            {isLoading ? (
-              <div className="flex flex-col gap-4">
-                {[1, 2].map((item) => (
-                  <div
-                    key={item}
-                    className="h-40 bg-gray-200 animate-pulse rounded-lg"
-                  ></div>
-                ))}
-              </div>
-            ) : filteredOffers.filter((offer) => offer.status === "pending")
-                .length > 0 ? (
-              <div className="flex flex-col gap-5">
-                {filteredOffers
-                  .filter((offer) => offer.status === "pending")
-                  .map((offer, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer"
-                      onClick={() => handleChangePage(offer?.postId!)}
-                    >
-                      <OfferCard offer={offer} />
+                  <div className="mt-2 flex items-center text-gray-600">
+                    <span className="font-medium mr-2">Role:</span> {offer.role}
+                  </div>
+                  <p className="mt-2 text-gray-700 line-clamp-2">
+                    {offer.description}
+                  </p>
+                  <div className="mt-3 flex justify-between items-center">
+                    <div className="text-sm text-gray-500">
+                      {new Date(offer.startDate).toLocaleDateString("th-TH")} -{" "}
+                      {new Date(offer.endDate).toLocaleDateString("th-TH")}
                     </div>
-                  ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No pending offers found</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="accepted" className="space-y-4">
-            {isLoading ? (
-              <div className="flex flex-col gap-4">
-                {[1, 2].map((item) => (
-                  <div
-                    key={item}
-                    className="h-40 bg-gray-200 animate-pulse rounded-lg"
-                  ></div>
-                ))}
-              </div>
-            ) : filteredOffers.filter((offer) => offer.status === "accepted")
-                .length > 0 ? (
-              <div className="flex flex-col gap-5">
-                {filteredOffers
-                  .filter((offer) => offer.status === "accepted")
-                  .map((offer, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer"
-                      onClick={() => handleChangePage(offer?.postId!)}
-                    >
-                      <OfferCard offer={offer} />
+                    <div className="font-bold text-mainblue">
+                      ฿{offer.price.toLocaleString()}
                     </div>
-                  ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No accepted offers found</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="rejected" className="space-y-4">
-            {isLoading ? (
-              <div className="flex flex-col gap-4">
-                {[1, 2].map((item) => (
-                  <div
-                    key={item}
-                    className="h-40 bg-gray-200 animate-pulse rounded-lg"
-                  ></div>
-                ))}
-              </div>
-            ) : filteredOffers.filter((offer) => offer.status === "rejected")
-                .length > 0 ? (
-              <div className="flex flex-col gap-5">
-                {filteredOffers
-                  .filter((offer) => offer.status === "rejected")
-                  .map((offer, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer"
-                      onClick={() => handleChangePage(offer?.postId!)}
-                    >
-                      <OfferCard offer={offer} />
-                    </div>
-                  ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No rejected offers found</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            // No offers state
+            <div className="text-center py-8">
+              <p className="text-gray-500">คุณยังไม่มีข้อเสนอ</p>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
