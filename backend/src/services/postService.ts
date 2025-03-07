@@ -300,7 +300,9 @@ async getPost(id:string): Promise<PostDTO|null> {
   async getOffer(offerReq: OfferRequestDTO): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
     try {
       const offerRequest: GetOfferRequestModel = offerReq
-
+      if(role==="producer"){
+        const res = await postRepository.getProducerOffer(offerRequest);
+      }
       const res = await postRepository.getProducerOffer(offerRequest);
       const resDTO = res.data.map((offer) => {
         return new OfferResponseDTO({

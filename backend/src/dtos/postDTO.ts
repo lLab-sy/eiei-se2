@@ -290,6 +290,10 @@ export class OfferRequestDTO {
     @IsString()
     postId!: string;
 
+    // @ApiProperty({ description: 'The id of production professional', type: String })
+    // @IsString()
+    // productionProfessionalId!: string|boolean;
+
     @ApiProperty({ description: 'The status of post', type: String })
     @IsString()  
     postStatus!: string;
