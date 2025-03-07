@@ -97,6 +97,7 @@ export default function CreatePostPage() {
   }
 
   useEffect(()=>{
+      console.log(session)
       const fetchData=async()=>{
           const response= await getPostRoles()
           const tmp= response.data.data
@@ -108,7 +109,7 @@ export default function CreatePostPage() {
           // console.log("Option",options)
       }
       fetchData()
-  },[])
+  },[session])
   useEffect(()=>{
     const fetchData=async()=>{
         const response= await getMediaTypes()
@@ -144,7 +145,6 @@ export default function CreatePostPage() {
   //For CREATE POST 
 
   async function onSubmit (values: z.infer<typeof formSchema>) {
-    const imageList = img.map((img)=>(img.imgFile))
     const userID= session?.user.id
     if(!userID){
       return;
@@ -161,20 +161,27 @@ export default function CreatePostPage() {
     // const postImage: string[] = response.data
 
     //mock image
-    const postImage = imageList.map((img)=>(URL.createObjectURL(img)))
     const postData:PostData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
-      postImages:["Picture.png"],
       postStatus: "created",
       userID: session?.user.id,
       postDescription: values.description
     };
  
+    const formData = new FormData()
 
+    const imageList = img.map((eachImg) => eachImg.imgFile);
 
-    const postCreateResponse = await createPost(postData,token)
+    if (imageList.length > 0) {
+      imageList.forEach((file) => {
+        formData.append("postImagesSend", file);  
+      });
+    }
+    formData.append('postData',JSON.stringify(postData))
+    console.log("FormData")
+    const postCreateResponse = await createPost(formData,token)
     if (postCreateResponse === null) {
       toast({
         variant: "destructive",
@@ -198,7 +205,6 @@ export default function CreatePostPage() {
   const [postRoles,setPostRoles]=useState<Option[]|null>(null)
   const [mediaTypes,setMediaTypes]=useState<Option[]|null>(null)
   const [mostRecentImg, setMostRecentImg] = useState<string>("")
-
 
   const onImgChange = (e:any) => {
     if (e.target.files && e.target.files[0]) {

@@ -3,6 +3,7 @@ export interface PostData {
     postName: string;
     postDescription: string;
     postImages?: string[];
+    postImagesSend?: File[];
     postMediaType: string;
     postProjectRoles: string[];
     postStatus: string;
@@ -11,6 +12,16 @@ export interface PostData {
     userID: string;
 }
 
+export interface ReceivedReview{
+    reviewerName: string;
+    reviewerProfileImage: string;
+    ratingScore: number;
+    comment: string;
+}
+
+export interface ReceivedReviews{
+    receivedReviews: ReceivedReview[];
+}
 
 export interface PostDataHistory {
     id:string,
@@ -26,17 +37,40 @@ export interface PostDataHistory {
     roleCount:number;
 }
 
-// export interface Project {
-//     id: string;
-//     postName: string;
-//     postDescription: string;
-//     postImages: string[];
-//     postMediaType: string;
-//     postProjectRoles: string[];
-//     postStatus: string;
-//     startDate: string; 
-//     endDate: string;    
-// }
+export interface Rating{
+    ratingScore: number;
+    comment: string;
+}
+
+export interface Professional{
+    _id: string;
+    username: string;
+    role: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    gender: string;
+    occupation: string;
+    skill: string[];
+    experience: number;
+    rating: Rating[];
+    avgRating: number;
+    description?: string;
+    imageUrl?: string;
+}
+
+export interface MetaData{
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export interface ProfessionalsData{
+    data: Professional[];
+    meta: MetaData;
+}
 
 // export interface ProjectResponse {
 //     status: string;
@@ -70,7 +104,7 @@ export interface OfferData{
 export interface OfferHistoryData{
     roleName: string; //populate
     price: Number;
-    offerBy: Number;
+    offeredBy: Number;
     createdAt: string;
     detail: string
 }

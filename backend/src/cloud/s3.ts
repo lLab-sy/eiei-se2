@@ -28,6 +28,7 @@ class S3ClientClass {
   
 
     public async uploadFile(fileBuffer: Buffer, fileName: string, mimetype: string) {
+      console.log("cloud check")
       const params = {
         Bucket: this.bucketName,
         Key: fileName,
@@ -45,7 +46,6 @@ class S3ClientClass {
         Bucket: this.bucketName,
         Key: key
       };
-  
       const command = new GetObjectCommand(params);
       const expireTime = 3600;
       const url = await getSignedUrl(this.client, command, {

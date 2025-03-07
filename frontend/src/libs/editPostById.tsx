@@ -3,19 +3,19 @@ import { PostData } from "../../interface";
 
 export default async function editPostById(
   postId: string,
-  data: PostData,
+  data: FormData,
   token: string
 ) {
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
-
+  console.log(apiUrl)
   try {
     const response = await axios.put(apiUrl, data, {
       withCredentials: true,
       headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+        "Authorization": `Bearer ${token}`,
+        "Content-Type" :  "multipart/form-data"
+
+      }
     });
 
     if (!response) {

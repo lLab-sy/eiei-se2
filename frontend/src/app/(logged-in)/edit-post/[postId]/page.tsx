@@ -113,7 +113,16 @@ export default function EditPostPage({
     imgFile: File;
   }
 
+  interface IpostImageDisplay{
+    imageURL:string;
+    imageKey:string;
+  }
+  
+
   const [img, setImg] = useState<imagePair[]>([]);
+  const [postImages, setPostImages] = useState<IpostImageDisplay[]>([]);
+  const [postImagesKey, setPostImagesKey] = useState<string[]>([]);
+  const [deletedImageKey, setDeletedImageKey] = useState<string[]>([]);
   const [mostRecentImg, setMostRecentImg] = useState<string>("");
   const [postRoles, setPostRoles] = useState<Option[] | null>(null);
   const [mediaTypes, setMediaTypes] = useState<Option[] | null>(null);
@@ -132,6 +141,18 @@ export default function EditPostPage({
             value: role.id,
           })),
         );
+
+        /*setPostRoles(
+          Array.from(
+            new Map(
+              (rolesResponse.data.data as PostRolesResponse[]).map((role) => [
+                role.roleName, // Use roleName as the key to prevent duplicates
+                { label: role.roleName, value: role.id }
+              ])
+            ).values()
+          ) as Option[] // Cast the result to Option[] explicitly
+        );*/  
+        
 
         setMediaTypes(
           mediaResponse.data.data.map((media: MediaTypesResponse) => ({
@@ -172,14 +193,20 @@ export default function EditPostPage({
             setErrorMessage("You are not the producer of this post.");
           }
 
+          if(data.postImageDisplay.length > 0){
+            setPostImages(data.postImageDisplay);
+            setPostImagesKey(data.postImagesKey);
+            setMostRecentImg(data.postImageDisplay[data.postImageDisplay.length-1].imageURL);
+          }
+
           form.reset({
             postname: data.postName || "",
             description: data.postDescription || "",
             type: data.postMediaType || "",
-            roles: data.postProjectRoles.map((role: string) => {
-              const foundRole = postRoles.find((r) => r.value === role);
-              return foundRole || { label: role, value: role };
-            }),
+            roles: data.postProjectRolesOut.map((role: { id: string; roleName: string }) => {
+              const foundRole = postRoles.find((r) => r.value === role.id); // Match by `id`
+              return foundRole || { label: role.roleName, value: role.id }; // Set value to `id`
+            }),                       
           });
         })
         .catch((error) => {
@@ -190,27 +217,41 @@ export default function EditPostPage({
   }, [postRoles, mediaTypes, postId, token, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const imageList = img.map((img) => img.imgFile);
+    
 
     const userID = session?.user.id;
     if (!userID) return;
     if (!postId) return;
 
-    const postImage = imageList.map((img) => URL.createObjectURL(img));
+    //const postImage = imageList.map((img) => URL.createObjectURL(img));
     const postData = {
-      postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
-      postMediaType: values.type,
       postDescription: values.description,
-      postImages: postImage,
+      postImagesKey: postImagesKey.filter((key) => !deletedImageKey.includes(key)),
       postStatus: "created",
       userID: session?.user.id,
+      postMediaType: values.type,
+      //postImagesSend: be appended below,
+      keyImagesDelete: deletedImageKey,
+      postProjectRoles: values.roles.map((obj) => obj.value),  
     };
     console.log(postData);
 
+    const formData = new FormData()
+    const imageList = img.map((img) => img.imgFile);
+    if (imageList.length > 0) {
+      imageList.forEach((file) => {
+        formData.append("postImagesSend", file);  
+      });
+    }
+    formData.append('postData',JSON.stringify(postData))
+
+    // console.log("FormData")
+    // console.log(postData);
+
     const postEditResponse = await editPostById(
       postId.toString(),
-      postData,
+      formData,
       token,
     );
     if (postEditResponse === null) {
@@ -228,10 +269,16 @@ export default function EditPostPage({
     });
   }
 
+  // ตรวจสอบว่าเป็น IpostImageDisplay หรือไม่
+  const isIpostImageDisplay = (imgData: IpostImageDisplay | imagePair): imgData is IpostImageDisplay => {
+    return (imgData as IpostImageDisplay).imageKey !== undefined;  // เช็คว่า 'imageKey' มีอยู่ในข้อมูล
+  };
+
+
   const onImgChange = (e: any) => {
     if (e.target.files && e.target.files[0]) {
       const files: File[] = Array.from(e.target.files);
-      if (files.length + img.length > 3) {
+      if (files.length + img.length + postImages.length > 3) {
         toast({
           variant: "destructive",
           title: "Picture count limit",
@@ -264,14 +311,37 @@ export default function EditPostPage({
       setMostRecentImg(filenames[filenames.length - 1].imgSrc);
       const newImg = [...img, ...filenames];
       setImg(newImg);
+      //setMostRecentImg(img[img.length-1].imgSrc);
     }
   };
 
   const removeImg = (imgSrc: string) => {
-    setImg(img.filter((img) => img.imgSrc !== imgSrc));
-    console.log(img.length);
-    if (mostRecentImg === imgSrc && img.length > 1)
-      setMostRecentImg(img[img.length - 2].imgSrc);
+    const isUploadedImg = img.some((img) => img.imgSrc === imgSrc);
+    if(isUploadedImg){
+      const updatedImg = img.filter((img) => img.imgSrc !== imgSrc);
+      setImg(updatedImg);
+      if (mostRecentImg === imgSrc && updatedImg.length > 0) {
+        setMostRecentImg(updatedImg[updatedImg.length - 1].imgSrc);
+      }else if(postImages.length>0){
+        setMostRecentImg(postImages[postImages.length - 1].imageURL);
+      }
+    }else{
+      const removedImage = postImages.find((img) => img.imageURL === imgSrc);
+      if (removedImage) {
+        setDeletedImageKey((prev) => [...prev, removedImage.imageKey]);
+      }
+      const updatedPostImages = postImages.filter((img) => img.imageURL !== imgSrc);
+      setPostImages(updatedPostImages);
+      if (mostRecentImg === imgSrc && updatedPostImages.length > 0) {
+        setMostRecentImg(updatedPostImages[updatedPostImages.length - 1].imageURL);
+      }else if(img.length>0){
+        setMostRecentImg(img[img.length-1].imgSrc);
+      }
+    }
+    // setImg(img.filter((img) => img.imgSrc !== imgSrc));
+    // console.log(img.length);
+    // if (mostRecentImg === imgSrc && img.length > 1)
+    //   setMostRecentImg(img[img.length - 2].imgSrc);
   };
 
   if (!postRoles || !mediaTypes) {
@@ -430,7 +500,7 @@ export default function EditPostPage({
                 <CardTitle className="text-sm">Your Post Picture</CardTitle>
                 <div className="flex flex-col items-center">
                   <div className="h-1/2">
-                    {img.length !== 0 ? (
+                    {(postImages.length !== 0 || img.length!==0 )? (
                       <Image
                         src={mostRecentImg}
                         alt="Post Image Here"
@@ -459,31 +529,31 @@ export default function EditPostPage({
                     placeholder="Your post picture"
                     onChange={onImgChange}
                     multiple
-                    disabled={img.length >= 3 ? true : false}
+                    disabled={img.length+postImages.length >= 3 ? true : false}
                   />
                   <div className="w-[80%] justify-center flex">
                     <Carousel>
                       <CarouselContent>
-                        {img.length !== 0 ? (
-                          img.map((img) => (
+                        {(postImages.length > 0 || img.length > 0) ? (
+                          [...postImages, ...img].map((imgData, index) => (
                             <CarouselItem
-                              key={img.imgSrc}
+                            key={isIpostImageDisplay(imgData) ? imgData.imageKey : imgData.imgSrc}
                               className="relative pt-1 justify-center inline-flex flex-col group"
                             >
                               <Image
-                                src={img.imgSrc}
+                                src={isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc}
                                 alt="Post Image Here"
                                 width={parent.innerWidth}
                                 height={parent.innerHeight}
                                 className="max-h-48 object-contain aspect-square cursor-pointer bg-maingrey "
                                 priority
                                 placeholder="empty"
-                                onClick={() => setMostRecentImg(img.imgSrc)}
+                                onClick={() => setMostRecentImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
                               />
                               <X
                                 className="absolute top-1 right-1 hidden group-hover:block
                            bg-mainblue-lightest cursor-pointer"
-                                onClick={() => removeImg(img.imgSrc)}
+                                onClick={() => removeImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
                               />
                             </CarouselItem>
                           ))
@@ -503,7 +573,7 @@ export default function EditPostPage({
                           </CarouselItem>
                         )}
                       </CarouselContent>
-                      <Label>Total item: {img.length}</Label>
+                      <Label>Total item: {img.length+postImages.length}</Label>
                       <CarouselPrevious />
                       <CarouselNext />
                     </Carousel>

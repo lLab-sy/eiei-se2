@@ -1,10 +1,33 @@
-import { Router } from 'express';
+import { Router,Request } from 'express';
 import postController from '../controllers/postController';
 import AuthMiddleware from '../middlewares/authMiddleware'
 import { RequestHandler } from '@nestjs/common/interfaces';
+import multer from 'multer';
+import path from 'path';
 
 const router = Router();
-
+const storage = multer.memoryStorage()
+const fileFilter = (req: Request, file: any, cb: Function) => {
+    const filetypes = /png|jpeg|gif|webp|jpg/;
+    // Check file extension
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // const sizeCheck = file.size < maxSize
+    // console.log(file.size)
+    // Check MIME type
+    const mimeType = file.mimetype.startsWith('image/');
+    if (extname && mimeType) {
+        return cb(null, true);
+    }
+    else {
+        return cb(new Error("Error: Only PNG, JPEG, and GIF files are allowed!"));
+    }
+};
+const maxSize = 5 * 1024 * 1024 // bytes / 5mb
+const upload = multer({
+    storage: storage,
+    fileFilter,
+    limits : {fileSize : maxSize}
+})
 /**
  * @swagger
  * tags:
@@ -168,8 +191,8 @@ router.get('/posts', postController.getAllPosts);
  *         description: Server error
  */
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
-router.post('/posts', AuthMiddleware.authenticate as RequestHandler, postController.createPost as RequestHandler);
-
+router.post('/posts', AuthMiddleware.authenticate as RequestHandler, upload.array('postImagesSend'), postController.createPost as RequestHandler);
+// router.post('/upload-profile/:id',upload.single('profileImage'), userController.uploadProfileImage)
 /**
  * @swagger
  * /api/v1/posts/user:
@@ -254,7 +277,7 @@ router.get('/posts/:id', postController.getPost);
  *       500:
  *         description: Server error
  */
-router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postController.updatePost as RequestHandler);
+router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, upload.array('postImagesSend'), postController.updatePost as RequestHandler);
 
 /**
  * @swagger
@@ -281,7 +304,62 @@ router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postCont
  */
 router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postController.deletePost as RequestHandler);
 
-
+/**
+ * @swagger
+ * /api/v1/create-offer:
+ *   post:
+ *     summary: Create a new offer for a participant in a post
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - roleID
+ *               - productionProfessionalID
+ *               - price
+ *               - offeredBy
+ *               - createdAt
+ *               - reason
+ *               - postID
+ *             properties:
+ *               roleID:
+ *                 type: string
+ *                 description: The ID of the role being offered
+ *               productionProfessionalID:
+ *                 type: string
+ *                 description: The ID of the professional receiving the offer
+ *               price:
+ *                 type: number
+ *                 description: The amount offered
+ *               offeredBy:
+ *                 type: number
+ *                 description: The user making the offer (0 = system, 1 = user)
+ *               createdAt:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The date and time when the offer was made
+ *               reason:
+ *                 type: string
+ *                 description: The reason for the offer
+ *               postID:
+ *                 type: string
+ *                 description: The ID of the post associated with the offer
+ *     responses:
+ *       201:
+ *         description: Offer created successfully
+ *       400:
+ *         description: Bad request, invalid input
+ *       404:
+ *         description: Post or participant not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/create-offer', AuthMiddleware.authenticate as RequestHandler, postController.createOffer as RequestHandler);
 
 
 export default router;

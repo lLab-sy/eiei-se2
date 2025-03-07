@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function PostHistoryList({
   postLists,userName,role
 }: {
-  postLists: PostDataHistory[],
+  postLists: PostDataHistory[]|null,
   userName:string,
   role:string
 }) {
@@ -33,11 +33,11 @@ export default function PostHistoryList({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const projectsPerPage = 10;
   const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
-  const currentProjects = postLists.slice(
+  const currentProjects = postLists ?  postLists.slice(
     //เอาอันไหนมาแสดงบ้าง
     startIndex,
     startIndex + projectsPerPage, //projectPerPage
-  );
+  ) : null ;
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-slate-200">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -53,6 +53,14 @@ export default function PostHistoryList({
               : "View your completed projects and achievements"}
           </p>
         </div>
+        {/* Create Post for Producer*/}
+        { role === "producer" ?
+        <div className="">
+          <Link
+          className={"w-10 h-10 p-3 rounded-full transition-all duration-200 bg-mainblue text-white hover:bg-mainblue-light"}
+          href = "/create-post"
+        > Create Post </Link>
+        </div> : <></>}
 
         {/* Projects Grid */}
         {
@@ -67,7 +75,7 @@ export default function PostHistoryList({
                 <PostHistoryCard post={project} userName={userName} role={role} />
               </Link>
             </div>
-          ))}
+          )): <div></div>}
         </div>
           }
         {/* Pagination Section */}
