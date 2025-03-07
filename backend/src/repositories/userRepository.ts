@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import {User, IUser } from '../models/userModel';
+import Post from '../models/postModel';
 import { error } from 'console';
 
 //change to similar to test using input as I user
@@ -243,71 +244,106 @@ class UserRepository {
                 if(!userReceivedReviews){
                     throw new Error("this user (production professional) received review not found.")
                 }
-
+                console.log(userReceivedReviews)
                 return userReceivedReviews;
 
             }else{//user.role is producer
-                const userReceivedReviews = await User.aggregate(
+                const userReceivedReviews = await Post.aggregate(
                     [
                         {
-                            $match:{
-                                _id:userId
-                            }
-                        },
-                        { $unwind: {path: '$rating'}},
-                        {
-                            $lookup:{
-                                from: 'postTypes',
-                                localField: 'rating.postID',
-                                foreignField: '_id',
-                                as: 'rating.post',
-                                pipeline:[
-                                    {
-                                        $project:{
-                                            _id:1,
-                                            participants:1
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        { $unwind: {path:'$rating.post.participants'}},
-                        {
-                            $lookup:{
-                                from: 'users',
-                                localField: 'rating.post.participants.participantID',
-                                foreignField: '_id',
-                                as: 'rating.producprofes',
-                                pipeline:[
-                                    {
-                                        $project:{
-                                            username: 1,
-                                            profileImage: 1,
-                                        }
-                                    }
-                                ]
-                            }
+                          $match: {
+                            userID: userId
+                          }
                         },
                         {
-                            $set:{
-                                "rating.producprofes": { $arrayElemAt: ["$rating.producprofes", 0] }
-                            }
+                          $project: {
+                            participants: 1,
+                            _id: 0
+                          }
                         },
                         {
-                            $group:{
-                                _id:'$_id',
-                                reviews:{
-                                    $addToSet:{
-                                        reviewerName:"$rating.producprofes.username",
-                                        reviewProfileImage: "$rating.producprofes.profileImage",
-                                        ratingScore: "$rating.ratingScore",
-                                        comment: "$rating.comment"
-                                    }
+                          $project: {
+                            "participants.participantID": 1,
+                            "participants.review": 1,
+                            _id: 0
+                          }
+                        },
+                        {
+                          $lookup: {
+                            from: "users",
+                            localField: "participants.participantID",
+                            foreignField: "_id",
+                            as: "rating",
+                            pipeline: [
+                              {
+                                $project: {
+                                  username: 1,
+                                  profileImage: 1
                                 }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          $project: {
+                            mergedArray: {
+                              $map: {
+                                input: "$participants",
+                                as: "p",
+                                in: {
+                                  $mergeObjects: [
+                                    "$$p",
+                                    {
+                                      $arrayElemAt: [
+                                        {
+                                          $filter: {
+                                            input: "$rating",
+                                            as: "r",
+                                            cond: {
+                                              $eq: [
+                                                "$$r._id",
+                                                "$$p.participantID"
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        0
+                                      ]
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          $unwind:
+                            /**
+                             * path: Path to the array field.
+                             * includeArrayIndex: Optional name for index.
+                             * preserveNullAndEmptyArrays: Optional
+                             *   toggle to unwind null and empty values.
+                             */
+                            {
+                              path: "$mergedArray"
                             }
                         },
-                        { $sort:{_id:-1}}
-                    ],
+                        {
+                          $group: {
+                            _id: "$mergedArray.participantID",
+                            reviews: {
+                              $push: {
+                                ratingScore:
+                                  "$mergedArray.review.ratingScore",
+                                comment: "$mergedArray.review.comment",
+                                reviewerName: "$mergedArray.username",
+                                reviewProfileImage:
+                                  "$mergedArray.profileImage"
+                              }
+                            }
+                          }
+                        }
+                      ],
                     { maxTimeMS: 60000, allowDiskUse: true}
                 );
 
@@ -315,6 +351,7 @@ class UserRepository {
                     throw new Error("this user (producer) received review not found.")
                 }
 
+                console.log(userReceivedReviews);
                 return userReceivedReviews;
 
             }

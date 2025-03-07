@@ -168,5 +168,302 @@
         
       }
     ]
+  },
+  {
+    "_id": {
+      "$oid": "67cac60fd0aaf2cc7cada40d"
+    },
+    "userID": {
+      "$oid": "67cac72f06b94eeab26c51c4"
+    },
+    "postName": "Video Editing for Commercial",
+    "postDescription": "Editing a high-quality commercial for a new product launch.",
+    "postImages": [
+      "https://example.com/video1.jpg"
+    ],
+    "postMediaType": {
+      "$oid": "67ae18ad7c7f8482264c2ae9"
+    },
+    "postProjectRoles": [
+      {
+        "$oid": "65b8765432abcd5678ef1234"
+      }
+    ],
+    "postStatus": "created",
+    "startDate": "2025-02-10T00:00:00.000Z",
+    "endDate": "2025-03-05T00:00:00.000Z",
+    "postDetailID": {
+      "$oid": "65bd5b99a1c2a9d1f8e1b127"
+    },
+    "participants": [
+      {
+        "participantID": {
+          "$oid": "67ae18a37c7f8482264c2ae8"
+        },
+        "status": "in-progress",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65b1234567abcd1234ef5678"
+            },
+            "price": 2000,
+            "offeredBy": 1,
+            "createdAt": "2025-02-09T14:00:00.000Z",
+            "reason": "Experienced video editor."
+          }
+        ],
+        "review": {
+          "ratingScore": 4.8,
+          "comment": "Great attention to detail.",
+          "reviewedAt": "2025-03-01T00:00:00.000Z"
+        },
+        "timeTracking": {
+          "createdAt": "2025-02-10T00:00:00.000Z",
+          "updatedAt": "2025-02-12T11:30:00.000Z"
+        }
+      },
+      {
+        "participantID": {
+          "$oid": "67cac60f650a022a3b56bf5f"
+        },
+        "status": "in-progress",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65c8765432abcd5678ef1234"
+            },
+            "price": 1800,
+            "offeredBy": 0,
+            "createdAt": "2025-03-30T14:00:00.000Z",
+            "reason": "Creative animator."
+          }
+        ],
+        "review": {
+          "ratingScore": 4.6,
+          "comment": "Impressive animation work.",
+          "reviewedAt": "2025-05-05T00:00:00.000Z"
+        },
+        "timeTracking": {
+          "createdAt": "2025-04-01T00:00:00.000Z",
+          "updatedAt": "2025-04-15T11:00:00.000Z"
+        }
+      }
+    ]
+  },{
+    "_id": {
+      "$oid": "67cac60fd0aaf2cc7cada40e"
+    },
+    "userID": {
+      "$oid": "67cac72f06b94eeab26c51c4"
+    },
+    "postName": "Photography Session for Magazine",
+    "postDescription": "A fashion photoshoot for a well-known magazine.",
+    "postImages": [
+      "https://example.com/photo1.jpg"
+    ],
+    "postMediaType": {
+      "$oid": "67ae18ad7c7f8482264c2ae9"
+    },
+    "postProjectRoles": [
+      {
+        "$oid": "65a1234567abcd1234ef5678"
+      }
+    ],
+    "postStatus": "success",
+    "startDate": "2025-02-15T00:00:00.000Z",
+    "endDate": "2025-03-10T00:00:00.000Z",
+    "postDetailID": {
+      "$oid": "65bd5b99a1c2a9d1f8e1b128"
+    },
+    "participants": [
+      {
+        "participantID": {
+          "$oid": "67ae18a37c7f8482264c2ae8"
+        },
+        "status": "success",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65a1234567abcd1234ef5678"
+            },
+            "price": 1200,
+            "offeredBy": 0,
+            "createdAt": "2025-02-14T10:00:00.000Z",
+            "reason": "Talented photographer."
+          }
+        ],
+        "review": {
+          "ratingScore": 5,
+          "comment": "Absolutely brilliant work!",
+          "reviewedAt": "2025-03-10T00:00:00.000Z"
+        },
+        "timeTracking": {
+          "createdAt": "2025-02-15T00:00:00.000Z",
+          "updatedAt": "2025-02-17T13:00:00.000Z"
+        }
+      }
+    ]
+  },{
+    "_id": {
+      "$oid": "67cac60fd0aaf2cc7cada40f"
+    },
+    "userID": {
+      "$oid": "67cac72f06b94eeab26c51c4"
+    },
+    "postName": "Graphic Design for Branding",
+    "postDescription": "Creating branding materials including logos and brochures.",
+    "postImages": [
+      "https://example.com/design1.jpg"
+    ],
+    "postMediaType": {
+      "$oid": "67ae18ad7c7f8482264c2ae9"
+    },
+    "postProjectRoles": [
+      {
+        "$oid": "65b1234567abcd1234ef5678"
+      }
+    ],
+    "postStatus": "created",
+    "startDate": "2025-01-20T00:00:00.000Z",
+    "endDate": "2025-02-25T00:00:00.000Z",
+    "postDetailID": {
+      "$oid": "65bd5b99a1c2a9d1f8e1b126"
+    },
+    "participants": [
+      {
+        "participantID": {
+          "$oid": "67ae18a37c7f8482264c2ae8"
+        },
+        "status": "candidate",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65b8765432abcd5678ef1234"
+            },
+            "price": 1500,
+            "offeredBy": 1,
+            "createdAt": "2025-01-19T15:00:00.000Z",
+            "reason": "Experienced designer."
+          }
+        ],
+        "review": {
+          "ratingScore": 4.5,
+          "comment": "Highly skilled in design.",
+          "reviewedAt": "2025-02-10T00:00:00.000Z"
+        },
+        "timeTracking": {
+          "createdAt": "2025-01-20T00:00:00.000Z",
+          "updatedAt": "2025-01-22T12:30:00.000Z"
+        }
+      }
+    ]
+  },{
+    "_id": {
+      "$oid": "67cac60fd0aaf2cc7cada410"
+    },
+    "userID": {
+      "$oid": "67cac74406b94eeab26c51cb"
+    },
+    "postName": "Script Writing for TV Series",
+    "postDescription": "Writing an engaging script for a new drama series.",
+    "postImages": [
+      "https://example.com/script1.jpg"
+    ],
+    "postMediaType": {
+      "$oid": "67ae18c07c7f8482264c2aec"
+    },
+    "postProjectRoles": [
+      {
+        "$oid": "65c8765432abcd5678ef1234"
+      }
+    ],
+    "postStatus": "success",
+    "startDate": "2025-03-01T00:00:00.000Z",
+    "endDate": "2025-04-15T00:00:00.000Z",
+    "postDetailID": {
+      "$oid": "65bd5b99a1c2a9d1f8e1b129"
+    },
+    "participants": [
+      {
+        "participantID": {
+          "$oid": "67cac60f650a022a3b56bf5f"
+        },
+        "status": "in-progress",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65c8765432abcd5678ef1234"
+            },
+            "price": 2500,
+            "offeredBy": 1,
+            "createdAt": "2025-02-25T16:00:00.000Z",
+            "reason": "Experienced scriptwriter."
+          }
+        ],
+        "review": {
+          "ratingScore": 4.7,
+          "comment": "Strong storytelling skills.",
+          "reviewedAt": "2025-04-10T00:00:00.000Z"
+        },
+        "timeTracking": {
+          "createdAt": "2025-03-01T00:00:00.000Z",
+          "updatedAt": "2025-03-05T10:00:00.000Z"
+        }
+      }
+    ]
+  },{
+    "_id": {
+      "$oid": "67cac60fd0aaf2cc7cada411"
+    },
+    "userID": {
+      "$oid": "67cac74406b94eeab26c51cb"
+    },
+    "postName": "Animation for Kids Show",
+    "postDescription": "Creating engaging animations for an educational kids show.",
+    "postImages": [
+      "https://example.com/animation1.jpg"
+    ],
+    "postMediaType": {
+      "$oid": "67ae18c07c7f8482264c2aec"
+    },
+    "postProjectRoles": [
+      {
+        "$oid": "65b8765432abcd5678ef1234"
+      }
+    ],
+    "postStatus": "success",
+    "startDate": "2025-04-01T00:00:00.000Z",
+    "endDate": "2025-05-10T00:00:00.000Z",
+    "postDetailID": {
+      "$oid": "65bd5b99a1c2a9d1f8e1b130"
+    },
+    "participants": [
+      {
+        "participantID": {
+          "$oid": "67cac60f650a022a3b56bf5f"
+        },
+        "status": "in-progress",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65c8765432abcd5678ef1234"
+            },
+            "price": 1800,
+            "offeredBy": 0,
+            "createdAt": "2025-03-30T14:00:00.000Z",
+            "reason": "Creative animator."
+          }
+        ],
+        "review": {
+          "ratingScore": 4.6,
+          "comment": "Impressive animation work.",
+          "reviewedAt": "2025-05-05T00:00:00.000Z"
+        },
+        "timeTracking": {
+          "createdAt": "2025-04-01T00:00:00.000Z",
+          "updatedAt": "2025-04-15T11:00:00.000Z"
+        }
+      }
+    ]
   }
 ]

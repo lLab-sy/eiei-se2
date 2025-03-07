@@ -91,7 +91,7 @@ const PostDetail = () => {
 
   const fetchDataReview=async()=>{
       if(!ownerResponse) return;
-      
+
       var responseReview;
       try{
         responseReview = await getReviewProfesstional(ownerResponse._id);
@@ -103,6 +103,7 @@ const PostDetail = () => {
 
 
   if (!dataResponse || !ownerResponse) {
+    
     fetchData();
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -111,11 +112,10 @@ const PostDetail = () => {
     );
   }else if(ownerResponse != null && !dataReviews){
     fetchDataReview();
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Loading...</p>
-      </div>
-    );
+    dataResponse.postProjectRoles = [];
+    dataResponse.postProjectRolesOut?.forEach((e) => {
+      dataResponse.postProjectRoles.push(e.id);
+    })
   }
   else{
     dataResponse.postProjectRoles = [];
@@ -294,7 +294,7 @@ const PostDetail = () => {
           
           {/*Review Section*/}
           <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Producer's Received Reviews</h2>
             {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
               dataReviews.receivedReviews.map((review, index) => (
                 <ReviewCard

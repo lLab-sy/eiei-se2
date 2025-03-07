@@ -141,7 +141,7 @@ class UserService {
     async getUserReceivedReviewsByID(id:string){
         try{
             const userReceivedReviews = await userRepository.getUserReceivedReviewsByID(id);
-
+            
             const result = await Promise.all(
                 userReceivedReviews.map(async (r) => {
                     return new ReceivedReviewsDTO({
