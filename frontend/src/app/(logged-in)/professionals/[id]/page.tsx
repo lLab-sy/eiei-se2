@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Mail, Phone, Briefcase, Star, User, Award } from "lucide-react";
+import { Mail, Phone, Star, User, Award } from "lucide-react";
 import { Professional, ReceivedReviews} from "../../../../../interface";
 import getUser from "@/libs/getUser";
-import getReviewProfesstional from "@/libs/getReviewProfesstional";
+import ReviewCard from "@/components/ReviewCard";
 
 const ProfessionalDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -180,28 +180,24 @@ const ProfessionalDetail = () => {
             </a>
           </div>
 
+            {/*Review Section*/}
           <div className="mt-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
             {dataReviews != null && dataReviews.receivedReviews.length > 0 ? (
               dataReviews.receivedReviews.map((review, index) => (
-                <div key={index} className="border-b py-4">
-                  <div className="flex items-center gap-4">
-                    <Image src={review.reviewerProfileImage} alt={review.reviewerName} width={40} height={40} className="rounded-full" />
-                    <div>
-                      <p className="font-semibold">{review.reviewerName}</p>
-                      <div className="flex">
-                        {[...Array(review.ratingScore)].map((_, i) => (
-                          <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-gray-700">{review.comment}</p>
-                </div>
+                <ReviewCard
+                        key={index}
+                        index={index}
+                        reviewerName={review.reviewerName}
+                        reviewerProfileImage={review.reviewerProfileImage}
+                        ratingScore={review.ratingScore}
+                        comment={review.comment}
+                      />
               ))
             ) : (
               <p className="text-gray-500">No reviews yet.</p>
             )}
+
           </div>
         </CardContent>
       </Card>
