@@ -12,6 +12,16 @@ export interface PostData {
     userID: string;
 }
 
+export interface ReceivedReview{
+    reviewerName: string;
+    reviewerProfileImage: string;
+    ratingScore: number;
+    comment: string;
+}
+
+export interface ReceivedReviews{
+    receivedReviews: ReceivedReview[];
+}
 
 export interface PostDataHistory {
     id:string,

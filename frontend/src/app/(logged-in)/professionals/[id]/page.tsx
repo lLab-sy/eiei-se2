@@ -6,22 +6,32 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Mail, Phone, Briefcase, Star, User, Award } from "lucide-react";
-import { Professional} from "../../../../../interface";
+import { Professional, ReceivedReviews} from "../../../../../interface";
 import getUser from "@/libs/getUser";
+import getReviewProfesstional from "@/libs/getReviewProfesstional";
 
 const ProfessionalDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
   const [dataResponse,setDataResponse]= useState<Professional|null>(null);
+  //const [dataReviews, setDataReviews]= useState<ReceivedReviews|null>(null);
 
     useEffect(()=>{
       const fetchData=async()=>{
-          var response;
+          var responseData;
+          var responseReviewProf;
           try{
-            response= await getUser(id);
-            setDataResponse(response);
+            responseData = await getUser(id);
+            setDataResponse(responseData);
           }catch(error){
             console.log("User Not Found");
+          }
+
+          try{
+            //responseReviewProf = await getReviewProfesstional(id);
+            //setDataReviews(responseReviewProf);
+          }catch(error){
+            console.log("Review not found");
           }
       }
       fetchData()
@@ -40,6 +50,29 @@ const ProfessionalDetail = () => {
       })
       dataResponse.avgRating = dataResponse.rating.length ? Math.ceil((sum / dataResponse.rating.length) * 10) / 10 : 0.0;
   }
+
+  const dataReviews: ReceivedReviews = {
+    receivedReviews: [
+      {
+        reviewerName: "John Doe",
+        reviewerProfileImage: "/image/logo.png",
+        ratingScore: 5,
+        comment: "Excellent service! Highly recommended."
+      },
+      {
+        reviewerName: "Jane Smith",
+        reviewerProfileImage: "/image/logo.png",
+        ratingScore: 4,
+        comment: "Very professional and skilled. Would hire again."
+      },
+      {
+        reviewerName: "Alice Johnson",
+        reviewerProfileImage: "/image/logo.png",
+        ratingScore: 3,
+        comment: "Good experience overall, but there's room for improvement."
+      }
+    ]
+  };
 
   const ProfessionalInfo = {
     id: dataResponse,
@@ -145,6 +178,30 @@ const ProfessionalDetail = () => {
             <a href={`mailto:${ProfessionalInfo.email}`} className="bg-mainblue-lightest text-white py-3 px-8 rounded-lg shadow-md hover:bg-mainblue-light transition-colors duration-300">
               Contact
             </a>
+          </div>
+
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
+            {dataReviews != null && dataReviews.receivedReviews.length > 0 ? (
+              dataReviews.receivedReviews.map((review, index) => (
+                <div key={index} className="border-b py-4">
+                  <div className="flex items-center gap-4">
+                    <Image src={review.reviewerProfileImage} alt={review.reviewerName} width={40} height={40} className="rounded-full" />
+                    <div>
+                      <p className="font-semibold">{review.reviewerName}</p>
+                      <div className="flex">
+                        {[...Array(review.ratingScore)].map((_, i) => (
+                          <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="mt-2 text-gray-700">{review.comment}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No reviews yet.</p>
+            )}
           </div>
         </CardContent>
       </Card>
