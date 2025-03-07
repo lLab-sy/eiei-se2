@@ -14,14 +14,41 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Mail, Phone, Star, User, Calendar } from "lucide-react";
-import { MediaType, PostData, RoleType, UserData } from "../../../../../interface";
+import { MediaType, PostData, ReceivedReviews, RoleType, UserData } from "../../../../../interface";
 import getPostById from "@/libs/getPostById";
 import { useSession } from "next-auth/react";
 import getMediaTypes from "@/libs/getMediaTypes";
 import getPostRoles from "@/libs/getPostRoles";
 import getUser from "@/libs/getUser";
+import ReviewCard from "@/components/ReviewCard";
 
 const PostDetail = () => {
+
+  ////// For debug
+  const dataReviews: ReceivedReviews = {
+    receivedReviews: [
+      {
+        reviewerName: "John Doe",
+        reviewerProfileImage: "/image/logo.png",
+        ratingScore: 5,
+        comment: "Excellent service! Highly recommended."
+      },
+      {
+        reviewerName: "Jane Smith",
+        reviewerProfileImage: "/image/logo.png",
+        ratingScore: 4,
+        comment: "Very professional and skilled. Would hire again."
+      },
+      {
+        reviewerName: "Alice Johnson",
+        reviewerProfileImage: "/image/logo.png",
+        ratingScore: 3,
+        comment: "Good experience overall, but there's room for improvement."
+      }
+    ]
+  };
+
+
   const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
   // post data
@@ -266,6 +293,26 @@ const PostDetail = () => {
               Send Offer
             </button>
           </div>
+          
+          {/*Review Section*/}
+          <div className="mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews Producer</h2>
+          {dataReviews != null && dataReviews.receivedReviews.length > 0 ? (
+            dataReviews.receivedReviews.map((review, index) => (
+              <ReviewCard
+                      key={index}
+                      index={index}
+                      reviewerName={review.reviewerName}
+                      reviewerProfileImage={review.reviewerProfileImage}
+                      ratingScore={review.ratingScore}
+                      comment={review.comment}
+                    />
+            ))
+          ) : (
+            <p className="text-gray-500">No reviews yet.</p>
+          )}
+          </div>
+          
         </CardContent>
       </Card>
     </div>
