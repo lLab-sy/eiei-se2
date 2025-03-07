@@ -51,6 +51,24 @@ export interface MetaData{
     totalPages: number;
 }
 
+export interface UserData{
+    _id: string;
+    username: string;
+    role: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    gender: string;
+    occupation: string;
+    skill: string[];
+    experience: number;
+    rating: Rating[];
+    avgRating: number;
+    description?: string;
+    imageUrl?: string;
+}
+
 export interface PostDataHistory {
     id:string,
     postName: string;

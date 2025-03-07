@@ -5,12 +5,12 @@ import React from "react";
 import Footer from "@/components/Footer";
 import SearchPostBar from "@/components/SearchPostBar";
 import Pagination from "@/components/Pagination";
-import PostCrad from "@/components/PostCard";
 import { PostData, SearchPosts } from "../../../../interface";
 import getPosts from "@/libs/getPosts";
 import { RoleType, MediaType } from "../../../../interface";
 import getMediaTypes from "@/libs/getMediaTypes";
 import getPostRoles from "@/libs/getPostRoles";
+import PostCard from "@/components/PostCard";
 
 const PAGE_SIZE = 12;
 
@@ -133,14 +133,14 @@ const ProfessionalsPage = () => {
       {PostsCurrentPage ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
           {PostsCurrentPage.map((post, index) => (
-            <PostCrad
+            <PostCard
               key={index}
               title={post.postName}
               description={post.postDescription}
               imageUrl={post.postImages? post.postImages[0] : ""} 
               role={getRoleById(post.postProjectRoles)} 
               mediaType={getMediaNameById(post.postMediaType)}
-              id={post.userID}          
+              id={post.id}          
               />
           ))}
         </div>

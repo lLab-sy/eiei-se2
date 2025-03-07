@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 
-interface PostCradProp {
+interface IPostCardProp {
   title: string;
   role: string[];
   description: string;
@@ -10,7 +10,7 @@ interface PostCradProp {
   id: string;
 }
 
-const PostCrad: React.FC<PostCradProp> = ({
+const PostCard: React.FC<IPostCardProp> = ({
   title,
   role,
   description,
@@ -55,4 +55,4 @@ const PostCrad: React.FC<PostCradProp> = ({
     );
 };
 
-export default PostCrad;
+export default PostCard;

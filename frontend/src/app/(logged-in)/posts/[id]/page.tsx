@@ -21,33 +21,9 @@ import getMediaTypes from "@/libs/getMediaTypes";
 import getPostRoles from "@/libs/getPostRoles";
 import getUser from "@/libs/getUser";
 import ReviewCard from "@/components/ReviewCard";
+import getReviewProfesstional from "@/libs/getReviewProfesstional";
 
 const PostDetail = () => {
-
-  ////// For debug
-  const dataReviews: ReceivedReviews = {
-    receivedReviews: [
-      {
-        reviewerName: "John Doe",
-        reviewerProfileImage: "/image/logo.png",
-        ratingScore: 5,
-        comment: "Excellent service! Highly recommended."
-      },
-      {
-        reviewerName: "Jane Smith",
-        reviewerProfileImage: "/image/logo.png",
-        ratingScore: 4,
-        comment: "Very professional and skilled. Would hire again."
-      },
-      {
-        reviewerName: "Alice Johnson",
-        reviewerProfileImage: "/image/logo.png",
-        ratingScore: 3,
-        comment: "Good experience overall, but there's room for improvement."
-      }
-    ]
-  };
-
 
   const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
@@ -56,6 +32,7 @@ const PostDetail = () => {
 
   //Owner Data
   const [ownerResponse, setOwnerResponse] = useState<UserData|null>(null);
+  const [dataReviews, setDataReviews]= useState<ReceivedReviews|null>(null);
 
   // all types
   const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
@@ -112,6 +89,19 @@ const PostDetail = () => {
     }
   }
 
+  const fetchDataReview=async()=>{
+      if(!ownerResponse) return;
+      
+      var responseReview;
+      try{
+        responseReview = await getReviewProfesstional(ownerResponse._id);
+        setDataReviews(responseReview);
+      }catch(error){
+        console.log("Review not found");
+      }
+  }
+
+
   if (!dataResponse || !ownerResponse) {
     fetchData();
     return (
@@ -119,7 +109,15 @@ const PostDetail = () => {
         <p>Loading...</p>
       </div>
     );
-  }else{
+  }else if(ownerResponse != null && !dataReviews){
+    fetchDataReview();
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  else{
     dataResponse.postProjectRoles = [];
     dataResponse.postProjectRolesOut?.forEach((e) => {
       dataResponse.postProjectRoles.push(e.id);
@@ -296,21 +294,22 @@ const PostDetail = () => {
           
           {/*Review Section*/}
           <div className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews Producer</h2>
-          {dataReviews != null && dataReviews.receivedReviews.length > 0 ? (
-            dataReviews.receivedReviews.map((review, index) => (
-              <ReviewCard
-                      key={index}
-                      index={index}
-                      reviewerName={review.reviewerName}
-                      reviewerProfileImage={review.reviewerProfileImage}
-                      ratingScore={review.ratingScore}
-                      comment={review.comment}
-                    />
-            ))
-          ) : (
-            <p className="text-gray-500">No reviews yet.</p>
-          )}
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
+            {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
+              dataReviews.receivedReviews.map((review, index) => (
+                <ReviewCard
+                        key={index}
+                        index={index}
+                        reviewerName={review.reviewerName}
+                        reviewerProfileImage={review.reviewerProfileImage}
+                        ratingScore={review.ratingScore}
+                        comment={review.comment}
+                      />
+              ))
+            ) : (
+              <p className="text-gray-500">No reviews yet.</p>
+            )}
+
           </div>
           
         </CardContent>
