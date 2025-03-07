@@ -208,7 +208,7 @@ class UserController {
             sendResponse(res, 'error', 'control layer Failed to get user received reviews')
         }
     }
-}
+
 
     async addProductionProfessionalReview(req : Request, res : Response) : Promise<void> {
         try{
