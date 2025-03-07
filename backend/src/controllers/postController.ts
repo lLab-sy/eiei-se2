@@ -183,7 +183,7 @@ class PostController {
 //@Private Request from Producer/ProdcutionProfessional Role and userID from frontEnd isMatch
 async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    console.log("hellooo")
+    // console.log("hellooo")
     const role=req.user.role
     console.log(req.user.userId)
     // const productionProfessionalID= req.query.productionProfessionalID ? req.query.productionProfessionalID as string: false;
@@ -192,7 +192,12 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     const page = req.query.page ? Number(req.query.page): 1;
     const status = ['created', 'in-progress', 'success', 'cancel'];
     
-    if (limit < 1 || page < 1 || !userId ) {
+    if ((limit < 1 || page < 1 || !userId) && role ==="production professional" ) {
+      sendResponse(res, 'error', '', 'bad request', 400);
+      return
+    }
+
+    if ((limit < 1 || page < 1 ||) && role ==="producer" ) {
       sendResponse(res, 'error', '', 'bad request', 400);
       return
     }

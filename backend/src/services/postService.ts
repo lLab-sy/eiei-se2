@@ -302,6 +302,8 @@ async getPost(id:string): Promise<PostDTO|null> {
       const offerRequest: GetOfferRequestModel = offerReq
       if(role==="producer"){
         const res = await postRepository.getProducerOffer(offerRequest);
+      }else if(role==="production professional"){
+        //TODO: Boom Implement
       }
       const res = await postRepository.getProducerOffer(offerRequest);
       const resDTO = res.data.map((offer) => {
