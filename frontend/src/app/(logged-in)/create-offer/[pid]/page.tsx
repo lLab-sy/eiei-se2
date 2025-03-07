@@ -11,6 +11,7 @@ import getPostById from "@/libs/getPostById";
 import { useSession } from "next-auth/react";
 import { FaHistory } from "react-icons/fa";
 import OfferHistoryMinimal from "@/components/OfferHistoryMinimal";
+import { OfferHistoryMinimal2 } from "@/components/OfferHistoryMinimal2";
 
 const mockOfferHistory: OfferHistoryData[] = [
     {
@@ -158,10 +159,12 @@ const mockOfferHistory: OfferHistoryData[] = [
                 : `${session.user.username} (Owner)`}
               {/* รอแก้ Project Owner */}
             </CardTitle>
-            <FaHistory
+            {/* <FaHistory
               className="cursor-pointer hover:text-mainblue transition-colors"
               onClick={() => setShowOfferHistory(true)}
-            />
+            /> */}
+            <OfferHistoryMinimal2 productionProfessionalName={pid} offerHistoryDatas={mockOfferHistory}/>
+
           </CardHeader>
 
           <hr className="h-px bg-gray-300 border-0" />
@@ -190,13 +193,16 @@ const mockOfferHistory: OfferHistoryData[] = [
           </div>
         </Card>
       </div>
-
+      
+            
       {showOfferHistory && (
+        <div  className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <OfferHistoryMinimal
           productionProfessionalName={pid}
           offerHistoryDatas={mockOfferHistory}
           onCloseWindow={() => setShowOfferHistory(false)}
         />
+        </div>
       )}
     </div>
   );
