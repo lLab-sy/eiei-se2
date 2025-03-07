@@ -197,7 +197,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       return
     }
 
-    if ((limit < 1 || page < 1 ||) && role ==="producer" ) {
+    if ((limit < 1 || page < 1) && role ==="producer" ) {
       sendResponse(res, 'error', '', 'bad request', 400);
       return
     }
