@@ -18,6 +18,16 @@ export interface PostImageDisplay{
     imageURL:string;
     imageKey:string;
 }
+export interface ReceivedReview{
+    reviewerName: string;
+    reviewerProfileImage: string;
+    ratingScore: number;
+    comment: string;
+}
+
+export interface ReceivedReviews{
+    receivedReviews: ReceivedReview[];
+}
 
 export interface ReceivedReview{
     reviewerName: string;
