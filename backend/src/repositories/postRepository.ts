@@ -629,7 +629,7 @@ class PostRepository {
             const sortStage: PipelineStage.Sort = {
                 $sort: { createdAt: -1 }
             }
-            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+            matchStage.push(sortStage, { $skip: skip }, { $limit: pageSize });
 
             const results = await Post.aggregate(pipeline)
             const response: GetPostByProfResponse = {
