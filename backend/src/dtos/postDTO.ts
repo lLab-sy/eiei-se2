@@ -280,6 +280,7 @@ export class PostWithRoleCountDTO extends PostDTO{
     }
 }
 
+
 export class OfferRequestDTO {
     @ApiProperty({ description: 'The id of user', type: String })
     @IsString()
