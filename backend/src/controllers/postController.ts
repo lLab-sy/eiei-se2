@@ -58,7 +58,7 @@ class PostController {
   async createPost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
 
-      //
+      //Front End
       req.body=JSON.parse(req.body.postData)
 
       //unauthorize

@@ -332,74 +332,80 @@ class PostRepository {
 		}
 	}
 
-    public async getOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
+    //User ID ของบูมเป็น production professional ของเราใช้แค่ postID น่าจะพอ (userID optional เผื่อจะแยกแชทต่อคน)
+    public async getProducerOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
         try {
             const { userId, postId, postStatus, limit, page } = getOfferReq;
 
-            const matchStage: PipelineStage.Match = {
-                $match: {
-                  ...(userId && { 'participants.participantID': new ObjectId(userId) }),
-                  ...(postId && { _id: new ObjectId(postId) }),
-                  ...(postStatus && { postStatus }),
-                },
-              };
-
-            const pipeline: PipelineStage[] = [matchStage];
-
-            //unwind participants
-            const unwind1: PipelineStage.Unwind = {
-                 $unwind: { path: '$participants' } 
+            const matchStage: PipelineStage[] = [];
+            
+            if(postId){ //posId if it has
+                matchStage.push({
+                    $match: {
+                        _id: new ObjectId(postId)
+                      }
+                    })
             }
-            pipeline.push(unwind1);
 
-            //unwind participants.offer
-            const unwind2: PipelineStage.Unwind = {
-                $unwind: { path: '$participants.offer' } 
+            if(postStatus){ // postStatus If it has
+                matchStage.push({
+                    $match: { postStatus: 'success' }
+                })
             }
-            pipeline.push(unwind2);
 
-            //lookup to postRoleTypes
-            const lookup: PipelineStage.Lookup ={
+            matchStage.push({ //unwind paticipant
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({ //unwind each offer
+                $unwind: {
+                    path: '$participants.offer',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            if(userId){
+                matchStage.push({ //paticipant in post if it has
+                    $match: {
+                        'participants.participantID': new ObjectId(
+                        userId
+                        )
+                    }
+                    
+                })
+            }
+
+            matchStage.push({ // change roleID -> roleName
                 $lookup: {
                     from: 'postRoleTypes',
                     localField: 'participants.offer.role',
                     foreignField: '_id',
                     as: 'roleName'
-                  }
-            }
-            pipeline.push(lookup);
+                }
+            })
 
-            //set field
-            const setStage: PipelineStage.Set = {
-                $set: {
+            matchStage.push({
+                $project: {
+                    _id: 1,
+                    postName: 1,
                     roleName: {
                       $arrayElemAt: ['$roleName.roleName', 0]
                     },
                     currentWage: '$participants.offer.price',
                     reason: '$participants.offer.reason',
-                    offeredBy: '$participants.offer.offerBy',
-                    status: "$participants.status",
-                    createdAt: '$participants.offer.createdAt'
+                    offeredBy:
+                      '$participants.offer.offeredBy',
+                    status: '$participants.status',
+                    createdAt: '$participants.createdAt'
                   }
-            }
-            pipeline.push(setStage);
-
-            //project
-            const projectStage: PipelineStage.Project = {
-                $project: {
-                    postName: 1,
-                    roleName: 1,
-                    currentWage: 1,
-                    reason: 1,
-                    offeredBy: 1,
-                    status:1,
-                    createdAt: 1
-                  }
-            }
-            pipeline.push(projectStage);
-
+            })
             console.log("Check2",matchStage)
-            const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
+            const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
             const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
 
@@ -412,9 +418,9 @@ class PostRepository {
             const sortStage: PipelineStage.Sort = {
                 $sort: { createdAt: -1 }
             }
-            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+            matchStage.push(sortStage, { $skip: skip }, { $limit: pageSize });
 
-            const results = await Post.aggregate(pipeline)
+            const results = await Post.aggregate(matchStage)
             const response: GetOfferResponse = {
                 data: results,
                 totalItems: totalItems
