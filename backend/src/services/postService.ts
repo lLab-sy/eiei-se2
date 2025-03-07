@@ -301,7 +301,7 @@ async getPost(id:string): Promise<PostDTO|null> {
     try {
       const offerRequest: GetOfferRequestModel = offerReq
 
-      const res = await postRepository.getOffer(offerRequest);
+      const res = await postRepository.getProducerOffer(offerRequest);
       const resDTO = res.data.map((offer) => {
         return new OfferResponseDTO({
           _id: offer._id as string,
