@@ -46,7 +46,6 @@ class S3ClientClass {
         Bucket: this.bucketName,
         Key: key
       };
-  
       const command = new GetObjectCommand(params);
       const expireTime = 3600;
       const url = await getSignedUrl(this.client, command, {

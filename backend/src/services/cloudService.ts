@@ -45,7 +45,7 @@ class CloudService {
   }
   async getSignedUrlImageCloud(key:string){
     try{
-        const url = await s3Client.createSignedURL(key)
+        const url = await s3Client.createSignedURL(key);
         return url
     }catch(err){
         throw new Error(err as string)

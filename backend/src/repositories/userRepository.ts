@@ -83,6 +83,7 @@ class UserRepository {
                             $lookup:{
                                 from:'postTypes',
                                 localField: 'rating.postID',
+                                foreignField: '_id',
                                 as:'rating.post',
                                 pipeline:[
                                     {

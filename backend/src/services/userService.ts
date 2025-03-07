@@ -10,6 +10,7 @@ import userRepository from "../repositories/userRepository";
 import postRepository from "../repositories/postRepository";
 import { PostDTO } from "../dtos/postDTO";
 import { IPost } from "../models/postModel";
+import cloudService from "./cloudService";
 
 class UserService {
     async getUser(username:string){
@@ -99,7 +100,7 @@ class UserService {
             throw new Error("Error in service layer when add Review to Production Professional: " + (error as Error).message);
         }
     }
-}
+
     async getUserReceivedReviewsByID(id:string){
         try{
             const userReceivedReviews = await userRepository.getUserReceivedReviewsByID(id);
@@ -109,8 +110,8 @@ class UserService {
                     return new ReceivedReviewsDTO({
                         receivedReviews: await Promise.all(
                             r.reviews.map(async (review: ReceivedReviewDTO) => {
-                                let reviewerProfileImageTmp = review.reviewerProfileImage
-                                    ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage)
+                                let reviewerProfileImageTmp = (review.reviewerProfileImage && review.reviewerProfileImage.length != 0)
+                                    ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage[0])
                                     : '';
                                 return new ReceivedReviewDTO({
                                     reviewerName: review.reviewerName as string,

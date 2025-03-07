@@ -9,12 +9,13 @@ import { Mail, Phone, Star, User, Award } from "lucide-react";
 import { Professional, ReceivedReviews} from "../../../../../interface";
 import getUser from "@/libs/getUser";
 import ReviewCard from "@/components/ReviewCard";
+import getReviewProfesstional from "@/libs/getReviewProfesstional";
 
 const ProfessionalDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
   const [dataResponse,setDataResponse]= useState<Professional|null>(null);
-  //const [dataReviews, setDataReviews]= useState<ReceivedReviews|null>(null);
+  const [dataReviews, setDataReviews]= useState<ReceivedReviews|null>(null);
 
     useEffect(()=>{
       const fetchData=async()=>{
@@ -28,8 +29,9 @@ const ProfessionalDetail = () => {
           }
 
           try{
-            //responseReviewProf = await getReviewProfesstional(id);
-            //setDataReviews(responseReviewProf);
+            responseReviewProf = await getReviewProfesstional(id);
+            setDataReviews(responseReviewProf);
+            console.log(dataReviews);
           }catch(error){
             console.log("Review not found");
           }
@@ -50,29 +52,6 @@ const ProfessionalDetail = () => {
       })
       dataResponse.avgRating = dataResponse.rating.length ? Math.ceil((sum / dataResponse.rating.length) * 10) / 10 : 0.0;
   }
-
-  const dataReviews: ReceivedReviews = {
-    receivedReviews: [
-      {
-        reviewerName: "John Doe",
-        reviewerProfileImage: "/image/logo.png",
-        ratingScore: 5,
-        comment: "Excellent service! Highly recommended."
-      },
-      {
-        reviewerName: "Jane Smith",
-        reviewerProfileImage: "/image/logo.png",
-        ratingScore: 4,
-        comment: "Very professional and skilled. Would hire again."
-      },
-      {
-        reviewerName: "Alice Johnson",
-        reviewerProfileImage: "/image/logo.png",
-        ratingScore: 3,
-        comment: "Good experience overall, but there's room for improvement."
-      }
-    ]
-  };
 
   const ProfessionalInfo = {
     id: dataResponse,
