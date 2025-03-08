@@ -1,55 +1,76 @@
-import { DialogContent } from "@radix-ui/react-dialog";
-import { Dialog, DialogTrigger } from "./ui/dialog";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import { Airplay, Bitcoin, CircleCheck, CircleX, Clock9, SearchCheck, Timer } from "lucide-react";
+// 1. src/components/HistoryProductionContent.tsx
+import { Airplay, Bitcoin } from "lucide-react";
 import { historyStateInterface } from "./HistoryProduction";
 
-export default function HistoryProductionContent({data} : {data : historyStateInterface}) {
-  const offerDate = new Date(data.createdAt)
-  const displayDate = offerDate.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-  const colarMapping = {
-    'candidate' : <Timer />,
-    "reject" : <CircleX />,
-    "in-progress" : <SearchCheck />
-  }
+export default function HistoryProductionContent({
+  data,
+}: {
+  data: historyStateInterface;
+}) {
+  const offerDate = new Date(data.createdAt);
+  const displayDate = offerDate.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  // ทำให้ status แสดงเป็นภาษาไทย
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "candidate":
+        return "รอพิจารณา";
+      case "reject":
+        return "ปฏิเสธแล้ว";
+      case "in-progress":
+        return "ตอบรับแล้ว";
+      default:
+        return status;
+    }
+  };
+
+  // ทำให้ offeredBy แสดงเป็นภาษาไทย
+  const getOfferByText = (offeredBy: boolean) => {
+    return offeredBy ? "Producer" : "Professional";
+  };
+
   return (
-    <div className="cursor-pointer mt-3 group bg-white flex h-[120px] rounded-lg shadow-lg">
-      <div
-        style={{
-          transition: "transform 1s ease",
-        }}
-        className="group-hover:translate-x-4 w-[20%] flex justify-center items-center h-full relative"
-      >
-        <Airplay size={30} />
-      </div>
-      <div className="w-[80%] h-full flex flex-row justify-between">
-        <div className="flex flex-col justify-center">
-          <span>Offer By: {data.offeredBy}</span>
-          <span>Role: {data.roleName}</span>
-          <span>Offer Time: {displayDate}</span>
-          <span>Status: {data.status}</span>
-        </div>
-        <div className="flex w-[30%] group items-center mr-2 relative">
-          <Bitcoin
-            style={{
-              transition: "color 1s ease",
-            }}
-            size={50}
-            className={`group-hover:text-green-500`}
-          />
-          <div className='absolute right-1 top-1'>
-            {
-              (data.status === 'candidate') ? <CircleCheck color="#00b083" strokeWidth={2} /> : 
-              (data.status === 'in-progress') ? <Clock9 color='#3e47dc' strokeWidth={2} /> : <CircleX color="#ff3e0c" />
-            }
+    <div className="w-full bg-white rounded-lg shadow-md p-3">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <div className="bg-gray-100 p-1 rounded-lg">
+            <Airplay size={16} className="text-gray-700" />
           </div>
-          <span className="text-2xl">{data.currentWage}</span>
+          <span className="font-medium">Offer By:</span>
+          <span>{getOfferByText(data.offeredBy)}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Bitcoin size={16} className="text-gray-700" />
+          <span className="text-lg font-medium">{data.currentWage}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        <div>
+          <span className="font-medium">Role:</span> {data.roleName}
+        </div>
+        <div>
+          <span className="font-medium">Status:</span>
+          <span
+            className={
+              data.status === "candidate"
+                ? "text-yellow-500"
+                : data.status === "in-progress"
+                  ? "text-green-500"
+                  : "text-red-500"
+            }
+          >
+            {" " + getStatusText(data.status)}
+          </span>
+        </div>
+        <div className="col-span-2">
+          <span className="font-medium">Offer Time:</span> {displayDate}
         </div>
       </div>
     </div>
