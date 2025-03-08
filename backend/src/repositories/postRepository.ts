@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, getPostByProfRequestModel } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel } from '../models/postModel';
 import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
@@ -293,6 +293,40 @@ class PostRepository {
         }
     }
 
+    public async addPostReview(postID: string, participantID: string, newRating: PaticipantRating) {
+        try {
+            if (!postID) {
+                throw new Error("Id is required");
+            }
+            const result = await Post.findOneAndUpdate(
+                {
+                  _id: postID,
+                  "postStatus": "success", // post success
+                  "participants.participantID": participantID, // Ensure has paticipant in post
+                  "participants.status": "candidate", // cadidate only
+                  "participants.reviewedAt": { $exists: false }, // make sure that no review when add to this post
+                },
+                { $set: { 
+                    "participants.$.ratingScore": newRating.ratingScore,
+                    "participants.$.comment": newRating.comment,
+                    "participants.$.reviewedAt": newRating.reviewedAt,
+                 }}, // Update the matching element
+                { new: true, runValidators: true }
+            );
+            
+            if (!result) {
+                console.log('not found')
+                throw new Error('Production professional (participantID) not found in this Post');
+            }
+
+            return result
+        }
+        catch(err){
+            console.log(err)
+            throw new Error('Cannot Update this Post: ' + err)
+		}
+	}
+
     public async getOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
         try {
             const { userId, postId, postStatus, limit, page } = getOfferReq;
@@ -387,7 +421,7 @@ class PostRepository {
         }
     }
 
-    public async getPostsByProf(getPostByProfReq: getPostByProfRequestModel): Promise<GetPostByProfResponse>{
+    public async getPostsByProf(getPostByProfReq: GetPostByProfRequestModel): Promise<GetPostByProfResponse>{
         try {
             const { userId, postStatus, limit, page } = getPostByProfReq;
             const objectId = new mongoose.Types.ObjectId(userId);
