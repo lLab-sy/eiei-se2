@@ -89,6 +89,60 @@ const upload = multer({
  *           type: string
  *           format: date-time
  *           description: The end date of the post
+ *     PostWithIDDTO:
+ *       type: object
+ *       required:
+ *         - id
+ *         - postName
+ *         - postDescription
+ *         - postImages
+ *         - postMediaType
+ *         - postProjectRoles
+ *         - userID
+ *         - postStatus
+ *         - startDate
+ *         - endDate
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The id of the post
+ *         postName:
+ *           type: string
+ *           description: The name of the post
+ *           maxLength: 50
+ *         postDescription:
+ *           type: string
+ *           description: The description of the post
+ *           maxLength: 500
+ *         postImages:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: An array of image URLs for the post
+ *         postMediaType:
+ *           type: string
+ *           description: The media type of the post
+ *         postProjectRoles:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [actor, cameraman, editor, vtuber]
+ *           description: The roles associated with the post
+ *         userID:
+ *           type: string
+ *           description: The user belong this post
+ *         postStatus:
+ *           type: string
+ *           enum: [created, in-progress, success, cancel]
+ *           description: The status of the post
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *           description: The start date of the post
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *           description: The end date of the post
  */
 
 
@@ -143,6 +197,178 @@ const upload = multer({
  *         description: Server error
  */
 router.get('/posts/search', postController.searchPost);
+
+/**
+ * @swagger
+ * /api/v1/posts/get-offer:
+ *   get:
+ *     summary: Get offer details
+ *     tags: [Post]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: The id of the user
+ *       - in: query
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         description: The id of the post
+ *       - in: query
+ *         name: postStatus
+ *         schema:
+ *           type: string
+ *         description: The status of post
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of offers per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The current page number
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved offers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                             example: "67b463aae151ca405ff1951f"
+ *                           postName:
+ *                             type: string
+ *                             example: "Graphic Design for Branding2"
+ *                           roleName:
+ *                             type: string
+ *                             example: "Actor"
+ *                           currentWage:
+ *                             type: integer
+ *                             example: 1400
+ *                           reason:
+ *                             type: string
+ *                             example: "Skilled lighting technician."
+ *                           offeredBy:
+ *                             type: integer
+ *                             example: 1
+ *                           status:
+ *                             type: string
+ *                             example: "candidate"
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2025-01-20T16:00:00.000Z"
+ *                     meta:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         totalItems:
+ *                           type: integer
+ *                           example: 1
+ *                         totalPages:
+ *                           type: integer
+ *                           example: 1
+ *                 message:
+ *                   type: string
+ *                   example: Successfully get offers
+ *       404:
+ *         description: Offers not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/get-offer', postController.getOffer);
+
+/**
+ * @swagger
+ * /api/v1/posts/user/prof:
+ *   get:
+ *     summary: Get posts by a specific user
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: postStatus
+ *         schema:
+ *           type: string
+ *         description: The status of post
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of posts per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The current page number
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: "#/components/schemas/PostDTO"
+ *                     meta:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         totalItems:
+ *                           type: integer
+ *                           example: 5
+ *                         totalPages:
+ *                           type: integer
+ *                           example: 1
+ *                 message:
+ *                   type: string
+ *                   example: Successfully get posts
+ *       404:
+ *         description: Posts not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/user/prof', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByProf as RequestHandler);
 
 /**
  * @swagger
