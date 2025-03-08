@@ -192,7 +192,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     const page = req.query.page ? Number(req.query.page): 1;
     const status = ['created', 'in-progress', 'success', 'cancel'];
     
-    if ((limit < 1 || page < 1 || !userId) && role ==="production professional" ) {
+    if ((limit < 1 || page < 1 || userId=="") && role ==="production professional" ) {
       sendResponse(res, 'error', '', 'bad request', 400);
       return
     }
@@ -285,55 +285,6 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       sendResponse(res, 'success', post, 'Successfully add review to post');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
-    }
-  };
-
-  async getOffer(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = req.query.userId? req.query.userId as string: false;
-      const limit = req.query.limit ? Number(req.query.limit): 10;
-      const page = req.query.page ? Number(req.query.page): 1;
-      const status = ['created', 'in-progress', 'success', 'cancel'];
-      
-      if (limit < 1 || page < 1 || !userId ) {
-        sendResponse(res, 'error', '', 'bad request', 400);
-        return
-      }
-      
-      let postStatus;
-      if (!req.query.postStatus){
-        postStatus = '';
-      }else{
-        if(!status.includes(req.query.postStatus as string)){
-          sendResponse(res, 'error', '', 'bad request', 400)
-        }else{
-          postStatus = req.query.postStatus as string
-        }
-          
-      }
-
-      const offerReqDTO: OfferRequestDTO = {
-        page: page,
-        limit: limit,
-        userId: userId,
-        postId: req.query.postId? req.query.postId as string: "",
-        postStatus: postStatus as string
-      }
-
-      const offers = await postService.getOffer(offerReqDTO);
-      // console.log(offers.meta.totalPages)
-      if (!offers.meta.totalPages){
-        sendResponse(res, 'error', '', 'You have no offer.', 400);
-        return
-      }
-      if (offers.meta.totalPages < page) {
-        sendResponse(res, 'error', '', 'bad request', 400);
-        return
-      }
-
-      sendResponse(res, 'success', offers, 'Successfully get offers');
-    } catch (err) {
-      sendResponse(res, 'error', err, 'Failed to get offers at controller', 500);
     }
   };
 

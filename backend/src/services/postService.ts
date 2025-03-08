@@ -297,15 +297,17 @@ async getPost(id:string): Promise<PostDTO|null> {
       throw new Error('Error in service layer: ' + error);
     }
   }
-  async getOffer(offerReq: OfferRequestDTO): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
+  async getOffer(offerReq: OfferRequestDTO,role:string): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
     try {
       const offerRequest: GetOfferRequestModel = offerReq
+      var res;
       if(role==="producer"){
-        const res = await postRepository.getProducerOffer(offerRequest);
+        res = await postRepository.getProducerOffer(offerRequest);
       }else if(role==="production professional"){
-        //TODO: Boom Implement
+        res = await postRepository.getOffer(offerRequest);
+      }else{
+        res = await postRepository.getProducerOffer(offerRequest);
       }
-      const res = await postRepository.getProducerOffer(offerRequest);
       const resDTO = res.data.map((offer) => {
         return new OfferResponseDTO({
           _id: offer._id as string,
