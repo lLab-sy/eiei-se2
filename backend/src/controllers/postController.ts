@@ -187,7 +187,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     const role=req.user.role
     console.log(req.user.userId)
     // const productionProfessionalID= req.query.productionProfessionalID ? req.query.productionProfessionalID as string: false;
-    const userId = req.query.userId? req.query.userId as string: false;
+    const userId = req.query.userId? req.query.userId as string: "";
     const limit = req.query.limit ? Number(req.query.limit): 10;
     const page = req.query.page ? Number(req.query.page): 1;
     const status = ['created', 'in-progress', 'success', 'cancel'];
