@@ -99,6 +99,7 @@ class PostRepository {
             }
 
             return post
+
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);
         }

@@ -24,7 +24,7 @@ export function OfferHistoryMinimal2({productionProfessionalName,offerHistoryDat
         <DialogHeader>
           <DialogTitle className="flex">Offer History</DialogTitle>
           <DialogDescription>
-          <hr className="h-px bg-black border-0 dark:bg-gray-700"></hr>
+          {/* <hr className="h-px bg-black border-0 dark:bg-gray-700"></hr> */}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col py-5 w-[100%] max-h-[60vh] overflow-y-auto space-y-3 m-auto">
