@@ -65,6 +65,7 @@ export default function OfferPostContent() {
     day: "numeric",
   });
   console.log("PostState", postState);
+  const postImage = postState?.postImages?.[0] ?? ''
   return (
     <main className=" flex flex-col h-[100vh] gap-3 mb-5 relative">
       <div className="relative  mt-20 flex flex-row gap-5 items-baseline w-full h-full">
@@ -74,34 +75,39 @@ export default function OfferPostContent() {
               <span className="text-2xl w-full ml-5 font-bold">
                 Post Detail
               </span>
-              <div className="px-5 flex justify-between mt-5">
-                <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">
-                    Post Name
-                  </span>
-                  <span>{postState?.postName}</span>
+              <div className='w-full flex gap-4'>
+                <div className='w-[320px] h-[320px] mt-5 rounded-lg bg-slate-50 shadow-xl'>
+                  {(postImage === "") ? "" : <Image className='w-full rounded-lg h-full' width={400} height={400} alt='No Image' src={postImage}></Image>}
                 </div>
-
-                <div className="flex flex-col ">
-                  <span className="text-sm text-muted-foreground">
-                    Start Date
-                  </span>
-                  <span>{startDate}</span>
+                <div className='flex flex-col gap-4 bg-slate-50 mt-5 w-[50%]'>
+                  <div className="px-5 flex justify-between mt-5">
+                    <div className="flex flex-col w-full">
+                      <span className="text-sm text-muted-foreground">
+                        Post Name
+                      </span>
+                      <span>{postState?.postName}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-muted-foreground">
+                        Start Date
+                      </span>
+                      <span>{startDate}</span>
+                    </div>
+                  </div>
+                  <div className="px-5 flex justify-between mt-5">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-muted-foreground">Status</span>
+                      <span className="text-xl text-orange-400">
+                        {postState?.postStatus}
+                      </span>
+                    </div>
+                    <div className="flex flex-col ">
+                      <span className="text-sm text-muted-foreground">
+                        End Date
+                      </span>
+                      <span>{endDate}</span>
+                    </div>
                 </div>
-              </div>
-              <div className="px-5 flex justify-between mt-5">
-                <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">Status</span>
-                  <span className="text-xl text-orange-400">
-                    {postState?.postStatus}
-                  </span>
-                </div>
-
-                <div className="flex flex-col ">
-                  <span className="text-sm text-muted-foreground">
-                    End Date
-                  </span>
-                  <span>{endDate}</span>
                 </div>
               </div>
               <Separator className="mt-5" />
