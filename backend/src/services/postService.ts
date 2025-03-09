@@ -313,38 +313,41 @@ async getPost(id:string): Promise<PostDTO|null> {
 
   async getPostsByProf(getPostReq: GetPostByProfRequestModel): Promise<PaginatedResponseDTO<PostDTO>> {
     try {
-      const postsReq:GetPostByProfRequestModel = getPostReq;
-      const res = await postRepository.getPostsByProf(postsReq);
-      const resDTO = res.data.map((post) => {
- 
-        return new PostDTO({
-        id: post._id?.toString(),
-        postName: post.postName as string,
-        postDescription: post.postDescription as string,
-        postImages: post.postImages as [string],
-        postMediaType: post.postMediaType.toString() as string,
-        postProjectRoles: post.postProjectRoles.map(eachRole=>(
-          eachRole.toString()
-        )) as [string],
-        postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-        // postDetailID: post.postDetailID.toString() as string,
-        startDate: post.startDate?post.startDate:"",  
-        endDate: post.endDate?post.endDate:""
-      })})
+        const postsReq: GetPostByProfRequestModel = getPostReq;
+        const res = await postRepository.getPostsByProf(postsReq);
 
-      const response: PaginatedResponseDTO<PostDTO> = {
-        data: resDTO,
-        meta: {
-            page: getPostReq.page,
-            limit: getPostReq.limit,
-            totalItems: res.totalItems,
-            totalPages: Math.ceil(res.totalItems / getPostReq.limit)
-        } as PaginationMetaDTO
-      }
-      return response;
-    }catch (error) {
-          console.error('Error in service layer:', error);
-          throw new Error('Error in service layer: ' + error);
+        const resDTO = await Promise.all(res.data.map(async (post) => {
+            let postImage = post.postImages[0] 
+                ? await cloudService.getSignedUrlImageCloud(post.postImages[0] as string) 
+                : '';
+            // console.log('postImage',postImage)
+            return new PostDTO({
+                id: post._id?.toString(),
+                postName: post.postName as string,
+                postDescription: post.postDescription as string,
+                postImages: [postImage] as [string],
+                postMediaType: post.postMediaType.toString() as string,
+                postProjectRoles: post.postProjectRoles.map(eachRole => eachRole.toString()) as [string],
+                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                startDate: post.startDate ? post.startDate : "",  
+                endDate: post.endDate ? post.endDate : ""
+            });
+        }));
+
+        const response: PaginatedResponseDTO<PostDTO> = {
+            data: resDTO,
+            meta: {
+                page: getPostReq.page,
+                limit: getPostReq.limit,
+                totalItems: res.totalItems,
+                totalPages: Math.ceil(res.totalItems / getPostReq.limit)
+            } as PaginationMetaDTO
+        };
+
+        return response;
+    } catch (error) {
+        console.error('Error in service layer:', error);
+        throw new Error('Error in service layer: ' + error);
     }
   }
 
