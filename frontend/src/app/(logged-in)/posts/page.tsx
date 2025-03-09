@@ -137,7 +137,7 @@ const ProfessionalsPage = () => {
               key={index}
               title={post.postName}
               description={post.postDescription}
-              imageUrl={post.postImages? post.postImages[0] : ""} 
+              imageUrl={(post.postImages && post.postImages.length != 0)  ? post.postImages[0] : ''} 
               role={getRoleById(post.postProjectRoles)} 
               mediaType={getMediaNameById(post.postMediaType)}
               id={post.id}          

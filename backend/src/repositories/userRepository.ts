@@ -185,173 +185,198 @@ class UserRepository {
             }
             if(user.role === "production professional"){
                 const userReceivedReviews = await User.aggregate(
-                    [
-                        {
-                            $match: {
-                                _id: userId
+                  [
+                    {
+                      $match: {
+                        _id: userId
+                      }
+                    },
+                    {
+                      $unwind: {
+                        path: "$rating"
+                      }
+                    },
+                    {
+                      $lookup: {
+                        from: "postTypes",
+                        localField: "rating.postID",
+                        foreignField: "_id",
+                        as: "rating.post",
+                        pipeline: [
+                          {
+                            $project: {
+                              _id: 1,
+                              userID: 1
                             }
-                        },
-                        { $unwind: {path: '$rating'} },
-                        {
-                            $lookup:{
-                                from:'postTypes',
-                                localField: 'rating.postID',
-                                foreignField: '_id',
-                                as:'rating.post',
-                                pipeline:[
-                                    {
-                                        $project:{
-                                            _id:1,
-                                            userID:1
-                                        }
-                                    }
-                                ]
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      $lookup: {
+                        from: "users",
+                        localField: "rating.post.userID",
+                        foreignField: "_id",
+                        as: "rating.producer",
+                        pipeline: [
+                          {
+                            $project: {
+                              username: 1,
+                              profileImage: 1
                             }
-                        },
-                        {
-                            $lookup:{
-                                from: 'users',
-                                localField: 'rating.post.userID',
-                                foreignField: '_id',
-                                as: 'rating.producer',
-                                pipeline: [
-                                    {
-                                        $project:{
-                                            username:1,
-                                            profileImage:1
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            $group:{
-                                _id: "$_id",
-                                reviews:{
-                                    $addToSet:{
-                                        reviewerName: '$rating.producer.username',
-                                        reviewerProfileImage: '$rating.producer.profileImage',
-                                        ratingScore: '$rating.ratingScore',
-                                        comment:'$rating.comment'
-                                    }
-                                }
-                            }
-                        },
-                        { $sort:{_id:-1}}
-                    ],
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      $group: {
+                        _id: "$_id",
+                        reviews: {
+                          $addToSet: {
+                            reviewerName:
+                              "$rating.producer.username",
+                            reviewerProfileImage:
+                              "$rating.producer.profileImage",
+                            ratingScore: "$rating.ratingScore",
+                            comment: "$rating.comment"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      $sort: {
+                        _id: -1
+                      }
+                    }
+                  ],
                     {maxTimeMS: 60000, allowDiskUse: true}
                 );
                 if(!userReceivedReviews){
                     throw new Error("this user (production professional) received review not found.")
                 }
-                console.log(userReceivedReviews)
+
                 return userReceivedReviews;
 
             }else{//user.role is producer
                 const userReceivedReviews = await Post.aggregate(
-                    [
-                        {
-                          $match: {
-                            userID: userId
+                  [
+                    {
+                      $match: {
+                        userID: userId
+                      }
+                    },
+                    {
+                      $project: {
+                        participants: 1,
+                        _id: 0
+                      }
+                    },
+                    {
+                      $project: {
+                        "participants.participantID": 1,
+                        "participants.review": 1,
+                        _id: 0
+                      }
+                    },
+                    {
+                      $lookup: {
+                        from: "users",
+                        localField: "participants.participantID",
+                        foreignField: "_id",
+                        as: "rating",
+                        pipeline: [
+                          {
+                            $project: {
+                              username: 1,
+                              profileImage: 1
+                            }
                           }
-                        },
-                        {
-                          $project: {
-                            participants: 1,
-                            _id: 0
-                          }
-                        },
-                        {
-                          $project: {
-                            "participants.participantID": 1,
-                            "participants.review": 1,
-                            _id: 0
-                          }
-                        },
-                        {
-                          $lookup: {
-                            from: "users",
-                            localField: "participants.participantID",
-                            foreignField: "_id",
-                            as: "rating",
-                            pipeline: [
-                              {
-                                $project: {
-                                  username: 1,
-                                  profileImage: 1
-                                }
-                              }
-                            ]
-                          }
-                        },
-                        {
-                          $project: {
-                            mergedArray: {
-                              $map: {
-                                input: "$participants",
-                                as: "p",
-                                in: {
-                                  $mergeObjects: [
-                                    "$$p",
+                        ]
+                      }
+                    },
+                    {
+                      $project: {
+                        mergedArray: {
+                          $map: {
+                            input: "$participants",
+                            as: "p",
+                            in: {
+                              $mergeObjects: [
+                                "$$p",
+                                {
+                                  $arrayElemAt: [
                                     {
-                                      $arrayElemAt: [
-                                        {
-                                          $filter: {
-                                            input: "$rating",
-                                            as: "r",
-                                            cond: {
-                                              $eq: [
-                                                "$$r._id",
-                                                "$$p.participantID"
-                                              ]
-                                            }
-                                          }
-                                        },
-                                        0
-                                      ]
-                                    }
+                                      $filter: {
+                                        input: "$rating",
+                                        as: "r",
+                                        cond: {
+                                          $eq: [
+                                            "$$r._id",
+                                            "$$p.participantID"
+                                          ]
+                                        }
+                                      }
+                                    },
+                                    0
                                   ]
                                 }
-                              }
-                            }
-                          }
-                        },
-                        {
-                          $unwind:
-                            /**
-                             * path: Path to the array field.
-                             * includeArrayIndex: Optional name for index.
-                             * preserveNullAndEmptyArrays: Optional
-                             *   toggle to unwind null and empty values.
-                             */
-                            {
-                              path: "$mergedArray"
-                            }
-                        },
-                        {
-                          $group: {
-                            _id: "$mergedArray.participantID",
-                            reviews: {
-                              $push: {
-                                ratingScore:
-                                  "$mergedArray.review.ratingScore",
-                                comment: "$mergedArray.review.comment",
-                                reviewerName: "$mergedArray.username",
-                                reviewProfileImage:
-                                  "$mergedArray.profileImage"
-                              }
+                              ]
                             }
                           }
                         }
-                      ],
+                      }
+                    },
+                    {
+                      $unwind:
+                        {
+                          path: "$mergedArray"
+                        }
+                    },
+                    {
+                      $group: {
+                        _id: "$mergedArray.participantID",
+                        reviews: {
+                          $push: {
+                            ratingScore:
+                              "$mergedArray.review.ratingScore",
+                            comment: "$mergedArray.review.comment",
+                            reviewerName: "$mergedArray.username",
+                            reviewerProfileImage:
+                              "$mergedArray.profileImage"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      $group: {
+                        _id: null,
+                        reviews: {
+                          $push: "$reviews"
+                        }
+                      }
+                    },
+                    {
+                      $project: {
+                        _id: 0,
+                        reviews: {
+                          $reduce: {
+                            input: "$reviews",
+                            initialValue: [],
+                            in: {
+                              $concatArrays: ["$$value", "$$this"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
                     { maxTimeMS: 60000, allowDiskUse: true}
                 );
 
                 if(!userReceivedReviews){
                     throw new Error("this user (producer) received review not found.")
                 }
-
-                console.log(userReceivedReviews);
+ 
                 return userReceivedReviews;
 
             }
