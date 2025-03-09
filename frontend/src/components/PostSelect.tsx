@@ -39,7 +39,7 @@ export default function PostSelect({
       changePostSelect(selectedPost);
     }
   };
-  console.log("IAMGE",postSelectData?.postImageDisplay)
+  // console.log("IAMGE",postSelectData?.postImageDisplay)
   return (
     <div className="flex flex-col w-4/5 lg:w-3/5 m-auto space-y-4">
       <Carousel className="w-full">

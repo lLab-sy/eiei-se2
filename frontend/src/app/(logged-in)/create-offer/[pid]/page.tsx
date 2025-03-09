@@ -156,7 +156,7 @@ const mockOfferHistory: OfferHistoryData[] = [
             <CardTitle className="flex">
               {userRole === "producer"
                 ? `Create Offer to ${pid} `
-                : `${session.user.username} (Owner)`}
+                : `${pid} (Owner)`}
               {/* รอแก้ Project Owner */}
             </CardTitle>
             {/* <FaHistory
