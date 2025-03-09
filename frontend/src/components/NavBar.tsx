@@ -9,6 +9,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import axios from "axios";
 import { Avatar, AvatarImage } from "./ui/avatar";
+import HistoryProduction from "./HistoryProduction";
 
 type menuItem = {
   icon: JSX.Element;
@@ -143,7 +144,7 @@ const NavBar = (session: any) => {
             </span>
           </div>
         </Link>
-
+        
         {/* Right Section */}
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
@@ -152,6 +153,9 @@ const NavBar = (session: any) => {
               await handleLogout()
               await signOut()
             }}>Logout</Button> : ''} */}
+            <div className={`${session?.session ? "" : "hidden"}`}>
+             <HistoryProduction session={session} userId={session?.session?.user?.id}/>
+            </div>
             <span className="text-sm">{session?.session?.user?.username ?? "Username"}</span>
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               {/* <User className="w-5 h-5 text-gray-600"/> */}
