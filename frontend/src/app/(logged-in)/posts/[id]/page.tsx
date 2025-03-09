@@ -41,6 +41,10 @@ const PostDetail = () => {
   const { data: session } = useSession();
 
   if(!session){
+    const handleSendOffer = () => {
+      console.log("Send offer clicked");
+    };
+  
     return (
       <div className="flex justify-center items-center min-h-screen">
         <p>Loading...</p>
@@ -102,9 +106,18 @@ const PostDetail = () => {
       }
   }
 
+  useEffect(()=>{
+      if(dataResponse && !dataResponse.postProjectRoles){
+        dataResponse.postProjectRolesOut?.forEach((e) => {
+          if (!dataResponse.postProjectRoles) {
+            dataResponse.postProjectRoles = [];
+          }
+          dataResponse.postProjectRoles.push(e.id);
+        })
+      }
+  },[dataResponse]);
 
   if (!dataResponse || !ownerResponse) {
-    
     fetchData();
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -113,16 +126,6 @@ const PostDetail = () => {
     );
   }else if(ownerResponse != null && !dataReviews){
     fetchDataReview();
-    dataResponse.postProjectRoles = [];
-    dataResponse.postProjectRolesOut?.forEach((e) => {
-      dataResponse.postProjectRoles.push(e.id);
-    })
-  }
-  else{
-    dataResponse.postProjectRoles = [];
-    dataResponse.postProjectRolesOut?.forEach((e) => {
-      dataResponse.postProjectRoles.push(e.id);
-    })
   }
 
   const getMedia = (id: string) => {
@@ -156,7 +159,7 @@ const PostDetail = () => {
     postDescription: dataResponse.postDescription,
     postImages: dataResponse.postImages,
     postMediaType: getMedia(dataResponse.postMediaType) ,
-    postProjectRoles: getRoles(dataResponse.postProjectRoles),
+    postProjectRoles: getRoles(dataResponse.postProjectRoles || []),
     postStatus: dataResponse.postStatus ,
     startDate: getDate(dataResponse.startDate || "N/AT") ,
     endDate: getDate(dataResponse.endDate || "N/AT"),
@@ -284,13 +287,12 @@ const PostDetail = () => {
 
           {/* Contact Button */}
           <div className="mt-6 flex justify-center">
-            <button
-              // href={`mailto:${PostInfo.email}`}
-              onClick={handleSendOffer}
+            <a
+              href={`mailto:${PostInfo.email}`}
               className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
             >
               Send Offer
-            </button>
+            </a>
           </div>
           
           {/*Review Section*/}
