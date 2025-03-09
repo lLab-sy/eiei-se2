@@ -295,7 +295,7 @@ const PostDetail = () => {
           
           {/*Review Section*/}
           <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Producer's Received Reviews</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Producer's Previously Received Reviews</h2>
             {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
               dataReviews.receivedReviews.map((review, index) => (
                 <ReviewCard
