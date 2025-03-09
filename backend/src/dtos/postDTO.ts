@@ -14,6 +14,11 @@ export interface ImageDisplayDTO{
     imageKey: string;
 }
 
+export interface NameUserDTO{
+    id: string;
+    username:string;
+}
+
 export interface PaticipantRatingDTO {
     ratingScore: number;
     comment: string; 
@@ -41,6 +46,11 @@ export class ParticipantDetailDTO {
     @IsString()
     @IsNotEmpty()
     participantID!: string;
+
+    @ApiProperty({ description: 'useName of the participant', type: String })
+    @IsString()
+    @IsNotEmpty()
+    participantName!: string;
 
     @ApiProperty({ description: 'Current status of the participant', enum: ['candidate', 'reject', 'in-progress'] })
     @IsString()
@@ -210,6 +220,12 @@ export class PostDTO {
     @IsString()
     @IsNotEmpty()
     userID!: string;  // This is the reference to the PostDetail model
+
+    @ApiProperty({ description: 'The paticipant', type: [ParticipantDetailDTO] })
+    participant!: ParticipantDetailDTO[];
+
+    // @ApiProperty({ description: 'The paticipant', type: [ParticipantDetailDTO] })
+    // participant!: ParticipantDetailDTO[];
 
     constructor(init?: Partial<PostDTO>) {
         Object.assign(this, init);

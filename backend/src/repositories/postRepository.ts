@@ -9,7 +9,11 @@ class PostRepository {
     public async getAllPosts(queryStr:string) {
         try {
             console.log(queryStr)
-             const posts= await Post.find(JSON.parse(queryStr)).populate('postProjectRoles');
+             const posts= await Post.find(JSON.parse(queryStr)).populate('postProjectRoles')
+             .populate({
+                path:'participants.participantID',
+                select: 'username'
+            });
             //  console.log('Posts from database:', posts);
              return posts
         } catch (error) {
@@ -95,6 +99,7 @@ class PostRepository {
             }
 
             return post
+
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);
         }

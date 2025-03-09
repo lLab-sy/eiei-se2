@@ -4,6 +4,8 @@ import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, Participa
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
+import { ProducerDto } from '../dtos/producerDTO';
+import { ProctionProfessionalReturnGetMeDTO } from '../dtos/authDTO';
 
 class PostService {
   
@@ -23,7 +25,7 @@ class PostService {
         for (let i = 0; i < postImages.length; i++) {
           postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
         }
-
+        // console.log("eachP",post.participants)
         return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
@@ -37,12 +39,29 @@ class PostService {
                 })),
                 postImageDisplay:postImageDisplay as ImageDisplayDTO[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                participant: post.participants.map(participant => new ParticipantDetailDTO({
+                  participantID: (participant.participantID as any)._id.toString(),
+                  participantName: (participant.participantID as any).username,
+                  status: participant.status,
+                  // offer: participant.offer.map(offer => ({
+                  //   role: offer.role.toString(), 
+                  //   price: offer.price,
+                  //   offeredBy: offer.offeredBy,
+                  //   createdAt: offer.createdAt,
+                  //   reason: offer.reason
+                // })),
+                  ratingScore: participant.ratingScore,
+                  comment: participant.comment,
+                  reviewedAt: participant.reviewedAt || null,
+                  createdAt: participant.createdAt,
+                  updatedAt: participant.updatedAt,
+              })),
                 userID: post.userID.toString() as string,
                 startDate: post.startDate? post.startDate.toString():"",
                 endDate: post.endDate?post.endDate.toString():""
             });
         }));
- 
+        
         return result;
     } catch (error) {
         console.error('Error in service layer:', error);
@@ -142,7 +161,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
-      console.log("postData",postData)
+      // console.log("postData",postData)
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);

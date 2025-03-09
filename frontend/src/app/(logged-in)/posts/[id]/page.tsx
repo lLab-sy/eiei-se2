@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const PostDetail = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [img, setImg] = useState<string[]>([]);
   const { toast } = useToast();
 
@@ -43,7 +44,9 @@ const PostDetail = () => {
     roleCount: 2, // Added the missing roleCount property
   };
 
-  // handleSubmitReview removed and moved to PostHistoryCard
+  const handleSendOffer = () => {
+    router.push(`/create-offer/${id}`);
+  };
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
@@ -170,12 +173,13 @@ const PostDetail = () => {
 
           {/* Contact Button */}
           <div className="mt-6 flex justify-center">
-            <a
-              href={`mailto:${PostInfo.email}`}
+            <button
+              // href={`mailto:${PostInfo.email}`}
+              onClick={handleSendOffer}
               className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
             >
               Send Offer
-            </a>
+            </button>
           </div>
         </CardContent>
       </Card>
