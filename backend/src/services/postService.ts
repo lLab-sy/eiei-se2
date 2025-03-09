@@ -127,7 +127,7 @@ async getPost(id:string): Promise<PostDTO|null> {
                 post.postImages.map(async (eachImg: string) => {
                     return await cloudService.getSignedUrlImageCloud(eachImg);
                 }));
-              // console.log(post.postMediaType)
+              console.log("......")
               return new PostWithRoleCountDTO({
                   id: postId,
                   postName: post.postName as string,
