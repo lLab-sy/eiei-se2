@@ -28,6 +28,7 @@ class PostController {
   async getPost(req: Request, res: Response): Promise<void> {
     try {
       const postId = req.params.id
+      console.log("Hello getPost")
       const posts = await postService.getPost(postId);
       // console.log('Fetched posts:', posts);  // Log fetched posts
       sendResponse(res, 'success', posts, 'Successfully retrieved post');
@@ -58,7 +59,7 @@ class PostController {
   async createPost(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
 
-      //
+      //Front End
       req.body=JSON.parse(req.body.postData)
 
       //unauthorize
@@ -179,6 +180,65 @@ class PostController {
     }
   }
 
+//@Private Request from Producer/ProdcutionProfessional Role and userID from frontEnd isMatch
+async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    // console.log("hellooo")
+    const role=req.user.role
+    console.log(req.user.userId)
+    // const productionProfessionalID= req.query.productionProfessionalID ? req.query.productionProfessionalID as string: false;
+    const userId = req.query.userId? req.query.userId as string: "";
+    const limit = req.query.limit ? Number(req.query.limit): 10;
+    const page = req.query.page ? Number(req.query.page): 1;
+    const status = ['created', 'in-progress', 'success', 'cancel'];
+    
+    if ((limit < 1 || page < 1 || userId=="") && role ==="production professional" ) {
+      sendResponse(res, 'error', '', 'bad request', 400);
+      return
+    }
+
+    if ((limit < 1 || page < 1) && role ==="producer" ) {
+      sendResponse(res, 'error', '', 'bad request', 400);
+      return
+    }
+    
+    let postStatus;
+    if (!req.query.postStatus){
+      postStatus = '';
+    }else{
+      if(!status.includes(req.query.postStatus as string)){
+        sendResponse(res, 'error', '', 'bad request', 400)
+      }else{
+        postStatus = req.query.postStatus as string
+      }
+        
+    }
+
+    const offerReqDTO: OfferRequestDTO = {
+      page: page,
+      limit: limit,
+      userId: userId,
+      // productionProfessionalId: productionProfessionalID,
+      postId: req.query.postId? req.query.postId as string: "",
+      postStatus: postStatus as string
+    }
+
+    const offers = await postService.getOffer(offerReqDTO,role);
+    // console.log(offers.meta.totalPages)
+    if (!offers.meta.totalPages){
+      sendResponse(res, 'error', '', 'You have no offer.', 400);
+      return
+    }
+    if (offers.meta.totalPages < page) {
+      sendResponse(res, 'error', '', 'bad request', 400);
+      return
+    }
+
+    sendResponse(res, 'success', offers, 'Successfully get offers');
+  } catch (err) {
+    sendResponse(res, 'error', err, 'Failed to get offers at controller', 500);
+  }
+};
   async searchPost(req: Request, res: Response): Promise<void> {
     try {
       // make sure postMediaTypes and roleRequirements are string[] or undefined
@@ -225,55 +285,6 @@ class PostController {
       sendResponse(res, 'success', post, 'Successfully add review to post');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
-    }
-  };
-
-  async getOffer(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = req.query.userId? req.query.userId as string: false;
-      const limit = req.query.limit ? Number(req.query.limit): 10;
-      const page = req.query.page ? Number(req.query.page): 1;
-      const status = ['created', 'in-progress', 'success', 'cancel'];
-      
-      if (limit < 1 || page < 1 || !userId ) {
-        sendResponse(res, 'error', '', 'bad request', 400);
-        return
-      }
-      
-      let postStatus;
-      if (!req.query.postStatus){
-        postStatus = '';
-      }else{
-        if(!status.includes(req.query.postStatus as string)){
-          sendResponse(res, 'error', '', 'bad request', 400)
-        }else{
-          postStatus = req.query.postStatus as string
-        }
-          
-      }
-
-      const offerReqDTO: OfferRequestDTO = {
-        page: page,
-        limit: limit,
-        userId: userId,
-        postId: req.query.postId? req.query.postId as string: "",
-        postStatus: postStatus as string
-      }
-
-      const offers = await postService.getOffer(offerReqDTO);
-      // console.log(offers.meta.totalPages)
-      if (!offers.meta.totalPages){
-        sendResponse(res, 'error', '', 'You have no offer.', 400);
-        return
-      }
-      if (offers.meta.totalPages < page) {
-        sendResponse(res, 'error', '', 'bad request', 400);
-        return
-      }
-
-      sendResponse(res, 'success', offers, 'Successfully get offers');
-    } catch (err) {
-      sendResponse(res, 'error', err, 'Failed to get offers at controller', 500);
     }
   };
 
@@ -331,5 +342,7 @@ class PostController {
     }
   };
 }
+
+
 
 export default new PostController();

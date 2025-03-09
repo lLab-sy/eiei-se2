@@ -280,6 +280,7 @@ export class PostWithRoleCountDTO extends PostDTO{
     }
 }
 
+
 export class OfferRequestDTO {
     @ApiProperty({ description: 'The id of user', type: String })
     @IsString()
@@ -289,6 +290,10 @@ export class OfferRequestDTO {
     @ApiProperty({ description: 'The id of post', type: String })
     @IsString()
     postId!: string;
+
+    // @ApiProperty({ description: 'The id of production professional', type: String })
+    // @IsString()
+    // productionProfessionalId!: string|boolean;
 
     @ApiProperty({ description: 'The status of post', type: String })
     @IsString()  

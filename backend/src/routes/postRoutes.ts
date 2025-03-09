@@ -252,108 +252,6 @@ router.get('/posts/search', postController.searchPost);
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
 router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandler, postController.addPostReview as RequestHandler);
 
-/**
- * @swagger
- * /api/v1/posts/get-offer:
- *   get:
- *     summary: Get offer details
- *     tags: [Post]
- *     parameters:
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *         description: The id of the user
- *       - in: query
- *         name: postId
- *         schema:
- *           type: string
- *         description: The id of the post
- *       - in: query
- *         name: postStatus
- *         schema:
- *           type: string
- *         description: The status of post
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           example: 10
- *         description: The number of offers per page
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           example: 1
- *         description: The current page number
- *     responses:
- *       200:
- *         description: Successfully retrieved offers
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- *                 data:
- *                   type: object
- *                   properties:
- *                     data:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           _id:
- *                             type: string
- *                             example: "67b463aae151ca405ff1951f"
- *                           postName:
- *                             type: string
- *                             example: "Graphic Design for Branding2"
- *                           roleName:
- *                             type: string
- *                             example: "Actor"
- *                           currentWage:
- *                             type: integer
- *                             example: 1400
- *                           reason:
- *                             type: string
- *                             example: "Skilled lighting technician."
- *                           offeredBy:
- *                             type: integer
- *                             example: 1
- *                           status:
- *                             type: string
- *                             example: "candidate"
- *                           createdAt:
- *                             type: string
- *                             format: date-time
- *                             example: "2025-01-20T16:00:00.000Z"
- *                     meta:
- *                       type: object
- *                       properties:
- *                         page:
- *                           type: integer
- *                           example: 1
- *                         limit:
- *                           type: integer
- *                           example: 10
- *                         totalItems:
- *                           type: integer
- *                           example: 1
- *                         totalPages:
- *                           type: integer
- *                           example: 1
- *                 message:
- *                   type: string
- *                   example: Successfully get offers
- *       404:
- *         description: Offers not found
- *       500:
- *         description: Server error
- */
-router.get('/posts/get-offer', postController.getOffer);
 
 /**
  * @swagger
@@ -496,6 +394,112 @@ router.post('/posts', AuthMiddleware.authenticate as RequestHandler, upload.arra
  *         description: Server error
  */
 router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+
+
+/**
+ * @swagger
+ * /api/v1/posts/getOffers:
+ *   get:
+ *     summary: Get offer details
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: The id of the production professional (if you are producer, it is optional)
+ *       - in: query
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         description: The id of the post
+ *       - in: query
+ *         name: postStatus
+ *         schema:
+ *           type: string
+ *         description: The status of post
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of offers per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The current page number
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved offers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                             example: "67b463aae151ca405ff1951f"
+ *                           postName:
+ *                             type: string
+ *                             example: "Graphic Design for Branding2"
+ *                           roleName:
+ *                             type: string
+ *                             example: "Actor"
+ *                           currentWage:
+ *                             type: integer
+ *                             example: 1400
+ *                           reason:
+ *                             type: string
+ *                             example: "Skilled lighting technician."
+ *                           offeredBy:
+ *                             type: integer
+ *                             example: 1
+ *                           status:
+ *                             type: string
+ *                             example: "candidate"
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2025-01-20T16:00:00.000Z"
+ *                     meta:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         totalItems:
+ *                           type: integer
+ *                           example: 1
+ *                         totalPages:
+ *                           type: integer
+ *                           example: 1
+ *                 message:
+ *                   type: string
+ *                   example: Successfully get offers
+ *       404:
+ *         description: Offers not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/getOffers', AuthMiddleware.authenticate as RequestHandler, postController.getOffers as RequestHandler);
 
 /**
  * @swagger
@@ -640,6 +644,5 @@ router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postC
  *         description: Internal server error
  */
 router.post('/create-offer', AuthMiddleware.authenticate as RequestHandler, postController.createOffer as RequestHandler);
-
 
 export default router;

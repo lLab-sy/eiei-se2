@@ -332,6 +332,107 @@ class PostRepository {
 		}
 	}
 
+    //User ID ของบูมเป็น production professional ของเราใช้แค่ postID น่าจะพอ (userID optional เผื่อจะแยกแชทต่อคน)
+    public async getProducerOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
+        try {
+            const { userId, postId, postStatus, limit, page } = getOfferReq;
+
+            const matchStage: PipelineStage[] = [];
+            
+            if(postId){ //posId if it has
+                matchStage.push({
+                    $match: {
+                        _id: new ObjectId(postId)
+                      }
+                    })
+            }
+
+            if(postStatus){ // postStatus If it has
+                matchStage.push({
+                    $match: { postStatus: 'success' }
+                })
+            }
+
+            matchStage.push({ //unwind paticipant
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({ //unwind each offer
+                $unwind: {
+                    path: '$participants.offer',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            if(userId){
+                matchStage.push({ //paticipant in post if it has
+                    $match: {
+                        'participants.participantID': new ObjectId(
+                        userId
+                        )
+                    }
+                    
+                })
+            }
+
+            matchStage.push({ // change roleID -> roleName
+                $lookup: {
+                    from: 'postRoleTypes',
+                    localField: 'participants.offer.role',
+                    foreignField: '_id',
+                    as: 'roleName'
+                }
+            })
+
+            matchStage.push({
+                $project: {
+                    _id: 1,
+                    postName: 1,
+                    roleName: {
+                      $arrayElemAt: ['$roleName.roleName', 0]
+                    },
+                    currentWage: '$participants.offer.price',
+                    reason: '$participants.offer.reason',
+                    offeredBy:
+                      '$participants.offer.offeredBy',
+                    status: '$participants.status',
+                    createdAt: '$participants.createdAt'
+                  }
+            })
+            console.log("Check2",matchStage)
+            const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            //sort by date from new to old, push skip and limit
+            const sortStage: PipelineStage.Sort = {
+                $sort: { createdAt: -1 }
+            }
+            matchStage.push(sortStage, { $skip: skip }, { $limit: pageSize });
+
+            const results = await Post.aggregate(matchStage)
+            const response: GetOfferResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            console.log("ANSWER",response)
+            return response
+        } catch (error) {
+            throw new Error('Error search post in repository: ' + error);
+        }
+    }
+
+
     public async getOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
         try {
             const { userId, postId, postStatus, limit, page } = getOfferReq;
@@ -485,6 +586,7 @@ class PostRepository {
         }
     }
 }
+
 
 export default new PostRepository();
 
