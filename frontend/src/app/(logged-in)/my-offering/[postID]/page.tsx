@@ -20,6 +20,7 @@ import ProfessionalSelector from "@/components/ProfessionalSelector";
 import OfferHistory from "@/components/OfferHistory";
 import ComparisonView from "@/components/ComparisonView";
 import PostDetail from "@/components/PostDetail";
+import getPostById from "@/libs/getPostById";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -53,9 +54,7 @@ export default function OfferPostContent() {
   const [offerArray, setOfferArray] = useState<Array<historyStateInterface>>(
     [],
   );
-  const [userRole, setUserRole] = useState<
-    "producer" | "production professional"
-  >("producer");
+
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<
     string | null
   >(null);
@@ -314,6 +313,36 @@ export default function OfferPostContent() {
     return Object.values(roles);
   };
 
+//------------------------------------------------------------------------------------
+const [postState, setPostState] = useState<PostData | null>(null);
+
+const userID= session?.user.id
+const userRole =session?.user.role
+const token =session?.user.token
+const [error, setError] = useState<string | null>(null);
+//API Connection
+ useEffect(() => {
+      const fetchData = async () => {
+        try {
+          let response;
+          if (userRole === "producer") {
+            response = await getPostById(postID,token) 
+          } else if (userRole === "production professional") {
+            // response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+          }
+          console.log("respons",response)
+          
+          }
+        catch (err) {
+          setError("Failed to load posts. Please try again later.");
+        }
+      };
+     fetchData();
+    }, []); // ใช้ pid และ token ใน dependency array
+
+
+//------------------------------------------------------------------------------------
+
   // สร้างข้อมูลเปรียบเทียบตามบทบาท
   useEffect(() => {
     if (userRole === "producer") {
@@ -339,34 +368,6 @@ export default function OfferPostContent() {
 
   const userId = user?._id ?? "";
 
-  useEffect(() => {
-    // สมมติว่าเราดึงบทบาทของผู้ใช้จาก session หรือ Redux store
-    const role = session?.user?.role || "producer"; // สมมติว่าเป็น producer ในตัวอย่างนี้
-    setUserRole(role as "producer" | "production professional");
-
-    if (role === "producer") {
-      // เลือก professional คนแรกโดยค่าเริ่มต้น (ถ้ามี)
-      if (professionals.length > 0) {
-        setSelectedProfessionalId(professionals[0].id);
-        // ดึงข้อเสนอของ professional คนแรก
-        setOfferArray(
-          mockProfessionalOffers[
-            professionals[0].id as keyof typeof mockProfessionalOffers
-          ] || [],
-        );
-      }
-    } else if (role === "production professional") {
-      // ถ้าเป็น professional ให้ใช้ข้อเสนอของ professional คนนั้น
-      setOfferArray(myProfessionalOffers);
-    }
-  }, [session]);
-
-  const [postState, setPostState] = useState<PostData | null>(null);
-
-  useEffect(() => {
-    // ใช้ mock data แทนการเรียก API จริง
-    setPostState(mockPostDetail);
-  }, []);
 
   // เมื่อเลือก professional
   const handleSelectProfessional = (professionalId: string) => {

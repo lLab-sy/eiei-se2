@@ -13,7 +13,7 @@ class PostService {
     
     try {
         const posts = await postRepository.getAllPosts(queryStr);
-  
+        console.log("HELLO posts",posts)
         const result = await Promise.all(posts.map(async (post) => {
         const postImages:string[] = await Promise.all(
         post.postImages.map(async (eachImg) => {
@@ -25,7 +25,7 @@ class PostService {
         for (let i = 0; i < postImages.length; i++) {
           postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
         }
-        // console.log("eachP",post.participants)
+        console.log("eachP",post.participants)
         return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
