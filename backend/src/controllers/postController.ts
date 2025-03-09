@@ -18,7 +18,7 @@ class PostController {
       //Handler Compare
       queryStr=queryStr.replace(/\b(gt|gte|lt|lte|e)\b/g,match=>`$${match}`)
       const posts = await postService.getAllPosts(queryStr);
-      // console.log('Fetched posts:', posts);  // Log fetched posts
+      console.log('Fetched posts:', posts);  // Log fetched posts
       sendResponse(res, 'success',posts , 'Successfully retrieved posts');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');

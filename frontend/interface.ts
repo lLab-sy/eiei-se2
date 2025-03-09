@@ -11,6 +11,12 @@ export interface PostData {
     startDate?: string; 
     endDate?: string;  
     userID: string;
+    postImageDisplay:PostImageDisplay[]
+}
+
+export interface PostImageDisplay{
+    imageURL:string;
+    imageKey:string;
 }
 
 export interface ReceivedReview{

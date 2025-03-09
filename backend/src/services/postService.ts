@@ -61,7 +61,7 @@ class PostService {
                 endDate: post.endDate?post.endDate.toString():""
             });
         }));
- 
+        
         return result;
     } catch (error) {
         console.error('Error in service layer:', error);
@@ -161,7 +161,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
-      console.log("postData",postData)
+      // console.log("postData",postData)
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);

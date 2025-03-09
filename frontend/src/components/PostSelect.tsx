@@ -39,15 +39,16 @@ export default function PostSelect({
       changePostSelect(selectedPost);
     }
   };
+  console.log("IAMGE",postSelectData?.postImageDisplay)
   return (
     <div className="flex flex-col w-4/5 lg:w-3/5 m-auto space-y-4">
       <Carousel className="w-full">
         <CarouselContent>
-          {postSelectData?.postImages.map((image, index) => (
+          {postSelectData?.postImageDisplay.map((image, index) => (
             <CarouselItem key={index}>
               <Card className="relative w-full aspect-video">
                 <Image
-                  src={image}
+                  src={image.imageURL}
                   alt={`Project Image ${index + 1}`}
                   fill
                   className="object-cover rounded-lg"
