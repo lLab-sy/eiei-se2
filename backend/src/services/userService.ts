@@ -4,7 +4,7 @@ import { IProducer, Rating, searchReqModel } from "../models/userModel"
 import { IProductionProfessional } from "../models/userModel"
 import ProducerRespository from '../repositories/producerRepository';
 import ProductionProfessionalRespository from "../repositories/productionProfessionalRespository";
-import { searchReqDTO ,ReceivedReviewDTO, ReceivedReviewsDTO} from "../dtos/userDTO";
+import { searchReqDTO, reviewDTO, reviewWithRatingDTO, ReceivedReviewDTO, ReceivedReviewsDTO} from "../dtos/userDTO";
 import { PaginatedResponseDTO, PaginationMetaDTO } from "../dtos/utilsDTO";
 import userRepository from "../repositories/userRepository";
 import postRepository from "../repositories/postRepository";
@@ -78,6 +78,43 @@ class UserService {
         }
     }
 
+    async getUserReviewsById(id: string) {
+        try {
+            const userReviews = await userRepository.getUserReviewsByID(id);
+    
+            const result = await Promise.all(
+                userReviews.map(async (r) => {
+                    return new reviewWithRatingDTO({
+                        rating: r._id as number,
+                        amount: r.amount as number,
+                        reviews: await Promise.all(
+                            r.reviews.map(async (review: reviewDTO) => {
+                                let producerProfileImage = review.producerProfileImage
+                                    ? await cloudService.getSignedUrlImageCloud(review.producerProfileImage)
+                                    : '';
+                                console.log('reviewProducerProfileImage', review.producerProfileImage)
+                                console.log('producerProfileImage', producerProfileImage)
+                                return new reviewDTO({
+                                    postName: review.postName as string,
+                                    producer: review.producer as string,
+                                    producerProfileImage: producerProfileImage,
+                                    role: review.role as string,
+                                    comment: review.comment as string,
+                                    reviewAt: review.reviewAt as Date
+                                });
+                            })
+                        ),
+                    });
+                })
+            );
+    
+            return result;
+        } catch (error) {
+            console.error("Error fetching user reviews:", error);
+            throw error;
+        }
+    }
+    
     async addProductionProfessionalReview(id: string, newReviewDTO: RatingDTO): Promise<ProductionProfessionalDtO> {
         try {
             // check post status
