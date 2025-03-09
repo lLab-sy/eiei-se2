@@ -141,14 +141,15 @@ class UserService {
     async getUserReceivedReviewsByID(id:string){
         try{
             const userReceivedReviews = await userRepository.getUserReceivedReviewsByID(id);
-
+            
             const result = await Promise.all(
                 userReceivedReviews.map(async (r) => {
                     return new ReceivedReviewsDTO({
                         receivedReviews: await Promise.all(
                             r.reviews.map(async (review: ReceivedReviewDTO) => {
-                                let reviewerProfileImageTmp = (review.reviewerProfileImage && review.reviewerProfileImage.length != 0)
-                                    ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage[0])
+                                let reviewerProfileImageTmp = (typeof review.reviewerProfileImage === 'string')
+                                    ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage)
+                                    : (review.reviewerProfileImage) ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage[0])
                                     : '';
                                 return new ReceivedReviewDTO({
                                     reviewerName: review.reviewerName as string,
@@ -162,6 +163,7 @@ class UserService {
                 })
             )
 
+            console.log(result);
             return result;
         }catch(error){
             console.error("Error service layer fetching user received reviews", error);

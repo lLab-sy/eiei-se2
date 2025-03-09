@@ -29,7 +29,7 @@ interface PostResponse {
 export default async function getPostById(
   postId: string,
   token: string
-): Promise<PostResponse> {
+): Promise<PostData> {
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
 
   try {

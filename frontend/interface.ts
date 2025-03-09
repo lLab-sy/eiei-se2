@@ -1,5 +1,5 @@
 export interface PostData {
-    id?:string
+    id:string
     postName: string;
     postDescription: string;
     postImages?: string[];
@@ -18,6 +18,16 @@ export interface PostImageDisplay{
     imageURL:string;
     imageKey:string;
 }
+export interface ReceivedReview{
+    reviewerName: string;
+    reviewerProfileImage: string;
+    ratingScore: number;
+    comment: string;
+}
+
+export interface ReceivedReviews{
+    receivedReviews: ReceivedReview[];
+}
 
 export interface ReceivedReview{
     reviewerName: string;
@@ -28,6 +38,35 @@ export interface ReceivedReview{
 
 export interface ReceivedReviews{
     receivedReviews: ReceivedReview[];
+}
+export interface SearchPosts{
+    data: PostData[];
+    meta: MetaData;
+}
+
+export interface MetaData{
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export interface UserData{
+    _id: string;
+    username: string;
+    role: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    gender: string;
+    occupation: string;
+    skill: string[];
+    experience: number;
+    rating: Rating[];
+    avgRating: number;
+    description?: string;
+    imageUrl?: string;
 }
 
 export interface PostDataHistory {
@@ -100,6 +139,15 @@ export interface imagePair {
     imgFile: File
   }
 
+export  interface RoleType{
+    id: string; 
+    roleName: string;
+}
+  
+export interface MediaType{
+    id: string;
+    mediaName: string;
+}
 export interface OfferData{
     roleID:string;
     productionProfessionalID:string;
@@ -109,7 +157,6 @@ export interface OfferData{
     createdAt: Date;
     postID: string;
 }
-
 
 export interface OfferHistoryData{
     roleName: string; //populate

@@ -269,7 +269,23 @@ async getPost(id:string): Promise<PostDTO|null> {
       const postM: PostSearchRequestModel = postSearchReq
 
       const res = await postRepository.searchPost(postM);
-      const resDTO = res.data.map((post) => this.convertModelToDTO(post))
+      const resDTO = res.data.map((post) => {
+ 
+
+        return new PostDTO({
+        id: post._id?.toString(),
+        postName: post.postName as string,
+        postDescription: post.postDescription as string,
+        postImages: post.postImages as [string],
+        postMediaType: post.postMediaType.toString() as string,
+        postProjectRoles: post.postProjectRoles.map(eachRole=>(
+          eachRole.toString()
+        )) as [string],
+        postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+        // postDetailID: post.postDetailID.toString() as string,
+        startDate: post.startDate?post.startDate:"",  
+        endDate: post.endDate?post.endDate:""
+      })})
 
       const response: PaginatedResponseDTO<PostDTO> = {
         data: resDTO,

@@ -31,7 +31,6 @@ const ProfessionalDetail = () => {
           try{
             responseReviewProf = await getReviewProfesstional(id);
             setDataReviews(responseReviewProf);
-            console.log(dataReviews);
           }catch(error){
             console.log("Review not found");
           }
@@ -161,8 +160,8 @@ const ProfessionalDetail = () => {
 
             {/*Review Section*/}
           <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
-            {dataReviews != null && dataReviews.receivedReviews.length > 0 ? (
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Previously Received Reviews</h2>
+            {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
               dataReviews.receivedReviews.map((review, index) => (
                 <ReviewCard
                         key={index}

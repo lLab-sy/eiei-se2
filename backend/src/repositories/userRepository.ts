@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import {User, IUser } from '../models/userModel';
+import Post from '../models/postModel';
 import { error } from 'console';
 
 //change to similar to test using input as I user
@@ -184,60 +185,70 @@ class UserRepository {
             }
             if(user.role === "production professional"){
                 const userReceivedReviews = await User.aggregate(
-                    [
-                        {
-                            $match: {
-                                _id: userId
+                  [
+                    {
+                      $match: {
+                        _id: userId
+                      }
+                    },
+                    {
+                      $unwind: {
+                        path: "$rating"
+                      }
+                    },
+                    {
+                      $lookup: {
+                        from: "postTypes",
+                        localField: "rating.postID",
+                        foreignField: "_id",
+                        as: "rating.post",
+                        pipeline: [
+                          {
+                            $project: {
+                              _id: 1,
+                              userID: 1
                             }
-                        },
-                        { $unwind: {path: '$rating'} },
-                        {
-                            $lookup:{
-                                from:'postTypes',
-                                localField: 'rating.postID',
-                                foreignField: '_id',
-                                as:'rating.post',
-                                pipeline:[
-                                    {
-                                        $project:{
-                                            _id:1,
-                                            userID:1
-                                        }
-                                    }
-                                ]
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      $lookup: {
+                        from: "users",
+                        localField: "rating.post.userID",
+                        foreignField: "_id",
+                        as: "rating.producer",
+                        pipeline: [
+                          {
+                            $project: {
+                              username: 1,
+                              profileImage: 1
                             }
-                        },
-                        {
-                            $lookup:{
-                                from: 'users',
-                                localField: 'rating.post.userID',
-                                foreignField: '_id',
-                                as: 'rating.producer',
-                                pipeline: [
-                                    {
-                                        $project:{
-                                            username:1,
-                                            profileImage:1
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            $group:{
-                                _id: "$_id",
-                                reviews:{
-                                    $addToSet:{
-                                        reviewerName: '$rating.producer.username',
-                                        reviewerProfileImage: '$rating.producer.profileImage',
-                                        ratingScore: '$rating.ratingScore',
-                                        comment:'$rating.comment'
-                                    }
-                                }
-                            }
-                        },
-                        { $sort:{_id:-1}}
-                    ],
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      $group: {
+                        _id: "$_id",
+                        reviews: {
+                          $addToSet: {
+                            reviewerName:
+                              "$rating.producer.username",
+                            reviewerProfileImage:
+                              "$rating.producer.profileImage",
+                            ratingScore: "$rating.ratingScore",
+                            comment: "$rating.comment"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      $sort: {
+                        _id: -1
+                      }
+                    }
+                  ],
                     {maxTimeMS: 60000, allowDiskUse: true}
                 );
                 if(!userReceivedReviews){
@@ -247,74 +258,125 @@ class UserRepository {
                 return userReceivedReviews;
 
             }else{//user.role is producer
-                const userReceivedReviews = await User.aggregate(
-                    [
-                        {
-                            $match:{
-                                _id:userId
+                const userReceivedReviews = await Post.aggregate(
+                  [
+                    {
+                      $match: {
+                        userID: userId
+                      }
+                    },
+                    {
+                      $project: {
+                        participants: 1,
+                        _id: 0
+                      }
+                    },
+                    {
+                      $project: {
+                        "participants.participantID": 1,
+                        "participants.review": 1,
+                        _id: 0
+                      }
+                    },
+                    {
+                      $lookup: {
+                        from: "users",
+                        localField: "participants.participantID",
+                        foreignField: "_id",
+                        as: "rating",
+                        pipeline: [
+                          {
+                            $project: {
+                              username: 1,
+                              profileImage: 1
                             }
-                        },
-                        { $unwind: {path: '$rating'}},
-                        {
-                            $lookup:{
-                                from: 'postTypes',
-                                localField: 'rating.postID',
-                                foreignField: '_id',
-                                as: 'rating.post',
-                                pipeline:[
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      $project: {
+                        mergedArray: {
+                          $map: {
+                            input: "$participants",
+                            as: "p",
+                            in: {
+                              $mergeObjects: [
+                                "$$p",
+                                {
+                                  $arrayElemAt: [
                                     {
-                                        $project:{
-                                            _id:1,
-                                            participants:1
+                                      $filter: {
+                                        input: "$rating",
+                                        as: "r",
+                                        cond: {
+                                          $eq: [
+                                            "$$r._id",
+                                            "$$p.participantID"
+                                          ]
                                         }
-                                    }
-                                ]
-                            }
-                        },
-                        { $unwind: {path:'$rating.post.participants'}},
-                        {
-                            $lookup:{
-                                from: 'users',
-                                localField: 'rating.post.participants.participantID',
-                                foreignField: '_id',
-                                as: 'rating.producprofes',
-                                pipeline:[
-                                    {
-                                        $project:{
-                                            username: 1,
-                                            profileImage: 1,
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            $set:{
-                                "rating.producprofes": { $arrayElemAt: ["$rating.producprofes", 0] }
-                            }
-                        },
-                        {
-                            $group:{
-                                _id:'$_id',
-                                reviews:{
-                                    $addToSet:{
-                                        reviewerName:"$rating.producprofes.username",
-                                        reviewProfileImage: "$rating.producprofes.profileImage",
-                                        ratingScore: "$rating.ratingScore",
-                                        comment: "$rating.comment"
-                                    }
+                                      }
+                                    },
+                                    0
+                                  ]
                                 }
+                              ]
                             }
-                        },
-                        { $sort:{_id:-1}}
-                    ],
+                          }
+                        }
+                      }
+                    },
+                    {
+                      $unwind:
+                        {
+                          path: "$mergedArray"
+                        }
+                    },
+                    {
+                      $group: {
+                        _id: "$mergedArray.participantID",
+                        reviews: {
+                          $push: {
+                            ratingScore:
+                              "$mergedArray.review.ratingScore",
+                            comment: "$mergedArray.review.comment",
+                            reviewerName: "$mergedArray.username",
+                            reviewerProfileImage:
+                              "$mergedArray.profileImage"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      $group: {
+                        _id: null,
+                        reviews: {
+                          $push: "$reviews"
+                        }
+                      }
+                    },
+                    {
+                      $project: {
+                        _id: 0,
+                        reviews: {
+                          $reduce: {
+                            input: "$reviews",
+                            initialValue: [],
+                            in: {
+                              $concatArrays: ["$$value", "$$this"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
                     { maxTimeMS: 60000, allowDiskUse: true}
                 );
 
                 if(!userReceivedReviews){
                     throw new Error("this user (producer) received review not found.")
                 }
-
+ 
                 return userReceivedReviews;
 
             }
