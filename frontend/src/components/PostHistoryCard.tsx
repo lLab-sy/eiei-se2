@@ -45,9 +45,9 @@ export default function PostHistoryCard({
   });
 
   // Handle review submission - fixed logic issue
+  // ฟังก์ชัน onSubmit ที่ปรับปรุงแล้ว
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    //console.log("Submit called")
-    console.log(values);
+    console.log("Submit values:", values);
     if (values.comment.length < 10) {
       toast({
         variant: "destructive",
@@ -56,6 +56,7 @@ export default function PostHistoryCard({
       });
       return;
     }
+
     if (values.rating < 1 || values.rating > 5) {
       toast({
         variant: "destructive",
@@ -64,45 +65,74 @@ export default function PostHistoryCard({
       });
       return;
     }
+
     const reviewData: ReviewData = {
       createdAt: new Date(),
       postID: post.id,
       ratingScore: values.rating,
       comment: values.comment,
     };
-    // In real app, make API call to submit review
-    // idk route for prodprof -> producer
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/${role === "producer" ? `/users/${values.production}/addReview` : ""}`;
-    const response = await axios.put(apiUrl, reviewData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
 
-    if (!response) {
-      console.log("Post Review Res", response);
+    let apiUrl;
+    let method;
+
+    if (role === "producer") {
+      // Producer is reviewing a Production Professional
+      // apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/users/${values.production}/addReview`;
+      method = "put";
+    } else {
+      // Production Professional is reviewing a post
+      apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${post.id}/addReview`;
+      method = "post";
+    }
+
+    try {
+      const response = await axios({
+        method: method,
+        url: apiUrl,
+        data: reviewData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response) {
+        console.log("Post Review Res", response);
+        toast({
+          variant: "destructive",
+          title: "Failed to submit review",
+          description: "Failed to submit review. Please try again.",
+        });
+        return;
+      }
+
+      // ตรวจสอบการตอบกลับจาก API
+      if (response.data?.data?.status === "error") {
+        toast({
+          variant: "destructive",
+          title: "Review Submission Failed",
+          description: response.data.data?.message || "Failed to submit review",
+        });
+        return;
+      }
+
+      // สำเร็จ
+      toast({
+        variant: "default",
+        title: "Successful review submission",
+        description: "Your review has been submitted!",
+      });
+
+      setHasReviewed(true);
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Error submitting review:", error);
       toast({
         variant: "destructive",
-        title: "Failed to submit review",
-        description: "Failed to submit review. Please try again.",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
       });
-      return;
     }
-    if (response.data.data.status == "error") {
-      toast({
-        variant: "destructive",
-        title: "Edit Profile",
-        description: response.data.data ?? "Failed to Edit User",
-      });
-      return;
-    }
-    // Fixed condition - show success message when response is OK
-    toast({
-      variant: "default",
-      title: "Successful review submission",
-      description: "Your review has been submitted!",
-    });
-    setIsOpen(false);
   }
 
   return (
