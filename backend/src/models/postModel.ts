@@ -9,6 +9,12 @@ export interface OfferHistory {
     createdAt: Date; // Date when the offer was created
 }
 
+export interface PaticipantRating {
+    ratingScore: number;
+    comment: string; 
+    reviewedAt: Date|null; // Date of review for the participant
+}
+
 // Participant Detail Model
 export interface ParticipantDetail {
     participantID: mongoose.Schema.Types.ObjectId; // Production Professional ID
@@ -183,4 +189,40 @@ export interface PostSearchRequestModel {
 export interface PostSearchResponse {
     data: IPost[],
     totalItems: number
+}
+
+export interface GetOfferRequestModel {
+    userId?: string;
+    postId?: string;
+    postStatus?: string;
+    limit?: number;
+    page?: number;     
+}
+
+export interface OfferHistoryForGetOfferResponse {
+    _id: string;
+    postName: string;
+    roleName: string; // Role offered to the participant
+    currentWage: number; // The amount offered for the role
+    reason: string;
+    offeredBy: number; // User ID should be better than 0/1 ?
+    status: string;
+    createdAt: Date; // Date when the offer was created
+}
+
+export interface GetOfferResponse {
+    data: OfferHistoryForGetOfferResponse[],
+    totalItems: number
+}
+
+export interface GetPostByProfRequestModel {
+    userId: string;
+    postStatus: string;
+    limit: number;
+    page: number;
+}
+
+export interface GetPostByProfResponse {
+    data: IPost[];
+    totalItems: number;
 }

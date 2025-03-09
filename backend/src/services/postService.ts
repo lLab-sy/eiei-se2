@@ -1,9 +1,11 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO } from '../dtos/postDTO';
-import Post, { ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO } from '../dtos/postDTO';
+import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
+import { ProducerDto } from '../dtos/producerDTO';
+import { ProctionProfessionalReturnGetMeDTO } from '../dtos/authDTO';
 
 class PostService {
   
@@ -23,7 +25,7 @@ class PostService {
         for (let i = 0; i < postImages.length; i++) {
           postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
         }
-
+        // console.log("eachP",post.participants)
         return new PostDTO({
                 id: post.id.toString(),
                 postName: post.postName as string,
@@ -37,12 +39,29 @@ class PostService {
                 })),
                 postImageDisplay:postImageDisplay as ImageDisplayDTO[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                participant: post.participants.map(participant => new ParticipantDetailDTO({
+                  participantID: (participant.participantID as any)._id.toString(),
+                  participantName: (participant.participantID as any).username,
+                  status: participant.status,
+                  // offer: participant.offer.map(offer => ({
+                  //   role: offer.role.toString(), 
+                  //   price: offer.price,
+                  //   offeredBy: offer.offeredBy,
+                  //   createdAt: offer.createdAt,
+                  //   reason: offer.reason
+                // })),
+                  ratingScore: participant.ratingScore,
+                  comment: participant.comment,
+                  reviewedAt: participant.reviewedAt || null,
+                  createdAt: participant.createdAt,
+                  updatedAt: participant.updatedAt,
+              })),
                 userID: post.userID.toString() as string,
                 startDate: post.startDate? post.startDate.toString():"",
                 endDate: post.endDate?post.endDate.toString():""
             });
         }));
- 
+        
         return result;
     } catch (error) {
         console.error('Error in service layer:', error);
@@ -71,8 +90,8 @@ async getPost(id:string): Promise<PostDTO|null> {
             id: post.id.toString(),
             postName: post.postName as string,
             postDescription: post.postDescription as string,
-            postImages: postImages as [string],
-            postMediaType: post.postMediaType.toString() as string,
+            postImages: post.postImages as [string],
+            postMediaType: post.postMediaType.toString(),
             postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
               id: (eachRole as any)._id.toString(),
               roleName: (eachRole as any).roleName
@@ -142,7 +161,7 @@ async getPost(id:string): Promise<PostDTO|null> {
         startDate: postData.startDate?postData.startDate:"",
         endDate: postData.endDate?postData.endDate:""
       });
-      console.log("postData",postData)
+      // console.log("postData",postData)
       return await postRepository.createPost(postModel);
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -224,28 +243,33 @@ async getPost(id:string): Promise<PostDTO|null> {
       throw new Error('Error create offer in service layer: ' + error);
     }
   }
+
+  convertModelToDTO(post: IPost): PostDTO {
+    const postId = post._id?post._id.toString():'';
+          // console.log(post.postMediaType)
+    return new PostDTO({
+      id: postId,
+      postName: post.postName as string,
+      postDescription: post.postDescription as string,
+      postImages: post.postImages as [string],
+      postMediaType: post.postMediaType.toString() as string,
+      postImagesKey: post.postImages,
+      postProjectRoles: post.postProjectRoles.map(eachRole=>(
+        eachRole.toString()
+      )) as [string],
+      participants: post.participants,
+      postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+      startDate: post.startDate? post.startDate.toString():"",
+      endDate: post.endDate?post.endDate.toString():""
+    });
+  }
+
   async searchPost(postSearchReq: PostSearchRequestDTO): Promise<PaginatedResponseDTO<PostDTO>> {
     try {
       const postM: PostSearchRequestModel = postSearchReq
 
       const res = await postRepository.searchPost(postM);
-      const resDTO = res.data.map((post) => {
- 
-
-        return new PostDTO({
-        id: post.id?.toString(),
-        postName: post.postName as string,
-        postDescription: post.postDescription as string,
-        postImages: post.postImages as [string],
-        postMediaType: post.postMediaType.toString() as string,
-        postProjectRoles: post.postProjectRoles.map(eachRole=>(
-          eachRole.toString()
-        )) as [string],
-        postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-        // postDetailID: post.postDetailID.toString() as string,
-        startDate: post.startDate?post.startDate:"",  
-        endDate: post.endDate?post.endDate:""
-      })})
+      const resDTO = res.data.map((post) => this.convertModelToDTO(post))
 
       const response: PaginatedResponseDTO<PostDTO> = {
         data: resDTO,
@@ -260,6 +284,89 @@ async getPost(id:string): Promise<PostDTO|null> {
 
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  public async addPostReview(postID: string, participantID: string, newRating: PaticipantRatingDTO): Promise<PostDTO> {
+    try {
+      newRating.reviewedAt = new Date();
+
+      const rawResult: IPost = await postRepository.addPostReview(postID, participantID, newRating);
+      return this.convertModelToDTO(rawResult);
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+  async getOffer(offerReq: OfferRequestDTO): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
+    try {
+      const offerRequest: GetOfferRequestModel = offerReq
+
+      const res = await postRepository.getOffer(offerRequest);
+      const resDTO = res.data.map((offer) => {
+        return new OfferResponseDTO({
+          _id: offer._id as string,
+          postName: offer.postName,
+          roleName: offer.roleName, // Role offered to the participant
+          currentWage: offer.currentWage, // The amount offered for the role
+          reason: offer.reason,
+          offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
+          status: offer.status,
+          createdAt: offer.createdAt
+        })         
+      });
+      const response: PaginatedResponseDTO<OfferResponseDTO> = {
+        data: resDTO,
+        meta: {
+            page: offerReq.page,
+            limit: offerReq.limit,
+            totalItems: res.totalItems,
+            totalPages: Math.ceil(res.totalItems / offerReq.limit)
+        } as PaginationMetaDTO
+      }
+      return response;
+
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  async getPostsByProf(getPostReq: GetPostByProfRequestModel): Promise<PaginatedResponseDTO<PostDTO>> {
+    try {
+        const postsReq: GetPostByProfRequestModel = getPostReq;
+        const res = await postRepository.getPostsByProf(postsReq);
+
+        const resDTO = await Promise.all(res.data.map(async (post) => {
+            let postImage = post.postImages[0] 
+                ? await cloudService.getSignedUrlImageCloud(post.postImages[0] as string) 
+                : '';
+            // console.log('postImage',postImage)
+            return new PostDTO({
+                id: post._id?.toString(),
+                postName: post.postName as string,
+                postDescription: post.postDescription as string,
+                postImages: [postImage] as [string],
+                postMediaType: post.postMediaType.toString() as string,
+                postProjectRoles: post.postProjectRoles.map(eachRole => eachRole.toString()) as [string],
+                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                startDate: post.startDate ? post.startDate : "",  
+                endDate: post.endDate ? post.endDate : ""
+            });
+        }));
+
+        const response: PaginatedResponseDTO<PostDTO> = {
+            data: resDTO,
+            meta: {
+                page: getPostReq.page,
+                limit: getPostReq.limit,
+                totalItems: res.totalItems,
+                totalPages: Math.ceil(res.totalItems / getPostReq.limit)
+            } as PaginationMetaDTO
+        };
+
+        return response;
+    } catch (error) {
+        console.error('Error in service layer:', error);
+        throw new Error('Error in service layer: ' + error);
     }
   }
 
