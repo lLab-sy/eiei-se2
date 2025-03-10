@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongoose';
+import { PostRoleDTO } from './postRoleDTO';
 class PostProjectRoleDTO {
     @ApiProperty({ description: 'Role ID', type: String })
     id!: string;
@@ -24,6 +25,11 @@ export interface PaticipantRatingDTO {
     comment: string; 
     reviewedAt: Date|null; // Date of review for the participant
 }
+export interface ProducerDisplayDTO{
+    userID: string;
+    producerName: string;
+}
+
 
 export interface OfferDTO{ //ซ้ำกับบูม
     role: string;
@@ -272,6 +278,9 @@ export class PostWithRoleCountDTO extends PostDTO{
     @IsArray()
     @IsString({ each: true })
     postProjectRoles!: string[];
+
+    producerName!: ProducerDisplayDTO
+    postProjectRolesOutProfessional!: PostRoleDTO
 
     constructor(data: Partial<PostWithRoleCountDTO>){
         super(data);
