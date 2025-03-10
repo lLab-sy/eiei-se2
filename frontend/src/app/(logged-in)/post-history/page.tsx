@@ -56,11 +56,6 @@ export default function HistoryPostPage() {
         userName={userName}
         role={role}
       />
-      <PostHistoryList
-        postLists={postHistoryResponse}
-        userName={userName}
-        role={role}
-      />
     </div>
   );
 }
