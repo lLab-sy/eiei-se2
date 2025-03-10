@@ -37,14 +37,16 @@ class PostRepository {
       const posts = await Post.aggregate([
         {
           $match: {
-            userID: objectId,
+            objectId,
             postStatus: "success",
           },
         },
         {
           $addFields: {
             roleCount: { $size: "$postProjectRoles" },
-            postProjectRoles: { $slice: ["$postProjectRoles", 3] },
+            postProjectRoles: {
+              $slice: ["$postProjectRoles", 3],
+            },
           },
         },
         {
@@ -57,7 +59,7 @@ class PostRepository {
         },
         {
           $addFields: {
-            postProjectRoles: "$roleDetails.roleName", // Extract role names only
+            postProjectRoles: "$roleDetails.roleName",
           },
         },
         {
@@ -70,26 +72,40 @@ class PostRepository {
         },
         {
           $addFields: {
-            postMediaType: { $arrayElemAt: ["$mediaDetails.mediaName", 0] }, // Extract first mediaName
+            postMediaType: {
+              $arrayElemAt: ["$mediaDetails.mediaName", 0],
+            },
           },
         },
-        {
-          $sort: {
-            roleCount: -1,
-          },
-        },
+        { $sort: { roleCount: -1 } },
         {
           $project: {
             _id: 1,
             postName: 1,
             postDescription: 1,
             postImages: 1,
-            postMediaType: 1, // Show mediaName instead of postMediaType
+            postMediaType: 1,
             postStatus: 1,
             startDate: 1,
             endDate: 1,
             postProjectRoles: 1,
             roleCount: 1,
+            participants: 1,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "participants.participantID",
+            foreignField: "_id",
+            as: "userDetail",
+          },
+        },
+        {
+          $project: {
+            "userDetail.password": 0,
+            "userDetail.skill": 0,
+            "userDetail.rating": 0,
           },
         },
       ]);
