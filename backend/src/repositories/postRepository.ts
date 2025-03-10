@@ -445,7 +445,7 @@ class PostRepository {
           postStatus: "success", // post success
           "participants.participantID": participantID, // Ensure has paticipant in post
           "participants.status": "candidate", // cadidate only
-          //   "participants.reviewedAt": { $exists: false }, // make sure that no review when add to this post
+          // "participants.reviewedAt": { $exists: true, $ne: null }, // make sure that no review when add to this post
         },
         {
           $set: {
