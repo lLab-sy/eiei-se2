@@ -153,7 +153,7 @@ const ProfessionalDetail = () => {
           </div>
 
           <div className="mt-6 flex justify-center">
-            <a href={`mailto:${ProfessionalInfo.email}`} className="bg-mainblue-lightest text-white py-3 px-8 rounded-lg shadow-md hover:bg-mainblue-light transition-colors duration-300">
+            <a href={`/create-offer/${id}`} className="bg-mainblue-lightest text-white py-3 px-8 rounded-lg shadow-md hover:bg-mainblue-light transition-colors duration-300">
               Contact
             </a>
           </div>
