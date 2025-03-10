@@ -5,7 +5,10 @@ import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { z } from "zod";
-import axios from "axios";
+// นำเข้าฟังก์ชัน reviewPost
+import postReviewProfessional from "@/libs/postReviewPost";
+// ถ้ามีการใช้ cookie หรือ session ต้องนำเข้า
+import { useSession } from "next-auth/react"; // หรือวิธีที่คุณใช้ในการจัดการสถานะการเข้าสู่ระบบ
 
 export default function PostHistoryCard({
   post,
@@ -19,6 +22,9 @@ export default function PostHistoryCard({
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(false);
+  // ถ้าใช้ next-auth
+  const { data: session } = useSession();
+  const token = session?.user?.token;
 
   const endDateDayJS = new Date(post.endDate);
   const EndDate = endDateDayJS.toDateString();
@@ -44,8 +50,7 @@ export default function PostHistoryCard({
       .or(z.literal("unneeded")),
   });
 
-  // Handle review submission - fixed logic issue
-  // ฟังก์ชัน onSubmit ที่ปรับปรุงแล้ว
+  // Handle review submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Submit values:", values);
     if (values.comment.length < 10) {
@@ -73,28 +78,27 @@ export default function PostHistoryCard({
       comment: values.comment,
     };
 
-    let apiUrl;
-    let method;
-
-    if (role === "producer") {
-      // Producer is reviewing a Production Professional
-      // apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/users/${values.production}/addReview`;
-      method = "put";
-    } else {
-      // Production Professional is reviewing a post
-      apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${post.id}/addReview`;
-      method = "post";
-    }
-
     try {
-      const response = await axios({
-        method: method,
-        url: apiUrl,
-        data: reviewData,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      let response;
+
+      if (role === "producer") {
+        // Producer is reviewing a Production Professional
+        // ส่วนนี้ต้องมีการสร้าง function reviewProfessional แยกต่างหาก
+        // ไว้สำหรับกรณีที่ producer รีวิว production professional
+        toast({
+          variant: "destructive",
+          title: "Feature not implemented",
+          description: "Producer review feature is not implemented yet.",
+        });
+        return;
+      } else {
+        // Production Professional is reviewing a post
+        // ใช้ฟังก์ชัน postReviewProfessional ที่เราสร้างขึ้น
+        // ดึง token จาก localStorage แทนการใช้ session
+        // const token = localStorage.getItem("token") || "";
+
+        response = await postReviewProfessional(reviewData, token, post.id);
+      }
 
       if (!response) {
         console.log("Post Review Res", response);
@@ -107,11 +111,11 @@ export default function PostHistoryCard({
       }
 
       // ตรวจสอบการตอบกลับจาก API
-      if (response.data?.data?.status === "error") {
+      if (response.data?.status === "error") {
         toast({
           variant: "destructive",
           title: "Review Submission Failed",
-          description: response.data.data?.message || "Failed to submit review",
+          description: response.data?.message || "Failed to submit review",
         });
         return;
       }
@@ -137,7 +141,6 @@ export default function PostHistoryCard({
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden">
-      {/* <div className="absolute inset-0 bg-mainblue opacity-0 group-hover:opacity-10 transition-opacity duration-300" /> */}
       <div className="flex p-6">
         <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
           <Image
@@ -178,7 +181,7 @@ export default function PostHistoryCard({
                   Period: {StartDate} - {EndDate}
                 </p>
               </div>
-              {post.postStatus === "success" && (
+              {post.postStatus === "success" && !hasReviewed && (
                 <div className="flex justify-end z-50">
                   <button
                     className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
@@ -186,8 +189,6 @@ export default function PostHistoryCard({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      console.log(setIsOpen);
-                      console.log(isOpen);
                       setIsOpen(true);
                     }}
                   >
@@ -201,20 +202,21 @@ export default function PostHistoryCard({
             <>
               <div className="flex items-center text-gray-600">
                 <User className="w-4 h-4 mr-2 text-mainblue-light" />
-                {/* <p className="text-sm">Producer: {post.}</p> */}
+                <p className="text-sm">
+                  Producer: {post.producerName?.producerName || "Unknown"}
+                </p>
               </div>
               <div className="flex items-center text-gray-600">
                 <Film className="w-4 h-4 mr-2 text-mainblue-light" />
                 <p className="text-sm">
-                  Role:
-                  {post.postProjectRolesOutProfessional?.roleName}
+                  Role: {post.postProjectRolesOutProfessional?.roleName}
                 </p>
               </div>
               <div className="flex items-center text-gray-600">
                 <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
                 <p className="text-sm">Completed: {EndDate}</p>
               </div>
-              {post.postStatus === "success" && (
+              {post.postStatus === "success" && !hasReviewed && (
                 <div className="flex justify-end z-50">
                   <button
                     className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
