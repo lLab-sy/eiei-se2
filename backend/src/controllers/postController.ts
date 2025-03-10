@@ -40,7 +40,7 @@ class PostController {
   async getPostsByUser(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const role=req.user.role
-      const posts = await postService.getPostsbyUser(req.user.userId);
+      const posts = await postService.getPostsbyUser(req.user.userId,req.user.role);
       sendResponse(res, 'success', posts, `Successfully retrieved ${posts?posts.length:0} posts`);
       return;
   
@@ -216,8 +216,12 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       postId: req.query.postId? req.query.postId as string: "",
       postStatus: postStatus as string
     }
-
-    const offers = await postService.getOffer(offerReqDTO,role);
+    var offers;
+    if(role=="producer"){
+      offers= await postService.getProducerOffer(offerReqDTO,role);
+    }else{
+      offers= await postService.getOffer(offerReqDTO,role);
+    }
     // console.log(offers.meta.totalPages)
     if (!offers.meta.totalPages){
       sendResponse(res, 'error', '', 'You have no offer.', 400);

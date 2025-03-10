@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { OfferData, PostData } from "../../../../../interface";
+import { PostData } from "../../../../../interface";
 
 // นำเข้า mock data
 import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
@@ -219,63 +219,56 @@ export default function OfferPostContent() {
   // หาว่าข้อเสนอไหนเป็นข้อเสนอล่าสุดสำหรับคน/บทบาทนั้นๆ
   const getLatestOffers = () => {
     // จัดกลุ่มข้อเสนอตามบทบาท
-    const roles = postState?.postProjectRolesOut
+    const roles: { [key: string]: RoleBasedOffer } = {};
 
     // สร้าง map เพื่อเก็บข้อเสนอล่าสุดของแต่ละคน (professional+role)
-    const latestOffers: { [key: string]: OfferData } = {};
+    const latestOffers: { [key: string]: string } = {};
 
     // วนลูปผ่านแต่ละ Professional mockProfessionalOffers
-    postState?.participants.forEach((eachProf) => {
-      const prof = professionals.find((p) => p.id === eachProf.participantID);
+    Object.keys(mockProfessionalOffers).forEach((profId) => {
+      const prof = professionals.find((p) => p.id === profId);
       if (!prof) return;
 
       // เก็บข้อเสนอของแต่ละคนตามบทบาท
-      const profOffersByRole: { [role: string]: OfferData[] } = {};
+      const profOffersByRole: { [role: string]: historyStateInterface[] } = {};
 
       // วนลูปผ่านข้อเสนอของแต่ละคน
-      postState.participants.map((eachP) => {
-        eachP.offer.map((eachOffer)=>{
-            const roleID=eachOffer.roleID //roleName->roleID
-            if (!profOffersByRole[roleID]) {
-              profOffersByRole[roleID] = [];
-            }
-            profOffersByRole[roleID].push(eachOffer);
+      mockProfessionalOffers[
+        profId as keyof typeof mockProfessionalOffers
+      ].forEach((offer) => {
+        const roleName = offer.roleName;
 
-        })
-        // const roleName = offer.roleName;
+        if (!profOffersByRole[roleName]) {
+          profOffersByRole[roleName] = [];
+        }
 
-        // if (!profOffersByRole[roleName]) {
-        //   profOffersByRole[roleName] = [];
-        // }
-
-        // profOffersByRole[roleName].push(offer);
+        profOffersByRole[roleName].push(offer);
       });
 
       // หาข้อเสนอล่าสุดของแต่ละบทบาท
-      profOffersByRole.forEach((roleID) => {
+      Object.keys(profOffersByRole).forEach((roleName) => {
         // เรียงลำดับข้อเสนอตามวันที่ (ล่าสุดก่อน)
-        const sortedOffers = profOffersByRole[roleID].sort(
+        const sortedOffers = profOffersByRole[roleName].sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
         // หาข้อเสนอล่าสุดที่มาจาก Professional (ไม่ใช่ Producer)
-        const latestOffer = sortedOffers[0];
+        const latestProfOffer = sortedOffers.find((o) => !o.offeredBy);
 
-        if (latestOffer) {
+        if (latestProfOffer) {
           // เก็บ ID ของข้อเสนอล่าสุด
-          const offerKey = `${roleID}-${roleID}`;
-          // latestOffers[offerKey] = latestProfOffer._id;
-          latestOffers[offerKey]=latestOffer
+          const offerKey = `${profId}-${roleName}`;
+          latestOffers[offerKey] = latestProfOffer._id;
 
-          // if (!roles[roleName]) { //I don't know
-          //   roles[roleName] = {
-          //     role: roleName,
-          //     professionals: [],
-          //   };
-          // }
+          if (!roles[roleName]) {
+            roles[roleName] = {
+              role: roleName,
+              professionals: [],
+            };
+          }
 
-          const offerDate = new Date(latestOffer.createdAt);
+          const offerDate = new Date(latestProfOffer.createdAt);
           const formattedDate = offerDate.toLocaleString("en-US", {
             year: "numeric",
             month: "short",

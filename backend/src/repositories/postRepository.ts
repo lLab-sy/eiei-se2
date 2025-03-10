@@ -456,7 +456,7 @@ class PostRepository {
                 $unwind: {
                     path: '$participants',
                     includeArrayIndex: 'string',
-                    preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: false
                   }
             })
 
@@ -492,6 +492,8 @@ class PostRepository {
                 $project: {
                     _id: 1,
                     postName: 1,
+                    participantsID:
+                      '$participants.participantID',
                     roleName: {
                       $arrayElemAt: ['$roleName.roleName', 0]
                     },
@@ -503,7 +505,51 @@ class PostRepository {
                     createdAt: '$participants.createdAt'
                   }
             })
-            console.log("Check2",matchStage)
+
+            matchStage.push({
+                $lookup: {
+                    from: 'users',
+                    localField: 'participantsID',
+                    foreignField: '_id',
+                    as: 'parti'
+                  }
+            })
+
+            matchStage.push({
+                $project: {
+                    user: { $arrayElemAt: ['$parti', 0] },
+                    postName: 1,
+                    participantsID: 1,
+                    roleName: 1,
+                    currentWage: 1,
+                    reason: 1,
+                    offeredBy: 1,
+                    status: 1,
+                    createdAt: 1
+                  }
+            })
+
+            matchStage.push({
+                $project: {
+                    postName: 1,
+                    participantsID: 1,
+                    roleName: 1,
+                    currentWage: 1,
+                    reason: 1,
+                    offeredBy: 1,
+                    status: 1,
+                    createdAt: 1,
+                    userName: '$user.username'
+                  }
+            })
+
+            matchStage.push({
+                $group: {
+                    _id: '$participantsID',
+                    offers: { $push: '$$ROOT' }
+                  }
+            })
+            // console.log("Check2",matchStage)
             const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
             const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;

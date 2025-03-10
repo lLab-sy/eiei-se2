@@ -201,6 +201,7 @@ export interface GetOfferRequestModel {
 
 export interface OfferHistoryForGetOfferResponse {
     _id: string;
+    userName:string;
     postName: string;
     roleName: string; // Role offered to the participant
     currentWage: number; // The amount offered for the role
