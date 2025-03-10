@@ -1,6 +1,13 @@
 const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
 const puppeteer = require('puppeteer');
 const assert = require('assert');
+let chai;
+let expect;
+
+Before(async () => {
+  chai = await import('chai');
+  expect = chai.expect;
+});
 
 let browser, page;
 
@@ -49,35 +56,62 @@ Given('has target post', async function () {
 
 Given('the production professional fills out the offer details', async function () {
   // Write code here that turns the phrase above into concrete actions
-  return 'pending';
+  await page.waitForSelector('textarea[name="description"]',{ visible: true })
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
+  await page.waitForSelector('input[name="price"]')
+  console.log("Got Price")
+  await page.evaluate(() => {
+    document.querySelector('input[name="price"]').value = '';
+  });
+  await page.type('input[name="price"]', '500');
+  await page.click('button[role="combobox"]');
+  await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
+  await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
 });
 
-Given('the production professional does not fill out the price', function () {
+Given('the production professional does not fill out the price', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  await page.waitForSelector('textarea[name="description"]',{ visible: true })
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
+  await page.waitForSelector('button[role="combobox"]')
+  await page.click('button[role="combobox"]');
+  await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
+  await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
+});
+
+When('the production professional clicks create offer button', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  await page.waitForSelector('button[aria-haspopup="dialog"]')
+  await page.click('button[aria-haspopup="dialog"]')
+  await page.waitForSelector('div[role="alertdialog"]', { visible: true }); 
+  await page.waitForSelector('button.bg-green-700', { visible: true });
+  console.log("Can Submit")
+  await page.click('button.bg-green-700');
+});
+
+Then('ensure the system sends an offer to producer',async function () {
+  // Write code here that turns the phrase above into concrete actions
+  await page.waitForSelector('li[role="status"][data-state="open"]', { visible: true });
+  const toastMessage = await page.$eval('li[role="status"] .text-sm.font-semibold', el => el.textContent);
+
+  expect(toastMessage).to.equal("Successful post creation");
+  
+  
+});
+
+Then('ensure that the system shows the offer in his production professional\'s all job',async function () {
   // Write code here that turns the phrase above into concrete actions
   return 'pending';
 });
 
-When('the production professional clicks create offer button', function () {
-  // Write code here that turns the phrase above into concrete actions
-  return 'pending';
-});
-
-Then('ensure the system sends an offer to producer', function () {
-  // Write code here that turns the phrase above into concrete actions
-  return 'pending';
-});
-
-Then('ensure that the system shows the offer in his production professional\'s all job', function () {
-  // Write code here that turns the phrase above into concrete actions
-  return 'pending';
-});
-
-Then('ensure the system adds change to offer\'s history', function () {
+Then('ensure the system adds change to offer\'s history',async function () {
   // Write code here that turns the phrase above into concrete actions
   return 'pending';
 });
 
 Then('ensure the system sends a message failed to create an offer with a production professional.', async function () {
-  await page.waitForSelector('#\\:rd\\:-form-item-message');
-  return 'pending';
+  await page.waitForFunction(() => {
+    return [...document.querySelectorAll('p[id$="-form-item-message"]')]
+        .some(el => el.textContent.includes("Price more than 0."));
+  });
 });
