@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { PostData } from "../../../../../interface";
+import { OfferData, PostData } from "../../../../../interface";
 
 // นำเข้า mock data
 import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
@@ -219,56 +219,63 @@ export default function OfferPostContent() {
   // หาว่าข้อเสนอไหนเป็นข้อเสนอล่าสุดสำหรับคน/บทบาทนั้นๆ
   const getLatestOffers = () => {
     // จัดกลุ่มข้อเสนอตามบทบาท
-    const roles: { [key: string]: RoleBasedOffer } = {};
+    const roles = postState?.postProjectRolesOut
 
     // สร้าง map เพื่อเก็บข้อเสนอล่าสุดของแต่ละคน (professional+role)
-    const latestOffers: { [key: string]: string } = {};
+    const latestOffers: { [key: string]: OfferData } = {};
 
-    // วนลูปผ่านแต่ละ Professional
-    Object.keys(mockProfessionalOffers).forEach((profId) => {
-      const prof = professionals.find((p) => p.id === profId);
+    // วนลูปผ่านแต่ละ Professional mockProfessionalOffers
+    postState?.participants.forEach((eachProf) => {
+      const prof = professionals.find((p) => p.id === eachProf.participantID);
       if (!prof) return;
 
       // เก็บข้อเสนอของแต่ละคนตามบทบาท
-      const profOffersByRole: { [role: string]: historyStateInterface[] } = {};
+      const profOffersByRole: { [role: string]: OfferData[] } = {};
 
       // วนลูปผ่านข้อเสนอของแต่ละคน
-      mockProfessionalOffers[
-        profId as keyof typeof mockProfessionalOffers
-      ].forEach((offer) => {
-        const roleName = offer.roleName;
+      postState.participants.map((eachP) => {
+        eachP.offer.map((eachOffer)=>{
+            const roleID=eachOffer.roleID //roleName->roleID
+            if (!profOffersByRole[roleID]) {
+              profOffersByRole[roleID] = [];
+            }
+            profOffersByRole[roleID].push(eachOffer);
 
-        if (!profOffersByRole[roleName]) {
-          profOffersByRole[roleName] = [];
-        }
+        })
+        // const roleName = offer.roleName;
 
-        profOffersByRole[roleName].push(offer);
+        // if (!profOffersByRole[roleName]) {
+        //   profOffersByRole[roleName] = [];
+        // }
+
+        // profOffersByRole[roleName].push(offer);
       });
 
       // หาข้อเสนอล่าสุดของแต่ละบทบาท
-      Object.keys(profOffersByRole).forEach((roleName) => {
+      profOffersByRole.forEach((roleID) => {
         // เรียงลำดับข้อเสนอตามวันที่ (ล่าสุดก่อน)
-        const sortedOffers = profOffersByRole[roleName].sort(
+        const sortedOffers = profOffersByRole[roleID].sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
         // หาข้อเสนอล่าสุดที่มาจาก Professional (ไม่ใช่ Producer)
-        const latestProfOffer = sortedOffers.find((o) => !o.offeredBy);
+        const latestOffer = sortedOffers[0];
 
-        if (latestProfOffer) {
+        if (latestOffer) {
           // เก็บ ID ของข้อเสนอล่าสุด
-          const offerKey = `${profId}-${roleName}`;
-          latestOffers[offerKey] = latestProfOffer._id;
+          const offerKey = `${roleID}-${roleID}`;
+          // latestOffers[offerKey] = latestProfOffer._id;
+          latestOffers[offerKey]=latestOffer
 
-          if (!roles[roleName]) {
-            roles[roleName] = {
-              role: roleName,
-              professionals: [],
-            };
-          }
+          // if (!roles[roleName]) { //I don't know
+          //   roles[roleName] = {
+          //     role: roleName,
+          //     professionals: [],
+          //   };
+          // }
 
-          const offerDate = new Date(latestProfOffer.createdAt);
+          const offerDate = new Date(latestOffer.createdAt);
           const formattedDate = offerDate.toLocaleString("en-US", {
             year: "numeric",
             month: "short",
@@ -327,11 +334,11 @@ const [error, setError] = useState<string | null>(null);
           let response;
           if (userRole === "producer") {
             response = await getPostById(postID,token) 
+            setPostState(response)
           } else if (userRole === "production professional") {
             // response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
           }
-          console.log("respons",response)
-          
+          // console.log(response,"OHNPPPPPPPPPPPPPPPPPPPPp")
           }
         catch (err) {
           setError("Failed to load posts. Please try again later.");
@@ -355,12 +362,12 @@ const [error, setError] = useState<string | null>(null);
 
       // ตั้งค่าบทบาทเริ่มต้น (ถ้ามี)
       if (roles.length > 0 && !selectedRole) {
-        setSelectedRole(roles[0]);
+        setSelectedRole(postState?.postProjectRolesOut[0].id);
       }
     }
     setLoading(false);
   }, [userRole, professionals]);
-  console.log(userRole, session?.user?.role);
+  // console.log(userRole, session?.user?.role);
 
   const handleBack = () => {
     router.push("/my-offering");
@@ -418,7 +425,6 @@ const [error, setError] = useState<string | null>(null);
     month: "long",
     day: "numeric",
   });
-
   const offerDateEnd = new Date(postState?.endDate ?? "");
   const endDate = offerDateEnd.toLocaleString("en-US", {
     year: "numeric",
@@ -530,6 +536,7 @@ const [error, setError] = useState<string | null>(null);
                       selectedRole={selectedRole}
                       availableRoles={availableRoles}
                       onSelectRole={handleSelectRole}
+                      postProjectRoles={postState?.postProjectRolesOut}
                     />
 
                     {/* แสดงรายชื่อ Professional ตาม Role ที่เลือก */}

@@ -12,6 +12,18 @@ export interface PostData {
     endDate?: string;  
     userID: string;
     postImageDisplay:PostImageDisplay[]
+    participants: Participant[]
+}
+
+export interface Participant{
+    comment:string,
+    createdAt:Date,
+    offer:OfferData[],
+    participantID:string,
+    ratingScore:string,
+    reviewedAt?:Date,
+    status: string,
+    updatedAt: Date;
 }
 
 export interface PostImageDisplay{

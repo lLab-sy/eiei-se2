@@ -40,7 +40,7 @@ class PostController {
   async getPostsByUser(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const role=req.user.role
-      const posts = await postService.getPostsbyUser(req.user.userId,req.user.role);
+      const posts = await postService.getPostsbyUser(req.user.userId);
       sendResponse(res, 'success', posts, `Successfully retrieved ${posts?posts.length:0} posts`);
       return;
   

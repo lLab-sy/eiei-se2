@@ -48,7 +48,7 @@ export default function HistoryProduction({userId, session} : {userId: string, s
     } 
     handleFetch(userId, "created")
   }, [session?.session])
-  console.log("historyState",historyState)
+  // console.log("historyState",historyState)
   const [isRead, setIsRead] = useState(false);
   const [pageState, setPageState] = useState(0);
   const clickRead = (key : number) => {
