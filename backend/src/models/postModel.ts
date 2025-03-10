@@ -226,3 +226,11 @@ export interface GetPostByProfResponse {
     data: IPost[];
     totalItems: number;
 }
+
+export interface GetOfferRequestModel {
+    userId?: string;
+    postId?: string;
+    postStatus?: string;
+    limit?: number;
+    page?: number;     
+}

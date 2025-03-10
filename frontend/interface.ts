@@ -1,15 +1,32 @@
 export interface PostData {
-    id?:string
+    id:string
     postName: string;
     postDescription: string;
     postImages?: string[];
     postImagesSend?: File[];
     postMediaType: string;
-    postProjectRoles: string[];
+    postProjectRoles?: string[];
+    postProjectRolesOut?: PostRolesResponse[]
     postStatus: string;
     startDate?: string; 
     endDate?: string;  
     userID: string;
+    postImageDisplay:PostImageDisplay[]
+}
+
+export interface PostImageDisplay{
+    imageURL:string;
+    imageKey:string;
+}
+export interface ReceivedReview{
+    reviewerName: string;
+    reviewerProfileImage: string;
+    ratingScore: number;
+    comment: string;
+}
+
+export interface ReceivedReviews{
+    receivedReviews: ReceivedReview[];
 }
 
 export interface ReceivedReview{
@@ -22,14 +39,46 @@ export interface ReceivedReview{
 export interface ReceivedReviews{
     receivedReviews: ReceivedReview[];
 }
+export interface SearchPosts{
+    data: PostData[];
+    meta: MetaData;
+}
+
+export interface MetaData{
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export interface UserData{
+    _id: string;
+    username: string;
+    role: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    gender: string;
+    occupation: string;
+    skill: string[];
+    experience: number;
+    rating: Rating[];
+    avgRating: number;
+    description?: string;
+    imageUrl?: string;
+}
 
 export interface PostDataHistory {
     id:string,
     postName: string;
+    producerName: ProducerResponse;
     postDescription: string;
     postImages: string[];
+    postImagesKey?: string[];
     postMediaType: string;
     postProjectRolesOut?: PostRolesResponse[]
+    postProjectRolesOutProfessional?: PostRolesResponse
     startDate: string; 
     endDate: string;   
     postProjectRoles: string[]; 
@@ -83,6 +132,11 @@ export interface PostRolesResponse{
     id: string
 }
 
+export interface ProducerResponse{
+    producerName: string,
+    id: string
+}
+
 export interface MediaTypesResponse{
     mediaName: string;
     id: string;
@@ -93,13 +147,24 @@ export interface imagePair {
     imgFile: File
   }
 
-export interface OfferData{
-    paticipantID:string;
-    price: Number;
-    description: string;
-    role: string;
+export  interface RoleType{
+    id: string; 
+    roleName: string;
 }
-
+  
+export interface MediaType{
+    id: string;
+    mediaName: string;
+}
+export interface OfferData{
+    roleID:string;
+    productionProfessionalID:string;
+    offeredBy: Number;
+    price: Number;
+    reason: string;
+    createdAt: Date;
+    postID: string;
+}
 
 export interface OfferHistoryData{
     roleName: string; //populate

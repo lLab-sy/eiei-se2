@@ -18,6 +18,7 @@ export default function PostHistoryCard({
 }) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   const endDateDayJS = new Date(post.endDate);
   const EndDate = endDateDayJS.toDateString();
@@ -27,85 +28,112 @@ export default function PostHistoryCard({
 
   const formSchema = z.object({
     comment: z
-      .string({required_error: "Please type in your comment"})
+      .string({ required_error: "Please type in your comment" })
       .trim() //prevent case of PURELY whitespace
       .min(10, { message: "Comment must be at least 10 characters." })
       .max(1000, { message: "Comment must not exceed 1000 characters." }),
     rating: z
-      .number({required_error: "Please provide a rating between 1 to 5 star(s)."})
-      .min(1, { message: "Please provide a rating between 1 to 5 star(s)."})
-      .max(5, { message: "Please provide a rating between 1 to 5 star(s)."})
+      .number({
+        required_error: "Please provide a rating between 1 to 5 star(s).",
+      })
+      .min(1, { message: "Please provide a rating between 1 to 5 star(s)." })
+      .max(5, { message: "Please provide a rating between 1 to 5 star(s)." })
       .finite(),
     production: z
-      .string({required_error: "Please select a Production Professional."})
-      .or(z.literal('unneeded')),
+      .string({ required_error: "Please select a Production Professional." })
+      .or(z.literal("unneeded")),
   });
 
   // Handle review submission - fixed logic issue
-  async function onSubmit (values: z.infer<typeof formSchema>) {
-      //console.log("Submit called")
-      console.log(values)
-      if (values.comment.length < 10) {
+  // ฟังก์ชัน onSubmit ที่ปรับปรุงแล้ว
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Submit values:", values);
+    if (values.comment.length < 10) {
+      toast({
+        variant: "destructive",
+        title: "Comment too short",
+        description: "Comment must have at least 10 characters.",
+      });
+      return;
+    }
+
+    if (values.rating < 1 || values.rating > 5) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Rating",
+        description: "Please provide a rating from 1 to 5 stars.",
+      });
+      return;
+    }
+
+    const reviewData: ReviewData = {
+      createdAt: new Date(),
+      postID: post.id,
+      ratingScore: values.rating,
+      comment: values.comment,
+    };
+
+    let apiUrl;
+    let method;
+
+    if (role === "producer") {
+      // Producer is reviewing a Production Professional
+      // apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/users/${values.production}/addReview`;
+      method = "put";
+    } else {
+      // Production Professional is reviewing a post
+      apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${post.id}/addReview`;
+      method = "post";
+    }
+
+    try {
+      const response = await axios({
+        method: method,
+        url: apiUrl,
+        data: reviewData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response) {
+        console.log("Post Review Res", response);
         toast({
           variant: "destructive",
-          title: "Comment too short",
-          description: "Comment must have at least 10 characters.",
-          })
+          title: "Failed to submit review",
+          description: "Failed to submit review. Please try again.",
+        });
         return;
       }
-      if (values.rating < 1 || values.rating > 5) {
+
+      // ตรวจสอบการตอบกลับจาก API
+      if (response.data?.data?.status === "error") {
         toast({
           variant: "destructive",
-          title: "Invalid Rating",
-          description: "Please provide a rating from 1 to 5 stars.",
-          })
+          title: "Review Submission Failed",
+          description: response.data.data?.message || "Failed to submit review",
+        });
         return;
       }
-        const reviewData:ReviewData = {
-          createdAt: new Date(),
-          postID: post.id,
-          ratingScore: values.rating,
-          comment: values.comment
-        }
-        // In real app, make API call to submit review
-        // idk route for prodprof -> producer  
-        const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/${role === "producer" ? `/users/${values.production}/addReview`:"" }` 
-        const response = await axios.put(
-          apiUrl, reviewData,
-{
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
 
-        if(!response) {
-          console.log("Post Review Res", response)
-          toast({
-            variant: "destructive",
-            title: "Failed to submit review",
-            description: "Failed to submit review. Please try again.",
-          });
-          return
-        }
-        if (response.data.data.status == "error") {
-          toast({
-            variant: "destructive",
-            title: "Edit Profile",
-            description: response.data.data ?? "Failed to Edit User",
-          });
-          return;
-        }
-          // Fixed condition - show success message when response is OK
-          toast({
-            variant: "default",
-            title: "Successful review submission",
-            description: "Your review has been submitted!",
-          });
-          setIsOpen(false)
-      }
-    
+      // สำเร็จ
+      toast({
+        variant: "default",
+        title: "Successful review submission",
+        description: "Your review has been submitted!",
+      });
 
+      setHasReviewed(true);
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
+  }
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden">
@@ -115,7 +143,7 @@ export default function PostHistoryCard({
           <Image
             src={
               post.postImages && post.postImages.length > 0
-                ? `/${post.postImages[0]}`
+                ? `${post.postImages[0]}`
                 : "/image/logo.png"
             }
             alt={post.postName}
@@ -151,19 +179,22 @@ export default function PostHistoryCard({
                 </p>
               </div>
               {post.postStatus === "success" && (
-            <div className="flex justify-end z-50">
-              <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
-                     hover:bg-mainblue-light transition-colors" onClick={(e)=>{
-                        e.preventDefault()
-                        e.stopPropagation()
-                        console.log(setIsOpen)
-                        console.log(isOpen)
-                        setIsOpen(true)
-                        }}>
-                      Review Professional
-                    </button>
-            </div>
-            )}
+                <div className="flex justify-end z-50">
+                  <button
+                    className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
+                     hover:bg-mainblue-light transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log(setIsOpen);
+                      console.log(isOpen);
+                      setIsOpen(true);
+                    }}
+                  >
+                    Review Professional
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             // Production Professional View
@@ -175,10 +206,8 @@ export default function PostHistoryCard({
               <div className="flex items-center text-gray-600">
                 <Film className="w-4 h-4 mr-2 text-mainblue-light" />
                 <p className="text-sm">
-                  Role:{" "}
-                  {Array.isArray(post.postProjectRoles)
-                    ? post.postProjectRoles.join(", ")
-                    : post.postProjectRoles}
+                  Role:
+                  {post.postProjectRolesOutProfessional?.roleName}
                 </p>
               </div>
               <div className="flex items-center text-gray-600">
@@ -186,27 +215,31 @@ export default function PostHistoryCard({
                 <p className="text-sm">Completed: {EndDate}</p>
               </div>
               {post.postStatus === "success" && (
-              <div className="flex justify-end z-50">
-                <button className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
-                     hover:bg-mainblue-light transition-colors" onClick={(e)=>{
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setIsOpen(true)}}>
-                        Review Project
-                    </button>
-              </div>
+                <div className="flex justify-end z-50">
+                  <button
+                    className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
+                     hover:bg-mainblue-light transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsOpen(true);
+                    }}
+                  >
+                    Review Project
+                  </button>
+                </div>
               )}
             </>
           )}
         </div>
       </div>
       <ReviewSubmissionForm
-                role = {role}
-                isOpen = {isOpen}
-                setIsOpen={setIsOpen}
-                onSubmit={onSubmit}
-                toast={toast}
-              />
+        role={role}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        onSubmit={onSubmit}
+        toast={toast}
+      />
     </div>
   );
 }

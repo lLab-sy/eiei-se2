@@ -73,8 +73,8 @@ class PostDetailController {
 
   async getPostsByProductionProfessional(req: Request, res: Response): Promise<void> {
       try {
-        const posts = await postDetailService.getProductionProfessionalPosts(req.params.id); //userID of production professional
-        sendResponse(res, 'success', posts, 'Successfully retrieved posts');
+        // const posts = await postDetailService.getProductionProfessionalPosts(req.params.id,req.user.); //userID of production professional
+        sendResponse(res, 'success', 'Successfully retrieved posts');
       } catch (err) {
         sendResponse(res, 'error', err, 'Failed to retrieve posts');
       }

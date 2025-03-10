@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongoose';
+import { PostRoleDTO } from './postRoleDTO';
 class PostProjectRoleDTO {
     @ApiProperty({ description: 'Role ID', type: String })
     id!: string;
@@ -14,11 +15,21 @@ export interface ImageDisplayDTO{
     imageKey: string;
 }
 
+export interface NameUserDTO{
+    id: string;
+    username:string;
+}
+
 export interface PaticipantRatingDTO {
     ratingScore: number;
     comment: string; 
     reviewedAt: Date|null; // Date of review for the participant
 }
+export interface ProducerDisplayDTO{
+    userID: string;
+    producerName: string;
+}
+
 
 export interface OfferDTO{ //ซ้ำกับบูม
     role: string;
@@ -41,6 +52,11 @@ export class ParticipantDetailDTO {
     @IsString()
     @IsNotEmpty()
     participantID!: string;
+
+    @ApiProperty({ description: 'useName of the participant', type: String })
+    @IsString()
+    @IsNotEmpty()
+    participantName!: string;
 
     @ApiProperty({ description: 'Current status of the participant', enum: ['candidate', 'reject', 'in-progress'] })
     @IsString()
@@ -211,6 +227,12 @@ export class PostDTO {
     @IsNotEmpty()
     userID!: string;  // This is the reference to the PostDetail model
 
+    @ApiProperty({ description: 'The paticipant', type: [ParticipantDetailDTO] })
+    participant!: ParticipantDetailDTO[];
+
+    // @ApiProperty({ description: 'The paticipant', type: [ParticipantDetailDTO] })
+    // participant!: ParticipantDetailDTO[];
+
     constructor(init?: Partial<PostDTO>) {
         Object.assign(this, init);
     }
@@ -257,12 +279,16 @@ export class PostWithRoleCountDTO extends PostDTO{
     @IsString({ each: true })
     postProjectRoles!: string[];
 
+    producerName!: ProducerDisplayDTO
+    postProjectRolesOutProfessional!: PostRoleDTO
+
     constructor(data: Partial<PostWithRoleCountDTO>){
         super(data);
         this.postProjectRoles = data.postProjectRoles!;
         this.roleCount = data.roleCount!;
     }
 }
+
 
 export class OfferRequestDTO {
     @ApiProperty({ description: 'The id of user', type: String })
@@ -273,6 +299,10 @@ export class OfferRequestDTO {
     @ApiProperty({ description: 'The id of post', type: String })
     @IsString()
     postId!: string;
+
+    // @ApiProperty({ description: 'The id of production professional', type: String })
+    // @IsString()
+    // productionProfessionalId!: string|boolean;
 
     @ApiProperty({ description: 'The status of post', type: String })
     @IsString()  

@@ -2,9 +2,9 @@
 
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Carousel,
@@ -14,36 +14,160 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Mail, Phone, Star, User, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import PostHistoryCard from "@/components/PostHistoryCard"; // Import the PostHistoryCard component
-import { useToast } from "@/hooks/use-toast";
+import { MediaType, PostData, ReceivedReviews, RoleType, UserData } from "../../../../../interface";
+import getPostById from "@/libs/getPostById";
+import { useSession } from "next-auth/react";
+import getMediaTypes from "@/libs/getMediaTypes";
+import getPostRoles from "@/libs/getPostRoles";
+import getUser from "@/libs/getUser";
+import ReviewCard from "@/components/ReviewCard";
+import getReviewProfesstional from "@/libs/getReviewProfesstional";
 
 const PostDetail = () => {
-  const { id } = useParams();
+
+  const { id } = useParams<{ id: string }>();
   const [img, setImg] = useState<string[]>([]);
-  const { toast } = useToast();
+  // post data
+  const [dataResponse,setDataResponse]= useState<PostData|null>(null);
+
+  //Owner Data
+  const [ownerResponse, setOwnerResponse] = useState<UserData|null>(null);
+  const [dataReviews, setDataReviews]= useState<ReceivedReviews|null>(null);
+
+  // all types
+  const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
+  const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
+
+  const { data: session } = useSession();
+
+  if(!session){
+    const handleSendOffer = () => {
+      console.log("Send offer clicked");
+    };
+  
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
+  const token=session.user?.token
+  const userName=session.user?.username
+  const role= session.user.role
+
+  const fetchData = async() => {
+
+    var response;
+    var userResponse;
+    try{
+      response = await getPostById(id, token);
+      setDataResponse(response);
+      
+      try{
+        userResponse = await getUser(response.userID);
+        setOwnerResponse(userResponse);
+      }catch(error){
+        console.log("Owner Not Found");
+      }
+
+
+    }catch(error){
+      console.log("Post Not Found");
+    }
+
+    var medias, roles;
+      
+    try{
+      medias = await getMediaTypes();
+      setMediaTypes(medias.data.data);
+    }catch(error){
+      console.log("MediaTypes Not Found");
+    }
+
+    try{
+      roles = await getPostRoles();
+      setRoleTypes(roles.data.data);
+    }catch(error){
+      console.log("Post Role Not Found");
+    }
+  }
+
+  const fetchDataReview=async()=>{
+      if(!ownerResponse) return;
+
+      var responseReview;
+      try{
+        responseReview = await getReviewProfesstional(ownerResponse._id);
+        setDataReviews(responseReview);
+        console.log("data" + responseReview);
+      }catch(error){
+        console.log("Review not found");
+      }
+  }
+
+  useEffect(()=>{
+      if(dataResponse && !dataResponse.postProjectRoles){
+        dataResponse.postProjectRolesOut?.forEach((e) => {
+          if (!dataResponse.postProjectRoles) {
+            dataResponse.postProjectRoles = [];
+          }
+          dataResponse.postProjectRoles.push(e.id);
+        })
+      }
+  },[dataResponse]);
+
+  if (!dataResponse || !ownerResponse) {
+    fetchData();
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }else if(ownerResponse != null && !dataReviews){
+    fetchDataReview();
+  }
+
+  const getMedia = (id: string) => {
+    var result = "Unknow";
+    mediaTypes.forEach(element => {
+      if(element.id == id) result = element.mediaName;
+    });
+    return result;
+  }
+
+  const getRole = (id: string) => {
+    var result = "Unknow";
+    roleTypes.forEach(element => {
+      if(element.id == id) result = element.roleName;
+    });
+    return result;
+  }
+
+  const getRoles = (ids: string[]) => {
+    var roles: string[] = [];
+    ids.forEach(id => roles.push(getRole(id)));
+    return roles;
+  }
+
+  const getDate = (date: string) => {
+    return date.split("T")[0];
+  }
 
   const PostInfo = {
-    id: id as string, // Add id from params
-    postName: "Marvel Studios",
-    postDescription:
-      "We are seeking a talented and creative videographer to capture dynamic behind-the-scenes footage for our upcoming movie project. The ideal candidate should have experience in shooting documentary-style content, the ability to anticipate key moments on set, and a keen eye for storytelling through visuals. This role involves documenting the energy, interactions, and creative process during filming to give audiences an exclusive peek into the making of the film. Responsibilities include filming candid moments, interviews with cast and crew, and capturing the overall atmosphere of the production. Strong editing skills are a plus but not mandatory. We're looking for someone enthusiastic about film and who thrives in fast-paced, collaborative environments. If you're passionate about storytelling and have a knack for capturing authentic moments, we'd love to hear from you.",
-    postImages: [],
-    postMediaType: "Video",
-    postProjectRoles: ["Videographer", "Editor"],
-    postStatus: "success",
-    startDate: "2022-10-01",
-    endDate: "2022-10-31",
-    price: "100",
-    firstName: "John",
-    lastName: "Doe",
-    email: "realMarvelStudio@yahoo.com",
-    phoneNumber: "123-456-7890",
-    professionalId: "123",
-    roleCount: 2, // Added the missing roleCount property
+    postName: dataResponse.postName,
+    postDescription: dataResponse.postDescription,
+    postImages: dataResponse.postImages,
+    postMediaType: getMedia(dataResponse.postMediaType) ,
+    postProjectRoles: getRoles(dataResponse.postProjectRoles || []),
+    postStatus: dataResponse.postStatus ,
+    startDate: getDate(dataResponse.startDate || "N/AT") ,
+    endDate: getDate(dataResponse.endDate || "N/AT"),
+    firstName: ownerResponse?.firstName || "N/A",
+    lastName: ownerResponse?.lastName || "N/A",
+    email: ownerResponse?.email || "N/A",
+    phoneNumber: ownerResponse?.phoneNumber || "N/A",
   };
-
-  // handleSubmitReview removed and moved to PostHistoryCard
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
@@ -60,11 +184,11 @@ const PostDetail = () => {
           <div className="w-full flex justify-center">
             <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
               <CarouselContent>
-                {PostInfo.postImages.length !== 0 ? (
+                {(PostInfo.postImages && PostInfo.postImages.length != 0) ? (
                   PostInfo.postImages.map((imgSrc) => (
                     <CarouselItem key={imgSrc} className="flex justify-center">
                       <Image
-                        src={imgSrc}
+                        src={"/image/logo.png"}//imgSrc}
                         alt="Project Image"
                         width={300}
                         height={300}
@@ -103,28 +227,21 @@ const PostDetail = () => {
               </span>
             </div>
           </div>
-          <p>&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
+          <p className="text-main-gery break-words whitespace-normal">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
 
           {/* Project Detail Section */}
           <div className="place-content-center grid grid-cols-1 gap-3">
-            <div className="flex items-center gap-2 justify-center">
-              <div className="flex flex-wrap gap-2 ">
-                <h3 className="font-semibold text-maingrey text-center">
-                  Roles :{" "}
-                </h3>
-                {PostInfo.postProjectRoles.map((skill) => (
-                  <span
-                    key={skill}
-                    className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-1 rounded-full shadow-sm"
-                  >
-                    {skill}
-                  </span>
-                ))}
+             <div className="flex items-center gap-2 justify-center">
+                <div className="flex flex-wrap gap-2 ">
+                  <h3 className="font-semibold text-maingrey text-center">Roles : </h3>
+                  {PostInfo.postProjectRoles.map((skill, index) => (
+                    <span key={index} className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-1 rounded-full shadow-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-            <h3 className="text- font-semibold text-maingrey text-center">
-              Budget : {PostInfo.price} Bath
-            </h3>
+              {/*<h3 className="text- font-semibold text-maingrey text-center">Budget : {PostInfo.price} Bath</h3>*/}
           </div>
 
           <div className="place-content-center grid grid-cols-2 gap-4 place-items-center h-full">
@@ -177,6 +294,27 @@ const PostDetail = () => {
               Send Offer
             </a>
           </div>
+          
+          {/*Review Section*/}
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Producer's Previously Received Reviews</h2>
+            {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
+              dataReviews.receivedReviews.map((review, index) => (
+                <ReviewCard
+                        key={index}
+                        index={index}
+                        reviewerName={review.reviewerName}
+                        reviewerProfileImage={review.reviewerProfileImage}
+                        ratingScore={review.ratingScore}
+                        comment={review.comment}
+                      />
+              ))
+            ) : (
+              <p className="text-gray-500">No reviews yet.</p>
+            )}
+
+          </div>
+          
         </CardContent>
       </Card>
     </div>
@@ -184,3 +322,7 @@ const PostDetail = () => {
 };
 
 export default PostDetail;
+function useSessionContext(): { session: any; } {
+  throw new Error("Function not implemented.");
+}
+

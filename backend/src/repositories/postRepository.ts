@@ -9,7 +9,11 @@ class PostRepository {
     public async getAllPosts(queryStr:string) {
         try {
             console.log(queryStr)
-             const posts= await Post.find(JSON.parse(queryStr)).populate('postProjectRoles');
+             const posts= await Post.find(JSON.parse(queryStr)).populate('postProjectRoles')
+             .populate({
+                path:'participants.participantID',
+                select: 'username'
+            });
             //  console.log('Posts from database:', posts);
              return posts
         } catch (error) {
@@ -85,7 +89,102 @@ class PostRepository {
         }
     }
 
-    public async getPost(id:string): Promise<IPost> {
+    public async getHistoryPostsByProductionProfessional(id:string){
+        try{
+            const matchStage: PipelineStage[] = [];
+            matchStage.push({
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({
+                $match: {
+                    $and: [
+                      {
+                        'participants.participantID':
+                          new ObjectId(id)
+                      },
+                      { 'participants.status': 'candidate' }
+                    ]
+                  }
+            })
+
+            matchStage.push({
+                $project: {
+                    endDate: 1,
+                    postDescription: 1,
+                    postImages: 1,
+                    postMediaType: 1,
+                    postName: 1,
+                    postProjectRolesOut: {
+                      $arrayElemAt: [
+                        '$participants.offer.role',
+                        -1
+                      ]
+                    },
+                    postStatus: 1,
+                    startDate: 1,
+                    producerName: '$userID'
+            }})
+
+            matchStage.push({
+                
+                    $lookup: {
+                        from: 'postRoleTypes',
+                        localField: 'postProjectRolesOut',
+                        foreignField: '_id',
+                        as: 'postProjectRolesOut'
+                    }
+            })
+
+            matchStage.push({
+                $lookup: {
+                    from: 'users',
+                    localField: 'producerName',
+                    foreignField: '_id',
+                    as: 'producerName'
+                  }
+            })
+
+            matchStage.push({
+                $project: {
+                    endDate: 1,
+                    postDescription: 1,
+                    postImages: 1,
+                    postMediaType: 1,
+                    postName: 1,
+                    postProjectRolesOut: {
+                      $arrayElemAt: [
+                        '$postProjectRolesOut',
+                        0
+                      ]
+                    },
+                    postStatus: 1,
+                    startDate: 1,
+                    producerName: {
+                      $arrayElemAt: ['$producerName', 0]
+                    }
+                  }
+            })
+            const totalItemsResult = await Post.aggregate(matchStage);
+            return totalItemsResult
+        }catch(error) {
+            throw new Error('Error Get Posts history Production professional from repository: ' + error);
+        }
+    }
+
+    public async getPost(id:string) {
         try {
             const objectId = new ObjectId(id);
             const post: IPost | null = await Post.findById(objectId).populate(['postProjectRoles']);
@@ -95,6 +194,7 @@ class PostRepository {
             }
 
             return post
+
         } catch (error) {
             throw new Error('Error fetching posts from repository: ' + error);
         }
@@ -250,9 +350,13 @@ class PostRepository {
             }
 
             if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
                 matchStage.push({
                     $match: {
-                        postMediaType: { $in: postMediaTypes}
+                        postMediaType: { $in: postMediaTypesID}
                     }
                 })
             }
@@ -326,6 +430,107 @@ class PostRepository {
             throw new Error('Cannot Update this Post: ' + err)
 		}
 	}
+
+    //User ID ของบูมเป็น production professional ของเราใช้แค่ postID น่าจะพอ (userID optional เผื่อจะแยกแชทต่อคน)
+    public async getProducerOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
+        try {
+            const { userId, postId, postStatus, limit, page } = getOfferReq;
+
+            const matchStage: PipelineStage[] = [];
+            
+            if(postId){ //posId if it has
+                matchStage.push({
+                    $match: {
+                        _id: new ObjectId(postId)
+                      }
+                    })
+            }
+
+            if(postStatus){ // postStatus If it has
+                matchStage.push({
+                    $match: { postStatus: 'success' }
+                })
+            }
+
+            matchStage.push({ //unwind paticipant
+                $unwind: {
+                    path: '$participants',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            matchStage.push({ //unwind each offer
+                $unwind: {
+                    path: '$participants.offer',
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                  }
+            })
+
+            if(userId){
+                matchStage.push({ //paticipant in post if it has
+                    $match: {
+                        'participants.participantID': new ObjectId(
+                        userId
+                        )
+                    }
+                    
+                })
+            }
+
+            matchStage.push({ // change roleID -> roleName
+                $lookup: {
+                    from: 'postRoleTypes',
+                    localField: 'participants.offer.role',
+                    foreignField: '_id',
+                    as: 'roleName'
+                }
+            })
+
+            matchStage.push({
+                $project: {
+                    _id: 1,
+                    postName: 1,
+                    roleName: {
+                      $arrayElemAt: ['$roleName.roleName', 0]
+                    },
+                    currentWage: '$participants.offer.price',
+                    reason: '$participants.offer.reason',
+                    offeredBy:
+                      '$participants.offer.offeredBy',
+                    status: '$participants.status',
+                    createdAt: '$participants.createdAt'
+                  }
+            })
+            console.log("Check2",matchStage)
+            const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            //sort by date from new to old, push skip and limit
+            const sortStage: PipelineStage.Sort = {
+                $sort: { createdAt: -1 }
+            }
+            matchStage.push(sortStage, { $skip: skip }, { $limit: pageSize });
+
+            const results = await Post.aggregate(matchStage)
+            const response: GetOfferResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            console.log("ANSWER",response)
+            return response
+        } catch (error) {
+            throw new Error('Error search post in repository: ' + error);
+        }
+    }
+
 
     public async getOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
         try {
@@ -480,6 +685,7 @@ class PostRepository {
         }
     }
 }
+
 
 export default new PostRepository();
 

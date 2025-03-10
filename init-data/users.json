@@ -6,6 +6,7 @@
     "username": "johndoe",
     "role": "production professional",
     "email": "johndoe@example.com",
+    "profileImage": "10123e7c7aef4701e1dda38db7015d59b8f7ed70f75583997540ee03fdd2b729",
     "firstName": "John",
     "lastName": "Doe",
     "phoneNumber": "+1234567890",
@@ -351,5 +352,73 @@
       }
     ],
     "createdAt": "2024-02-01T07:25:00.000Z"
+  },
+  {
+    "_id": {
+      "$oid": "67cac72f06b94eeab26c51c4"
+    },
+    "username": "Producer10",
+    "password": "$2b$10$GRzzSzVIFfs7eM5m7JkSnunK9Mr.pp.qKrWZ932jaC8aa8xtv9TTK",
+    "role": "producer",
+    "createdAt": {
+      "$date": "2025-03-07T10:15:11.148Z"
+    },
+    "updatedAt": {
+      "$date": "2025-03-07T10:15:56.370Z"
+    },
+    "__v": 0,
+    "bankAccount": {
+      "bankName": "",
+      "accountHolderName": "",
+      "accountNumber": "",
+      "_id": {
+        "$oid": "67cac75c06b94eeab26c51d1"
+      }
+    },
+    "cardNumber": "",
+    "company": "",
+    "email": "rujroot1@gmail.com",
+    "firstName": "r.m.s1",
+    "gender": "Male",
+    "lastName": "u11",
+    "middleName": "",
+    "nameOnCard": "",
+    "paymentType": "qrCode",
+    "phoneNumber": "0642103885",
+    "profileImage": ""
+  },
+  {
+    "_id": {
+      "$oid": "67cac74406b94eeab26c51cb"
+    },
+    "username": "Producer11",
+    "password": "$2b$10$WDE5hhUsgmYe.eE87OQBqe.whvXOl41fJeqlFf/JcNmHc459Gg85i",
+    "role": "producer",
+    "createdAt": {
+      "$date": "2025-03-07T10:15:32.912Z"
+    },
+    "updatedAt": {
+      "$date": "2025-03-07T10:16:22.793Z"
+    },
+    "__v": 0,
+    "bankAccount": {
+      "bankName": "",
+      "accountHolderName": "",
+      "accountNumber": "",
+      "_id": {
+        "$oid": "67cac77606b94eeab26c51d6"
+      }
+    },
+    "cardNumber": "",
+    "company": "",
+    "email": "rujroot2@gmail.com",
+    "firstName": "Ruj1",
+    "gender": "Male",
+    "lastName": "Siripanyapong1",
+    "middleName": "",
+    "nameOnCard": "",
+    "paymentType": "qrCode",
+    "phoneNumber": "0642103880",
+    "profileImage": ""
   }
 ]
