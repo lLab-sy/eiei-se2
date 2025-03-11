@@ -147,9 +147,8 @@ class UserService {
                     return new ReceivedReviewsDTO({
                         receivedReviews: await Promise.all(
                             r.reviews.map(async (review: ReceivedReviewDTO) => {
-                                let reviewerProfileImageTmp = (typeof review.reviewerProfileImage === 'string')
+                                let reviewerProfileImageTmp = (typeof review.reviewerProfileImage === 'string' && review.reviewerProfileImage != "")
                                     ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage)
-                                    : (review.reviewerProfileImage) ? await cloudService.getSignedUrlImageCloud(review.reviewerProfileImage[0])
                                     : '';
                                 return new ReceivedReviewDTO({
                                     reviewerName: review.reviewerName as string,
