@@ -1,37 +1,93 @@
 [
   {
-    "userID": { "$oid": "67ae18a37c7f8482264c2ae8" },
-    "postName": "Graphic Design for Branding",
-    "postDescription": "Creating branding materials including logos and brochures.",
-    "postImages": ["https://example.com/design1.jpg"],
-    "postMediaType": { "$oid": "67ae18ad7c7f8482264c2ae9" },
-    "postProjectRoles": [{ "$oid": "65b1234567abcd1234ef5678" }],
-    "postStatus": "success",
-    "startDate": "2025-01-20T00:00:00.000Z",
-    "endDate": "2025-02-25T00:00:00.000Z",
-    "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b126" },
+    "_id": {
+      "$oid": "67cfd0dcd7a5564045ed78be"
+    },
+    "userID": {
+      "$oid": "67cfd83dd7cc70d580f6ee73"
+    },
+    "postName": "Video Editing for Commercial",
+    "postDescription": "Editing a high-quality commercial for a new product launch.",
+    "postImages": [
+      "https://example.com/video1.jpg"
+    ],
+    "postMediaType": {
+      "$oid": "67ae18ad7c7f8482264c2ae9"
+    },
+    "postProjectRoles": [
+      {
+        "$oid": "65b8765432abcd5678ef1234"
+      }
+    ],
+    "postStatus": "created",
+    "startDate": "2025-02-10T00:00:00.000Z",
+    "endDate": "2025-03-05T00:00:00.000Z",
+    "postDetailID": {
+      "$oid": "65bd5b99a1c2a9d1f8e1b127"
+    },
     "participants": [
       {
-        "participantID": { "$oid": "67ae18a37c7f8482264c2ae8" },
+        "participantID": {
+          "$oid": "67ae18a37c7f8482264c2ae8"
+        },
+        "status": "in-progress",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65b1234567abcd1234ef5678"
+            },
+            "price": 2000,
+            "offeredBy": 1,
+            "createdAt": "2025-02-09T14:00:00.000Z",
+            "reason": "Experienced video editor."
+          }
+        ],
+        "createdAt": "2025-02-10T00:00:00.000Z",
+        "updatedAt": "2025-02-12T11:30:00.000Z"
+      },
+      {
+        "participantID": {
+          "$oid": "67cfd0dcdfcc5d44a81029f2"
+        },
         "status": "candidate",
         "offer": [
           {
-            "role": { "$oid": "65b8765432abcd5678ef1234" },
+            "role": {
+              "$oid": "65b8765432abcd5678ef1234"
+            },
             "price": 1500,
             "offeredBy": 1,
             "createdAt": "2025-01-19T15:00:00.000Z",
             "reason": "Experienced designer."
           }
         ],
-        
-          "ratingScore": 4.5,
-          "comment": "Highly skilled in design.",
-          "reviewedAt": "2025-02-10T00:00:00.000Z",
-       
-        
-          "createdAt": "2025-01-20T00:00:00.000Z",
-          "updatedAt": "2025-01-22T12:30:00.000Z"
-        
+        "ratingScore": 1,
+        "comment": "Very Bad.",
+        "reviewedAt": "2025-02-10T00:00:00.000Z",
+        "createdAt": "2025-01-20T00:00:00.000Z",
+        "updatedAt": "2025-01-22T12:30:00.000Z"
+      },
+      {
+        "participantID": {
+          "$oid": "67cfd0dcdfcc5d44a81029f4"
+        },
+        "status": "candidate",
+        "offer": [
+          {
+            "role": {
+              "$oid": "65b8765432abcd5678ef1234"
+            },
+            "price": 1500,
+            "offeredBy": 1,
+            "createdAt": "2025-01-19T15:00:00.000Z",
+            "reason": "Experienced designer."
+          }
+        ],
+        "ratingScore": 1,
+        "comment": "Very Bad.",
+        "reviewedAt": "2025-02-10T00:00:00.000Z",
+        "createdAt": "2025-01-20T00:00:00.000Z",
+        "updatedAt": "2025-01-22T12:30:00.000Z"
       }
     ]
   },
