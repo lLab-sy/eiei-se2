@@ -100,7 +100,6 @@ const PostDetail = () => {
       try{
         responseReview = await getReviewProfesstional(ownerResponse._id);
         setDataReviews(responseReview);
-        console.log("data" + responseReview);
       }catch(error){
         console.log("Review not found");
       }

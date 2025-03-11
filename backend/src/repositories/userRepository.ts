@@ -192,6 +192,11 @@ class UserRepository {
                       }
                     },
                     {
+                      $project: {
+                        rating: 1
+                      }
+                    },
+                    {
                       $unwind: {
                         path: "$rating"
                       }
@@ -229,6 +234,11 @@ class UserRepository {
                       }
                     },
                     {
+                      $unwind: {
+                        path: "$rating.producer"
+                      }
+                    },
+                    {
                       $group: {
                         _id: "$_id",
                         reviews: {
@@ -244,8 +254,8 @@ class UserRepository {
                       }
                     },
                     {
-                      $sort: {
-                        _id: -1
+                      $project: {
+                        _id: 0
                       }
                     }
                   ],
@@ -274,9 +284,22 @@ class UserRepository {
                     {
                       $project: {
                         "participants.participantID": 1,
-                        "participants.review": 1,
+                        "participants.ratingScore": 1,
+                        "participants.comment": 1,
+                        "participants.status": 1,
                         _id: 0
                       }
+                    },
+                    {
+                      $unwind: {
+                        path: "$participants"
+                      }
+                    },
+                    {
+                      $match:
+                        {
+                          "participants.status": "candidate"
+                        }
                     },
                     {
                       $lookup: {
@@ -295,78 +318,36 @@ class UserRepository {
                       }
                     },
                     {
-                      $project: {
-                        mergedArray: {
-                          $map: {
-                            input: "$participants",
-                            as: "p",
-                            in: {
-                              $mergeObjects: [
-                                "$$p",
-                                {
-                                  $arrayElemAt: [
-                                    {
-                                      $filter: {
-                                        input: "$rating",
-                                        as: "r",
-                                        cond: {
-                                          $eq: [
-                                            "$$r._id",
-                                            "$$p.participantID"
-                                          ]
-                                        }
-                                      }
-                                    },
-                                    0
-                                  ]
-                                }
-                              ]
-                            }
-                          }
-                        }
+                      $unwind: {
+                        path: "$rating"
                       }
                     },
                     {
-                      $unwind:
-                        {
-                          path: "$mergedArray"
-                        }
-                    },
-                    {
-                      $group: {
-                        _id: "$mergedArray.participantID",
-                        reviews: {
-                          $push: {
-                            ratingScore:
-                              "$mergedArray.review.ratingScore",
-                            comment: "$mergedArray.review.comment",
-                            reviewerName: "$mergedArray.username",
-                            reviewerProfileImage:
-                              "$mergedArray.profileImage"
-                          }
-                        }
+                      $project: {
+                        participantID:
+                          "$participants.participantID",
+                        ratingScore: "$participants.ratingScore",
+                        comment: "$participants.comment",
+                        username: "$rating.username",
+                        profileImage: "$rating.profileImage"
                       }
                     },
                     {
                       $group: {
                         _id: null,
                         reviews: {
-                          $push: "$reviews"
+                          $push: {
+                            ratingScore: "$ratingScore",
+                            comment: "$comment",
+                            reviewerName: "$username",
+                            reviewerProfileImage: "$profileImage"
+                          }
                         }
                       }
                     },
                     {
                       $project: {
-                        _id: 0,
-                        reviews: {
-                          $reduce: {
-                            input: "$reviews",
-                            initialValue: [],
-                            in: {
-                              $concatArrays: ["$$value", "$$this"]
-                            }
-                          }
-                        }
+                        _id: 0
                       }
                     }
                   ],
