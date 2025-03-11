@@ -73,7 +73,7 @@ class ProductionProfessionalRespository {
     
             if (searchReqModel.minRating !== undefined) {
                 matchStage.push(
-                    { $unwind: "$rating" },
+                    { $unwind: {path: "$rating", preserveNullAndEmptyArrays: true }},
                     { 
                         $group: {
                             _id: "$_id",
@@ -81,7 +81,7 @@ class ProductionProfessionalRespository {
                             doc: { $first: "$$ROOT" }
                         }
                     },
-                    { $replaceRoot: { newRoot: { $mergeObjects: ["$doc", { avgRating: "$avgRating" }] } } },
+                    { $replaceRoot: { newRoot: { $mergeObjects: ["$doc", { avgRating: { $ifNull: ["$avgRating", 0] } }] } } },
                     { $match: { avgRating: { $gte: searchReqModel.minRating } } }
                 );
             }
@@ -93,7 +93,7 @@ class ProductionProfessionalRespository {
             const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
             const totalItemsResult = await ProductionProfessional.aggregate(totalItemstStage);
             const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
-    
+            
             matchStage.push({ $sort: { score: -1 } }, { $skip: skip }, { $limit: limit });
     
             const results: IProductionProfessional[] = await ProductionProfessional.aggregate(matchStage);
