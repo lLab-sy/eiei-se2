@@ -12,20 +12,40 @@ Given('the production professional is logged in', async function () {
     await page.goto("http://localhost:3000/");
     await page.waitForSelector('button.p-2.hover\\:bg-blue-800');
     await page.click('button.p-2.hover\\:bg-blue-800');
-    await page.$eval(`a[href='/login']`, element => element.click());
+
+    await Promise.all([
+      page.waitForNavigation(), 
+      await page.$eval(`a[href='/login']`, element => element.click())
+    ]);
+
     await page.waitForSelector('input[name="username"]');
-    await page.type('input[name="username"]', 'production@test.com');
+    await page.type('input[name="username"]', 'production@test.com'
+      , {delay: 50}
+    );
+
     await page.waitForSelector('input[name="password"]');
-    await page.type('input[name="password"]', 'production!');
-    await page.click('[type="submit"]');
-    await page.waitForNavigation();
+    await page.type('input[name="password"]', 'production!'
+      , {delay: 50}
+    );
+
+    await Promise.all([
+      page.waitForNavigation(), 
+      await page.click('[type="submit"]')
+    ]);
+    // await page.click('[type="submit"]');
+    // await page.waitForNavigation();
 });
 
 Given('has target post', async function () {
   await page.waitForSelector('button.p-2.hover\\:bg-blue-800');
   await page.click('button.p-2.hover\\:bg-blue-800');
-  await page.$eval(`a[href='/posts']`, element => element.click());
-  await page.waitForNavigation();
+
+  await Promise.all([
+    page.waitForNavigation(), 
+    await page.$eval(`a[href='/posts']`, element => element.click())
+  ]);
+  // await page.$eval(`a[href='/posts']`, element => element.click());
+  // await page.waitForNavigation();
   await page.waitForFunction(() => {
     return Array.from(document.querySelectorAll('a')).some(a => a.href.match(/\/posts\/\d+/));
   });
@@ -37,23 +57,29 @@ Given('has target post', async function () {
 
   const element = elementHandle.asElement() as ElementHandle<Element> | null;
   if (element) {
-    await element.click();
-    await page.waitForNavigation();
+    await Promise.all([
+      page.waitForNavigation(), 
+      await element.click()
+    ]);
+    // await element.click();
+    // await page.waitForNavigation();
     await page.waitForSelector('a[href*="/create-offer/"]');
-    await page.click('a[href*="/create-offer/"]');
-    await page.waitForNavigation();
+    await Promise.all([
+      page.waitForNavigation(), 
+      await page.click('a[href*="/create-offer/"]')
+    ]);
+    // await page.click('a[href*="/create-offer/"]');
+    // await page.waitForNavigation();
   }
 });
 
 Given('the production professional fills out the offer details', async function () {
   await page.waitForSelector('textarea[name="description"]', { visible: true });
-  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
-  await page.waitForSelector('input[name="price"]');
-  await page.evaluate(() => {
-    const priceInput = document.querySelector('input[name="price"]') as HTMLInputElement;
-    if (priceInput) priceInput.value = '';
-  });
-  await page.type('input[name="price"]', '500');
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field'
+    , {delay: 25}
+  );
+  await page.waitForSelector('input[name="price"]', { visible: true });
+  await page.type('input[name="price"]', '500', {delay: 50});
   await page.click('button[role="combobox"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
   await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
@@ -61,7 +87,9 @@ Given('the production professional fills out the offer details', async function 
 
 Given('the production professional does not fill out the price', async function () {
   await page.waitForSelector('textarea[name="description"]', { visible: true });
-  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field'
+    , {delay: 25}
+  );
   await page.waitForSelector('button[role="combobox"]');
   await page.click('button[role="combobox"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });

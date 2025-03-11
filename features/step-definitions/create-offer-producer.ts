@@ -8,24 +8,37 @@ let page: Page;
 Given('the producer is logged in', async function () {
   browser = await puppeteer.launch({ headless: false });
   page = await browser.newPage();
+
   await page.goto("http://localhost:3000/");
   await page.waitForSelector('button.p-2.hover\\:bg-blue-800');
   await page.click('button.p-2.hover\\:bg-blue-800');
-  await page.$eval(`a[href='/login']`, element => element.click());
+  // await page.$eval(`a[href='/login']`, element => element.click());
+  await Promise.all([
+      page.waitForNavigation(), 
+      await page.$eval(`a[href='/login']`, element => element.click())
+    ]);
 
   await page.waitForSelector('input[name="username"]');
-  await page.type('input[name="username"]', 'producersan@test.com');
+  await page.type('input[name="username"]', 'producersan@test.com', {delay: 50});
+
   await page.waitForSelector('input[name="password"]');
-  await page.type('input[name="password"]', 'producer!!!');
-  await page.click('[type="submit"]');
-  await page.waitForNavigation();
+  await page.type('input[name="password"]', 'producer!!!', {delay: 50});
+
+  await Promise.all([
+    page.waitForNavigation(), 
+    await page.click('[type="submit"]')
+  ]);
+  // await page.click('[type="submit"]');
+  // await page.waitForNavigation();
 });
 
 Given('has a target production professional', async function () {
   await page.waitForSelector('button.p-2.hover\\:bg-blue-800');
   await page.click('button.p-2.hover\\:bg-blue-800');
-  await page.$eval(`a[href='/professionals']`, element => element.click());
-  await page.waitForNavigation();
+  await Promise.all([
+    page.waitForNavigation(), 
+    await page.$eval(`a[href='/professionals']`, element => element.click())
+  ]);
 
   await page.waitForFunction(() => {
     return [...document.querySelectorAll('a')].some(a => a.href.match(/\/professionals\/\d+/));
@@ -34,17 +47,20 @@ Given('has a target production professional', async function () {
   const elementHandle = await page.evaluateHandle(() => {
     const links = Array.from(document.querySelectorAll('a'))
       .filter((a) => a.href.match(/\/professionals\/\d+/));
-  
     return links.length > 0 ? links[Math.floor(Math.random() * links.length)] : null;
   });
 
   const element = elementHandle.asElement() as ElementHandle<Element>;
   if (element) {
-    await element.click();
-    await page.waitForNavigation();
+    await Promise.all([
+      page.waitForNavigation(), 
+      element.click(), 
+    ]);
     await page.waitForSelector('a[href*="/create-offer/"]');
-    await page.click('a[href*="/create-offer/"]');
-    await page.waitForNavigation();
+    await Promise.all([
+      page.waitForNavigation(), 
+      await page.click('a[href*="/create-offer/"]'), 
+    ]);
   }
 });
 
@@ -57,17 +73,12 @@ Given('the producer has their own posts', async function () {
 
 Given('the producer fills out the offer details', async function () {
   await page.waitForSelector('textarea[name="description"]', { visible: true });
-  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field'
+    , {delay: 25}
+  );
   
   await page.waitForSelector('input[name="price"]');
-  console.log("Got Price");
-
-  await page.evaluate(() => {
-    const input = document.querySelector('input[name="price"]') as HTMLInputElement;
-    if (input) input.value = '';
-  });
-
-  await page.type('input[name="price"]', '500');
+  await page.type('input[name="price"]', '500', {delay: 50});
   await page.click('button[aria-controls="radix-:rg:"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
   await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
@@ -75,10 +86,12 @@ Given('the producer fills out the offer details', async function () {
 
 Given('the producer does not fill out the price', async function () {
   await page.waitForSelector('textarea[name="description"]', { visible: true });
-  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field'
+    , {delay: 25}
+  );
 
   await page.waitForSelector('button[role="combobox"]');
-  await page.click('button[role="combobox"]');
+  await page.click('button[aria-controls="radix-:rg:"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
   await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
 });
@@ -88,7 +101,6 @@ When('the producer clicks create offer button', async function () {
   await page.click('button[aria-haspopup="dialog"]');
   await page.waitForSelector('div[role="alertdialog"]', { visible: true });
   await page.waitForSelector('button.bg-green-700', { visible: true });
-  console.log("Can Submit");
   await page.click('button.bg-green-700');
 });
 

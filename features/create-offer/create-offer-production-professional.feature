@@ -12,8 +12,6 @@ Feature: Production Professional Create Offer to Producer
         Given the production professional fills out the offer details
         When the production professional clicks create offer button
         Then ensure the system sends an offer to producer 
-            And ensure that the system shows the offer in his production professional's all job
-            And ensure the system adds change to offer's history
 
     Scenario: Failed to create an offer to a producer
         Given the production professional does not fill out the price

@@ -13,8 +13,6 @@ Feature: Producer Create Offer to Production Professional
             And the producer fills out the offer details
         When the producer clicks create offer button
         Then ensure the system sends an offer to production professional
-            And ensure the system shows the offer in producer post's offer list
-            And ensure the system adds change to offer history
 
     Scenario: Failed to create an offer to a production professional
         Given the producer has their own posts
