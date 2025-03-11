@@ -432,12 +432,18 @@ class PostRepository {
 	}
 
     //User ID ของบูมเป็น production professional ของเราใช้แค่ postID น่าจะพอ (userID optional เผื่อจะแยกแชทต่อคน)
-    public async getProducerOffer(getOfferReq: GetOfferRequestModel): Promise<GetOfferResponse>{
+    public async getProducerOffer(getOfferReq: GetOfferRequestModel,producerID:string): Promise<GetOfferResponse>{
         try {
             const { userId, postId, postStatus, limit, page } = getOfferReq;
 
             const matchStage: PipelineStage[] = [];
             
+            matchStage.push({ //SECURITY
+                $match: {
+                    userID: new ObjectId(producerID)
+                  }
+            })
+
             if(postId){ //posId if it has
                 matchStage.push({
                     $match: {

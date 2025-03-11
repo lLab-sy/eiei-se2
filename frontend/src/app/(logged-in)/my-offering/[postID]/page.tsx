@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { OfferData, OfferHistoryData, OfferHistoryResponseData, PostData } from "../../../../../interface";
+import { PostData } from "../../../../../interface";
 
 // นำเข้า mock data
 import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
@@ -20,8 +20,6 @@ import ProfessionalSelector from "@/components/ProfessionalSelector";
 import OfferHistory from "@/components/OfferHistory";
 import ComparisonView from "@/components/ComparisonView";
 import PostDetail from "@/components/PostDetail";
-import getPostById from "@/libs/getPostById";
-import getPrudcerOffers from "@/libs/getProducerOffers";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -55,7 +53,9 @@ export default function OfferPostContent() {
   const [offerArray, setOfferArray] = useState<Array<historyStateInterface>>(
     [],
   );
-
+  const [userRole, setUserRole] = useState<
+    "producer" | "production professional"
+  >("producer");
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<
     string | null
   >(null);
@@ -119,7 +119,7 @@ export default function OfferPostContent() {
       status: "in-progress",
     },
   ];
- 
+
   // Mock data สำหรับข้อเสนอของแต่ละ Professional
   const mockProfessionalOffers = {
     prof1: [
@@ -225,7 +225,7 @@ export default function OfferPostContent() {
     // สร้าง map เพื่อเก็บข้อเสนอล่าสุดของแต่ละคน (professional+role)
     const latestOffers: { [key: string]: string } = {};
 
-    // วนลูปผ่านแต่ละ Professional mockProfessionalOffers
+    // วนลูปผ่านแต่ละ Professional
     Object.keys(mockProfessionalOffers).forEach((profId) => {
       const prof = professionals.find((p) => p.id === profId);
       if (!prof) return;
@@ -314,57 +314,6 @@ export default function OfferPostContent() {
     return Object.values(roles);
   };
 
-//------------------------------------------------------------------------------------
-
-//*********************************** */
-const token =session?.user.token
-const [postState, setPostState] = useState<PostData | null>(null);
-const userID= session?.user.id
-const userRole =session?.user.role
-const [error, setError] = useState<string | null>(null);
-const [professionalOffers,setProfessionalOffers] =useState<OfferHistoryResponseData[]|null>(null)
-
-//API connection GET Offer
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      let response;
-      // if (userRole === "producer") {
-      response = await getPrudcerOffers(token); // ดึงโพสต์ของ producer
-      // console.log("CHECKOO",response)
-      setProfessionalOffers(response)
-      // setPostArray(response)
-    } catch (err) {
-      setError("Failed to load posts. Please try again later.");
-    }
-  };
-  fetchData();
-}, [userID, userRole]);
-  //*********************************** */
-
-//API Connection
- useEffect(() => {
-      const fetchData = async () => {
-        try {
-          let response;
-          if (userRole === "producer") {
-            response = await getPostById(postID,token) 
-            setPostState(response)
-          } else if (userRole === "production professional") {
-            // response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
-          }
-          // console.log(response,"OHNPPPPPPPPPPPPPPPPPPPPp")
-          }
-        catch (err) {
-          setError("Failed to load posts. Please try again later.");
-        }
-      };
-     fetchData();
-    }, []); // ใช้ pid และ token ใน dependency array
-
-
-//------------------------------------------------------------------------------------
-
   // สร้างข้อมูลเปรียบเทียบตามบทบาท
   useEffect(() => {
     if (userRole === "producer") {
@@ -377,12 +326,12 @@ useEffect(() => {
 
       // ตั้งค่าบทบาทเริ่มต้น (ถ้ามี)
       if (roles.length > 0 && !selectedRole) {
-        setSelectedRole(postState?.postProjectRolesOut[0].id);
+        setSelectedRole(roles[0]);
       }
     }
     setLoading(false);
   }, [userRole, professionals]);
-  // console.log(userRole, session?.user?.role);
+  console.log(userRole, session?.user?.role);
 
   const handleBack = () => {
     router.push("/my-offering");
@@ -390,6 +339,34 @@ useEffect(() => {
 
   const userId = user?._id ?? "";
 
+  useEffect(() => {
+    // สมมติว่าเราดึงบทบาทของผู้ใช้จาก session หรือ Redux store
+    const role = session?.user?.role || "producer"; // สมมติว่าเป็น producer ในตัวอย่างนี้
+    setUserRole(role as "producer" | "production professional");
+
+    if (role === "producer") {
+      // เลือก professional คนแรกโดยค่าเริ่มต้น (ถ้ามี)
+      if (professionals.length > 0) {
+        setSelectedProfessionalId(professionals[0].id);
+        // ดึงข้อเสนอของ professional คนแรก
+        setOfferArray(
+          mockProfessionalOffers[
+            professionals[0].id as keyof typeof mockProfessionalOffers
+          ] || [],
+        );
+      }
+    } else if (role === "production professional") {
+      // ถ้าเป็น professional ให้ใช้ข้อเสนอของ professional คนนั้น
+      setOfferArray(myProfessionalOffers);
+    }
+  }, [session]);
+
+  const [postState, setPostState] = useState<PostData | null>(null);
+
+  useEffect(() => {
+    // ใช้ mock data แทนการเรียก API จริง
+    setPostState(mockPostDetail);
+  }, []);
 
   // เมื่อเลือก professional
   const handleSelectProfessional = (professionalId: string) => {
@@ -440,6 +417,7 @@ useEffect(() => {
     month: "long",
     day: "numeric",
   });
+
   const offerDateEnd = new Date(postState?.endDate ?? "");
   const endDate = offerDateEnd.toLocaleString("en-US", {
     year: "numeric",
@@ -551,7 +529,6 @@ useEffect(() => {
                       selectedRole={selectedRole}
                       availableRoles={availableRoles}
                       onSelectRole={handleSelectRole}
-                      postProjectRoles={postState?.postProjectRolesOut}
                     />
 
                     {/* แสดงรายชื่อ Professional ตาม Role ที่เลือก */}

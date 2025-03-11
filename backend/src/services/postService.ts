@@ -390,11 +390,11 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
 
   async getProducerOffer(
     offerReq: OfferRequestDTO, 
-    role: string
+    producerID:string
 ): Promise<PaginatedResponseDTO<OfferProducerResponseDTO>> {
     try {
         const offerRequest: GetOfferRequestModel = offerReq;
-        const res = await postRepository.getProducerOffer(offerRequest);
+        const res = await postRepository.getProducerOffer(offerRequest,producerID);
 
         console.log("Response Data:", res);
 
@@ -403,8 +403,8 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
         }
 
         res.data.map((offer)=>{
-            console.log("JJJJJJJJJ",offer.status)
-            console.log("JJJJJJJJJ",offer.userName)
+            // console.log("JJJJJJJJJ",offer.status)
+            // console.log("JJJJJJJJJ",offer.userName)
         })
 
         // Map response data
