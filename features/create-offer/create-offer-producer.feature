@@ -5,7 +5,7 @@ Feature: Producer Create Offer to Production Professional
     So that I can recruit production professional to work on my project
 
     Background:
-        Given the production professional is logged in
+        Given the producer is logged in
         And has a target production professional
 
     Scenario: Successfully create an offer to a production professional
@@ -14,7 +14,7 @@ Feature: Producer Create Offer to Production Professional
         When the producer clicks create offer button
         Then ensure the system sends an offer to production professional
             And ensure the system shows the offer in producer post's offer list
-            And ensure the system adds change to offer's history
+            And ensure the system adds change to offer history
 
     Scenario: Failed to create an offer to a production professional
         Given the producer has their own posts

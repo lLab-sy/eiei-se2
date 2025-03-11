@@ -39,8 +39,69 @@ Given('has a target production professional', async function () {
     return matchingLinks.length > 0 ? matchingLinks[Math.floor(Math.random() * matchingLinks.length)] : null;
   });
   if (elementHandle) {
-    console.log('Random matching element found!');
+    console.log('Production professional found!');
     await elementHandle.click(); // Click on the element
     await page.waitForNavigation();
+    await page.waitForSelector('a[href*="/create-offer/"]');
+    await page.click('a[href*="/create-offer/"]');
+    await page.waitForNavigation();
   }
+});
+
+Given('the producer has their own posts', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  await page.waitForSelector('button[aria-controls="radix-:rc:"]');
+  await page.click('button[aria-controls="radix-:rc:"]');
+  await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
+  await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
+});
+
+Given('the producer fills out the offer details', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  await page.waitForSelector('textarea[name="description"]',{ visible: true })
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
+  await page.waitForSelector('input[name="price"]')
+  console.log("Got Price")
+  await page.evaluate(() => {
+    document.querySelector('input[name="price"]').value = '';
+  });
+  await page.type('input[name="price"]', '500');
+  await page.click('button[aria-controls="radix-:rg:"]');
+  await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
+  await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
+});
+
+Given('the producer does not fill out the price', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  await page.waitForSelector('textarea[name="description"]',{ visible: true })
+  await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
+  await page.waitForSelector('button[role="combobox"]')
+  await page.click('button[role="combobox"]');
+  await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
+  await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
+});
+
+When('the producer clicks create offer button', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  await page.waitForSelector('button[aria-haspopup="dialog"]')
+  await page.click('button[aria-haspopup="dialog"]')
+  await page.waitForSelector('div[role="alertdialog"]', { visible: true }); 
+  await page.waitForSelector('button.bg-green-700', { visible: true });
+  console.log("Can Submit")
+  // await page.click('button.bg-green-700');
+});
+
+Then('ensure the system sends an offer to production professional', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  return 'pending';
+});
+
+Then('ensure the system shows the offer in producer post\'s offer list', async function () {
+  // Write code here that turns the phrase above into concrete actions
+  return 'pending';
+});
+
+Then('ensure the system sends a message failed to create an offer with a production professional', function () {
+  // Write code here that turns the phrase above into concrete actions
+  return 'pending';
 });
