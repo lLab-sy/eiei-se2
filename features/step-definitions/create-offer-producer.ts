@@ -1,17 +1,18 @@
-const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
-const puppeteer = require('puppeteer');
-const assert = require('assert');
+import { Given, When, Then } from '@cucumber/cucumber';
+import puppeteer, { Browser, Page, ElementHandle } from 'puppeteer';
+import assert from "assert";
 
-let browser, page;
+let browser: Browser;
+let page: Page;
 
 Given('the producer is logged in', async function () {
-  // Navigate to the login page and simulate login.
   browser = await puppeteer.launch({ headless: false });
   page = await browser.newPage();
   await page.goto("http://localhost:3000/");
-  await page.waitForSelector('button.p-2.hover\\:bg-blue-800'); // Escape ":" in class
+  await page.waitForSelector('button.p-2.hover\\:bg-blue-800');
   await page.click('button.p-2.hover\\:bg-blue-800');
   await page.$eval(`a[href='/login']`, element => element.click());
+
   await page.waitForSelector('input[name="username"]');
   await page.type('input[name="username"]', 'producersan@test.com');
   await page.waitForSelector('input[name="password"]');
@@ -21,26 +22,25 @@ Given('the producer is logged in', async function () {
 });
 
 Given('has a target production professional', async function () {
-  // Simulate selection of a production professional.
-  await page.waitForSelector('button.p-2.hover\\:bg-blue-800'); // Escape ":" in class
+  await page.waitForSelector('button.p-2.hover\\:bg-blue-800');
   await page.click('button.p-2.hover\\:bg-blue-800');
   await page.$eval(`a[href='/professionals']`, element => element.click());
   await page.waitForNavigation();
+
   await page.waitForFunction(() => {
     return [...document.querySelectorAll('a')].some(a => a.href.match(/\/professionals\/\d+/));
   });
-  const elementHandle = await page.evaluateHandle(() => {
-    const links = [...document.querySelectorAll('a')];
 
-    // Filter links that match the pattern '/professionals/{some-id}'
-    const matchingLinks = links.filter(a => a.href.match(/\/professionals\/\d+/));
-    console.log(matchingLinks)
-    // Pick a random link if any exist
-    return matchingLinks.length > 0 ? matchingLinks[Math.floor(Math.random() * matchingLinks.length)] : null;
+  const elementHandle = await page.evaluateHandle(() => {
+    const links = Array.from(document.querySelectorAll('a'))
+      .filter((a) => a.href.match(/\/professionals\/\d+/));
+  
+    return links.length > 0 ? links[Math.floor(Math.random() * links.length)] : null;
   });
-  if (elementHandle) {
-    console.log('Production professional found!');
-    await elementHandle.click(); // Click on the element
+
+  const element = elementHandle.asElement() as ElementHandle<Element>;
+  if (element) {
+    await element.click();
     await page.waitForNavigation();
     await page.waitForSelector('a[href*="/create-offer/"]');
     await page.click('a[href*="/create-offer/"]');
@@ -49,7 +49,6 @@ Given('has a target production professional', async function () {
 });
 
 Given('the producer has their own posts', async function () {
-  // Write code here that turns the phrase above into concrete actions
   await page.waitForSelector('button[aria-controls="radix-:rc:"]');
   await page.click('button[aria-controls="radix-:rc:"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
@@ -57,14 +56,17 @@ Given('the producer has their own posts', async function () {
 });
 
 Given('the producer fills out the offer details', async function () {
-  // Write code here that turns the phrase above into concrete actions
-  await page.waitForSelector('textarea[name="description"]',{ visible: true })
+  await page.waitForSelector('textarea[name="description"]', { visible: true });
   await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
-  await page.waitForSelector('input[name="price"]')
-  console.log("Got Price")
+  
+  await page.waitForSelector('input[name="price"]');
+  console.log("Got Price");
+
   await page.evaluate(() => {
-    document.querySelector('input[name="price"]').value = '';
+    const input = document.querySelector('input[name="price"]') as HTMLInputElement;
+    if (input) input.value = '';
   });
+
   await page.type('input[name="price"]', '500');
   await page.click('button[aria-controls="radix-:rg:"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
@@ -72,36 +74,37 @@ Given('the producer fills out the offer details', async function () {
 });
 
 Given('the producer does not fill out the price', async function () {
-  // Write code here that turns the phrase above into concrete actions
-  await page.waitForSelector('textarea[name="description"]',{ visible: true })
+  await page.waitForSelector('textarea[name="description"]', { visible: true });
   await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field');
-  await page.waitForSelector('button[role="combobox"]')
+
+  await page.waitForSelector('button[role="combobox"]');
   await page.click('button[role="combobox"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
   await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
 });
 
 When('the producer clicks create offer button', async function () {
-  // Write code here that turns the phrase above into concrete actions
-  await page.waitForSelector('button[aria-haspopup="dialog"]')
-  await page.click('button[aria-haspopup="dialog"]')
-  await page.waitForSelector('div[role="alertdialog"]', { visible: true }); 
+  await page.waitForSelector('button[aria-haspopup="dialog"]');
+  await page.click('button[aria-haspopup="dialog"]');
+  await page.waitForSelector('div[role="alertdialog"]', { visible: true });
   await page.waitForSelector('button.bg-green-700', { visible: true });
-  console.log("Can Submit")
-  // await page.click('button.bg-green-700');
+  console.log("Can Submit");
+  await page.click('button.bg-green-700');
 });
 
 Then('ensure the system sends an offer to production professional', async function () {
-  // Write code here that turns the phrase above into concrete actions
-  return 'pending';
+  await page.waitForSelector('li[role="status"][data-state="open"]', { visible: true });
+  const toastMessage = await page.$eval('li[role="status"] .text-sm.font-semibold', el => el.textContent);
+  assert.strictEqual(toastMessage, "Successful post creation");
 });
 
 Then('ensure the system shows the offer in producer post\'s offer list', async function () {
-  // Write code here that turns the phrase above into concrete actions
   return 'pending';
 });
 
-Then('ensure the system sends a message failed to create an offer with a production professional', function () {
-  // Write code here that turns the phrase above into concrete actions
-  return 'pending';
+Then('ensure the system sends a message failed to create an offer with a production professional', async function () {
+  await page.waitForFunction(() => {
+    return Array.from(document.querySelectorAll('p[id$="-form-item-message"]'))
+      .some(el => el.textContent?.includes("Price more than 0."));
+  });
 });
