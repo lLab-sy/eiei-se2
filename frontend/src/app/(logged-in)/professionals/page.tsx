@@ -29,7 +29,9 @@ const ProfessionalsPage = () => {
         var response;
         console.log(requestPage + requestFilter);
         try{
+          console.log("Getting Professionals...")
           response= await getProfessionals(requestPage + requestFilter)
+          console.log("getProfessionals response",response)
         }catch(error){
           setTotalPages(1);
           handlePageChange(1);
@@ -37,7 +39,6 @@ const ProfessionalsPage = () => {
           setProfesstionalsCurrentPage(null);
           console.log("Request Not Found");
         }
-
         if (response) {
           setDataResponse(response);
         }

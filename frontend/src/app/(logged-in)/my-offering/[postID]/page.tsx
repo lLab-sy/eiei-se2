@@ -1,5 +1,3 @@
-// frontend/src/app/(logged-in)/my-offering/[postID]/page.tsx
-
 "use client";
 import { historyStateInterface } from "@/components/HistoryProduction";
 import { Button } from "@/components/ui/button";
@@ -8,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { PostData } from "../../../../../interface";
+import { OfferData, PostData } from "../../../../../interface";
 
 // นำเข้า mock data
 import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
@@ -57,8 +55,8 @@ export default function OfferPostContent() {
     [],
   );
   const [userRole, setUserRole] = useState<
-    "producer" | "production professional"
-  >("producer");
+    "producer" | "production professional" | ""
+  >("");
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<
     string | null
   >(null);
@@ -321,9 +319,9 @@ export default function OfferPostContent() {
 
 //*********************************** */
 const token =session?.user.token
-const [postState, setPostState] = useState<PostData | null>(null);
+// const [postState, setPostState] = useState<PostData | null>(null);
 const userID= session?.user.id
-const userRole =session?.user.role
+// const userRole =session?.user.role
 const [error, setError] = useState<string | null>(null);
 const [professionalOffers,setProfessionalOffers] =useState<OfferData[]|null>(null)
 const [postImageState, setPostImageState] = useState<string>('')
@@ -332,7 +330,8 @@ useEffect(() => {
     try {
       let response;
       if (userRole === "producer") {
-        response = await getPrudcerOffers(token); // ดึงโพสต์ของ producer
+        console.log('userRole1', userRole)
+        response = await getPrudcerOffers(token ?? ""); // ดึงโพสต์ของ producer
       } else if (userRole === "production professional") {
         const handleFetch = async (postID: string) => {
           const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postID}`;
@@ -342,7 +341,7 @@ useEffect(() => {
           const postImageDisplay = res?.data?.data?.postImageDisplay?.[0]
           // console.log('postImageDisplay', postImageDisplay)
           // console.log('imageDisplayUrl', postImageDisplay.imageUrl)
-          setPostImageState(res?.data?.data?.postImageDisplay?.[0].imageURL ?? "")
+          // setPostImageState(res?.data?.data?.postImageDisplay?.[0].imageURL ?? "")
           
         };
         handleFetch(postID);
@@ -407,9 +406,11 @@ useEffect(() => {
 
   useEffect(() => {
     // สมมติว่าเราดึงบทบาทของผู้ใช้จาก session หรือ Redux store
-    const role = session?.user?.role || "producer"; // สมมติว่าเป็น producer ในตัวอย่างนี้
+    console.log('sessionMyOffer', session)
+    const role = session?.user?.role// สมมติว่าเป็น producer ในตัวอย่างนี้
+    
     setUserRole(role as "producer" | "production professional");
-
+    console.log('userRoleAfter', userRole)
     if (role === "producer") {
       // เลือก professional คนแรกโดยค่าเริ่มต้น (ถ้ามี)
       if (professionals.length > 0) {
@@ -423,16 +424,16 @@ useEffect(() => {
       }
     } else if (role === "production professional") {
       // ถ้าเป็น professional ให้ใช้ข้อเสนอของ professional คนนั้น
-      setOfferArray(myProfessionalOffers);
+      // setOfferArray(myProfessionalOffers);
     }
   }, [session]);
 
   const [postState, setPostState] = useState<PostData | null>(null);
 
-  useEffect(() => {
-    // ใช้ mock data แทนการเรียก API จริง
-    setPostState(mockPostDetail);
-  }, []);
+  // useEffect(() => {
+  //   // ใช้ mock data แทนการเรียก API จริง
+  //   setPostState(mockPostDetail);
+  // }, []);
 
   // เมื่อเลือก professional
   const handleSelectProfessional = (professionalId: string) => {

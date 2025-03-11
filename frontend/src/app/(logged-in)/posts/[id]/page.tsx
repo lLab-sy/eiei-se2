@@ -167,6 +167,8 @@ const PostDetail = () => {
     email: ownerResponse?.email || "N/A",
     phoneNumber: ownerResponse?.phoneNumber || "N/A",
   };
+  console.log("dataReview: ",dataReviews)
+  console.log("post data", PostInfo)
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
