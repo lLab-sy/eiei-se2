@@ -38,7 +38,7 @@ export default function PostToOffer({
   });
 
   // ข้อมูลจำลองสำหรับ Producer
-  const applicantsCount = (post.participant).length; // จำนวนผู้สมัครทั้งหมด (สำหรับตัวอย่าง)
+  const applicantsCount = (post?.participants).length; // จำนวนผู้สมัครทั้งหมด (สำหรับตัวอย่าง)
   const offersCount = 3; // จำนวนข้อเสนอ (สำหรับตัวอย่าง)
 
   return (

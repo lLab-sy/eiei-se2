@@ -783,7 +783,7 @@ export default function UserPage() {
           </CardContent>
         </Card>
         {
-          (user.user.role !== 'producer') ?
+          (user.user.role === 'production professional') ?
           <Card className='w-[535px] h-[800px] relative'>
           <CardHeader>
               <CardTitle>Your Review</CardTitle>
