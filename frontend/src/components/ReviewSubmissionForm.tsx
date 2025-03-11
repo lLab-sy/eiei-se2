@@ -1,5 +1,3 @@
-// frontend/src/components/ReviewSubmissionForm.tsx
-
 "use client";
 
 import React, { SetStateAction, Dispatch, useEffect, useState } from "react";
@@ -20,7 +18,6 @@ import ReviewComment from "./ReviewComment";
 import ReviewProfessionalList from "./ReviewProfessionalList";
 import getPostParticipants from "@/libs/getPostParticipants";
 import { PostParticipant } from "../../interface";
-import axios from "axios";
 import { useSession } from "next-auth/react";
 
 const formSchema = z.object({
@@ -41,18 +38,13 @@ const formSchema = z.object({
     .or(z.literal("unneeded")),
 });
 
-// Fallback mock data ในกรณีที่ API ไม่ทำงาน
+// Fallback mock data
 const mockProductionProfList = [
   { label: "Klein Swatee - Cameraman", value: "67b1a81ded193cb7b3dd94bb" },
   { label: "Maggeline Brent - Lighting", value: "67b1a81ded193cb7b3dd94b2" },
   { label: "Johny Stafrod - Prop Master", value: "67b1a81ded193ab7b3dd94bb" },
   { label: "Czesky Wolfenmacht - Director", value: "67b1a81d28193cb7b3dd94bb" },
 ];
-
-// interface Participant {
-//   id: string;
-//   label: string;
-// }
 
 interface ReviewSubmissionFormProps {
   role: string;
@@ -64,7 +56,7 @@ interface ReviewSubmissionFormProps {
     title: string;
     description: string;
   }) => void;
-  postId?: string; // เพิ่ม postId เป็น optional parameter
+  postId?: string;
 }
 
 const ReviewSubmissionForm = ({
@@ -76,73 +68,96 @@ const ReviewSubmissionForm = ({
   postId,
 }: ReviewSubmissionFormProps) => {
   const [participants, setParticipants] = useState<PostParticipant[]>([]);
-  console.log("Participants:", participants);
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
   const token = session?.user?.token;
-  console.log("Token:", token);
-
-  // เพิ่มฟังก์ชัน handleClick
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       comment: "",
       rating: 0,
-      production: role === "producer" ? undefined : "unneeded",
+      production: role === "producer" ? "" : "unneeded",
     },
   });
 
-  useEffect(() => {
-    if (isOpen && role === "producer" && postId) {
-      if (!token) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Authentication token is missing. Please log in.",
-        });
-        setLoading(false);
-        return;
-      }
+  // ฟังก์ชันเพื่อป้องกันการปิด Dialog เมื่อคลิกภายใน
+  const handleDialogClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
+  // ดึงข้อมูล participants เมื่อ Dialog เปิด
+  useEffect(() => {
+    if (isOpen && role === "producer" && postId && token) {
       setLoading(true);
 
-      getPostParticipants(postId)
+      getPostParticipants(postId, token)
         .then((response) => {
-          if (response.status === "success") {
-            setParticipants(response.data);
+          if (response.status === "success" && Array.isArray(response.data)) {
+            console.log("API response data:", response.data);
+
+            // ตรวจสอบว่าข้อมูลมีรูปแบบที่ถูกต้องหรือไม่
+            const validParticipants = response.data
+              .map((item) => {
+                // ถ้าข้อมูลไม่มี label หรือ value ให้สร้างจาก id และ label ที่มี
+                if (!item.value && item.id) {
+                  return { ...item, value: item.id };
+                }
+                return item;
+              })
+              .filter((item) => item.label && item.value);
+
+            console.log("Processed participants:", validParticipants);
+            setParticipants(validParticipants);
+
+            // ตั้งค่าเริ่มต้นทันทีหลังได้ข้อมูล
+            if (validParticipants.length > 0) {
+              console.log("Setting default value:", validParticipants[0].value);
+              // ใช้ setTimeout เพื่อให้แน่ใจว่าการอัพเดทค่าเกิดหลังจาก render รอบแรก
+              setTimeout(() => {
+                form.setValue("production", validParticipants[0].value, {
+                  shouldValidate: true,
+                });
+                form.trigger("production"); // ทริกเกอร์การตรวจสอบฟอร์ม
+              }, 0);
+            }
           } else {
+            console.error("Unexpected API response format:", response);
             toast({
               variant: "destructive",
               title: "Error",
               description: "Failed to load production professionals.",
             });
+            // ใช้ mock data เป็น fallback
+            setParticipants(mockProductionProfList);
+            form.setValue("production", mockProductionProfList[0].value, {
+              shouldValidate: true,
+            });
           }
         })
         .catch((error) => {
-          console.error("Full error details:", error);
-          console.error("Error message:", error.message);
-          console.error("Error stack:", error.stack);
+          console.error("Error fetching participants:", error);
           toast({
             variant: "destructive",
             title: "Error",
-            description:
-              error.message || "Failed to load production professionals",
+            description: "Failed to load production professionals.",
+          });
+          // ใช้ mock data เป็น fallback
+          setParticipants(mockProductionProfList);
+          form.setValue("production", mockProductionProfList[0].value, {
+            shouldValidate: true,
           });
         })
         .finally(() => {
           setLoading(false);
         });
     }
-  }, [isOpen, postId, role, toast]);
+  }, [isOpen, postId, role, token, form, toast]);
 
   const commentValue = form.watch("comment");
 
   return (
-    <div onClick={handleClick}>
+    <div onClick={handleDialogClick}>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -151,27 +166,26 @@ const ReviewSubmissionForm = ({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="space-y-6 py-4">
-                <div className="space-y-2">
-                  {role === "producer" && (
-                    <>
-                      {loading ? (
-                        <div className="flex items-center justify-center py-4">
-                          <span className="animate-spin mr-2">⏳</span>
-                          <span>Loading professionals...</span>
-                        </div>
-                      ) : (
-                        <ReviewProfessionalList
-                          form={form}
-                          productionList={
-                            participants.length > 0
-                              ? participants
-                              : mockProductionProfList
-                          }
-                        />
-                      )}
-                    </>
-                  )}
-                </div>
+                {role === "producer" && (
+                  <div className="space-y-2">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-4">
+                        <span className="loading loading-spinner mr-2"></span>
+                        <span>Loading professionals...</span>
+                      </div>
+                    ) : (
+                      <ReviewProfessionalList
+                        form={form}
+                        productionList={
+                          participants.length > 0
+                            ? participants
+                            : mockProductionProfList
+                        }
+                      />
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <FormField
                     control={form.control}
@@ -202,7 +216,38 @@ const ReviewSubmissionForm = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Submit Review</Button>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    // เพิ่ม log เพื่อ debug
+                    const values = form.getValues();
+                    console.log("Submit with values:", values);
+                    console.log("Form state:", form.formState);
+
+                    if (!values.production && role === "producer") {
+                      e.preventDefault();
+                      toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Please select a production professional.",
+                      });
+                      return;
+                    }
+
+                    if (values.rating < 1) {
+                      e.preventDefault();
+                      toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Please provide a rating.",
+                      });
+                      return;
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  Submit Review
+                </Button>
               </DialogFooter>
             </form>
           </Form>
