@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
     user: {},
-    profileImageURL : "",
+    profileImageURL : "/",
 }
 
 export const userSlice = createSlice({
@@ -14,9 +14,13 @@ export const userSlice = createSlice({
         },
         setProfileImageURL: (state, action) => {
             state.profileImageURL = action.payload
+        },
+        clearStorage: (state, action) => {
+            state.user = {}
+            state.profileImageURL = "/"
         }
     }
 })
 
-export const { setUser, setProfileImageURL } = userSlice.actions
+export const { setUser, setProfileImageURL, clearStorage } = userSlice.actions
 export default userSlice.reducer;
