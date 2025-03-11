@@ -85,7 +85,7 @@ class PostController {
       const post= await postService.createPost(req.body)
       sendResponse(res.status(201), 'success',post, 'Successfully created posts');
     } catch (err) {
-      sendResponse(res, 'error', err, 'Failed to created posts');
+      sendResponse(res, 'error', err, 'Failed to created posts', 500);
     }
   };
   
