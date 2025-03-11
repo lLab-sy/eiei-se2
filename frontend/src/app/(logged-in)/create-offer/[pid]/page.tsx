@@ -3,7 +3,7 @@
 import { use } from "react";
 import PostSelect from "@/components/PostSelect";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { OfferHistoryData, PostData } from "../../../../../interface";
+import { OfferHistoryData, PostData, UserData } from "../../../../../interface";
 import { useEffect, useState } from "react";
 import OfferInformation from "@/components/OfferInformation";
 import getPostUser from "@/libs/getPostsUser";
@@ -13,6 +13,7 @@ import { FaHistory } from "react-icons/fa";
 import OfferHistoryMinimal from "@/components/OfferHistoryMinimal";
 import { OfferHistoryMinimal2 } from "@/components/OfferHistoryMinimal2";
 import getOfferHistory from "@/libs/getOffersHistory";
+import getUser from "@/libs/getUser";
 
 const mockOfferHistory: OfferHistoryData[] = [
     {
@@ -80,6 +81,7 @@ const mockOfferHistory: OfferHistoryData[] = [
     const mockImages = ["/image/logo.png", "/image/logo.png", "/image/logo.png"];
     const [postData, setPostData] = useState<PostData[] | null>();
     const [offerData,setOfferData]= useState<OfferHistoryData[]|null>();
+    const [userData,setUserData]= useState<UserData|null>(null);
     const [postSelect, setPostSelect] = useState<PostData | null>();
     const [showOfferHistory, setShowOfferHistory] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -112,14 +114,18 @@ const mockOfferHistory: OfferHistoryData[] = [
         try {
           let response;
           let resonponseOffer;
+          var userResponse;
 
           if (userRole === "producer") {
             response = await getPostUser(userID); // ดึงโพสต์ของ producer
+            userResponse = await getUser(pid);
             // resonponseOffer= await getOfferHistory(token,pid); 
           } else if (userRole === "production professional") {
             response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+            userResponse = await getUser(userID);
             // resonponseOffer= await getOfferHistory(token,userID); 
           }
+          setUserData(userResponse)
           console.log("respons",response)
           if (response) {
             const posts =
@@ -150,7 +156,7 @@ const mockOfferHistory: OfferHistoryData[] = [
       );
     }
   
-    if (!postSelect || !postData) {
+    if (!postSelect || !postData || !userData) {
       return (
         <div className="flex justify-center items-center min-h-screen">
           <p className="text-lg">Loading posts...</p>
@@ -165,8 +171,8 @@ const mockOfferHistory: OfferHistoryData[] = [
           <CardHeader className="justify-between flex flex-row">
             <CardTitle className="flex">
               {userRole === "producer"
-                ? `Create Offer to ${pid} `
-                : `${pid} (Owner)`}
+                ? `Create Offer to ${userData?.username} `
+                : `${userData?.username} (Owner)`}
               {/* รอแก้ Project Owner */}
             </CardTitle>
             {/* <FaHistory
