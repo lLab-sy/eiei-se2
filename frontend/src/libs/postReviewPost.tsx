@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ReviewData } from "../../interface";
 
-export default async function postReviewProfessional(
+export default async function postReviewPost(
   data: ReviewData,
   token: string,
   postId: string,
