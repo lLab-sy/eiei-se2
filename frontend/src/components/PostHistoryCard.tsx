@@ -241,6 +241,7 @@ export default function PostHistoryCard({
         setIsOpen={setIsOpen}
         onSubmit={onSubmit}
         toast={toast}
+        postId={post.id}
       />
     </div>
   );
