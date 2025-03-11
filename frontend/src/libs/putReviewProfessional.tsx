@@ -4,9 +4,10 @@ import { ReviewData } from "../../interface";
 export default async function putReviewProfessional(
   data: ReviewData,
   token: string,
-  pId: string,
+  // pId: string,
+  professionalId: string,
 ) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${pId}/addReview`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/${professionalId}/addReview`;
 
   const response = await axios.put(apiUrl, data, {
     withCredentials: true,
@@ -15,6 +16,8 @@ export default async function putReviewProfessional(
       "Content-Type": "application/json",
     },
   });
+
+  console.log("INPUT", data, token, professionalId);
 
   if (!response) {
     throw new Error("Failed to submit professional review");

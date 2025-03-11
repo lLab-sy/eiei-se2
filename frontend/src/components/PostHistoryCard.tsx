@@ -6,7 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { z } from "zod";
 // นำเข้าฟังก์ชัน reviewPost
-import postReviewProfessional from "@/libs/postReviewPost";
+import postReviewPost from "@/libs/postReviewPost";
+import putReviewProfessional from "@/libs/putReviewProfessional";
 // ถ้ามีการใช้ cookie หรือ session ต้องนำเข้า
 import { useSession } from "next-auth/react"; // หรือวิธีที่คุณใช้ในการจัดการสถานะการเข้าสู่ระบบ
 
@@ -82,22 +83,30 @@ export default function PostHistoryCard({
       let response;
 
       if (role === "producer") {
+        const professionalId = values.production;
         // Producer is reviewing a Production Professional
         // ส่วนนี้ต้องมีการสร้าง function reviewProfessional แยกต่างหาก
         // ไว้สำหรับกรณีที่ producer รีวิว production professional
-        toast({
-          variant: "destructive",
-          title: "Feature not implemented",
-          description: "Producer review feature is not implemented yet.",
-        });
-        return;
+        console.log("INPUT", reviewData, token, professionalId);
+        response = await putReviewProfessional(
+          reviewData,
+          token,
+          professionalId,
+        );
+
+        // toast({
+        //   variant: "destructive",
+        //   title: "Feature not implemented",
+        //   description: "Producer review feature is not implemented yet.",
+        // });
+        // return;
       } else {
         // Production Professional is reviewing a post
-        // ใช้ฟังก์ชัน postReviewProfessional ที่เราสร้างขึ้น
+        // ใช้ฟังก์ชัน postReviewPost ที่เราสร้างขึ้น
         // ดึง token จาก localStorage แทนการใช้ session
         // const token = localStorage.getItem("token") || "";
 
-        response = await postReviewProfessional(reviewData, token, post.id);
+        response = await postReviewPost(reviewData, token, post.id);
       }
 
       if (!response) {
