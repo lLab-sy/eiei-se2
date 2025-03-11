@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import { FaHistory } from "react-icons/fa";
 import OfferHistoryMinimal from "@/components/OfferHistoryMinimal";
 import { OfferHistoryMinimal2 } from "@/components/OfferHistoryMinimal2";
+import getOfferHistory from "@/libs/getOffersHistory";
 
 const mockOfferHistory: OfferHistoryData[] = [
     {
@@ -78,6 +79,7 @@ const mockOfferHistory: OfferHistoryData[] = [
 
     const mockImages = ["/image/logo.png", "/image/logo.png", "/image/logo.png"];
     const [postData, setPostData] = useState<PostData[] | null>();
+    const [offerData,setOfferData]= useState<OfferHistoryData[]|null>();
     const [postSelect, setPostSelect] = useState<PostData | null>();
     const [showOfferHistory, setShowOfferHistory] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -109,18 +111,26 @@ const mockOfferHistory: OfferHistoryData[] = [
       const fetchData = async () => {
         try {
           let response;
+          let resonponseOffer;
+
           if (userRole === "producer") {
             response = await getPostUser(userID); // ดึงโพสต์ของ producer
+            // resonponseOffer= await getOfferHistory(token,pid); 
           } else if (userRole === "production professional") {
             response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+            // resonponseOffer= await getOfferHistory(token,userID); 
           }
           console.log("respons",response)
           if (response) {
             const posts =
               userRole === "producer" ? response : [response];
             setPostData(posts);
-            console.log("OKAY",posts[0].postImages)
+            // console.log("OKAY",posts[0].postImages)
             setPostSelect(posts[0] || null);
+
+
+            // const res2= getOfferHistory(token,pid);
+            // setOfferData(resonponseOffer)
           }
         } catch (err) {
           setError("Failed to load posts. Please try again later.");
