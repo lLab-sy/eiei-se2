@@ -37,16 +37,14 @@ class PostRepository {
       const posts = await Post.aggregate([
         {
           $match: {
-            objectId,
+            userID: objectId,
             postStatus: "success",
           },
         },
         {
           $addFields: {
             roleCount: { $size: "$postProjectRoles" },
-            postProjectRoles: {
-              $slice: ["$postProjectRoles", 3],
-            },
+            postProjectRoles: { $slice: ["$postProjectRoles", 3] },
           },
         },
         {
@@ -59,7 +57,7 @@ class PostRepository {
         },
         {
           $addFields: {
-            postProjectRoles: "$roleDetails.roleName",
+            postProjectRoles: "$roleDetails.roleName", // Extract role names only
           },
         },
         {
@@ -72,40 +70,26 @@ class PostRepository {
         },
         {
           $addFields: {
-            postMediaType: {
-              $arrayElemAt: ["$mediaDetails.mediaName", 0],
-            },
+            postMediaType: { $arrayElemAt: ["$mediaDetails.mediaName", 0] }, // Extract first mediaName
           },
         },
-        { $sort: { roleCount: -1 } },
+        {
+          $sort: {
+            roleCount: -1,
+          },
+        },
         {
           $project: {
             _id: 1,
             postName: 1,
             postDescription: 1,
             postImages: 1,
-            postMediaType: 1,
+            postMediaType: 1, // Show mediaName instead of postMediaType
             postStatus: 1,
             startDate: 1,
             endDate: 1,
             postProjectRoles: 1,
             roleCount: 1,
-            participants: 1,
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "participants.participantID",
-            foreignField: "_id",
-            as: "userDetail",
-          },
-        },
-        {
-          $project: {
-            "userDetail.password": 0,
-            "userDetail.skill": 0,
-            "userDetail.rating": 0,
           },
         },
       ]);
@@ -113,6 +97,50 @@ class PostRepository {
       return posts;
     } catch (error) {
       throw new Error("Error fetching user posts from repository: " + error);
+    }
+  }
+
+  // เพิ่มฟังก์ชันนี้ใน postRepository.ts
+  public async getPostParticipants(postId: string) {
+    try {
+      const objectId = new ObjectId(postId);
+      const post = await Post.findById(objectId)
+        .populate({
+          path: "participants.participantID",
+          select: "username _id",
+        })
+        .populate({
+          path: "participants.offer.role",
+          select: "roleName",
+        });
+
+      if (!post) {
+        throw new Error("Post not found");
+      }
+
+      // กรองเฉพาะ participants ที่มีสถานะ "candidate"
+      const participants = post.participants.filter(
+        (p) => p.status === "candidate"
+      );
+      return participants.map((participant) => {
+        // หาบทบาทล่าสุดจาก offers (ถ้ามี)
+        const latestOffer =
+          participant.offer && participant.offer.length > 0
+            ? participant.offer[participant.offer.length - 1]
+            : null;
+
+        const roleName =
+          latestOffer && latestOffer.role
+            ? (latestOffer.role as any).roleName
+            : "Unknown Role";
+
+        return {
+          id: (participant.participantID as any)._id.toString(),
+          label: `${(participant.participantID as any).username} - ${roleName}`,
+        };
+      });
+    } catch (error) {
+      throw new Error("Error fetching post participants: " + error);
     }
   }
 

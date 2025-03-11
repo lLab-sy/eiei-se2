@@ -237,6 +237,16 @@ class PostService {
     }
   }
 
+  // เพิ่มฟังก์ชันนี้ใน postService.ts
+  async getPostParticipants(postId: string) {
+    try {
+      const participants = await postRepository.getPostParticipants(postId);
+      return participants;
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+
   async createPost(postData: PostDTO) {
     try {
       // map to model before pass it to repository

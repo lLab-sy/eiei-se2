@@ -2,14 +2,13 @@
 
 "use client";
 
-import React, { SetStateAction, Dispatch, useEffect } from "react";
+import React, { SetStateAction, Dispatch, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
@@ -19,6 +18,10 @@ import { useForm } from "react-hook-form";
 import StarRating from "./StarRating";
 import ReviewComment from "./ReviewComment";
 import ReviewProfessionalList from "./ReviewProfessionalList";
+import getPostParticipants from "@/libs/getPostParticipants";
+import { PostParticipant } from "../../interface";
+import axios from "axios";
+import { useSession } from "next-auth/react";
 
 const formSchema = z.object({
   comment: z
@@ -38,19 +41,18 @@ const formSchema = z.object({
     .or(z.literal("unneeded")),
 });
 
+// Fallback mock data ในกรณีที่ API ไม่ทำงาน
 const mockProductionProfList = [
   { label: "Klein Swatee - Cameraman", value: "67b1a81ded193cb7b3dd94bb" },
   { label: "Maggeline Brent - Lighting", value: "67b1a81ded193cb7b3dd94b2" },
   { label: "Johny Stafrod - Prop Master", value: "67b1a81ded193ab7b3dd94bb" },
   { label: "Czesky Wolfenmacht - Director", value: "67b1a81d28193cb7b3dd94bb" },
-  { label: "Ellen Joe - Stunt Specialist", value: "67b2a814ed195cbdb3de94ba" },
-  { label: "Zhu Yuan - Stunt Specialist", value: "67b2a114e41952bdb3de94ba" },
-  {
-    label: "Donald Tim Johnson - Marketing",
-    value: "67b2a814ed251cbdb3de94ba",
-  },
-  { label: "Kosuke Sato - Writer", value: "67b2a811ed291cbdb34294ba" },
 ];
+
+// interface Participant {
+//   id: string;
+//   label: string;
+// }
 
 interface ReviewSubmissionFormProps {
   role: string;
@@ -62,6 +64,7 @@ interface ReviewSubmissionFormProps {
     title: string;
     description: string;
   }) => void;
+  postId?: string; // เพิ่ม postId เป็น optional parameter
 }
 
 const ReviewSubmissionForm = ({
@@ -70,7 +73,16 @@ const ReviewSubmissionForm = ({
   setIsOpen,
   onSubmit,
   toast,
+  postId,
 }: ReviewSubmissionFormProps) => {
+  const [participants, setParticipants] = useState<PostParticipant[]>([]);
+  console.log("Participants:", participants);
+  const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
+  const token = session?.user?.token;
+  console.log("Token:", token);
+
+  // เพิ่มฟังก์ชัน handleClick
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
   };
@@ -85,9 +97,47 @@ const ReviewSubmissionForm = ({
   });
 
   useEffect(() => {
-    console.log(isOpen);
-    if (isOpen) form.reset();
-  }, [isOpen]);
+    if (isOpen && role === "producer" && postId) {
+      if (!token) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Authentication token is missing. Please log in.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      getPostParticipants(postId)
+        .then((response) => {
+          if (response.status === "success") {
+            setParticipants(response.data);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to load production professionals.",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Full error details:", error);
+          console.error("Error message:", error.message);
+          console.error("Error stack:", error.stack);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description:
+              error.message || "Failed to load production professionals",
+          });
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [isOpen, postId, role, toast]);
 
   const commentValue = form.watch("comment");
 
@@ -103,10 +153,23 @@ const ReviewSubmissionForm = ({
               <div className="space-y-6 py-4">
                 <div className="space-y-2">
                   {role === "producer" && (
-                    <ReviewProfessionalList
-                      form={form}
-                      productionList={mockProductionProfList}
-                    />
+                    <>
+                      {loading ? (
+                        <div className="flex items-center justify-center py-4">
+                          <span className="animate-spin mr-2">⏳</span>
+                          <span>Loading professionals...</span>
+                        </div>
+                      ) : (
+                        <ReviewProfessionalList
+                          form={form}
+                          productionList={
+                            participants.length > 0
+                              ? participants
+                              : mockProductionProfList
+                          }
+                        />
+                      )}
+                    </>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -125,7 +188,8 @@ const ReviewSubmissionForm = ({
                 <div className="space-y-2">
                   <ReviewComment form={form} />
                   <p className="text-sm text-gray-500">
-                    {commentValue.replace(/^\s+/, "").length}/1000 characters
+                    {commentValue?.replace(/^\s+/, "").length || 0}/1000
+                    characters
                   </p>
                 </div>
               </div>
