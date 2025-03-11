@@ -18,6 +18,8 @@ export interface historyStateInterface {
   status: string,
 }
 export default function HistoryProduction({userId, session} : {userId: string, session : any}) {
+  const token = session?.session?.user?.token;
+  console.log('tokenHistory', token)
   const mockData = [
     {
         role: "Professional",
@@ -42,9 +44,15 @@ export default function HistoryProduction({userId, session} : {userId: string, s
     }
     const handleFetch = async (userId : string, postStatus: string) => {
       const query = `?userId=${userId}&postStatus=${postStatus}&limit=10&page=1`
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/get-offer${query}`;
-      const res = await axios.get(apiUrl)
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+      const res = await axios.get(apiUrl, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setHistoryState(res?.data?.data?.data)
+      console.log('resHistory', res)
     } 
     handleFetch(userId, "created")
   }, [session?.session])
@@ -78,7 +86,7 @@ export default function HistoryProduction({userId, session} : {userId: string, s
           <div className=''>
             {
               (historyState && historyState.length > 0) ? historyState.map((data, index) => (
-                <div key={index} onClick={() => clickRead(index)}>
+                <div key={index} className='mt-2' onClick={() => clickRead(index)}>
                   <HistoryProductionContent key={index} data={data}/>
                 </div>
               )) : ""

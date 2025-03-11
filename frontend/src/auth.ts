@@ -1,6 +1,8 @@
 import axios from "axios"
 import NextAuth from "next-auth"
 import Credentials from 'next-auth/providers/credentials' 
+// import Cookies from 'js-cookie'
+import { cookies } from 'next/headers'
 export const loginUser = async (data: {username:string, password:string}) => {
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`
     const dataPost = {
@@ -8,13 +10,12 @@ export const loginUser = async (data: {username:string, password:string}) => {
         password: data.password,
     }
     const res = await axios.post(apiUrl, dataPost)
-
+    
     // data => token + user => id + username + role
     if(res.status !== 200 || !res.data){
         throw new Error('Cannot find User data')
         
     }
-
 
     return res.data;
 }
@@ -41,7 +42,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 if (!user || user?.status === 'error') {
                     throw new Error("Invalid username or password");
                 }
-        
+                const token = user.data.token
+                const cookieStore = await cookies()
+                cookieStore.set('token', token, {maxAge: 6*60*60})
+                // Cookies.set('token', token, {secure : true})
                 return {
                     // id from mongo
                     id: user.data.user.id,
@@ -57,6 +61,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
 
   ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 6 * 60 * 60,
+  },
   callbacks:{
     jwt({token, user} : {token : any, user : any}){
         if(user){
@@ -72,7 +80,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             session.user.id = token.id as string;
             session.user.username = token.username;
             session.user.role = token.role;
-            session.user.token = token.token    
+            // session.user.token = token.token    
         }
         return session
     },

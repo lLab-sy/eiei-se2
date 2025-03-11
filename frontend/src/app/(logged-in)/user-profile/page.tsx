@@ -101,7 +101,6 @@ export default function UserPage() {
   // Redux State
   const user: any = useSelector<RootState>((state) => state.user);
   const dispatch = useDispatch<AppDispatch>();
-
   const userData: any = user.user;
   console.log("userData", userData);
   console.log("user", user);

@@ -10,15 +10,67 @@ import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import axios from "axios";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import HistoryProduction from "./HistoryProduction";
-
+import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import Cookies from 'js-cookie'
 type menuItem = {
   icon: JSX.Element;
   label: string;
   href: string;
 }
-
+const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, handleSignOut: Function}) => {
+  return (
+    <div>
+      <Dialog>
+        <DialogTrigger asChild>
+          {/* <Link href='/'>Logout</Link> */}
+          <Link
+                href={'/'}
+                className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                  "text-red-600 hover:text-red-700"
+                }`}
+                onClick={ async () => setIsMenuOpen(false)}
+              >
+                <LogOut className="w-5 h-5"/>
+                <span>Logout</span>
+            </Link>
+          {/* <Button variant="outline">Edit Profile</Button> */}
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Logout</DialogTitle>
+          </DialogHeader>
+          <div className="gap-4 py-4">
+            <span>Are you sure?</span>
+            
+          </div>
+          <DialogFooter>
+            <div className=' w-full text-white flex flex-row justify-between'>
+                <Button className='bg-red-600'>No</Button>
+                <Button onClick={async () => {
+                  await handleSignOut()
+                }} className='bg-green-400'>Yes</Button>
+            </div>
+          </DialogFooter>  
+        </DialogContent>
+        
+      </Dialog>
+    </div>
+  )
+}
 const NavBar = (session: any) => {
-  const token = session?.session?.user?.token ?? '';
+  const token = Cookies.get('token') ?? '';
   const role = session?.session?.user?.role ?? '';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<menuItem[]>([])
@@ -26,7 +78,10 @@ const NavBar = (session: any) => {
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
   console.log('session', session)
-  
+  const handleSignOut = async () => {
+    await signOut()
+  }
+  // const token = Cookies.get()
   // const handleLogout = async () => {
   //   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
   //   await axios.post(apiUrl, {
@@ -39,7 +94,11 @@ const NavBar = (session: any) => {
   // }
   // console.log('session',session.session)
   useEffect(() => {
+    const handleSignoutEffect = async () => {
+      await handleSignOut()
+    }
     if(!session.session || token === ''){
+      // handleSignoutEffect()
       return;
     }
     // set token and set user from fetch data
@@ -51,6 +110,7 @@ const NavBar = (session: any) => {
       dispatch(setProfileImageURL(imageUrl))
       return imageUrl
     }
+  
     const handleFetch = async (fetchToken : string) => {
 
       const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`
@@ -122,7 +182,6 @@ const NavBar = (session: any) => {
       },
     ]
     setMenuItems(sessionMenuItems)},[session.session,token]);
-
   return (
     <header className="bg-[#2B428C] text-white fixed m-auto w-[100%] z-50">
       <div className="flex justify-between items-center h-16 bg-[#2B428C] text-white">
@@ -206,16 +265,40 @@ const NavBar = (session: any) => {
               <span>{item.label}</span>
             </Link>
           ))}
-          <Link
-              href={(session.session) ? '/api/auth/signout' : "/login"}
+          {
+            session?.session ? 
+            <DialogLogout handleSignOut={handleSignOut} setIsMenuOpen={setIsMenuOpen}/>
+            :
+            <Link
+                href={(session.session) ? '/' : "/login"}
+                className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                  session.session ? "text-red-600 hover:text-red-700" : ""
+                }`}
+                onClick={ async () => setIsMenuOpen(false)}
+              >
+                {session ? (<LogOut className="w-5 h-5"/>) : (<LogIn className="w-5 h-5"/>)}
+                <span>{(session.session) ? "Logout" : "Login"}</span>
+            </Link>
+          }
+          {/* <Link
+              href={(session.session) ? '/' : "/login"}
               className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
                 session.session ? "text-red-600 hover:text-red-700" : ""
               }`}
-              onClick={() => setIsMenuOpen(false)}
+              onClick={ async () => {
+                if(session.session){
+                  setIsMenuOpen(false)
+                  await handleSignOut()
+                  
+                }
+                else{
+                  setIsMenuOpen(false)
+                }
+              }}
             >
               {session ? (<LogOut className="w-5 h-5"/>) : (<LogIn className="w-5 h-5"/>)}
               <span>{(session.session) ? "Logout" : "Login"}</span>
-          </Link>
+          </Link> */}
         </div>
       </div>
 

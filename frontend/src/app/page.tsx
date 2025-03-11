@@ -2,6 +2,7 @@ import Banner from "@/components/Banner";
 import ShortKeyList from "@/components/ShortKeyList";
 import MovieList from "@/components/MovieList";
 import ProfessionalList from "@/components/ProfessionalList";
+import getTokenObject from "@/libs/getToken";
 
 export default function Home() {
   return (
