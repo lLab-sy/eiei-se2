@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { PostData } from "../../../../../interface";
+import { OfferData, PostData } from "../../../../../interface";
 
 // นำเข้า mock data
 import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
@@ -21,6 +21,7 @@ import OfferHistory from "@/components/OfferHistory";
 import ComparisonView from "@/components/ComparisonView";
 import PostDetail from "@/components/PostDetail";
 import getPostById from "@/libs/getPostById";
+import getPrudcerOffers from "@/libs/getProducerOffers";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -118,7 +119,7 @@ export default function OfferPostContent() {
       status: "in-progress",
     },
   ];
-
+ 
   // Mock data สำหรับข้อเสนอของแต่ละ Professional
   const mockProfessionalOffers = {
     prof1: [
@@ -314,12 +315,34 @@ export default function OfferPostContent() {
   };
 
 //------------------------------------------------------------------------------------
-const [postState, setPostState] = useState<PostData | null>(null);
 
+//*********************************** */
+const token =session?.user.token
+const [postState, setPostState] = useState<PostData | null>(null);
 const userID= session?.user.id
 const userRole =session?.user.role
-const token =session?.user.token
 const [error, setError] = useState<string | null>(null);
+const [professionalOffers,setProfessionalOffers] =useState<OfferData[]|null>(null)
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      let response;
+      if (userRole === "producer") {
+        response = await getPrudcerOffers(token); // ดึงโพสต์ของ producer
+      } else if (userRole === "production professional") {
+        response = mockProfessionalOffers
+      }
+      console.log("response",response)
+      // setPostArray(response)
+    } catch (err) {
+      setError("Failed to load posts. Please try again later.");
+    }
+  };
+  fetchData();
+}, [userID, userRole]);
+  //*********************************** */
+
 //API Connection
  useEffect(() => {
       const fetchData = async () => {
