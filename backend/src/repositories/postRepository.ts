@@ -107,13 +107,13 @@ class PostRepository {
       const post = await Post.findById(objectId)
         .populate({
           path: "participants.participantID",
-          select: "username _id",
+          // select: "username rating _id",
         })
         .populate({
           path: "participants.offer.role",
           select: "roleName",
         });
-
+      
       if (!post) {
         throw new Error("Post not found");
       }
@@ -133,10 +133,13 @@ class PostRepository {
           latestOffer && latestOffer.role
             ? (latestOffer.role as any).roleName
             : "Unknown Role";
+        
+        const isReview =  ((participant.participantID as any).rating).some((eachRating: { postID: any; }) => eachRating.postID == post.id);
 
         return {
           id: (participant.participantID as any)._id.toString(),
           label: `${(participant.participantID as any).username} - ${roleName}`,
+          isReview: isReview
         };
       });
     } catch (error) {
