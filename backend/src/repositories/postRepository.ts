@@ -184,6 +184,7 @@ class PostRepository {
           postImages: 1,
           postMediaType: 1,
           postName: 1,
+          participants: 1,
           postProjectRolesOut: {
             $arrayElemAt: ["$participants.offer.role", -1],
           },
@@ -218,6 +219,7 @@ class PostRepository {
           postImages: 1,
           postMediaType: 1,
           postName: 1,
+          participants: 1,
           postProjectRolesOut: {
             $arrayElemAt: ["$postProjectRolesOut", 0],
           },

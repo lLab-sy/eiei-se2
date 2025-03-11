@@ -220,6 +220,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                   | "in-progress"
                   | "success"
                   | "cancel",
+                participant: post.participants,
                 startDate: post.startDate ? post.startDate.toString() : "",
                 endDate: post.endDate ? post.endDate.toString() : "",
               });
@@ -259,6 +260,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                   | "in-progress"
                   | "success"
                   | "cancel",
+                participant: post.participants,
                 startDate: post.startDate ? post.startDate.toString() : "",
                 endDate: post.endDate ? post.endDate.toString() : "",
               });
