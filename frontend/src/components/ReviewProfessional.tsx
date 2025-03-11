@@ -103,7 +103,7 @@ export default function ReviewProfessional({ id }: { id: string }) {
       setReviewData(newReviewData ?? []);
       const allReviewArray :Array<reviewInterface> = []
       for(const reviewObject of newReviewData){
-        for (const review of reviewObject.reviews){
+        for (const review of reviewObject?.reviews){
           allReviewArray.push({...review, rating : reviewObject.rating})
         }
       }

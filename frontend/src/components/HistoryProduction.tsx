@@ -17,7 +17,7 @@ export interface historyStateInterface {
   createdAt : string,
   status: string,
 }
-export default function HistoryProduction({userId, session} : {userId: string, session : any}) {
+export default function HistoryProduction({handleFetch, historyDataArray} : {historyDataArray : Array<historyStateInterface>, handleFetch: Function}) {
   const mockData = [
     {
         role: "Professional",
@@ -34,21 +34,31 @@ export default function HistoryProduction({userId, session} : {userId: string, s
       reason : "You are my friend ah ah jdhajksdhaishddaskjdaisdjasja djasdjasjdasjd iajsdoajsdjdijaios djaosdjaso ajsodjasio hdjjdjasjhdiajsiod jaisjdiasjdijasidjiasjdaisodjaisdjaiosdj ashdjashdiuahsd hasudh uashdiuhas udhasudhasuidash dashdiusahdasdisidu"
   }
   ];
-  console.log('history session', session)
+
   const [historyState, setHistoryState] = useState<Array<historyStateInterface>>([])
-  useEffect(()=> {
-    if(!session?.session){
-      return;
-    }
-    const handleFetch = async (userId : string, postStatus: string) => {
-      const query = `?userId=${userId}&postStatus=${postStatus}&limit=10&page=1`
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/get-offer${query}`;
-      const res = await axios.get(apiUrl)
-      setHistoryState(res?.data?.data?.data)
-    } 
-    handleFetch(userId, "created")
-  }, [session?.session])
-  console.log("historyState",historyState)
+  // useEffect(()=> {
+  //   if(!session?.session){
+  //     return;
+  //   }
+  //   const handleFetch = async (userId : string, postStatus: string) => {
+  //     const query = `?userId=${userId}&postStatus=${postStatus}&limit=10&page=1`
+  //     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+  //     const res = await axios.get(apiUrl, {
+  //       withCredentials: true,
+  //       headers: {
+  //         Authorization: `Bearer ${session?.session?.user?.token}`,
+  //       },
+  //     });
+  //     setHistoryState(res?.data?.data?.data)
+  //     console.log('resHistory', res)
+  //   } 
+  //   handleFetch(userId, "created")
+  // }, [session?.session])
+  // setHistoryState(historyDataArray)
+  useEffect(() => {
+    setHistoryState(historyDataArray)
+  }, [historyDataArray])
+  // console.log("historyState",historyState)
   const [isRead, setIsRead] = useState(false);
   const [pageState, setPageState] = useState(0);
   const clickRead = (key : number) => {
@@ -59,7 +69,10 @@ export default function HistoryProduction({userId, session} : {userId: string, s
     <Dialog>
       <DialogTrigger
         asChild
-        onClick={() => setIsRead(false)}
+        onClick={async () => {
+          await handleFetch()
+          setIsRead(false)
+        }}
         className="h-30 w-full rounded-md "
       >
         <History />
@@ -78,10 +91,10 @@ export default function HistoryProduction({userId, session} : {userId: string, s
           <div className=''>
             {
               (historyState && historyState.length > 0) ? historyState.map((data, index) => (
-                <div key={index} onClick={() => clickRead(index)}>
+                <div key={index} className='mt-2' onClick={() => clickRead(index)}>
                   <HistoryProductionContent key={index} data={data}/>
                 </div>
-              )) : ""
+              )) : "No Data"
               
             }
 

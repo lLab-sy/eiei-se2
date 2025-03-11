@@ -37,9 +37,10 @@ import { OfferData, PostRolesResponse, PostData } from "../../interface";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import createOffer from "@/libs/postOffer";
+import { useRouter } from "next/navigation";
 
 export default function OfferInformation({postSelectData,productionProfessionalID,userRole}:{postSelectData:PostData,productionProfessionalID:string,userRole:string}){
-    
+    const router = useRouter()
     const {data:session}=useSession();
     const userID= session?.user.id
     const token = session?.user.token
@@ -106,7 +107,7 @@ export default function OfferInformation({postSelectData,productionProfessionalI
        
       
           console.log(offerData)
-          const postCreateResponse = await createOffer(offerData,token)
+          const postCreateResponse = await createOffer(offerData,token ?? "")
           if (postCreateResponse === null) {
             toast({
               variant: "destructive",
@@ -121,7 +122,9 @@ export default function OfferInformation({postSelectData,productionProfessionalI
             description: "Redirecting you...",
           })
           // TODO: await for API to finish then renavigate
-          // router.push(`/my-post`); 
+          
+          router.push(`/my-offering/${postSelectData.id}`); 
+
         }
  
     return(

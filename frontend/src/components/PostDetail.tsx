@@ -25,7 +25,7 @@ export default function PostDetail({
 
           <div className="flex flex-col">
             <span className="text-sm text-muted-foreground">วันที่เริ่ม</span>
-            <span>{startDate}</span>
+            <span>{startDate=="Invalid Date"?"-":startDate}</span>
           </div>
         </div>
         <div className="px-5 flex justify-between mt-5">
@@ -38,7 +38,7 @@ export default function PostDetail({
 
           <div className="flex flex-col">
             <span className="text-sm text-muted-foreground">วันที่สิ้นสุด</span>
-            <span>{endDate}</span>
+            <span>{endDate=="Invalid Date"?"-":startDate}</span>
           </div>
         </div>
         <Separator className="mt-5" />

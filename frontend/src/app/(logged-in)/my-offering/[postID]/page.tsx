@@ -20,6 +20,9 @@ import ProfessionalSelector from "@/components/ProfessionalSelector";
 import OfferHistory from "@/components/OfferHistory";
 import ComparisonView from "@/components/ComparisonView";
 import PostDetail from "@/components/PostDetail";
+import getPostById from "@/libs/getPostById";
+import getPrudcerOffers from "@/libs/getProducerOffers";
+import axios from "axios";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -314,6 +317,69 @@ export default function OfferPostContent() {
     return Object.values(roles);
   };
 
+//------------------------------------------------------------------------------------
+
+//*********************************** */
+const token =session?.user.token
+const [postState, setPostState] = useState<PostData | null>(null);
+const userID= session?.user.id
+const userRole =session?.user.role
+const [error, setError] = useState<string | null>(null);
+const [professionalOffers,setProfessionalOffers] =useState<OfferData[]|null>(null)
+const [postImageState, setPostImageState] = useState<string>('')
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      let response;
+      if (userRole === "producer") {
+        response = await getPrudcerOffers(token); // ดึงโพสต์ของ producer
+      } else if (userRole === "production professional") {
+        const handleFetch = async (postID: string) => {
+          const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postID}`;
+          const res = await axios.get(apiUrl);
+          setPostState(res?.data?.data ?? {});
+          // console.log("postImageDisplay", res?.data?.data?.postImageDisplay?.[0])
+          const postImageDisplay = res?.data?.data?.postImageDisplay?.[0]
+          // console.log('postImageDisplay', postImageDisplay)
+          // console.log('imageDisplayUrl', postImageDisplay.imageUrl)
+          setPostImageState(res?.data?.data?.postImageDisplay?.[0].imageURL ?? "")
+          
+        };
+        handleFetch(postID);
+      }
+      console.log("response",response)
+      // setPostArray(response)
+    } catch (err) {
+      setError("Failed to load posts. Please try again later.");
+    }
+  };
+  fetchData();
+}, [userID, userRole]);
+  //*********************************** */
+
+//API Connection
+ useEffect(() => {
+      const fetchData = async () => {
+        try {
+          let response;
+          if (userRole === "producer") {
+            response = await getPostById(postID,token ?? "") 
+            setPostState(response)
+          } else if (userRole === "production professional") {
+            // response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+          }
+          // console.log(response,"OHNPPPPPPPPPPPPPPPPPPPPp")
+          }
+        catch (err) {
+          setError("Failed to load posts. Please try again later.");
+        }
+      };
+     fetchData();
+    }, []); // ใช้ pid และ token ใน dependency array
+
+
+//------------------------------------------------------------------------------------
+
   // สร้างข้อมูลเปรียบเทียบตามบทบาท
   useEffect(() => {
     if (userRole === "producer") {
@@ -379,7 +445,22 @@ export default function OfferPostContent() {
       ] || [],
     );
   };
-
+  useEffect(() => {
+    const handleFetch = async (userId: string) => {
+      const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+      const res = await axios.get(apiUrl, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${session?.user?.token ?? ""}`,
+        },
+      });
+      setOfferArray(res?.data?.data?.data);
+      console.log('resOfferArray', res)
+    };
+    handleFetch(userId);
+  }, []);
+  console.log('offerArray', offerArray)
   // เมื่อเลือกบทบาท
   const handleSelectRole = (role: string) => {
     setSelectedRole(role);
@@ -507,113 +588,99 @@ export default function OfferPostContent() {
         </div>
 
         <div className="relative w-[44%] shadow-md h-[720px] rounded-lg">
-          {userRole === "producer" && (
-            <div className="w-full">
-              <div className="flex flex-col p-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-bold mb-2">ผู้สมัคร</h3>
-                  <button
-                    onClick={toggleViewMode}
-                    className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                  >
-                    {viewMode === "individual"
-                      ? "ดูแบบเปรียบเทียบ"
-                      : "ดูแบบรายคน"}
-                  </button>
-                </div>
-
-                {viewMode === "individual" && (
-                  <div className="flex flex-col gap-3">
-                    {/* ใช้ RoleDropdown component */}
-                    <RoleDropdown
-                      selectedRole={selectedRole}
-                      availableRoles={availableRoles}
-                      onSelectRole={handleSelectRole}
-                    />
-
-                    {/* แสดงรายชื่อ Professional ตาม Role ที่เลือก */}
-                    {selectedRole && (
-                      <ProfessionalSelector
-                        professionals={getProfessionalsByRole(selectedRole)}
-                        selectedProfessionalId={selectedProfessionalId}
-                        onSelect={handleSelectProfessional}
-                      />
-                    )}
+          <div className='h-full'>
+            {userRole === "producer" && (
+              <div className="w-full">
+                <div className="flex flex-col p-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-2xl font-bold mb-2">ผู้สมัคร</h3>
+                    <button
+                      onClick={toggleViewMode}
+                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                    >
+                      {viewMode === "individual"
+                        ? "ดูแบบเปรียบเทียบ"
+                        : "ดูแบบรายคน"}
+                    </button>
                   </div>
+                  {viewMode === "individual" && (
+                    <div className="flex flex-col gap-3">
+                      {/* ใช้ RoleDropdown component */}
+                      <RoleDropdown
+                        selectedRole={selectedRole}
+                        availableRoles={availableRoles}
+                        onSelectRole={handleSelectRole}
+                        postProjectRoles={postState?.postProjectRolesOut}
+                      />
+                      {/* แสดงรายชื่อ Professional ตาม Role ที่เลือก */}
+                      {selectedRole && (
+                        <ProfessionalSelector
+                          professionals={getProfessionalsByRole(selectedRole)}
+                          selectedProfessionalId={selectedProfessionalId}
+                          onSelect={handleSelectProfessional}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+                {viewMode === "individual" && selectedProfessionalId && (
+                  <OfferHistory
+                    offers={
+                      mockProfessionalOffers[
+                        selectedProfessionalId as keyof typeof mockProfessionalOffers
+                      ] || []
+                    }
+                    professionalName={
+                      professionals.find((p) => p.id === selectedProfessionalId)
+                        ?.name || ""
+                    }
+                    userRole={userRole}
+                    isLatestOffer={isLatestOffer}
+                    onAccept={handleAcceptOffer}
+                    onReject={handleRejectOffer}
+                  />
+                )}
+                {viewMode === "comparison" && (
+                  <ComparisonView
+                    roleBasedOffers={roleBasedOffers}
+                    onAccept={handleAcceptOffer}
+                    onReject={handleRejectOffer}
+                  />
                 )}
               </div>
-
-              {viewMode === "individual" && selectedProfessionalId && (
-                <OfferHistory
-                  offers={
-                    mockProfessionalOffers[
-                      selectedProfessionalId as keyof typeof mockProfessionalOffers
-                    ] || []
-                  }
-                  professionalName={
-                    professionals.find((p) => p.id === selectedProfessionalId)
-                      ?.name || ""
-                  }
-                  userRole={userRole}
-                  isLatestOffer={isLatestOffer}
-                  onAccept={handleAcceptOffer}
-                  onReject={handleRejectOffer}
-                />
-              )}
-
-              {viewMode === "comparison" && (
-                <ComparisonView
-                  roleBasedOffers={roleBasedOffers}
-                  onAccept={handleAcceptOffer}
-                  onReject={handleRejectOffer}
-                />
-              )}
-            </div>
-          )}
-
-          {userRole === "production professional" && (
-            <div className="mt-4 p-4">
-              <span className="text-2xl font-bold">ข้อเสนอของฉัน</span>
-              {offerArray.length > 0 ? (
-                <div
-                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                  className="overflow-scroll flex flex-col w-[100%] max-h-[640px] items-center flex-wrap gap-5 mt-4"
-                >
-                  {offerArray.map((offer, index) => (
-                    <div key={index} className="mt-4 w-[90%] relative">
-                      <HistoryProductionContent data={offer} />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-10 text-center text-gray-500">
-                  ยังไม่มีข้อเสนอ
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="w-full flex justify-end right-[80px] absolute bottom-[250px]">
-          {/* <div className="ml-[5%]">
-            {userRole === "production professional" && (
-              <Button
-                onClick={handleSendOffer}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                ส่งข้อเสนอ
-              </Button>
             )}
-          </div> */}
-
-          <Button
-            onClick={handleBack}
-            className="w-[100px] bg-red-500 hover:bg-red-600 text-white"
-          >
-            กลับ
-          </Button>
+            {userRole === "production professional" && (
+                <div className="mt-4 p-4 h-full">
+                  <span className="text-2xl font-bold">ข้อเสนอของฉัน</span>
+                  {offerArray?.length > 0 ? (
+                    <div
+                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                      className="overflow-scroll flex flex-col w-[100%] max-h-[640px] items-center flex-wrap gap-5 mt-4"
+                    >
+                      {offerArray.map((offer, index) => (
+                        <div key={index} className="mt-4 w-[90%] relative">
+                          <HistoryProductionContent data={offer} />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-10 text-center text-gray-500">
+                      ยังไม่มีข้อเสนอ
+                    </div>
+                  )}
+                </div>
+              )}
+          </div>
+          <div className='w-full flex justify-end mt-5'>
+              <Button
+                onClick={handleBack}
+                className="w-[100px] bg-red-500 hover:bg-red-600 text-white"
+              >
+                กลับ
+              </Button>
+            </div>
+                </div>
         </div>
-      </div>
     </main>
   );
 }

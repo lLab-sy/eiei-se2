@@ -179,19 +179,20 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
   try {
     // console.log("hellooo")
     const role=req.user.role
-    console.log(req.user.userId)
+    // console.log(req.user.userId)
     // const productionProfessionalID= req.query.productionProfessionalID ? req.query.productionProfessionalID as string: false;
     const userId = req.query.userId? req.query.userId as string: "";
+    const producerId= req.user.userId as string
     const limit = req.query.limit ? Number(req.query.limit): 10;
     const page = req.query.page ? Number(req.query.page): 1;
     const status = ['created', 'in-progress', 'success', 'cancel'];
-    
+    console.log(limit,page,producerId)
     if ((limit < 1 || page < 1 || userId=="") && role ==="production professional" ) {
       sendResponse(res, 'error', '', 'bad request', 400);
       return
     }
 
-    if ((limit < 1 || page < 1) && role ==="producer" ) {
+    if ((limit < 1 || page < 1 || producerId=="") && role ==="producer" ) {
       sendResponse(res, 'error', '', 'bad request', 400);
       return
     }
@@ -216,8 +217,12 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       postId: req.query.postId? req.query.postId as string: "",
       postStatus: postStatus as string
     }
-
-    const offers = await postService.getOffer(offerReqDTO,role);
+    var offers;
+    if(role=="producer"){
+      offers= await postService.getProducerOffer(offerReqDTO,producerId);
+    }else{
+      offers= await postService.getOffer(offerReqDTO,role);
+    }
     // console.log(offers.meta.totalPages)
     if (!offers.meta.totalPages){
       sendResponse(res, 'error', '', 'You have no offer.', 400);
