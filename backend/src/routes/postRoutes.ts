@@ -1,33 +1,32 @@
-import { Router,Request } from 'express';
-import postController from '../controllers/postController';
-import AuthMiddleware from '../middlewares/authMiddleware'
-import { RequestHandler } from '@nestjs/common/interfaces';
-import multer from 'multer';
-import path from 'path';
+import { Router, Request } from "express";
+import postController from "../controllers/postController";
+import AuthMiddleware from "../middlewares/authMiddleware";
+import { RequestHandler } from "@nestjs/common/interfaces";
+import multer from "multer";
+import path from "path";
 
 const router = Router();
-const storage = multer.memoryStorage()
+const storage = multer.memoryStorage();
 const fileFilter = (req: Request, file: any, cb: Function) => {
-    const filetypes = /png|jpeg|gif|webp|jpg/;
-    // Check file extension
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // const sizeCheck = file.size < maxSize
-    // console.log(file.size)
-    // Check MIME type
-    const mimeType = file.mimetype.startsWith('image/');
-    if (extname && mimeType) {
-        return cb(null, true);
-    }
-    else {
-        return cb(new Error("Error: Only PNG, JPEG, and GIF files are allowed!"));
-    }
+  const filetypes = /png|jpeg|gif|webp|jpg/;
+  // Check file extension
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  // const sizeCheck = file.size < maxSize
+  // console.log(file.size)
+  // Check MIME type
+  const mimeType = file.mimetype.startsWith("image/");
+  if (extname && mimeType) {
+    return cb(null, true);
+  } else {
+    return cb(new Error("Error: Only PNG, JPEG, and GIF files are allowed!"));
+  }
 };
-const maxSize = 5 * 1024 * 1024 // bytes / 5mb
+const maxSize = 5 * 1024 * 1024; // bytes / 5mb
 const upload = multer({
-    storage: storage,
-    fileFilter,
-    limits : {fileSize : maxSize}
-})
+  storage: storage,
+  fileFilter,
+  limits: { fileSize: maxSize },
+});
 /**
  * @swagger
  * tags:
@@ -143,8 +142,8 @@ const upload = multer({
  *           type: string
  *           format: date-time
  *           description: The end date of the post
- * 
- * 
+ *
+ *
  *     PaticipantRatingDTO:
  *       type: object
  *       required:
@@ -160,8 +159,6 @@ const upload = multer({
  *           type: string
  *           description: comment about user work
  */
-
-
 
 /**
  * @swagger
@@ -213,8 +210,51 @@ const upload = multer({
  *       500:
  *         description: Server error
  */
-router.get('/posts/search', postController.searchPost);
+router.get("/posts/search", postController.searchPost);
 
+/**
+ * @swagger
+ * /api/v1/posts/{id}/participants:
+ *   get:
+ *     summary: Get all participants for a post
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of participants in the post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "67b1a81ded193cb7b3dd94bb"
+ *                   label:
+ *                     type: string
+ *                     example: "Johny Stafrod - Prop Master"
+ *       403:
+ *         description: Unauthorized, only the post owner can view participants
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.get(
+  "/posts/:id/participants",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.getPostParticipants as RequestHandler
+);
 
 /**
  * @swagger
@@ -250,8 +290,11 @@ router.get('/posts/search', postController.searchPost);
  *         description: Server error
  */
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
-router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandler, postController.addPostReview as RequestHandler);
-
+router.post(
+  "/posts/:id/addReview",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.addPostReview as RequestHandler
+);
 
 /**
  * @swagger
@@ -320,7 +363,11 @@ router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandle
  *       500:
  *         description: Server error
  */
-router.get('/posts/user/prof', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByProf as RequestHandler);
+router.get(
+  "/posts/user/prof",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.getPostsByProf as RequestHandler
+);
 
 /**
  * @swagger
@@ -340,7 +387,7 @@ router.get('/posts/user/prof', AuthMiddleware.authenticate as RequestHandler, po
  *       500:
  *         description: Server error
  */
-router.get('/posts', postController.getAllPosts);
+router.get("/posts", postController.getAllPosts);
 
 /**
  * @swagger
@@ -369,7 +416,12 @@ router.get('/posts', postController.getAllPosts);
  *         description: Server error
  */
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
-router.post('/posts', AuthMiddleware.authenticate as RequestHandler, upload.array('postImagesSend'), postController.createPost as RequestHandler);
+router.post(
+  "/posts",
+  AuthMiddleware.authenticate as RequestHandler,
+  upload.array("postImagesSend"),
+  postController.createPost as RequestHandler
+);
 // router.post('/upload-profile/:id',upload.single('profileImage'), userController.uploadProfileImage)
 /**
  * @swagger
@@ -393,8 +445,11 @@ router.post('/posts', AuthMiddleware.authenticate as RequestHandler, upload.arra
  *       500:
  *         description: Server error
  */
-router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
-
+router.get(
+  "/posts/user",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.getPostsByUser as RequestHandler
+);
 
 /**
  * @swagger
@@ -499,7 +554,11 @@ router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postCon
  *       500:
  *         description: Server error
  */
-router.get('/posts/getOffers', AuthMiddleware.authenticate as RequestHandler, postController.getOffers as RequestHandler);
+router.get(
+  "/posts/getOffers",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.getOffers as RequestHandler
+);
 
 /**
  * @swagger
@@ -526,7 +585,7 @@ router.get('/posts/getOffers', AuthMiddleware.authenticate as RequestHandler, po
  *       500:
  *         description: Server error
  */
-router.get('/posts/:id', postController.getPost);
+router.get("/posts/:id", postController.getPost);
 
 /**
  * @swagger
@@ -561,7 +620,12 @@ router.get('/posts/:id', postController.getPost);
  *       500:
  *         description: Server error
  */
-router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, upload.array('postImagesSend'), postController.updatePost as RequestHandler);
+router.put(
+  "/posts/:id",
+  AuthMiddleware.authenticate as RequestHandler,
+  upload.array("postImagesSend"),
+  postController.updatePost as RequestHandler
+);
 
 /**
  * @swagger
@@ -586,7 +650,11 @@ router.put('/posts/:id', AuthMiddleware.authenticate as RequestHandler, upload.a
  *       500:
  *         description: Server error
  */
-router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postController.deletePost as RequestHandler);
+router.delete(
+  "/posts/:id",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.deletePost as RequestHandler
+);
 
 /**
  * @swagger
@@ -643,6 +711,10 @@ router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postC
  *       500:
  *         description: Internal server error
  */
-router.post('/create-offer', AuthMiddleware.authenticate as RequestHandler, postController.createOffer as RequestHandler);
+router.post(
+  "/create-offer",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.createOffer as RequestHandler
+);
 
 export default router;
