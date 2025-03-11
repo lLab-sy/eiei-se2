@@ -20,8 +20,8 @@ export default async function getPrudcerOffers(token:string){
             throw new Error("Failed to fetch offer");
           }
       
-          console.log("Hello My Offers:", response.data.data);
-          return response.data.data;
+          console.log("Hello My Offers:", response.data.data.data);
+          return response.data.data.data;
     }catch(error){
         console.error("Error fetching my offers:", error);
         throw error;

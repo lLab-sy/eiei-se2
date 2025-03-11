@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { OfferData, PostData } from "../../../../../interface";
+import { OfferData, OfferHistoryData, OfferHistoryResponseData, PostData } from "../../../../../interface";
 
 // นำเข้า mock data
 import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
@@ -322,18 +322,17 @@ const [postState, setPostState] = useState<PostData | null>(null);
 const userID= session?.user.id
 const userRole =session?.user.role
 const [error, setError] = useState<string | null>(null);
-const [professionalOffers,setProfessionalOffers] =useState<OfferData[]|null>(null)
+const [professionalOffers,setProfessionalOffers] =useState<OfferHistoryResponseData[]|null>(null)
 
+//API connection GET Offer
 useEffect(() => {
   const fetchData = async () => {
     try {
       let response;
-      if (userRole === "producer") {
-        response = await getPrudcerOffers(token); // ดึงโพสต์ของ producer
-      } else if (userRole === "production professional") {
-        response = mockProfessionalOffers
-      }
-      console.log("response",response)
+      // if (userRole === "producer") {
+      response = await getPrudcerOffers(token); // ดึงโพสต์ของ producer
+      // console.log("CHECKOO",response)
+      setProfessionalOffers(response)
       // setPostArray(response)
     } catch (err) {
       setError("Failed to load posts. Please try again later.");
