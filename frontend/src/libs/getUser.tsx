@@ -6,6 +6,6 @@ export default async function getUser(userID:string){
     if(!response){
         throw new Error("Falied to fetch his/her posts")
     }
-
+    console.log("HELLO USER",response.data.data)
     return await response.data.data
 }
