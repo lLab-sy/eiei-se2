@@ -81,7 +81,7 @@ async getPost(id:string): Promise<PostDTO|null> {
               return await cloudService.getSignedUrlImageCloud(eachImg);
           }));
 
-          var postImageDisplay:ImageDisplayDTO[]=[];
+          const postImageDisplay:ImageDisplayDTO[]=[];
           for (let i = 0; i < postImages.length; i++) {
             postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
           }
