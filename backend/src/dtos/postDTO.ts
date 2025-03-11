@@ -317,8 +317,15 @@ export class OfferRequestDTO {
     page!: number;
 }
 
+
+export class OfferProducerResponseDTO {
+    _id!:string;
+    offers!: OfferResponseDTO[]
+}
+
 export class OfferResponseDTO {
     _id!: string;
+    userName!:string;
     postName!: string;
     roleName!: string; // Role offered to the participant
     currentWage!: number; // The amount offered for the role
@@ -332,11 +339,13 @@ export class OfferResponseDTO {
         roleName: string,
         currentWage: number,
         reason: string,
+        userName:string,
         offeredBy: number,
         status: string,
         createdAt: Date}
       ) {
         this._id = init._id;
+        this.userName=init.userName;
         this.postName = init.postName;
         this.roleName = init.roleName;
         this.currentWage = init.currentWage;

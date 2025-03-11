@@ -12,7 +12,7 @@ export default function PostToOffer({
   userRole,
 }: {
   post: PostData;
-  userRole?: "producer" | "professional";
+  userRole?: string;
 }) {
   const mockPost: postContent = {
     postName: "PostName",
@@ -38,7 +38,7 @@ export default function PostToOffer({
   });
 
   // ข้อมูลจำลองสำหรับ Producer
-  const applicantsCount = 5; // จำนวนผู้สมัครทั้งหมด (สำหรับตัวอย่าง)
+  const applicantsCount = (post.participant).length; // จำนวนผู้สมัครทั้งหมด (สำหรับตัวอย่าง)
   const offersCount = 3; // จำนวนข้อเสนอ (สำหรับตัวอย่าง)
 
   return (

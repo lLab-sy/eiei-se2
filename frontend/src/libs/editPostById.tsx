@@ -6,6 +6,7 @@ export default async function editPostById(
   data: FormData,
   token: string
 ) {
+  // 
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
   console.log(apiUrl)
   try {

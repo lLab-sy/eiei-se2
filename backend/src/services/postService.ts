@@ -1,5 +1,5 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO } from '../dtos/postDTO';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO } from '../dtos/postDTO';
 import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
@@ -99,6 +99,7 @@ async getPost(id:string): Promise<PostDTO|null> {
             postImageDisplay:postImageDisplay as ImageDisplayDTO[],
             postImagesKey: post.postImages,
             postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+            participants: post.participants,
             // postDetailID: post.postDetailID.toString() as string,
             userID: post.userID.toString() as string,
             startDate: post.startDate? post.startDate.toString():"",
@@ -115,74 +116,75 @@ async getPost(id:string): Promise<PostDTO|null> {
   }
 }
 
-  async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null> {
-    try {
-      var result;
-      if(role=="producer"){
-        const posts = await postRepository.getPostsByUser(id);
-        if(posts){
-              result = await Promise.all(posts.map(async (post) => {
-              const postId = post._id?post._id.toString():'';
-              const postImages = await Promise.all(
-                post.postImages.map(async (eachImg: string) => {
-                    return await cloudService.getSignedUrlImageCloud(eachImg);
-                }));
-              console.log("......")
-              return new PostWithRoleCountDTO({
-                  id: postId,
-                  postName: post.postName as string,
-                  postDescription: post.postDescription as string,
-                  postImages: postImages as string[],
-                  postMediaType: post.postMediaType as string,
-                  roleCount: post.roleCount as number,
-                  postProjectRoles: post.postProjectRoles as string[],
-                  postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-                  startDate: post.startDate? post.startDate.toString():"",
-                  endDate: post.endDate?post.endDate.toString():""
-                });
-            }))
-            return result;
-        }
-        return null
-        // console.log(result)
-      }else{
-        const posts = await postRepository.getHistoryPostsByProductionProfessional(id);
-        if(posts){
-              result = await Promise.all(posts.map(async (post) => {
-              const postId = post._id?post._id.toString():'';
-              const postImages = await Promise.all(
-                post.postImages.map(async (eachImg: string) => {
-                    return await cloudService.getSignedUrlImageCloud(eachImg);
-                }));
-              // console.log(post.postMediaType)
-              return new PostWithRoleCountDTO({
-                  id: postId,
-                  producerName: {
-                    userID: post.producerName?._id,
-                    producerName: post.producerName?.username
-                  } as ProducerDisplayDTO,
-                  postProjectRolesOutProfessional: post.postProjectRolesOut,
-                  postName: post.postName as string,
-                  postDescription: post.postDescription as string,
-                  postImages: postImages as string[],
-                  postMediaType: post.postMediaType as string,
-                  roleCount: post.roleCount as number,
-                  postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-                  startDate: post.startDate? post.startDate.toString():"",
-                  endDate: post.endDate?post.endDate.toString():""
-                });
-            }))
-            console.log("POST",posts)
-            return result;
-        }
-        return null
+async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null> {
+  try {
+    var result;
+    if(role=="producer"){
+      const posts = await postRepository.getPostsByUser(id);
+      if(posts){
+            result = await Promise.all(posts.map(async (post) => {
+            const postId = post._id?post._id.toString():'';
+            const postImages = await Promise.all(
+              post.postImages.map(async (eachImg: string) => {
+                  return await cloudService.getSignedUrlImageCloud(eachImg);
+              }));
+            console.log("......")
+            return new PostWithRoleCountDTO({
+                id: postId,
+                postName: post.postName as string,
+                postDescription: post.postDescription as string,
+                postImages: postImages as string[],
+                postMediaType: post.postMediaType as string,
+                roleCount: post.roleCount as number,
+                postProjectRoles: post.postProjectRoles as string[],
+                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                startDate: post.startDate? post.startDate.toString():"",
+                endDate: post.endDate?post.endDate.toString():""
+              });
+          }))
+          return result;
       }
-      
-    }catch (error) {
-          console.error('Error in service layer:', error);
-          throw new Error('Error in service layer: ' + error);
+      return null
+      // console.log(result)
+    }else{
+      const posts = await postRepository.getHistoryPostsByProductionProfessional(id);
+      if(posts){
+            result = await Promise.all(posts.map(async (post) => {
+            const postId = post._id?post._id.toString():'';
+            const postImages = await Promise.all(
+              post.postImages.map(async (eachImg: string) => {
+                  return await cloudService.getSignedUrlImageCloud(eachImg);
+              }));
+            // console.log(post.postMediaType)
+            return new PostWithRoleCountDTO({
+                id: postId,
+                producerName: {
+                  userID: post.producerName?._id,
+                  producerName: post.producerName?.username
+                } as ProducerDisplayDTO,
+                postProjectRolesOutProfessional: post.postProjectRolesOut,
+                postName: post.postName as string,
+                postDescription: post.postDescription as string,
+                postImages: postImages as string[],
+                postMediaType: post.postMediaType as string,
+                roleCount: post.roleCount as number,
+                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                startDate: post.startDate? post.startDate.toString():"",
+                endDate: post.endDate?post.endDate.toString():""
+              });
+          }))
+          console.log("POST",posts)
+          return result;
+      }
+      return null
     }
+    
+  }catch (error) {
+        console.error('Error in service layer:', error);
+        throw new Error('Error in service layer: ' + error);
   }
+}
+
 
 
   async createPost(postData: PostDTO) {
@@ -355,17 +357,13 @@ async getPost(id:string): Promise<PostDTO|null> {
     try {
       const offerRequest: GetOfferRequestModel = offerReq
       var res;
-      if(role==="producer"){
-        res = await postRepository.getProducerOffer(offerRequest);
-      }else if(role==="production professional"){
         res = await postRepository.getOffer(offerRequest);
-      }else{
-        res = await postRepository.getProducerOffer(offerRequest);
-      }
+
       const resDTO = res.data.map((offer) => {
         return new OfferResponseDTO({
           _id: offer._id as string,
           postName: offer.postName,
+          userName: offer._id as string,
           roleName: offer.roleName, // Role offered to the participant
           currentWage: offer.currentWage, // The amount offered for the role
           reason: offer.reason,
@@ -389,6 +387,62 @@ async getPost(id:string): Promise<PostDTO|null> {
       throw new Error('Error in service layer: ' + error);
     }
   }
+
+  async getProducerOffer(
+    offerReq: OfferRequestDTO, 
+    producerID:string
+): Promise<PaginatedResponseDTO<OfferProducerResponseDTO>> {
+    try {
+        const offerRequest: GetOfferRequestModel = offerReq;
+        const res = await postRepository.getProducerOffer(offerRequest,producerID);
+
+        console.log("Response Data:", res);
+
+        if (!res || !Array.isArray(res.data)) {
+            throw new Error("Invalid response data format");
+        }
+
+        res.data.map((offer)=>{
+            // console.log("JJJJJJJJJ",offer.status)
+            // console.log("JJJJJJJJJ",offer.userName)
+        })
+
+        // Map response data
+        const resDTO: OfferProducerResponseDTO[] = res.data.map((offer: any) => ({
+            _id: String(offer._id), // Ensure _id is a string
+            offers: (offer.offers || []).map((o: any) => new OfferResponseDTO({
+                _id: String(o._id),
+                userName: o.userName as string,
+                postName: o.postName || "",
+                roleName: o.roleName || "",
+                currentWage: o.currentWage || 0,
+                reason: o.reason || "",
+                offeredBy: Number(o.offeredBy) || 0,
+                status: o.status || "unknown",
+                createdAt: new Date(o.createdAt) || new Date()
+            }))
+        }));
+
+        // Creating the paginated response DTO
+        const response: PaginatedResponseDTO<OfferProducerResponseDTO> = {
+            data: resDTO,
+            meta: {
+                page: offerReq.page,
+                limit: offerReq.limit,
+                totalItems: res.totalItems || 0,
+                totalPages: Math.ceil((res.totalItems || 0) / offerReq.limit)
+            } as PaginationMetaDTO
+        };
+
+        return response;
+    } catch (error) {
+        console.error("Error in getProducerOffer:", error);
+        throw new Error('Error in service layer: ' + (error as Error).message);
+    }
+}
+
+
+
 
   async getPostsByProf(getPostReq: GetPostByProfRequestModel): Promise<PaginatedResponseDTO<PostDTO>> {
     try {

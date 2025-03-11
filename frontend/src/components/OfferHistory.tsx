@@ -11,7 +11,7 @@ interface OfferHistoryProps {
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
 }
-
+// 
 export default function OfferHistory({
   offers,
   professionalName,

@@ -12,6 +12,18 @@ export interface PostData {
     endDate?: string;  
     userID: string;
     postImageDisplay:PostImageDisplay[]
+    participants: Participant[]
+}
+
+export interface Participant{
+    comment:string,
+    createdAt:Date,
+    offer:OfferData[],
+    participantID:string,
+    ratingScore:string,
+    reviewedAt?:Date,
+    status: string,
+    updatedAt: Date;
 }
 
 export interface PostImageDisplay{
@@ -166,12 +178,23 @@ export interface OfferData{
     postID: string;
 }
 
+export interface OfferHistoryResponseData{
+    _id:string,
+    offers:OfferHistoryData
+}
+
 export interface OfferHistoryData{
-    roleName: string; //populate
-    price: Number;
-    offeredBy: Number;
     createdAt: string;
-    detail: string
+    currentWage?: Number;
+    offeredBy: Number;
+    postName:string;
+    reason?:string;
+    roleName: string;
+    status: string;
+    userName?:string;
+    price?: Number;
+    _id:string; //id ของ post
+    detail?: string
 }
 
 export interface ReviewData{

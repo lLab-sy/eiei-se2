@@ -1,10 +1,12 @@
 // 2. src/components/RoleDropdown.tsx
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { PostRolesResponse } from "../../interface";
 
 interface RoleDropdownProps {
   selectedRole: string;
   availableRoles: string[];
+  postProjectRoles: PostRolesResponse[];
   onSelectRole: (role: string) => void;
 }
 
@@ -12,6 +14,7 @@ export default function RoleDropdown({
   selectedRole,
   availableRoles,
   onSelectRole,
+  postProjectRoles
 }: RoleDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,7 +22,7 @@ export default function RoleDropdown({
     onSelectRole(role);
     setIsOpen(false);
   };
-
+  // console.log("fsfsfsdfdsdfssfdfsdfdgdghgfhgfhfh",postProjectRoles)
   return (
     <div className="relative">
       <label className="text-sm text-gray-500 mb-1 block">
@@ -29,19 +32,22 @@ export default function RoleDropdown({
         className="border p-2 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-50"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span>{selectedRole || "เลือกตำแหน่งงาน"}</span>
+        {postProjectRoles&&(<span> {postProjectRoles.find((role) => role.id === selectedRole)?.roleName || "เลือกตำแหน่งงาน"}</span>)
+
+        }
+        
         <ChevronDown size={16} />
       </div>
 
       {isOpen && (
         <div className="absolute left-0 right-0 mt-1 border rounded-lg bg-white z-10 shadow-lg">
-          {availableRoles.map((role) => (
+          {postProjectRoles.map((role) => (
             <div
-              key={role}
+              key={role.id}
               className="p-2 hover:bg-gray-100 cursor-pointer"
-              onClick={() => handleSelectRole(role)}
+              onClick={() => handleSelectRole(role.id)}
             >
-              {role}
+              {role.roleName}
             </div>
           ))}
         </div>
