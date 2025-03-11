@@ -113,17 +113,17 @@ const mockOfferHistory: OfferHistoryData[] = [
       const fetchData = async () => {
         try {
           let response;
-          let resonponseOffer;
+          let responseOffer;
           var userResponse;
 
           if (userRole === "producer") {
             response = await getPostUser(userID); // ดึงโพสต์ของ producer
             userResponse = await getUser(pid);
-            // resonponseOffer= await getOfferHistory(token,pid); 
+            // responseOffer= await getOfferHistory(token,pid); 
           } else if (userRole === "production professional") {
             response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
             userResponse = await getUser(userID);
-            // resonponseOffer= await getOfferHistory(token,userID); 
+            // responseOffer= await getOfferHistory(token,userID); 
           }
           setUserData(userResponse)
           console.log("respons",response)
@@ -136,7 +136,7 @@ const mockOfferHistory: OfferHistoryData[] = [
 
 
             // const res2= getOfferHistory(token,pid);
-            // setOfferData(resonponseOffer)
+            // setOfferData(responseOffer)
           }
         } catch (err) {
           setError("Failed to load posts. Please try again later.");
