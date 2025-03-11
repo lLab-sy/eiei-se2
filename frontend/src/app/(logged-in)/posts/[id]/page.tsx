@@ -304,6 +304,7 @@ const PostDetail = () => {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Producer's Previously Received Reviews</h2>
             {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
               dataReviews.receivedReviews.map((review, index) => (
+                review.ratingScore > 0 ?
                 <ReviewCard
                         key={index}
                         index={index}
@@ -311,7 +312,7 @@ const PostDetail = () => {
                         reviewerProfileImage={review.reviewerProfileImage}
                         ratingScore={review.ratingScore}
                         comment={review.comment}
-                      />
+                      /> : <></>
               ))
             ) : (
               <p className="text-gray-500">No reviews yet.</p>
