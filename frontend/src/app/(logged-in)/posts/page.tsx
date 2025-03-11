@@ -48,6 +48,7 @@ const ProfessionalsPage = () => {
 
         if (response) {
           setDataResponse(response);
+          console.log(response);
         }
         
     }
@@ -132,7 +133,8 @@ const ProfessionalsPage = () => {
       <div className="min-h-screen p-14 bg-gray-50 px-8 lg:px-20">
       {PostsCurrentPage ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
-          {PostsCurrentPage.map((post, index) => (
+          {
+          PostsCurrentPage.map((post, index) => (
             <PostCard
               key={index}
               title={post.postName}
