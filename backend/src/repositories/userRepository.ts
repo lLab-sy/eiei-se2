@@ -192,6 +192,11 @@ class UserRepository {
                       }
                     },
                     {
+                      $project: {
+                        rating: 1
+                      }
+                    },
+                    {
                       $unwind: {
                         path: "$rating"
                       }
@@ -229,6 +234,11 @@ class UserRepository {
                       }
                     },
                     {
+                      $unwind: {
+                        path: "$rating.producer"
+                      }
+                    },
+                    {
                       $group: {
                         _id: "$_id",
                         reviews: {
@@ -244,8 +254,8 @@ class UserRepository {
                       }
                     },
                     {
-                      $sort: {
-                        _id: -1
+                      $project: {
+                        _id: 0
                       }
                     }
                   ],

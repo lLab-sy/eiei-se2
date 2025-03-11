@@ -31,6 +31,7 @@ const ProfessionalDetail = () => {
           try{
             responseReviewProf = await getReviewProfesstional(id);
             setDataReviews(responseReviewProf);
+            console.log(responseReviewProf);
           }catch(error){
             console.log("Review not found");
           }

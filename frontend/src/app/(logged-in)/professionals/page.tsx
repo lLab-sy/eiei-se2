@@ -68,7 +68,7 @@ const ProfessionalsPage = () => {
 
       {/*Header*/}
       <div className="top-0 bg-mainblue-light z-10 py-4">
-        <div className="flex justify-center items-center space-x-4 mt-20">
+        <div className="flex justify-center items-center space-x-4">
           <SearchBar onSearch={handleFilterChange}/>
         </div>
       </div>
