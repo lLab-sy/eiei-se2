@@ -118,7 +118,7 @@ export default function OfferInformation({postSelectData,productionProfessionalI
           }
             toast({
             variant: "default",
-            title: "Successful post creation",
+            title: "Successful offer creation",
             description: "Redirecting you...",
           })
           // TODO: await for API to finish then renavigate
