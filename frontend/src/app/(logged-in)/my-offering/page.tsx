@@ -153,7 +153,8 @@ useEffect(() => {
   return (
     <main className="h-[100vh] flex flex-col gap-3 relative">
       <div className="mt-20 gap-5 flex flex-col">
-        <span className="text-5xl font-bold flex justify-center">Post</span>
+      <span className="text-5xl font-bold flex justify-center">My Offering</span>
+        <span className="text-4xl font-bold flex justify-start ml-7">Post</span>
         {
           (userData?.role === 'producer') ? 
           <div className="flex flex-col gap-5">

@@ -34,7 +34,7 @@ export default function HistoryProductionContent({
   const getOfferByText = (offeredBy: boolean) => {
     return offeredBy ? "Producer" : "Professional";
   };
-
+  
   return (
     <div className="w-full bg-white rounded-lg shadow-md p-3">
       <div className="flex items-center justify-between mb-2">
@@ -56,7 +56,7 @@ export default function HistoryProductionContent({
           <span className="font-medium">Role:</span> {data.roleName}
         </div>
         <div>
-          <span className="font-medium">Status:</span>
+          {/* <span className="font-medium">Status:</span>
           <span
             className={
               data.status === "candidate"
@@ -67,7 +67,7 @@ export default function HistoryProductionContent({
             }
           >
             {" " + getStatusText(data.status)}
-          </span>
+          </span> */}
         </div>
         <div className="col-span-2">
           <span className="font-medium">Offer Time:</span> {displayDate}

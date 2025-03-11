@@ -363,7 +363,7 @@ useEffect(() => {
         try {
           let response;
           if (userRole === "producer") {
-            response = await getPostById(postID,token) 
+            response = await getPostById(postID,token ?? "") 
             setPostState(response)
           } else if (userRole === "production professional") {
             // response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
