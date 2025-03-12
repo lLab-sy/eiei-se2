@@ -20,11 +20,11 @@ export default function HistoryProductionContent({
   const getStatusText = (status: string) => {
     switch (status) {
       case "candidate":
-        return "รอพิจารณา";
+        return "candidate";
       case "reject":
-        return "ปฏิเสธแล้ว";
+        return "reject";
       case "in-progress":
-        return "ตอบรับแล้ว";
+        return "in-progress";
       default:
         return status;
     }

@@ -53,7 +53,7 @@ const mockPosts = [
       "https://example.com/images/mv-project2.jpg",
     ],
     postMediaType: "music-video",
-    postProjectRoles: ["ผู้กำกับ", "ช่างภาพ", "นักแสดงนำ", "โปรดิวเซอร์"],
+    postProjectRoles: ["Director", "ช่างภาพ", "นักแสดงนำ", "โปรดิวเซอร์"],
     postStatus: "created",
     startDate: "2025-05-01T00:00:00.000Z",
     endDate: "2025-06-15T00:00:00.000Z",
@@ -64,7 +64,7 @@ const mockPosts = [
 // Mock data สำหรับ Offer History ในหน้า post detail
 const mockOfferHistory = [
   {
-    roleName: "ผู้กำกับ",
+    roleName: "Director",
     price: 15000,
     offerBy: 1, // 1 = Producer, 2 = Production Professional
     createdAt: "2025-03-15T10:30:00.000Z",
@@ -72,7 +72,7 @@ const mockOfferHistory = [
       "ต้องการผู้กำกับที่มีประสบการณ์ทำงานหนังสั้นอย่างน้อย 2 ปี สามารถทำงานในพื้นที่กรุงเทพได้ตลอดช่วงการถ่ายทำ",
   },
   {
-    roleName: "ผู้กำกับ",
+    roleName: "Director",
     price: 20000,
     offerBy: 2,
     createdAt: "2025-03-16T14:20:00.000Z",
@@ -80,7 +80,7 @@ const mockOfferHistory = [
       "ผมมีประสบการณ์ทำหนังสั้นมา 3 ปี เคยได้รับรางวัลจากเทศกาลหนังสั้น อยากขอเสนอค่าตัวที่ 20,000 บาทเนื่องจากโปรเจคต้องใช้เวลาเตรียมงานและถ่ายทำค่อนข้างนาน",
   },
   {
-    roleName: "ผู้กำกับ",
+    roleName: "Director",
     price: 18000,
     offerBy: 1,
     createdAt: "2025-03-17T09:15:00.000Z",
@@ -118,7 +118,7 @@ const mockPostDetail = {
   ],
   postMediaType: "short-film",
   postProjectRoles: [
-    "ผู้กำกับ",
+    "Director",
     "ช่างภาพ",
     "นักแสดงนำชาย",
     "นักแสดงนำหญิง",

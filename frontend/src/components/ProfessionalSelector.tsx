@@ -22,7 +22,7 @@ export default function ProfessionalSelector({
   return (
     <div>
       <label className="text-sm text-gray-500 mb-1 block">
-        เลือกคนที่ต้องการดู
+        Select a Production Professional
       </label>
       <div className="flex overflow-x-auto py-2 gap-2">
         {professionals.map((prof) => (

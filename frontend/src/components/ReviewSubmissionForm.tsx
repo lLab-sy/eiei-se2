@@ -181,10 +181,11 @@ const ReviewSubmissionForm = ({
                     ) : (
                       <div className="p-4 text-center bg-gray-50 rounded-lg">
                         <p className="text-gray-500">
-                          ไม่พบผู้ร่วมงานที่ยังไม่ได้รับการรีวิว
+                          No production professional pending review.
                         </p>
                         <p className="text-sm text-gray-400 mt-1">
-                          คุณได้รีวิวผู้ร่วมงานทุกคนในโพสต์นี้แล้ว
+                          You have reviewed all production professional in this
+                          post.
                         </p>
                       </div>
                     )}

@@ -57,11 +57,11 @@ export default function PostToOffer({
           <>
             <span className="flex flex-col items-center">
               <span className="text-lg font-semibold">{applicantsCount}</span>
-              <span className="text-xs text-gray-500">ผู้สมัคร</span>
+              <span className="text-xs text-gray-500">Applicants</span>
             </span>
             <span className="flex flex-col items-center">
               <span className="text-lg font-semibold">{offersCount}</span>
-              <span className="text-xs text-gray-500">ข้อเสนอ</span>
+              <span className="text-xs text-gray-500">Offer</span>
             </span>
           </>
         )}

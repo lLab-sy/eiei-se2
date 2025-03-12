@@ -47,7 +47,7 @@ export default function ComparisonView({
 
   return (
     <div className="p-4">
-      <h3 className="text-xl font-bold mb-4">เปรียบเทียบข้อเสนอ</h3>
+      <h3 className="text-xl font-bold mb-4">Compare Offers</h3>
       <div className="w-full max-h-[560px] overflow-auto">
         {roleBasedOffers.map((roleOffer, index) => (
           <div key={index} className="mb-6 border rounded-lg overflow-hidden">
@@ -59,11 +59,11 @@ export default function ComparisonView({
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b">
-                      <th className="p-2">ผู้สมัคร</th>
-                      <th className="p-2">ราคา</th>
-                      <th className="p-2">รายละเอียด</th>
-                      <th className="p-2">สถานะ</th>
-                      <th className="p-2">การจัดการ</th>
+                      <th className="p-2">Applicant</th>
+                      <th className="p-2">Price</th>
+                      <th className="p-2">Details</th>
+                      <th className="p-2">Status</th>
+                      <th className="p-2">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -84,7 +84,7 @@ export default function ComparisonView({
                           </div>
                         </td>
                         <td className="p-2 font-semibold">
-                          {prof.price.toLocaleString()} บาท
+                          {prof.price.toLocaleString()} baht
                         </td>
                         <td
                           className="p-2 max-w-[200px] truncate"
@@ -97,10 +97,10 @@ export default function ComparisonView({
                             {getStatusIcon(prof.status)}
                             <span>
                               {prof.status === "candidate"
-                                ? "รอพิจารณา"
+                                ? "Pending"
                                 : prof.status === "in-progress"
-                                  ? "ตอบรับแล้ว"
-                                  : "ปฏิเสธแล้ว"}
+                                  ? "Accepted"
+                                  : "Rejected"}
                             </span>
                           </div>
                         </td>
@@ -112,14 +112,14 @@ export default function ComparisonView({
                                 className="bg-green-500 hover:bg-green-600 text-white"
                                 size="sm"
                               >
-                                ตอบรับ
+                                Accept
                               </Button>
                               <Button
                                 onClick={() => onReject(prof.offerId)}
                                 className="bg-red-500 hover:bg-red-600 text-white"
                                 size="sm"
                               >
-                                ปฏิเสธ
+                                Reject
                               </Button>
                             </div>
                           )}

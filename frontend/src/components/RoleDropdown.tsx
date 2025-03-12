@@ -25,9 +25,7 @@ export default function RoleDropdown({
   // console.log("fsfsfsdfdsdfssfdfsdfdgdghgfhgfhfh",postProjectRoles)
   return (
     <div className="relative">
-      <label className="text-sm text-gray-500 mb-1 block">
-        เลือกตำแหน่งงาน
-      </label>
+      <label className="text-sm text-gray-500 mb-1 block">Select a role</label>
       <div
         className="border p-2 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-50"
         onClick={() => setIsOpen(!isOpen)}

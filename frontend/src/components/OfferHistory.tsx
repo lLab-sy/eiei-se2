@@ -23,7 +23,7 @@ export default function OfferHistory({
   return (
     <div className="p-4">
       <h3 className="text-xl font-bold mb-4">
-        ประวัติการเสนอ - {professionalName}
+        Offer History - {professionalName}
       </h3>
       <div
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
@@ -44,14 +44,14 @@ export default function OfferHistory({
                     className="bg-green-500 hover:bg-green-600 text-white"
                     size="sm"
                   >
-                    ตอบรับ
+                    Accept
                   </Button>
                   <Button
                     onClick={() => onReject(offer._id)}
                     className="bg-red-500 hover:bg-red-600 text-white"
                     size="sm"
                   >
-                    ปฏิเสธ
+                    Reject
                   </Button>
                 </div>
               )}
