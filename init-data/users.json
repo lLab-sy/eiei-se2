@@ -1,470 +1,127 @@
-[
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2ae8"
-    },
-    "username": "johndoe",
-    "role": "production professional",
-    "email": "johndoe@example.com",
-    "profileImage": "10123e7c7aef4701e1dda38db7015d59b8f7ed70f75583997540ee03fdd2b729",
-    "firstName": "John",
-    "lastName": "Doe",
-    "phoneNumber": "+1234567890",
-    "gender": "Male",
-    "occupation": "Cameraman",
-    "skill": [
-      "Camerawork",
-      "Lighting"
-    ],
-    "experience": 5,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "67cfd0dcd7a5564045ed78be"
-        },
-        "ratingScore": 4.5,
-        "comment": "Great work!",
-        "createdAt": {
-          "$date": "2024-01-15T12:00:00Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "67cfd0dcd7a5564045ed78be"
-        },
-        "ratingScore": 5,
-        "comment": "Very professional.",
-        "createdAt": {
-          "$date": "2024-01-16T10:30:00Z"
-        }
-      }
-    ],
-    "createdAt": "2024-01-15T12:00:00.000Z"
+[{
+  "_id": {
+    "$oid": "67cfe75ee61393154761459b"
   },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2ae9"
-    },
-    "username": "janesmith",
-    "role": "production professional",
-    "email": "janesmith@example.com",
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "phoneNumber": "+1987654321",
-    "gender": "Female",
-    "occupation": "Video Editor",
-    "skill": ["Editing", "Color Grading"],
-    "experience": 3,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439013"
-        },
-        "ratingScore": 4.2,
-        "comment": "Very detailed and creative!",
-        "createdAt": {
-          "$date": "2023-11-22T10:30:00.000Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439014"
-        },
-        "ratingScore": 4.8,
-        "comment": "Amazing editing skills!",
-        "createdAt": {
-          "$date": "2023-11-23T14:45:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2023-11-22T10:30:00.000Z"
+  "username": "testpd1",
+  "password": "$2b$10$JJl2LrdY5JDRo69ug4tuhuEPv99xx3VKPHPXtR7fYJcpsXVvwCMja",
+  "role": "producer",
+  "createdAt": {
+    "$date": "2025-03-11T07:33:50.771Z"
   },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2aea"
-    },
-    "username": "alexwright",
-    "role": "production professional",
-    "email": "alexwright@example.com",
-    "firstName": "Alex",
-    "lastName": "Wright",
-    "phoneNumber": "+1765432109",
-    "gender": "Male",
-    "occupation": "Sound Engineer",
-    "skill": ["Sound Mixing", "Audio Editing"],
-    "experience": 7,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "67cfd0dcd7a5564045ed78be"
-        },
-        "ratingScore": 5.0,
-        "comment": "Excellent sound design!",
-        "createdAt": {
-          "$date": "2023-12-01T09:15:00.000Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439016"
-        },
-        "ratingScore": 4.7,
-        "comment": "Very professional work.",
-        "createdAt": {
-          "$date": "2023-12-02T10:45:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2022-12-01T09:15:00.000Z"
+  "updatedAt": {
+    "$date": "2025-03-12T13:35:15.849Z"
   },
-  {
+  "__v": 0,
+  "bankAccount": {
+    "bankName": "",
+    "accountHolderName": "",
+    "accountNumber": "",
     "_id": {
-      "$oid": "67ae18a37c7f8482264c2aeb"
-    },
-    "username": "emilyrose",
-    "role": "production professional",
-    "email": "emilyrose@example.com",
-    "firstName": "Emily",
-    "lastName": "Rose",
-    "phoneNumber": "+1543210987",
-    "gender": "Female",
-    "occupation": "Lighting Technician",
-    "skill": ["Stage Lighting", "Film Lighting"],
-    "experience": 4,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "67cfd0dcd7a5564045ed78be"
-        },
-        "ratingScore": 4.3,
-        "comment": "Great sense of lighting.",
-        "createdAt": {
-          "$date": "2023-05-17T14:45:00.000Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439018"
-        },
-        "ratingScore": 4.5,
-        "comment": "Reliable and skilled!",
-        "createdAt": {
-          "$date": "2023-05-18T16:00:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2023-05-17T14:45:00.000Z"
+      "$oid": "67d18d9358abc72a31509b12"
+    }
   },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2aec"
-    },
-    "username": "michaeljones",
-    "role": "production professional",
-    "email": "michaeljones@example.com",
-    "firstName": "Michael",
-    "lastName": "Jones",
-    "phoneNumber": "+1654321987",
-    "gender": "Male",
-    "occupation": "Director",
-    "skill": ["Filmmaking", "Screenwriting"],
-    "experience": 10,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439019"
-        },
-        "ratingScore": 5.0,
-        "comment": "Creative and visionary!",
-        "createdAt": {
-          "$date": "2021-08-10T16:20:00.000Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439020"
-        },
-        "ratingScore": 4.9,
-        "comment": "A pleasure to work with.",
-        "createdAt": {
-          "$date": "2021-08-11T09:00:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2021-08-10T16:20:00.000Z"
+  "cardNumber": "",
+  "company": "",
+  "email": "pd.nakub@email.com",
+  "firstName": "Iamproducer",
+  "gender": "Other",
+  "lastName": "nakub",
+  "middleName": "",
+  "nameOnCard": "",
+  "paymentType": "qrCode",
+  "phoneNumber": "0123456789",
+  "profileImage": ""
+},
+{
+  "_id": {
+    "$oid": "67cfebaa2ee482247147799b"
   },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2aed"
-    },
-    "username": "sarahadams",
-    "role": "production professional",
-    "email": "sarahadams@example.com",
-    "firstName": "Sarah",
-    "lastName": "Adams",
-    "phoneNumber": "+1789321456",
-    "gender": "Female",
-    "occupation": "Makeup Artist",
-    "skill": ["SFX Makeup", "Beauty Makeup"],
-    "experience": 6,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439021"
-        },
-        "ratingScore": 4.6,
-        "comment": "Talented and detail-oriented.",
-        "createdAt": {
-          "$date": "2023-09-30T08:10:00.000Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439022"
-        },
-        "ratingScore": 4.8,
-        "comment": "Great for any production!",
-        "createdAt": {
-          "$date": "2023-09-30T09:30:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2023-09-30T08:10:00.000Z"
+  "username": "testpf1",
+  "password": "$2b$10$mzClvv1vZvxKN3vsqoitH.D.yyVyE6v5pG5azBBprQGNONZ3vLCbK",
+  "role": "production professional",
+  "createdAt": {
+    "$date": "2025-03-11T07:52:10.645Z"
   },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2aee"
-    },
-    "username": "chrislee",
-    "role": "production professional",
-    "email": "chrislee@example.com",
-    "firstName": "Chris",
-    "lastName": "Lee",
-    "phoneNumber": "+1897654321",
-    "gender": "Male",
-    "occupation": "Gaffer",
-    "skill": ["Electrical Work", "Lighting Setup"],
-    "experience": 5,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439023"
-        },
-        "ratingScore": 4.4,
-        "comment": "Solid technical skills.",
-        "createdAt": {
-          "$date": "2022-06-21T11:30:00.000Z"
-        }
+  "skill": [],
+  "rating": [
+    {
+      "postID": {
+        "$oid": "67d061fa7baafcebfccffeb0"
       },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439024"
-        },
-        "ratingScore": 4.6,
-        "comment": "Great team player!",
-        "createdAt": {
-          "$date": "2022-06-21T12:00:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2022-06-21T11:30:00.000Z"
-  },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2aef"
-    },
-    "username": "rachelgreen",
-    "role": "production professional",
-    "email": "rachelgreen@example.com",
-    "firstName": "Rachel",
-    "lastName": "Green",
-    "phoneNumber": "+1456789123",
-    "gender": "Female",
-    "occupation": "Costume Designer",
-    "skill": ["Wardrobe Styling", "Fabric Design"],
-    "experience": 8,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "67cfd0dcd7a5564045ed78c1"
-        },
-        "ratingScore": 4.7,
-        "comment": "Very stylish and creative!",
-        "createdAt": {
-          "$date": "2022-02-15T13:55:00.000Z"
-        }
+      "ratingScore": 3,
+      "comment": "asdasdasdsadasdsadasdasdasdasd",
+      "createdAt": {
+        "$date": "2025-03-12T13:00:40.258Z"
       },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439026"
-        },
-        "ratingScore": 4.9,
-        "comment": "Absolutely fantastic designs!",
-        "createdAt": {
-          "$date": "2022-02-15T14:20:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2022-02-15T13:55:00.000Z"
-  },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2af0"
-    },
-    "username": "davidmartin",
-    "role": "production professional",
-    "email": "davidmartin@example.com",
-    "firstName": "David",
-    "lastName": "Martin",
-    "phoneNumber": "+1987543210",
-    "gender": "Male",
-    "occupation": "Production Manager",
-    "skill": ["Budgeting", "Scheduling"],
-    "experience": 9,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439027"
-        },
-        "ratingScore": 4.8,
-        "comment": "Very organized and efficient.",
-        "createdAt": {
-          "$date": "2021-04-12T17:40:00.000Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439028"
-        },
-        "ratingScore": 5.0,
-        "comment": "Top-tier project management!",
-        "createdAt": {
-          "$date": "2021-04-13T11:00:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2021-04-12T17:40:00.000Z"
-  },
-  {
-    "_id": {
-      "$oid": "67ae18a37c7f8482264c2af1"
-    },
-    "username": "lisabrown",
-    "role": "production professional",
-    "email": "lisabrown@example.com",
-    "firstName": "Lisa",
-    "lastName": "Brown",
-    "phoneNumber": "+1765432198",
-    "gender": "Female",
-    "occupation": "Production Assistant",
-    "skill": ["Logistics", "Coordination"],
-    "experience": 2,
-    "rating": [
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439029"
-        },
-        "ratingScore": 4.2,
-        "comment": "Very helpful and proactive.",
-        "createdAt": {
-          "$date": "2024-02-01T07:25:00.000Z"
-        }
-      },
-      {
-        "postID": {
-          "$oid": "507f1f77bcf86cd799439030"
-        },
-        "ratingScore": 4.5,
-        "comment": "Works great under pressure.",
-        "createdAt": {
-          "$date": "2024-02-02T09:15:00.000Z"
-        }
-      }
-    ],
-    "createdAt": "2024-02-01T07:25:00.000Z"
-  },
-  {
-    "_id": {
-      "$oid": "67cac72f06b94eeab26c51c4"
-    },
-    "username": "Producer10",
-    "password": "$2b$10$GRzzSzVIFfs7eM5m7JkSnunK9Mr.pp.qKrWZ932jaC8aa8xtv9TTK",
-    "role": "producer",
-    "createdAt": {
-      "$date": "2025-03-07T10:15:11.148Z"
-    },
-    "updatedAt": {
-      "$date": "2025-03-07T10:15:56.370Z"
-    },
-    "__v": 0,
-    "bankAccount": {
-      "bankName": "",
-      "accountHolderName": "",
-      "accountNumber": "",
       "_id": {
-        "$oid": "67cac75c06b94eeab26c51d1"
+        "$oid": "67d18578eef8c94abdec4312"
       }
-    },
-    "cardNumber": "",
-    "company": "",
-    "email": "rujroot1@gmail.com",
-    "firstName": "r.m.s1",
-    "gender": "Male",
-    "lastName": "u11",
-    "middleName": "",
-    "nameOnCard": "",
-    "paymentType": "qrCode",
-    "phoneNumber": "0642103885",
-    "profileImage": ""
+    }
+  ],
+  "updatedAt": {
+    "$date": "2025-03-12T13:00:40.308Z"
   },
-  {
+  "__v": 0,
+  "bankAccount": {
+    "bankName": "",
+    "accountHolderName": "",
+    "accountNumber": "",
     "_id": {
-      "$oid": "67cac74406b94eeab26c51cb"
-    },
-    "username": "Producer11",
-    "password": "$2b$10$WDE5hhUsgmYe.eE87OQBqe.whvXOl41fJeqlFf/JcNmHc459Gg85i",
-    "role": "producer",
-    "createdAt": {
-      "$date": "2025-03-07T10:15:32.912Z"
-    },
-    "updatedAt": {
-      "$date": "2025-03-07T10:16:22.793Z"
-    },
-    "__v": 0,
-    "bankAccount": {
-      "bankName": "",
-      "accountHolderName": "",
-      "accountNumber": "",
-      "_id": {
-        "$oid": "67cac77606b94eeab26c51d6"
-      }
-    },
-    "cardNumber": "",
-    "company": "",
-    "email": "rujroot2@gmail.com",
-    "firstName": "Ruj1",
-    "gender": "Male",
-    "lastName": "Siripanyapong1",
-    "middleName": "",
-    "nameOnCard": "",
-    "paymentType": "qrCode",
-    "phoneNumber": "0642103880",
-    "profileImage": ""
+      "$oid": "67d130dfd6cbd8ad204330bb"
+    }
   },
-  {
-    "_id": {
-      "$oid": "67cfd83dd7cc70d580f6ee73"
-    },
-    "username": "Producer13",
-    "password": "$2b$10$62AwMntBYdxr9iaxaORsN.6K.ZIuQHd2ZXphfDeOSps89XTl7UvdS",
-    "profileImage": "",
-    "role": "producer",
-    "createdAt": {
-      "$date": "2025-03-11T06:29:17.154Z"
-    },
-    "updatedAt": {
-      "$date": "2025-03-11T06:29:17.154Z"
-    },
-    "__v": 0
-  }
-]
+  "email": "pom.eng@email.com",
+  "firstName": "Pom",
+  "gender": "Male",
+  "lastName": "Eng",
+  "middleName": "",
+  "phoneNumber": "0123456789",
+  "profileImage": ""
+},
+{
+  "_id": {
+    "$oid": "67d08477b8275a1423132bc2"
+  },
+  "username": "yilongMa",
+  "password": "$2b$10$SRur4KLRrzQibglItOe.4uBWgqoGaotc47.R8o7eUnbJTUdyTikAq",
+  "role": "production professional",
+  "createdAt": {
+    "$date": "2025-03-11T18:44:07.489Z"
+  },
+  "skill": [],
+  "rating": [],
+  "updatedAt": {
+    "$date": "2025-03-12T13:00:52.573Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d18e3458abc72a31509b7c"
+  },
+  "username": "testpd2",
+  "password": "$2b$10$HmFokK96BkjTGkZtz74A2eerYcwhl4QxT3KrJNm1T1XkqBM4h6Ka2",
+  "role": "producer",
+  "createdAt": {
+    "$date": "2025-03-12T13:37:56.701Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-12T13:37:56.701Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d190d007f7f4ac7dc5ff15"
+  },
+  "username": "test1",
+  "password": "$2b$10$83r6i2iijO/DW.aKi8kdVeSh.t5m6AH3D3ZIqWhV.fNpzdhwm9MWS",
+  "role": "producer",
+  "createdAt": {
+    "$date": "2025-03-12T13:49:04.373Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-12T13:49:04.373Z"
+  },
+  "__v": 0
+}]
