@@ -8,6 +8,7 @@ export default function HistoryProductionContent({
   data: historyStateInterface;
 }) {
   const offerDate = new Date(data.createdAt);
+  // console.log(offerDate)
   const displayDate = offerDate.toLocaleString("en-US", {
     year: "numeric",
     month: "long",
@@ -20,11 +21,11 @@ export default function HistoryProductionContent({
   const getStatusText = (status: string) => {
     switch (status) {
       case "candidate":
-        return "รอพิจารณา";
+        return "Employed";
       case "reject":
-        return "ปฏิเสธแล้ว";
+        return "Banned";
       case "in-progress":
-        return "ตอบรับแล้ว";
+        return "Waiting";
       default:
         return status;
     }

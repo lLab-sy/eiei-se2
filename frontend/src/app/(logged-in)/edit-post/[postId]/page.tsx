@@ -500,16 +500,24 @@ export default function EditPostPage({
                 <CardTitle className="text-sm">Your Post Picture</CardTitle>
                 <div className="flex flex-col items-center">
                   <div className="h-1/2">
-                    {(postImages.length !== 0 || img.length!==0 )? (
-                      <Image
-                        src={mostRecentImg}
-                        alt="Post Image Here"
+
+                  <Carousel className="w-full h-full">
+                    <CarouselContent>
+                        <CarouselItem>
+                        {(postImages.length !== 0 || img.length!==0 )? (
+                      // <Card className="relative w-full aspect-video" >
+                        <Image
+                          src={mostRecentImg}
+                          alt="Post Image Here"
                         width={parent.innerWidth}
                         height={parent.innerHeight}
-                        className="max-h-48 object-scale-down aspect-square"
-                        priority
-                        placeholder="empty"
+                          // filly
+                          className="max-h-48 object-scale-down"
+                          priority
+                          placeholder="empty"
                       />
+                      // </Card>
+      
                     ) : (
                       <Image
                         src="/image/logo.png"
@@ -521,6 +529,10 @@ export default function EditPostPage({
                         placeholder="empty"
                       />
                     )}
+                        </CarouselItem>
+
+                      </CarouselContent>
+                  </Carousel>
                   </div>
                   <Input
                     type="file"
@@ -532,7 +544,7 @@ export default function EditPostPage({
                     disabled={img.length+postImages.length >= 3 ? true : false}
                   />
                   <div className="w-[80%] justify-center flex">
-                    <Carousel>
+                    <Carousel className="w-full h-full">
                       <CarouselContent>
                         {(postImages.length > 0 || img.length > 0) ? (
                           [...postImages, ...img].map((imgData, index) => (
@@ -540,16 +552,21 @@ export default function EditPostPage({
                             key={isIpostImageDisplay(imgData) ? imgData.imageKey : imgData.imgSrc}
                               className="relative pt-1 justify-center inline-flex flex-col group"
                             >
-                              <Image
-                                src={isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc}
-                                alt="Post Image Here"
-                                width={parent.innerWidth}
-                                height={parent.innerHeight}
-                                className="max-h-48 object-contain aspect-square cursor-pointer bg-maingrey "
-                                priority
-                                placeholder="empty"
-                                onClick={() => setMostRecentImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
-                              />
+
+                              <Card className="relative w-[100%] aspect-video">
+                                <Image
+                                  src={isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc}
+                                  alt="Post Image Here"
+                                  // width={parent.innerWidth}
+                                  // height={parent.innerHeight}
+                                  fill
+                                  className="rounded-lg object-cover shadow-sm w-["
+                                  priority
+                                  placeholder="empty"
+                                  onClick={() => setMostRecentImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
+                                />
+                              </Card>
+                              
                               <X
                                 className="absolute top-1 right-1 hidden group-hover:block
                            bg-mainblue-lightest cursor-pointer"

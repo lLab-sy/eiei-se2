@@ -63,7 +63,7 @@ const PostDetail = () => {
     try{
       response = await getPostById(id, token);
       setDataResponse(response);
-      
+      console.log("Hello Post Data",response )
       try{
         userResponse = await getUser(response.userID);
         setOwnerResponse(userResponse);
@@ -156,7 +156,7 @@ const PostDetail = () => {
   const PostInfo = {
     postName: dataResponse.postName,
     postDescription: dataResponse.postDescription,
-    postImages: dataResponse.postImages,
+    postImageDisplay: dataResponse.postImageDisplay,
     postMediaType: getMedia(dataResponse.postMediaType) ,
     postProjectRoles: getRoles(dataResponse.postProjectRoles || []),
     postStatus: dataResponse.postStatus ,
@@ -183,19 +183,22 @@ const PostDetail = () => {
         <CardContent className="space-y-6">
           {/* Image Carousel */}
           <div className="w-full flex justify-center">
-            <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
-              <CarouselContent>
-                {(PostInfo.postImages && PostInfo.postImages.length != 0) ? (
-                  PostInfo.postImages.map((imgSrc) => (
-                    <CarouselItem key={imgSrc} className="flex justify-center">
-                      <Image
-                        src={"/image/logo.png"}//imgSrc}
-                        alt="Project Image"
-                        width={300}
-                        height={300}
-                        className="rounded-lg object-cover shadow-sm"
-                        priority
-                      />
+             <Carousel className="w-full">
+                    <CarouselContent>
+                    {(PostInfo.postImageDisplay && PostInfo.postImageDisplay.length != 0) ? (
+                  PostInfo.postImageDisplay.map((img) => (
+                    <CarouselItem key={img.imageKey} className="flex justify-center">
+                      <Card className="relative w-full aspect-video">
+                        <Image
+                          src={img.imageURL}//imgSrc}
+                          alt="Project Image"
+                          // width={300}
+                          // height={300}
+                          fill
+                          className="rounded-lg object-cover shadow-sm"
+                          priority
+                        />
+                      </Card>
                     </CarouselItem>
                   ))
                 ) : (
@@ -210,10 +213,10 @@ const PostDetail = () => {
                     />
                   </CarouselItem>
                 )}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
+                    </CarouselContent>
+                    <CarouselPrevious className="left-2" />
+                    <CarouselNext className="right-2" />
+                  </Carousel>
           </div>
 
           {/* Project Name */}

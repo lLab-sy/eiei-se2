@@ -309,14 +309,17 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       const postM: PostSearchRequestModel = postSearchReq
 
       const res = await postRepository.searchPost(postM);
-      const resDTO = res.data.map((post) => {
- 
+      const resDTO = await Promise.all( res.data.map(async (post) => {
+      const postImagesDisplay = await Promise.all(
+          post.postImages.map(async (eachImg: string) => {
+              return await cloudService.getSignedUrlImageCloud(eachImg);
+          }));
 
         return new PostDTO({
         id: post._id?.toString(),
         postName: post.postName as string,
         postDescription: post.postDescription as string,
-        postImages: post.postImages as [string],
+        postImages: postImagesDisplay as [string],
         postMediaType: post.postMediaType.toString() as string,
         postProjectRoles: post.postProjectRoles.map(eachRole=>(
           eachRole.toString()
@@ -325,7 +328,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
         // postDetailID: post.postDetailID.toString() as string,
         startDate: post.startDate?post.startDate:"",  
         endDate: post.endDate?post.endDate:""
-      })})
+      })}))
 
       const response: PaginatedResponseDTO<PostDTO> = {
         data: resDTO,

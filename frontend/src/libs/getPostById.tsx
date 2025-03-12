@@ -44,7 +44,7 @@ export default async function getPostById(
       throw new Error("Failed to fetch post by ID");
     }
 
-    console.log("Fetched Post Data:", response.data.data);
+    console.log("Hello Fetched Post Datassssssssssssssssssssssssssss:", response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching post by ID:", error);
