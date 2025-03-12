@@ -645,4 +645,48 @@ router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postC
  */
 router.post('/create-offer', AuthMiddleware.authenticate as RequestHandler, postController.createOffer as RequestHandler);
 
+/**
+ * @swagger
+ * /api/v1/posts/{id}/participants:
+ *   get:
+ *     summary: Get all participants for a post
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of participants in the post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "67b1a81ded193cb7b3dd94bb"
+ *                   label:
+ *                     type: string
+ *                     example: "Johny Stafrod - Prop Master"
+ *       403:
+ *         description: Unauthorized, only the post owner can view participants
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.get(
+    "/posts/:id/participants",
+    AuthMiddleware.authenticate as RequestHandler,
+    postController.getPostParticipants as RequestHandler
+  );
+
 export default router;
