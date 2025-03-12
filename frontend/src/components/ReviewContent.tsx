@@ -41,9 +41,7 @@ export default function ReviewContent({data, rating} : {data : reviewInterface, 
         </span>
       </div>
       <span className="text-wrap ">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Consectetur
-        odio similique quia ad sint rerum, repudiandae accusantium ullam optio
-        beatae adipisci reiciendis dicta vitae quam saepe aperiam vel iste quos.
+        {data.comment}
       </span>
     </div>
   );
