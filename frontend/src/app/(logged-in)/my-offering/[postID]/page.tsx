@@ -335,9 +335,9 @@ useEffect(() => {
       let response2;
       if (userRole === "producer") {
         console.log('userRole1', userRole)
-        response = await getPrudcerOffers(token ?? ""); // ดึงโพสต์ของ producer
         response2 = await getPostById(postID,token ?? "") 
         setPostState(response2)
+        response = await getPrudcerOffers(token ?? "",postID); // ดึงโพสต์ของ producer
         setProducerOffers(response)
         // console.log("PRODUCER BY",response)
       } else if (userRole === "production professional") {
@@ -465,12 +465,13 @@ useEffect(() => {
         },
       });
       setOfferArray(res?.data?.data?.data);
-      // console.log('resOfferArray', res)
+      console.log('resOfferArrayFromTien', res)
     };
+    // console.log(userRole)
     if(userRole=="production professional"){
       handleFetch(userId);
     }
-  }, []);
+  }, [userRole]);
   // console.log('offerArray', offerArray)
   // เมื่อเลือกบทบาท
   const handleSelectRole = (role: string) => {
@@ -579,13 +580,13 @@ useEffect(() => {
   };
 
   
-  if (!producerOffers) {
-    return (
-      <div className="mt-20 flex justify-center items-center">
-        กำลังโหลดข้อมูล...
-      </div>
-    );
-  }
+  // if (!producerOffers) {
+  //   return (
+  //     <div className="mt-20 flex justify-center items-center">
+  //       กำลังโหลดข้อมูล...
+  //     </div>
+  //   );
+  // }
   
   const handleSelectProducerChange = (selectID: string) => {
     const tmpselectedOfferProducer = producerOffers.find((eachPerson) => eachPerson._id === selectID);
@@ -595,7 +596,7 @@ useEffect(() => {
     }
   };
 
-
+  
 
   return (
     <main className="flex flex-col h-[100vh] gap-3 mb-5 relative">
@@ -625,7 +626,7 @@ useEffect(() => {
                         : "ดูแบบรายคน"}
                     </button>
                   </div> */}
-                  {viewMode === "individual" && (
+                  {producerOffers!=null ? (
                     <div className="flex flex-col gap-3">
                         {/* SELECT PERSON INSTEAD FOR NOW */}
 
@@ -663,6 +664,10 @@ useEffect(() => {
                         />
                       )} */}
                     </div>
+                  ): (
+                    <div className="mt-10 text-center text-gray-500">
+                      You have no offer for now.
+                    </div>
                   )}
                 </div>
                 {//Instead Same As Tien
@@ -684,7 +689,8 @@ useEffect(() => {
                   // />
                   <div className="mt-4 p-4 h-full">
                   <span className="text-2xl font-bold">My Offering</span>
-                  {selectedOfferProducer?.offers?.length > 0 ? (
+        
+                  { selectedOfferProducer?.offers?.length > 0 ? (
                     <div
                       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                       className="overflow-scroll flex flex-col w-[100%] max-h-[640px] items-center flex-wrap gap-5 mt-4"
@@ -729,7 +735,7 @@ useEffect(() => {
                     </div>
                   ) : (
                     <div className="mt-10 text-center text-gray-500">
-                      You have no offer for now
+                      You have no offer for nowsdffsd
                     </div>
                   )}
                 </div>
