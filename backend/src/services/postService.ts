@@ -136,6 +136,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                 postImages: postImages as string[],
                 postMediaType: post.postMediaType as string,
                 roleCount: post.roleCount as number,
+                participant: post.participans,
                 postProjectRoles: post.postProjectRoles as string[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 startDate: post.startDate? post.startDate.toString():"",
@@ -166,6 +167,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: postImages as string[],
+                participant: post.participants,
                 postMediaType: post.postMediaType as string,
                 roleCount: post.roleCount as number,
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
@@ -259,7 +261,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
             createdAt: new Date() ,
             reason: offerInput.reason
         }
-        var response;
+        let response;
         //1 = Add OfferHistory
         if(offerEvidence.length>0){
           response= await postRepository.addNewOffer(offerModel,postID,productionProfessionalID)
@@ -487,6 +489,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
+  async getPostParticipants(postId: string) {
+    try {
+      const participants = await postRepository.getPostParticipants(postId);
+      return participants;
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+  
 }
 
 // Export an instance of the service
