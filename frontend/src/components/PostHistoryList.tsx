@@ -1,28 +1,27 @@
 "use client";
 
-import { useState, useReducer } from "react";
+import { useState } from "react";
 import { PostDataHistory } from "../../interface";
 import PostHistoryCard from "./PostHistoryCard";
 import PaginationBar from "./PostHistoryPaginationBar";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 
 export default function PostHistoryList({
-  postLists,userName,role
+  postLists,
+  userName,
+  role,
 }: {
-  postLists: PostDataHistory[]|null,
-  userName:string,
-  role:string
+  postLists: PostDataHistory[] | null;
+  userName: string;
+  role: string;
 }) {
-
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const projectsPerPage = 10;
-  const startIndex = (currentPage - 1) * projectsPerPage; //เริ่มตรงไหนใน pagesToShow
-  const currentProjects = postLists ?  postLists.slice(
-    //เอาอันไหนมาแสดงบ้าง
-    startIndex,
-    startIndex + projectsPerPage, //projectPerPage
-  ) : null ;
+  const projectsPerPage = 6; // ลดลงเพื่อให้เหมาะกับการแสดง 2 โพสต์ต่อแถว
+  const startIndex = (currentPage - 1) * projectsPerPage;
+  const currentProjects = postLists
+    ? postLists.slice(startIndex, startIndex + projectsPerPage)
+    : null;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-slate-200">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -38,27 +37,36 @@ export default function PostHistoryList({
               : "View your completed projects and achievements"}
           </p>
         </div>
-        {/* Create Post for Producer*/}
-        { role === "producer" ?
-        <div className="">
-          <Link
-          className={"w-10 h-10 p-3 rounded-full transition-all duration-200 bg-mainblue text-white hover:bg-mainblue-light"}
-          href = "/create-post"
-        > Create Post </Link>
-        </div> : <></>}
+
+        {/* Create Post for Producer */}
+        {role === "producer" && (
+          <div className="mb-6">
+            <Link
+              href="/create-post"
+              className="inline-block px-4 py-2 bg-mainblue text-white rounded-md hover:bg-mainblue-light transition-colors"
+            >
+              Create Post
+            </Link>
+          </div>
+        )}
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12 m-auto w-[100%]">
-          {currentProjects ? currentProjects.map((project,index) => (
-            <div
-              key={index}
-              className="transform hover:-translate-y-1 transition-transform duration-300 m-auto"
-            >
-              <Link href={`/post/${project.id}`}>
-                <PostHistoryCard post={project} userName={userName} role={role} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {currentProjects ? (
+            currentProjects.map((project, index) => (
+              <Link key={index} href={`/post/${project.id}`} className="block">
+                <PostHistoryCard
+                  post={project}
+                  userName={userName}
+                  role={role}
+                />
               </Link>
+            ))
+          ) : (
+            <div className="col-span-full text-center text-gray-500">
+              No projects found
             </div>
-          )): <div></div>}
+          )}
         </div>
 
         {/* Pagination Section */}
@@ -66,7 +74,7 @@ export default function PostHistoryList({
           <PaginationBar
             currentPage={currentPage}
             projectsPerPage={projectsPerPage}
-            postListLength={postLists? postLists.length : 0}
+            postListLength={postLists ? postLists.length : 0}
             setCurrentPage={setCurrentPage}
           />
         </div>

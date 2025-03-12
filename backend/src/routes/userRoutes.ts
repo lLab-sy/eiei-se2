@@ -1,31 +1,33 @@
 import { Request, Router } from "express";
+import { RequestHandler } from "@nestjs/common/interfaces";
+import AuthMiddleware from "../middlewares/authMiddleware";
 import userController from "../controllers/userController";
+import postController from "../controllers/postController";
 import multer from "multer";
-import path from 'path'
+import path from "path";
 
-const router = Router()
-const storage = multer.memoryStorage()
+const router = Router();
+const storage = multer.memoryStorage();
 const fileFilter = (req: Request, file: any, cb: Function) => {
-    const filetypes = /png|jpeg|gif|webp/;
-    // Check file extension
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // const sizeCheck = file.size < maxSize
-    // console.log(file.size)
-    // Check MIME type
-    const mimeType = file.mimetype.startsWith('image/');
-    if (extname && mimeType) {
-        return cb(null, true);
-    }
-    else {
-        return cb(new Error("Error: Only PNG, JPEG, and GIF files are allowed!"));
-    }
+  const filetypes = /png|jpeg|gif|webp/;
+  // Check file extension
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  // const sizeCheck = file.size < maxSize
+  // console.log(file.size)
+  // Check MIME type
+  const mimeType = file.mimetype.startsWith("image/");
+  if (extname && mimeType) {
+    return cb(null, true);
+  } else {
+    return cb(new Error("Error: Only PNG, JPEG, and GIF files are allowed!"));
+  }
 };
-const maxSize = 5 * 1024 * 1024 // bytes / 5mb
+const maxSize = 5 * 1024 * 1024; // bytes / 5mb
 const upload = multer({
-    storage: storage,
-    fileFilter,
-    limits : {fileSize : maxSize}
-})
+  storage: storage,
+  fileFilter,
+  limits: { fileSize: maxSize },
+});
 /**
  * @swagger
  * components:
@@ -71,7 +73,7 @@ const upload = multer({
  *         cardNumber:
  *           type: string
  *           description: Credit/Debit card number
- * 
+ *
  *     ProductionProfessionalDTO:
  *       type: object
  *       required:
@@ -130,7 +132,7 @@ const upload = multer({
  *               createdAt:
  *                 type: date
  *                 description: review created date
- * 
+ *
  *     RatingDTO:
  *       type: object
  *       required:
@@ -214,11 +216,19 @@ const upload = multer({
  *       500:
  *         description: Server error
  */
-router.put('/update-user/:id',upload.single('profileImage') , userController.updateUser)
+router.put(
+  "/update-user/:id",
+  upload.single("profileImage"),
+  userController.updateUser
+);
 // upload Image
-router.post('/upload-profile/:id',upload.single('profileImage'), userController.uploadProfileImage)
+router.post(
+  "/upload-profile/:id",
+  upload.single("profileImage"),
+  userController.uploadProfileImage
+);
 // get Signed Profile URL
-router.get('/signed-profile/:id', userController.getSignedURL)
+router.get("/signed-profile/:id", userController.getSignedURL);
 /**
  * @swagger
  * /api/users/search:
@@ -378,10 +388,53 @@ router.put("/:id/addReview", userController.addProductionProfessionalReview);
  */
 router.get("/:id", userController.getUserByID);
 
-
 //getUserReceivedReviews
-router.get("/receivedreviews/:id",userController.getUserReceivedReviewsByID);
+router.get("/receivedreviews/:id", userController.getUserReceivedReviewsByID);
 
-//get all offers for producer 
+//get all offers for producer
 
-export default router
+/**
+ * @swagger
+ * /api/v1/posts/{id}/participants:
+ *   get:
+ *     summary: Get all participants for a post
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of participants in the post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "67b1a81ded193cb7b3dd94bb"
+ *                   label:
+ *                     type: string
+ *                     example: "Johny Stafrod - Prop Master"
+ *       403:
+ *         description: Unauthorized, only the post owner can view participants
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.get(
+  "/posts/:id/participants",
+  AuthMiddleware.authenticate as RequestHandler,
+  postController.getPostParticipants as RequestHandler
+);
+
+export default router;
