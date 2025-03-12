@@ -204,3 +204,7 @@ export interface ReviewData{
     createdAt:Date;
 }
 
+export interface PostParticipant {
+    id: string;
+    label: string;
+}
