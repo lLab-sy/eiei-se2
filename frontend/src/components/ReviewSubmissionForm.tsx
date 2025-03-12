@@ -98,8 +98,8 @@ const ReviewSubmissionForm = ({
 
             // ตรวจสอบว่าข้อมูลมีรูปแบบที่ถูกต้องหรือไม่
             const validParticipants = response.data
+              .filter((item) => !item.isReview) // กรองเฉพาะคนที่ยังไม่ได้ถูกรีวิว
               .map((item) => {
-                // ถ้าข้อมูลไม่มี label หรือ value ให้สร้างจาก id และ label ที่มี
                 if (!item.value && item.id) {
                   return { ...item, value: item.id };
                 }
@@ -107,7 +107,7 @@ const ReviewSubmissionForm = ({
               })
               .filter((item) => item.label && item.value);
 
-            console.log("Processed participants:", validParticipants);
+            console.log("Filtered participants:", validParticipants);
             setParticipants(validParticipants);
 
             // ตั้งค่าเริ่มต้นทันทีหลังได้ข้อมูล
@@ -173,15 +173,20 @@ const ReviewSubmissionForm = ({
                         <span className="loading loading-spinner mr-2"></span>
                         <span>Loading professionals...</span>
                       </div>
-                    ) : (
+                    ) : participants.length > 0 ? (
                       <ReviewProfessionalList
                         form={form}
-                        productionList={
-                          participants.length > 0
-                            ? participants
-                            : mockProductionProfList
-                        }
+                        productionList={participants}
                       />
+                    ) : (
+                      <div className="p-4 text-center bg-gray-50 rounded-lg">
+                        <p className="text-gray-500">
+                          ไม่พบผู้ร่วมงานที่ยังไม่ได้รับการรีวิว
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          คุณได้รีวิวผู้ร่วมงานทุกคนในโพสต์นี้แล้ว
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}
