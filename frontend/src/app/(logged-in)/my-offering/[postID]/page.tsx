@@ -735,7 +735,7 @@ useEffect(() => {
                     </div>
                   ) : (
                     <div className="mt-10 text-center text-gray-500">
-                      You have no offer for nowsdffsd
+                      You have no offer for now.
                     </div>
                   )}
                 </div>
