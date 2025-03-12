@@ -818,9 +818,7 @@ class PostRepository {
       const participants = post.participants.filter(
         (p) => p.status === "candidate"
       );
-
-      let isReviewAll = true
-      const result = participants.map((participant) => {
+      return participants.map((participant) => {
         // หาบทบาทล่าสุดจาก offers (ถ้ามี)
         const latestOffer =
           participant.offer && participant.offer.length > 0
@@ -835,17 +833,13 @@ class PostRepository {
         const isReview = (participant.participantID as any).rating.some(
           (eachRating: { postID: any }) => eachRating.postID == post.id
         );
-        isReviewAll = isReviewAll && isReview
+
         return {
           id: (participant.participantID as any)._id.toString(),
           label: `${(participant.participantID as any).username} - ${roleName}`,
           isReview: isReview,
         };
-      })
-      return {
-        data: result,
-        isReviewAll: isReviewAll
-      };
+      });
     } catch (error) {
       throw new Error("Error fetching post participants: " + error);
     }
