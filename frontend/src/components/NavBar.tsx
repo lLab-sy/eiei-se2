@@ -181,7 +181,7 @@ const NavBar = (session: any) => {
     setMenuItems(sessionMenuItems)},[session.session,token]);
     
     const userId = user?.user?._id ?? ""
-    console.log('userIdToFind', user)
+    // console.log('userIdToFind', user)
     const [historyDataArray, setHistoryDataArray] = useState<Array<historyStateInterface>>([])
     const handleFetch = async () => {
       const postStatus = 'created'

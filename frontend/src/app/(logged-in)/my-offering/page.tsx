@@ -73,35 +73,7 @@ useEffect(() => {
   fetchData();
 }, [userID, userRole]); // ใช้ pid และ token ใน dependency array
 
-  // useEffect(() => {
-  //   // สมมติว่าเราดึงบทบาทของผู้ใช้จาก session หรือ Redux store
-  //   // ในตัวอย่างนี้เราสมมติให้ดึงจาก session
-  // //----------------------------------------------------------------
-  //   // const handleFetch = async (postStatus: string) => {
-  //   //   // ใช้ mock data แทนการเรียก API จริง
-  //   //   setPostArray(mockPosts);
 
-  //   //   // เมื่อทำจริงควรใช้ endpoint ที่แตกต่างกันตามบทบาท
-  //   //   /*
-  //   //   const endpoint = userRole === 'producer' 
-  //   //     ? 'posts/user/prod'  // สำหรับ Producer ดูโพสต์ของตัวเอง
-  //   //     : 'posts/user/prof'; // สำหรับ Professional ดูโพสต์ที่มี
-        
-  //   //   const query = `?postStatus=${postStatus}&limit=10&page=1`;
-  //   //   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/${endpoint}${query}`;
-  //   //   const res = await axios.get(apiUrl, {
-  //   //     withCredentials: true,
-  //   //     headers: {
-  //   //       Authorization: `Bearer ${session?.user?.token}`,
-  //   //     },
-  //   //   });
-  //   //   console.log("postres", res);
-  //   //   setPostArray(res?.data?.data?.data);
-  //   //   */
-  //   // };
-
-  //   handleFetch("created");
-  // }, [session]);
   const userData : any = useSelector<RootState>(state => state.user.user)
   console.log('userDataPostHistory', userData)
   console.log("postArrayData", postArray);
@@ -157,14 +129,22 @@ useEffect(() => {
         <span className="text-4xl font-bold flex justify-start ml-7">Post</span>
         {
           (userData?.role === 'producer') ? 
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-wrap my-4 mx-8 gap-5 h-full">
           {(postArray && postArray?.length > 0) ? postArray.map((post, index) => (
             <div
                 key={index}
               className="cursor-pointer"
               onClick={() => handleChangePage(post?.id!)}
             >
-              <PostToOffer post={post}/>
+              <PostCard 
+                key={index}
+                title={post.postName}
+                description={post.postDescription}
+                imageUrl={(post.postImages && post.postImages.length != 0)  ? post.postImages[0] : ''} 
+                role={getRoleById(post.postProjectRoles || [])} 
+                mediaType={getMediaNameById(post.postMediaType)}
+                id={post.id}
+              />
             </div>
           )) : ""}
           

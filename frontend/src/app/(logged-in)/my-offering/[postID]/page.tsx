@@ -6,8 +6,15 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { OfferData, PostData } from "../../../../../interface";
-
+import { OfferData, OfferHistoryResponseData, PostData } from "../../../../../interface";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 // นำเข้า mock data
 import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
 
@@ -317,21 +324,22 @@ export default function OfferPostContent() {
 
 //------------------------------------------------------------------------------------
 
-//*********************************** */
 const token =session?.user.token
-// const [postState, setPostState] = useState<PostData | null>(null);
 const userID= session?.user.id
-// const userRole =session?.user.role
-const [error, setError] = useState<string | null>(null);
-const [professionalOffers,setProfessionalOffers] =useState<OfferData[]|null>(null)
-const [postImageState, setPostImageState] = useState<string>('')
+const [producerOffers,setProducerOffers] =useState<OfferHistoryResponseData[]|null>(null)
+const [selectedOfferProducer,setSelectedOfferProducer] =useState<OfferHistoryResponseData|null>(null)
 useEffect(() => {
   const fetchData = async () => {
     try {
       let response;
+      let response2;
       if (userRole === "producer") {
         console.log('userRole1', userRole)
         response = await getPrudcerOffers(token ?? ""); // ดึงโพสต์ของ producer
+        response2 = await getPostById(postID,token ?? "") 
+        setPostState(response2)
+        setProducerOffers(response)
+        // console.log("PRODUCER BY",response)
       } else if (userRole === "production professional") {
         const handleFetch = async (postID: string) => {
           const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postID}`;
@@ -357,24 +365,24 @@ useEffect(() => {
   //*********************************** */
 
 //API Connection
- useEffect(() => {
-      const fetchData = async () => {
-        try {
-          let response;
-          if (userRole === "producer") {
-            response = await getPostById(postID,token ?? "") 
-            setPostState(response)
-          } else if (userRole === "production professional") {
-            // response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
-          }
-          // console.log(response,"OHNPPPPPPPPPPPPPPPPPPPPp")
-          }
-        catch (err) {
-          setError("Failed to load posts. Please try again later.");
-        }
-      };
-     fetchData();
-    }, []); // ใช้ pid และ token ใน dependency array
+//  useEffect(() => {
+//       const fetchData = async () => {
+//         try {
+//           let response;
+//           if (userRole === "producer") {
+//             response = await getPostById(postID,token ?? "") 
+//             setPostState(response)
+//           } else if (userRole === "production professional") {
+//             // response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+//           }
+//           // console.log(response,"OHNPPPPPPPPPPPPPPPPPPPPp")
+//           }
+//         catch (err) {
+//           setError("Failed to load posts. Please try again later.");
+//         }
+//       };
+//      fetchData();
+//     }, []); // ใช้ pid และ token ใน dependency array
 
 
 //------------------------------------------------------------------------------------
@@ -396,7 +404,7 @@ useEffect(() => {
     }
     setLoading(false);
   }, [userRole, professionals]);
-  console.log(userRole, session?.user?.role);
+  // console.log(userRole, session?.user?.role);
 
   const handleBack = () => {
     router.push("/my-offering");
@@ -457,11 +465,13 @@ useEffect(() => {
         },
       });
       setOfferArray(res?.data?.data?.data);
-      console.log('resOfferArray', res)
+      // console.log('resOfferArray', res)
     };
-    handleFetch(userId);
+    if(userRole=="production professional"){
+      handleFetch(userId);
+    }
   }, []);
-  console.log('offerArray', offerArray)
+  // console.log('offerArray', offerArray)
   // เมื่อเลือกบทบาท
   const handleSelectRole = (role: string) => {
     setSelectedRole(role);
@@ -568,13 +578,24 @@ useEffect(() => {
     return offer.isLatestOffer === true;
   };
 
-  if (loading) {
+  
+  if (!producerOffers) {
     return (
       <div className="mt-20 flex justify-center items-center">
         กำลังโหลดข้อมูล...
       </div>
     );
   }
+  
+  const handleSelectProducerChange = (selectID: string) => {
+    const tmpselectedOfferProducer = producerOffers.find((eachPerson) => eachPerson._id === selectID);
+    if (tmpselectedOfferProducer && tmpselectedOfferProducer._id !== selectedOfferProducer?._id) {
+      console.log("ChangPerson",tmpselectedOfferProducer);
+      setSelectedOfferProducer(tmpselectedOfferProducer);
+    }
+  };
+
+
 
   return (
     <main className="flex flex-col h-[100vh] gap-3 mb-5 relative">
@@ -593,7 +614,7 @@ useEffect(() => {
             {userRole === "producer" && (
               <div className="w-full">
                 <div className="flex flex-col p-4">
-                  <div className="flex justify-between items-center">
+                  {/* <div className="flex justify-between items-center">
                     <h3 className="text-2xl font-bold mb-2">ผู้สมัคร</h3>
                     <button
                       onClick={toggleViewMode}
@@ -603,56 +624,98 @@ useEffect(() => {
                         ? "ดูแบบเปรียบเทียบ"
                         : "ดูแบบรายคน"}
                     </button>
-                  </div>
+                  </div> */}
                   {viewMode === "individual" && (
                     <div className="flex flex-col gap-3">
-                      {/* ใช้ RoleDropdown component */}
-                      <RoleDropdown
+                        {/* SELECT PERSON INSTEAD FOR NOW */}
+
+                        <Select
+                          onValueChange={handleSelectProducerChange}
+                          // value={postState.?.id || ""}
+                        >
+                          <SelectTrigger className="shadow-lg">
+                            <SelectValue placeholder="Choose your Candidate" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {producerOffers.map((eachPost: OfferHistoryResponseData) => (
+                                <SelectItem key={eachPost._id} value={eachPost._id}>
+                                  {eachPost.offers[0].userName}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+
+
+                      {/* <RoleDropdown
                         selectedRole={selectedRole}
                         availableRoles={availableRoles}
                         onSelectRole={handleSelectRole}
                         postProjectRoles={postState?.postProjectRolesOut}
-                      />
+                      /> */}
                       {/* แสดงรายชื่อ Professional ตาม Role ที่เลือก */}
-                      {selectedRole && (
+                      {/* {selectedRole && (
                         <ProfessionalSelector
                           professionals={getProfessionalsByRole(selectedRole)}
                           selectedProfessionalId={selectedProfessionalId}
                           onSelect={handleSelectProfessional}
                         />
-                      )}
+                      )} */}
                     </div>
                   )}
                 </div>
-                {viewMode === "individual" && selectedProfessionalId && (
-                  <OfferHistory
-                    offers={
-                      mockProfessionalOffers[
-                        selectedProfessionalId as keyof typeof mockProfessionalOffers
-                      ] || []
-                    }
-                    professionalName={
-                      professionals.find((p) => p.id === selectedProfessionalId)
-                        ?.name || ""
-                    }
-                    userRole={userRole}
-                    isLatestOffer={isLatestOffer}
-                    onAccept={handleAcceptOffer}
-                    onReject={handleRejectOffer}
-                  />
-                )}
-                {viewMode === "comparison" && (
+                {//Instead Same As Tien
+                viewMode === "individual" && selectedProfessionalId && (
+                  // <OfferHistory
+                  //   offers={
+                  //     mockProfessionalOffers[
+                  //       selectedProfessionalId as keyof typeof mockProfessionalOffers
+                  //     ] || []
+                  //   }
+                  //   professionalName={
+                  //     professionals.find((p) => p.id === selectedProfessionalId)
+                  //       ?.name || ""
+                  //   }
+                  //   userRole={userRole}
+                  //   isLatestOffer={isLatestOffer}
+                  //   onAccept={handleAcceptOffer}
+                  //   onReject={handleRejectOffer}
+                  // />
+                  <div className="mt-4 p-4 h-full">
+                  <span className="text-2xl font-bold">My Offering</span>
+                  {selectedOfferProducer?.offers?.length > 0 ? (
+                    <div
+                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                      className="overflow-scroll flex flex-col w-[100%] max-h-[640px] items-center flex-wrap gap-5 mt-4"
+                    >
+                      {selectedOfferProducer?.offers.map((offer, index) => (
+                        <div key={index} className="mt-4 w-[90%] relative">
+                          <HistoryProductionContent data={offer} />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-10 text-center text-gray-500">
+                      You have no offer for now.
+                    </div>
+                  )}
+                </div>
+                )
+                
+                }
+                {/* {viewMode === "comparison" && (
                   <ComparisonView
                     roleBasedOffers={roleBasedOffers}
                     onAccept={handleAcceptOffer}
                     onReject={handleRejectOffer}
                   />
-                )}
+                )} */}
               </div>
             )}
             {userRole === "production professional" && (
                 <div className="mt-4 p-4 h-full">
-                  <span className="text-2xl font-bold">ข้อเสนอของฉัน</span>
+                  <span className="text-2xl font-bold">My Offering</span>
                   {offerArray?.length > 0 ? (
                     <div
                       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
@@ -666,7 +729,7 @@ useEffect(() => {
                     </div>
                   ) : (
                     <div className="mt-10 text-center text-gray-500">
-                      ยังไม่มีข้อเสนอ
+                      You have no offer for now
                     </div>
                   )}
                 </div>
@@ -677,7 +740,7 @@ useEffect(() => {
                 onClick={handleBack}
                 className="w-[100px] bg-red-500 hover:bg-red-600 text-white"
               >
-                กลับ
+                Back
               </Button>
             </div>
                 </div>
