@@ -227,7 +227,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     }
     // console.log(offers.meta.totalPages)
     if (!offers.meta.totalPages){
-      sendResponse(res, 'error', '', 'You have no offer.', 400);
+      sendResponse(res, 'success', [], 'You have no offer.', 200);
       return
     }
     if (offers.meta.totalPages < page) {
