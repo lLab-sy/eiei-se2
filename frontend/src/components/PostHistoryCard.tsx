@@ -5,13 +5,9 @@ import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { z } from "zod";
-// นำเข้าฟังก์ชัน reviewPost
 import postReviewPost from "@/libs/postReviewPost";
 import putReviewProfessional from "@/libs/putReviewProfessional";
-import getPostUser from "@/libs/getPostsUser";
-
-// ถ้ามีการใช้ cookie หรือ session ต้องนำเข้า
-import { useSession } from "next-auth/react"; // หรือวิธีที่คุณใช้ในการจัดการสถานะการเข้าสู่ระบบ
+import { useSession } from "next-auth/react";
 
 export default function PostHistoryCard({
   post,
@@ -25,7 +21,6 @@ export default function PostHistoryCard({
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(false);
-  // ถ้าใช้ next-auth
   const { data: session } = useSession();
   const token = session?.user?.token;
   const userId = session?.user?.id;
@@ -36,12 +31,9 @@ export default function PostHistoryCard({
   const startDateDayJS = new Date(post.startDate);
   const StartDate = startDateDayJS.toDateString();
 
-  // ตรวจสอบว่าโพสต์นี้ได้รับการรีวิวแล้วหรือยัง
   useEffect(() => {
-    // กรณี Production Professional
     if (role === "production professional" && post.participant) {
       if (!Array.isArray(post.participant)) {
-        // กรณีที่ participant เป็น object เดียว
         if (post.participant.participantID && post.participant.reviewedAt) {
           setHasReviewed(
             post.participant.participantID.toString() === userId &&
@@ -49,7 +41,6 @@ export default function PostHistoryCard({
           );
         }
       } else {
-        // กรณีที่ participant เป็น array
         const reviewed = post.participant.some(
           (p) =>
             p.participantID &&
@@ -59,16 +50,12 @@ export default function PostHistoryCard({
         setHasReviewed(reviewed);
       }
     }
-
-    // กรณี Producer
-    // สำหรับ Producer คุณอาจต้องตรวจสอบว่าได้รีวิว Production Professional ทุกคนใน post นี้หรือยัง
-    // หรือใช้เงื่อนไขอื่นตามที่กำหนดในแอพของคุณ
   }, [post, userId, role]);
 
   const formSchema = z.object({
     comment: z
       .string({ required_error: "Please type in your comment" })
-      .trim() //prevent case of PURELY whitespace
+      .trim()
       .min(10, { message: "Comment must be at least 10 characters." })
       .max(1000, { message: "Comment must not exceed 1000 characters." }),
     rating: z
@@ -83,9 +70,7 @@ export default function PostHistoryCard({
       .or(z.literal("unneeded")),
   });
 
-  // Handle review submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Submit values:", values);
     if (values.comment.length < 10) {
       toast({
         variant: "destructive",
@@ -116,33 +101,16 @@ export default function PostHistoryCard({
 
       if (role === "producer") {
         const professionalId = values.production;
-        // Producer is reviewing a Production Professional
-        // ส่วนนี้ต้องมีการสร้าง function reviewProfessional แยกต่างหาก
-        // ไว้สำหรับกรณีที่ producer รีวิว production professional
-        console.log("INPUT", reviewData, token, professionalId);
         response = await putReviewProfessional(
           reviewData,
           token,
           professionalId,
         );
-
-        // toast({
-        //   variant: "destructive",
-        //   title: "Feature not implemented",
-        //   description: "Producer review feature is not implemented yet.",
-        // });
-        // return;
       } else {
-        // Production Professional is reviewing a post
-        // ใช้ฟังก์ชัน postReviewPost ที่เราสร้างขึ้น
-        // ดึง token จาก localStorage แทนการใช้ session
-        // const token = localStorage.getItem("token") || "";
-
         response = await postReviewPost(reviewData, token, post.id);
       }
 
       if (!response) {
-        console.log("Post Review Res", response);
         toast({
           variant: "destructive",
           title: "Failed to submit review",
@@ -151,7 +119,6 @@ export default function PostHistoryCard({
         return;
       }
 
-      // ตรวจสอบการตอบกลับจาก API
       if (response.data?.status === "error") {
         toast({
           variant: "destructive",
@@ -161,7 +128,6 @@ export default function PostHistoryCard({
         return;
       }
 
-      // สำเร็จ
       toast({
         variant: "default",
         title: "Successful review submission",
@@ -181,9 +147,9 @@ export default function PostHistoryCard({
   }
 
   return (
-    <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden">
-      <div className="flex p-6">
-        <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+    <div className="group relative bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.01] h-full flex flex-col">
+      <div className="flex p-4 flex-1">
+        <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 mr-4">
           <Image
             src={
               post.postImages && post.postImages.length > 0
@@ -191,91 +157,64 @@ export default function PostHistoryCard({
                 : "/image/logo.png"
             }
             alt={post.postName}
-            width={0}
-            height={0}
             fill
             className="object-cover"
           />
         </div>
-        <div className="ml-6 flex-1">
-          <div className="flex justify-between items-start">
-            <h3 className="text-xl font-semibold text-mainblue mb-2 group-hover:text-mainblue-light transition-colors">
-              {post.postName}
-            </h3>
-          </div>
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-mainblue mb-2 line-clamp-2">
+            {post.postName}
+          </h3>
           {role === "producer" ? (
-            // Producer View
             <>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 text-sm mb-1">
                 <Film className="w-4 h-4 mr-2 text-mainblue-light" />
-                <p className="text-sm">Type: {post.postMediaType}</p>
+                <p>Type: {post.postMediaType}</p>
               </div>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 text-sm mb-1">
                 <User className="w-4 h-4 mr-2 text-mainblue-light" />
-                <p className="text-sm">
-                  Roles: {post.postProjectRoles?.join(", ") || "N/A"}
-                </p>
+                <p>Roles: {post.postProjectRoles?.join(", ") || "N/A"}</p>
               </div>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 text-sm">
                 <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
-                <p className="text-sm">
+                <p>
                   Period: {StartDate} - {EndDate}
                 </p>
               </div>
-              {post.postStatus === "success" && !hasReviewed && (
-                <div className="flex justify-end z-50">
-                  <button
-                    className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
-                     hover:bg-mainblue-light transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsOpen(true);
-                    }}
-                  >
-                    Review Professional
-                  </button>
-                </div>
-              )}
             </>
           ) : (
-            // Production Professional View
             <>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 text-sm mb-1">
                 <User className="w-4 h-4 mr-2 text-mainblue-light" />
-                <p className="text-sm">
-                  Producer: {post.producerName?.producerName || "Unknown"}
-                </p>
+                <p>Producer: {post.producerName?.producerName || "Unknown"}</p>
               </div>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 text-sm mb-1">
                 <Film className="w-4 h-4 mr-2 text-mainblue-light" />
-                <p className="text-sm">
-                  Role: {post.postProjectRolesOutProfessional?.roleName}
-                </p>
+                <p>Role: {post.postProjectRolesOutProfessional?.roleName}</p>
               </div>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 text-sm">
                 <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
-                <p className="text-sm">Completed: {EndDate}</p>
+                <p>Completed: {EndDate}</p>
               </div>
-              {post.postStatus === "success" && !hasReviewed && (
-                <div className="flex justify-end z-50">
-                  <button
-                    className="px-3 py-1 text-sm bg-mainblue text-white rounded-md
-                     hover:bg-mainblue-light transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsOpen(true);
-                    }}
-                  >
-                    Review Project
-                  </button>
-                </div>
-              )}
             </>
           )}
         </div>
       </div>
+      {post.postStatus === "success" && !hasReviewed && (
+        <div className="p-4 border-t">
+          <button
+            className="w-full px-3 py-2 text-sm bg-mainblue text-white rounded-md
+             hover:bg-mainblue-light transition-colors"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOpen(true);
+            }}
+          >
+            {role === "producer" ? "Review Professional" : "Review Project"}
+          </button>
+        </div>
+      )}
       <ReviewSubmissionForm
         role={role}
         isOpen={isOpen}
