@@ -56,6 +56,8 @@ class PostController {
         req.user.userId,
         req.user.role
       );
+
+      console.log("Fetched posts:", posts); // Log fetched posts
       sendResponse(
         res,
         "success",

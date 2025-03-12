@@ -3,11 +3,13 @@ import { PostDataHistory, ReviewData } from "../../interface";
 import { Clock, Calendar, User, Film } from "lucide-react";
 import ReviewSubmissionForm from "@/components/ReviewSubmissionForm";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 // นำเข้าฟังก์ชัน reviewPost
 import postReviewPost from "@/libs/postReviewPost";
 import putReviewProfessional from "@/libs/putReviewProfessional";
+import getPostUser from "@/libs/getPostsUser";
+
 // ถ้ามีการใช้ cookie หรือ session ต้องนำเข้า
 import { useSession } from "next-auth/react"; // หรือวิธีที่คุณใช้ในการจัดการสถานะการเข้าสู่ระบบ
 
@@ -26,12 +28,42 @@ export default function PostHistoryCard({
   // ถ้าใช้ next-auth
   const { data: session } = useSession();
   const token = session?.user?.token;
+  const userId = session?.user?.id;
 
   const endDateDayJS = new Date(post.endDate);
   const EndDate = endDateDayJS.toDateString();
 
   const startDateDayJS = new Date(post.startDate);
   const StartDate = startDateDayJS.toDateString();
+
+  // ตรวจสอบว่าโพสต์นี้ได้รับการรีวิวแล้วหรือยัง
+  useEffect(() => {
+    // กรณี Production Professional
+    if (role === "production professional" && post.participant) {
+      if (!Array.isArray(post.participant)) {
+        // กรณีที่ participant เป็น object เดียว
+        if (post.participant.participantID && post.participant.reviewedAt) {
+          setHasReviewed(
+            post.participant.participantID.toString() === userId &&
+              post.participant.reviewedAt !== null,
+          );
+        }
+      } else {
+        // กรณีที่ participant เป็น array
+        const reviewed = post.participant.some(
+          (p) =>
+            p.participantID &&
+            p.participantID.toString() === userId &&
+            p.reviewedAt !== null,
+        );
+        setHasReviewed(reviewed);
+      }
+    }
+
+    // กรณี Producer
+    // สำหรับ Producer คุณอาจต้องตรวจสอบว่าได้รีวิว Production Professional ทุกคนใน post นี้หรือยัง
+    // หรือใช้เงื่อนไขอื่นตามที่กำหนดในแอพของคุณ
+  }, [post, userId, role]);
 
   const formSchema = z.object({
     comment: z
@@ -181,7 +213,7 @@ export default function PostHistoryCard({
               <div className="flex items-center text-gray-600">
                 <User className="w-4 h-4 mr-2 text-mainblue-light" />
                 <p className="text-sm">
-                  Roles: {post.postProjectRoles.join(", ")}
+                  Roles: {post.postProjectRoles?.join(", ") || "N/A"}
                 </p>
               </div>
               <div className="flex items-center text-gray-600">
