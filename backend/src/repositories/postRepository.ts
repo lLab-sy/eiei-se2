@@ -554,7 +554,10 @@ class PostRepository {
                     offeredBy: 1,
                     status: 1,
                     createdAt: 1,
-                    userName: '$user.username'
+                    userName: '$user.username',
+                    firstName: '$user.firstName',
+                    middleName: '$user.middleName',
+                    lastName: '$user.lastName'
                   }
             })
 

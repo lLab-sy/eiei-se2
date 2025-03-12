@@ -27,7 +27,10 @@ class UserService {
         try{
 
             const getUser = await userRepository.getUserByID(id)
-            
+            if (getUser.firstName) {
+                getUser.username = (getUser.firstName ?? '') + ' ' + (getUser.middleName ?? '') + (getUser.middleName ? ' ' : '') + (getUser.lastName ?? '')
+            }
+
             return getUser
         }catch(err){
             console.error("Error in service layer:", err);

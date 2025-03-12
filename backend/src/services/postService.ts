@@ -361,8 +361,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
   async getOffer(offerReq: OfferRequestDTO,role:string): Promise<PaginatedResponseDTO<OfferResponseDTO>> {
     try {
       const offerRequest: GetOfferRequestModel = offerReq
-      var res;
-        res = await postRepository.getOffer(offerRequest);
+      const res = await postRepository.getOffer(offerRequest);
 
       const resDTO = res.data.map((offer) => {
         return new OfferResponseDTO({
@@ -417,7 +416,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
             _id: String(offer._id), // Ensure _id is a string
             offers: (offer.offers || []).map((o: any) => new OfferResponseDTO({
                 _id: String(o._id),
-                userName: o.userName as string,
+                userName:  o.firstName ? o.firstName + ' ' + o.middleName + (o.middleName ? ' ' : '') + o.lastName : o.userName,
                 postName: o.postName || "",
                 roleName: o.roleName || "",
                 currentWage: o.currentWage || 0,

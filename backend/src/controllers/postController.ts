@@ -217,7 +217,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       postId: req.query.postId? req.query.postId as string: "",
       postStatus: postStatus as string
     }
-    var offers;
+    let offers;
     if(role=="producer"){
       offers= await postService.getProducerOffer(offerReqDTO,producerId);
     }else{

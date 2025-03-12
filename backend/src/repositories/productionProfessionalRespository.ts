@@ -31,6 +31,14 @@ class ProductionProfessionalRespository {
             const matchStage: PipelineStage[] = [];
             
             console.log(searchReqModel)
+
+            matchStage.push({
+                $addFields: {
+                    firstName: { $ifNull: ["$firstName", "$username"] },
+                    middleName: { $ifNull: ["$middleName", ""] },
+                    lastName: { $ifNull: ["$lastName", ""] }
+                }
+            });
             
             if (searchReqModel.searchText) {
                 // full-text search only available in atlas sad T^T
