@@ -1,59 +1,76 @@
 "use client"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
-
+import { ProfessionalsData, Professional } from "../../../../interface";
 import SearchBar from "@/components/SearchBar";
 import ProfessionalCard from "@/components/ProfessionalCrad";
 import Pagination from "@/components/Pagination";
+import getProfessionals from "@/libs/getProfessionals";
 
-const PAGE_SIZE = 32;
-
-////////// For testing 
-const professionals = Array.from({ length: 259 }, (_, index) => ({
-  title: `John Doe ${index + 1}`,
-  skill: ["Cameraman", "Lighting", "Editing"],
-  description: "My name is John Doe and I am a professional videographer.",
-  ratings: (Math.random() * 5),
-  occupation: "Videographer",
-  imageUrl: "https://via.placeholder.com/150",
-  experience: 10,
-  id: index.toString(),
-}));
+const PAGE_SIZE = 12;
 
 const ProfessionalsPage = () => {
 
+  // requestFilter
+  const [requestFilter, setRequestFilter] = useState("&minRating=0");
+
+  // page
+  const [requestPage, setRequestPage] = useState("?limit="+PAGE_SIZE.toString()+"&page=1");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const totalPages = Math.ceil(professionals.length / PAGE_SIZE);
+  // data
+  const [dataResponse,setDataResponse]= useState<ProfessionalsData|null>(null);
+  const [professtionalsCurrentPage, setProfesstionalsCurrentPage] = useState<Professional[]|null>(null)
 
-  const paginatedServices = professionals.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+  useEffect(()=>{
+    const fetchData=async()=>{
+        
+        var response;
+        console.log(requestPage + requestFilter);
+        try{
+          console.log("Getting Professionals...")
+          response= await getProfessionals(requestPage + requestFilter)
+          console.log("getProfessionals response",response)
+        }catch(error){
+          setTotalPages(1);
+          handlePageChange(1);
+          setDataResponse(null);
+          setProfesstionalsCurrentPage(null);
+          console.log("Request Not Found");
+        }
+        if (response) {
+          setDataResponse(response);
+        }
+        
     }
-  };
+    fetchData()
+},[requestFilter, requestPage]);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  useEffect(() => {
+    if (dataResponse) {
+      setTotalPages(dataResponse.meta.totalPages);
+      setProfesstionalsCurrentPage(dataResponse.data); // Update professionals list
     }
-  };
+  }, [dataResponse]);
 
   const handlePageChange = (page: number) => {
+    setRequestPage("?limit="+PAGE_SIZE.toString()+"&page="+page.toString());
     setCurrentPage(page);
+  };
+
+  const handleFilterChange = (filter: string, rating: number) => {
+    handlePageChange(1);
+    setRequestFilter(filter + "&minRating=" + rating.toString());
   };
 
   return (
     <div className="sticky min-h-screen bg-gray-50 ">
 
       {/*Header*/}
-      <div className="sticky top-0 bg-mainblue-light z-10 py-4">
+      <div className="top-0 bg-mainblue-light z-10 py-4">
         <div className="flex justify-center items-center space-x-4">
-          <SearchBar />
+          <SearchBar onSearch={handleFilterChange}/>
         </div>
       </div>
 
@@ -63,21 +80,27 @@ const ProfessionalsPage = () => {
       
       {/* Grid Layout */}
       <div className="min-h-screen p-14 bg-gray-50 px-8 lg:px-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
-          {paginatedServices.map((professional, index) => (
-            <ProfessionalCard
-              key={index}
-              title={professional.title}
-              description={professional.description}
-              imageUrl={professional.imageUrl} 
-              skill={professional.skill} 
-              ratings={professional.ratings} 
-              occupation={professional.occupation}
-              experience={professional.experience}
-              id={professional.id}          
+      {professtionalsCurrentPage ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
+            {professtionalsCurrentPage.map((professional, index) => (
+              <ProfessionalCard
+                key={index}
+                title={professional?.firstName + " " + professional?.lastName}
+                description={professional?.description || ""}
+                imageUrl={professional?.imageUrl || ""}
+                skill={professional?.skill}
+                ratings={Number(professional?.avgRating) || 0}
+                occupation={professional?.occupation}
+                experience={professional?.experience}
+                id={professional?._id}
               />
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center text-xl text-gray-600">
+            Data not found
+          </div>
+        )}
       </div>
 
       {/* Pagination */}

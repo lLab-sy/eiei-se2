@@ -24,16 +24,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 //Multiselect: https://shadcnui-expansions.typeart.cc/docs/multiple-selector
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import uploadImage from "@/hooks/upload-image";
-import createPost from "@/hooks/create-post";
+import { useSession } from "next-auth/react";
+import { imagePair, MediaTypesResponse, PostData, PostRolesResponse } from "../../../../interface";
+import getPostRoles from "@/libs/getPostRoles";
+import createPost from "@/libs/postPost";
+import getMediaTypes from "@/libs/getMediaTypes";
+import router, { useRouter } from "next/navigation";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 const optionSchema = z.object({
   label: z.string(),
   value: z.string(),
@@ -52,39 +67,88 @@ const formSchema = z.object({
     .min(50, { message: "Description must be at least 50 characters." })
     .max(1000, { message: "Description must not exceed 1000 characters." }),
   //mock type, roles -> will need API to be updatable
-  type: z.enum(["media", "short", "drama", "ads"], {
-    required_error: "Please select your media type",
-  }),
+  type: z
+    .string({required_error: "Please select your media type"})
+    .min(1,{message:"Please Select mediaType"}),
   roles: z
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
-//mock options -> will use API in later stage
-const OPTIONS: Option[] = [
-  { label: "Producer", value: "producer" },
-  { label: "Camera Operator", value: "camera operator" },
-  { label: "Director", value: "director" },
-  { label: "Cinematographer", value: "cinematographer" },
-  { label: "Editor", value: "editor" },
-  { label: "Sound Mixer", value: "sound mixer" },
-  { label: "Prop Master", value: "prop master" },
-  { label: "Audio Technician", value: "audio technician" },
-];
 
+ 
 export default function CreatePostPage() {
+
+  const {data:session} = useSession()
+
+  if(!session){
+    return <>Loading</>
+  }
+  const token=session.user?.token
+  const role= session?.user.role
+
+  if(role!="producer"){
+    return (
+      <div className="flex bg-mainblue-light justify-center">
+        <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18 justify-center">
+          <h1 className="mt-5 text-center text-white">You don't have permission in this page.</h1>
+        </div>
+      </div>
+    )
+  }
+
+  useEffect(()=>{
+      console.log(session)
+      const fetchData=async()=>{
+          const response= await getPostRoles()
+          const tmp= response.data.data
+          let options:Option[]=[];
+          tmp.map((eachRole:PostRolesResponse)=>{
+            options.push({ label: eachRole.roleName, value: eachRole.id })
+          })
+          setPostRoles(options)
+          // console.log("Option",options)
+      }
+      fetchData()
+  },[session])
+  useEffect(()=>{
+    const fetchData=async()=>{
+        const response= await getMediaTypes()
+        const tmp= response.data.data
+        let options:Option[]=[];
+        tmp.map((eachMediaType:MediaTypesResponse)=>{
+          options.push({ label: eachMediaType.mediaName, value: eachMediaType.id })
+        })
+        setMediaTypes(options)
+        // console.log("MediaType",options)
+    }
+    fetchData()
+},[])
+
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       postname: "",
       description: "",
-      type: "media",
+      type: "",
     },
   });
-  /*  TODO: wait for the need to use renavigate
-  const router = useRouter(); */
+
+
+
+  
+  // /*  TODO: wait for the need to use renavigate
+  const router = useRouter(); 
   const { toast } = useToast();
+
+
+  //For CREATE POST 
+
   async function onSubmit (values: z.infer<typeof formSchema>) {
-    const imageList = img.map((img)=>(img.imgFile))
+    const userID= session?.user.id
+    if(!userID){
+      return;
+    }
     // const response = await uploadImage({imageFiles : imageList, token : ''})
     // if (response === null) {
     //   toast({
@@ -97,43 +161,49 @@ export default function CreatePostPage() {
     // const postImage: string[] = response.data
 
     //mock image
-    const postImage = imageList.map((img)=>(URL.createObjectURL(img)))
-
-    const postData = {
+    const postData:PostData = {
       postProjectRoles: values.roles.map((obj) => obj.value),
       postName: values.postname,
       postMediaType: values.type,
-      postDescription: values.description,
-      postImages: postImage
+      postStatus: "created",
+      userID: session?.user.id,
+      postDescription: values.description
     };
-    console.log(postData);
-    console.log(JSON.stringify(postData));
+ 
+    const formData = new FormData()
 
+    const imageList = img.map((eachImg) => eachImg.imgFile);
 
-    // const postCreateResponse = await createPost({postData: postData, token: ''})
-    // if (postCreateResponse === null) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Image uploading failed",
-    //     description: "Please try again.",
-    //   })
-    //   return
-    // }
-    // toast({
-    //   variant: "default",
-    //   title: "Successful post creation",
-    //   description: "Redirecting you...",
-    // })
+    if (imageList.length > 0) {
+      imageList.forEach((file) => {
+        formData.append("postImagesSend", file);  
+      });
+    }
+    formData.append('postData',JSON.stringify(postData))
+    console.log("FormData")
+    const postCreateResponse = await createPost(formData,token)
+    if (postCreateResponse === null) {
+      toast({
+        variant: "destructive",
+        title: "Image uploading failed",
+        description: "Please try again.",
+      })
+      return
+    }
+      toast({
+      variant: "default",
+      title: "Successful post creation",
+      description: "Redirecting you...",
+    })
     // TODO: await for API to finish then renavigate
     // router.push(`/my-post`); 
   }
 
-  interface imagePair {
-    imgSrc: string
-    imgFile: File
-  }
+
 
   const [img,setImg] = useState<imagePair[]>([]);
+  const [postRoles,setPostRoles]=useState<Option[]|null>(null)
+  const [mediaTypes,setMediaTypes]=useState<Option[]|null>(null)
   const [mostRecentImg, setMostRecentImg] = useState<string>("")
 
   const onImgChange = (e:any) => {
@@ -176,6 +246,11 @@ export default function CreatePostPage() {
     if (mostRecentImg === imgSrc && img.length > 1) 
       setMostRecentImg(img[img.length-2].imgSrc)
   }
+  if(!postRoles || !mediaTypes){
+    return <>Loading</>
+  }
+
+ 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
       <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18">
@@ -235,10 +310,12 @@ export default function CreatePostPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="media">Media</SelectItem>
-                              <SelectItem value="short">Short</SelectItem>
-                              <SelectItem value="drama">Drama</SelectItem>
-                              <SelectItem value="ads">Ads</SelectItem>
+                              {
+                                mediaTypes.map((eachMediaType:Option)=>(
+                                  <SelectItem key={eachMediaType.value} value={eachMediaType.value}>{eachMediaType.label}</SelectItem>
+                                ))
+                              }
+  
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -256,7 +333,7 @@ export default function CreatePostPage() {
                       <FormControl>
                         <MultipleSelector
                           {...field}
-                          defaultOptions={OPTIONS}
+                          defaultOptions={postRoles}
                           placeholder="Choose roles required for your project"
                           hidePlaceholderWhenSelected
                           emptyIndicator={
@@ -271,9 +348,29 @@ export default function CreatePostPage() {
                   )}
                   // still lacking picture but uncertain if needed
                 />
-                <Button type="submit">Create Post</Button>
+                {/* <Button type="submit">Create Post</Button> */}
+                <AlertDialog>
+                  <AlertDialogTrigger className=" bg-mainblue text-white p-3 rounded-md hover:bg-sky-700">Create Post</AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This post will add to your my-posts
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction className="bg-green-700" asChild> 
+                          <Button
+                        onClick={() => form.handleSubmit(onSubmit)()}>Confirm</Button>
+                          </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
               </form>
             </Form>
+
           </CardContent>
           <CardContent className="w-[40%] py-5">
             <CardTitle className="text-sm">Your Post Picture</CardTitle>

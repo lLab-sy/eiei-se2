@@ -1,6 +1,23 @@
 {
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
+    "@aws-sdk/s3-request-presigner": "^3.750.0",
+    "@cucumber/cucumber": "^11.2.0",
     "bcrypt": "^5.1.1",
-    "jsonwebtoken": "^9.0.2"
+    "chai": "^5.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "puppeteer": "^24.4.0",
+    "sharp": "^0.33.5",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/aws-sdk": "^0.0.42",
+    "@types/chai": "^5.2.0",
+    "@types/multer": "^1.4.12",
+    "@types/sharp": "^0.31.1"
+  },
+  "scripts": {
+    "test": "cucumber-js --require-module ts-node/register"
   }
 }

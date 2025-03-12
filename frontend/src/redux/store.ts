@@ -15,12 +15,14 @@ import {
     REGISTER,
   } from "redux-persist";
 
-const persistConfig = {
+  const persistConfig = {
     key: 'root',
     storage,
-}
+    whitelist: ['user'],
+};
+
 const rootReducer = combineReducers({
-    user: persistReducer(persistConfig, userReducer),
+    user: userReducer,
     post: postReducer,
 })
 const persistedReducer = persistReducer(persistConfig, rootReducer)

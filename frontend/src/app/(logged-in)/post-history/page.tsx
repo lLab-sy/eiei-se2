@@ -1,11 +1,10 @@
 'use client'
 import PostHistoryList from "@/components/PostHistoryList";
-import { Project } from "../../../../interface";
+import { PostDataHistory} from "../../../../interface";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import getHistoryPost from "@/libs/getHistoryPosts";
 import getHistoryPosts from "@/libs/getHistoryPosts";
-import session from "redux-persist/lib/storage/session";
 import { useSession } from "next-auth/react";
 
 
@@ -26,37 +25,32 @@ import { useSession } from "next-auth/react";
 
 
 export default function HistoryPostPage(){
-  const [postHistoryResponse,setPostHistoryResponse]= useState<Project[]|null>(null)
-  const {data:session} = useSession()
+  const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
+  const {data:session,status} = useSession()
+  const token = session?.user?.token ?? ''
+  const role = session?.user?.role ?? ''
+  const userName = session?.user?.username ?? ''
   
-  if(!session){
-    return <>Loading</>
-  }
-
-  const token=session.user?.token
-  const userName=session.user?.username
-
   useEffect(()=>{
       const fetchData=async()=>{
           const response= await getHistoryPosts(token)
           setPostHistoryResponse(response.data.data)
       }
       fetchData()
-  },[session])
+  },[])
   
  
 
   if(!postHistoryResponse){
     return <>Loading</>
-  }
+  } 
 
-  console.log(postHistoryResponse)
   return (
-    <div className="p-4">
+    <div className="pt-10 min-h">
 
       {/* Project History */}
       {/* <h2 className="text-2xl font-bold text-center my-4">Post-History</h2> */}
-      <PostHistoryList postLists={postHistoryResponse} userName={userName}/>
+      <PostHistoryList postLists={postHistoryResponse} userName={userName} role={role}/>
     
     </div>
   );

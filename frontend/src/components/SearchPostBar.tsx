@@ -1,44 +1,99 @@
 "use client";
 
+import getMediaTypes from "@/libs/getMediaTypes";
+import getPostRoles from "@/libs/getPostRoles";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { RoleType, MediaType } from "../../interface";
 
-const mediaOptions = ["Movie", "TV Show", "Music", "Podcast", "Book", "Game"];
-const roleOptions = ["Admin", "Editor", "Viewer"];
+interface SearchPostBarProps {
+  onSearch: (filter: string) => void;
+}
 
-const SearchBar = () => {
-  const [query, setQuery] = useState("");
+const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
   const [openType, setOpenType] = useState("");
-  const [options, setOptions] = useState<string[]>([]);
+  const [text, setText] = useState("");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+  const [selectedMedia, setSelectedMedia] = useState<MediaType[]>([]);
+  const [selectedRole, setSelectedRole] = useState<RoleType[]>([]);
+
+  const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
+  const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
+
+  useEffect(() => {
+    const fetchData=async()=>{
+        
+      var medias, roles;
+      
+      try{
+        medias = await getMediaTypes();
+      }catch(error){
+        console.log("MediaTypes Not Found");
+      }
+      try{
+        roles = await getPostRoles();
+      }catch(error){
+        console.log("Post Role Not Found");
+      }
+
+      if (medias) {
+        setMediaTypes(medias.data.data);
+      }
+      if(roles){
+        setRoleTypes(roles.data.data);
+      }
+      
+    }
+    fetchData()
+  }, []);
+
+  useEffect(() => {
+    console.log(selectedMedia);
+    console.log(selectedRole);
+  }, [selectedMedia, selectedRole]);
 
   const toggleModal = (type: string) => {
-    if(type === "Media") setOptions(mediaOptions);
-    else setOptions(roleOptions);
-
     setOpenType(type);
     setIsModalOpen(!isModalOpen);
   };
 
-  const handleOptionSelection = (option: string) => {
-    setSelectedOptions((prev) =>
+  const handleSelectionMedia = (option: MediaType) => {
+    setSelectedMedia((prev) =>
+      prev.includes(option) ? prev.filter((m) => m !== option) : [...prev, option]
+    );
+  };
+
+  const handleSelectionRole = (option: RoleType) => {
+    setSelectedRole((prev) =>
       prev.includes(option) ? prev.filter((m) => m !== option) : [...prev, option]
     );
   };
 
   function confirmButton(openType: string): void {
-    console.log(`Selected ${openType}:`, selectedOptions);
     setIsModalOpen(false);
+    handleSearch();
   }
 
   const handleSearch = () => {
-    console.log("Search " + query);
-  };
+    var result = "";
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
+    if(text != "") result += "&searchText="+text;
+
+    if(selectedMedia.length != 0){
+      selectedMedia.forEach(select => {
+        result += "&postMediaTypes=" + select.id;
+      });
+    }
+
+    if(selectedRole.length != 0){
+      selectedRole.forEach(select => {
+        result += "&roleRequirements=" + select.id;
+      })
+    }
+
+    onSearch(result);
   };
 
   return (
@@ -49,7 +104,7 @@ const SearchBar = () => {
           type="text"
           placeholder="Search..."
           className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500"
-          onChange={handleSearchChange}
+          onChange={(e) => setText(e.target.value)}
         />
         <button
           onClick={handleSearch}
@@ -76,17 +131,31 @@ const SearchBar = () => {
           <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg w-1/3">
               <h2 className="text-lg font-semibold mb-4">Select {openType}</h2>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {options.map((option) => (
+              { openType === "Media" ? (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  { mediaTypes.map((option: MediaType) => (
+                    <button
+                      key={option.mediaName}
+                      className={`px-3 py-1 rounded-full border ${selectedMedia.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                      onClick={() => handleSelectionMedia(option)}
+                    >
+                      {option.mediaName}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 mb-4">
+                { roleTypes.map((option: RoleType) => (
                   <button
-                    key={option}
-                    className={`px-3 py-1 rounded-full border ${selectedOptions.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => handleOptionSelection(option)}
+                    key={option.roleName}
+                    className={`px-3 py-1 rounded-full border ${selectedRole.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => handleSelectionRole(option)}
                   >
-                    {option}
+                    {option.roleName}
                   </button>
                 ))}
               </div>
+              )}
               <div className="flex justify-end gap-2">
                 <button className="px-4 py-2 bg-gray-300 rounded-md" onClick={() => toggleModal(openType)}>Cancel</button>
                 <button className="px-4 py-2 bg-blue-500 text-white rounded-md" onClick={() => confirmButton(openType)}>Confirm</button>
@@ -99,4 +168,4 @@ const SearchBar = () => {
   );
 };
 
-export default SearchBar;
+export default SearchPostBar;

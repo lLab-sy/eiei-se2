@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { IProductionProfessional, ProductionProfessional, searchProductionProfessionalResponse, searchReqModel } from "../models/userModel";
+import { IProductionProfessional, ProductionProfessional, Rating, searchProductionProfessionalResponse, searchReqModel } from "../models/userModel";
 import { PipelineStage } from "mongoose";
 
 
@@ -73,7 +73,7 @@ class ProductionProfessionalRespository {
     
             if (searchReqModel.minRating !== undefined) {
                 matchStage.push(
-                    { $unwind: "$rating" },
+                    { $unwind: {path: "$rating", preserveNullAndEmptyArrays: true }},
                     { 
                         $group: {
                             _id: "$_id",
@@ -81,7 +81,7 @@ class ProductionProfessionalRespository {
                             doc: { $first: "$$ROOT" }
                         }
                     },
-                    { $replaceRoot: { newRoot: { $mergeObjects: ["$doc", { avgRating: "$avgRating" }] } } },
+                    { $replaceRoot: { newRoot: { $mergeObjects: ["$doc", { avgRating: { $ifNull: ["$avgRating", 0] } }] } } },
                     { $match: { avgRating: { $gte: searchReqModel.minRating } } }
                 );
             }
@@ -93,7 +93,7 @@ class ProductionProfessionalRespository {
             const totalItemstStage: PipelineStage[] = [...matchStage, { $count: "totalCount" }];
             const totalItemsResult = await ProductionProfessional.aggregate(totalItemstStage);
             const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
-    
+            
             matchStage.push({ $sort: { score: -1 } }, { $skip: skip }, { $limit: limit });
     
             const results: IProductionProfessional[] = await ProductionProfessional.aggregate(matchStage);
@@ -108,7 +108,35 @@ class ProductionProfessionalRespository {
         }
     }
     
+    public async addProductionProfessionalReview(id: string, newRatingModel: Rating) {
+        try {
+            if (!id) {
+                throw new Error("Id is required");
+            }
 
+            const pipelineStage: PipelineStage[] = [];
+
+            pipelineStage.push({$match: {_id: new ObjectId(id)}})
+
+            const result = await ProductionProfessional.findOneAndUpdate(
+                {
+                  _id: id,
+                  "rating.postID": { $ne: newRatingModel.postID }, // Ensure no duplicate comment from the same user
+                },
+                { $push: { rating: newRatingModel } },
+                { new: true }
+            );
+          
+            if (!result) {
+                throw new Error('Review from post already exists or Production professional not found');
+            }
+
+            return result
+        }
+        catch(err){
+            throw new Error('Cannot Update this user: ' + err)
+        }
+    }
 
 }
 

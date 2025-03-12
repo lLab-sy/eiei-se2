@@ -17,6 +17,7 @@ export interface IUser extends Document {
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
+  url? : string;
 }
 
 export interface IBankAccount extends Document {
@@ -33,16 +34,21 @@ export interface IProducer extends IUser {
   cardNumber?: string; //for Credit/Debit
 }
 
+// review
+export interface Rating {
+  postID?: mongoose.Schema.Types.ObjectId;
+  ratingScore?: number;
+  comment?: string;
+  createdAt?: Date;
+} 
+
 // ProductionProfessional-specific fields
 export interface IProductionProfessional extends IUser {
   occupation?: string;
   description?: string;
   skill?: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
   experience?: number; // Years of experience
-  rating?: Array<{
-    ratingScore?: number
-    comment?: string
-  }>;
+  rating?: Array<Rating>;
 }
 
 export const BankAccountSchema = new Schema<IBankAccount>({
@@ -163,6 +169,11 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
     min: 0, // Minimum 0 years of experience
   },
   rating: [{
+    postID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "postTypes",
+      required: true,
+    },
     ratingScore: {
       type: Number,
       min: 0,
@@ -170,6 +181,10 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
     },
     comment: {
       type: String,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now, // Automatically sets the current timestamp when the review is created
     },
   }],
 });

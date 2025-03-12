@@ -37,21 +37,32 @@ import {
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import uploadImage from "@/hooks/upload-image";
+import { useSession } from "next-auth/react";
+import {
+  imagePair,
+  MediaTypesResponse,
+  PostData,
+  PostRolesResponse,
+} from "../../../../../interface";
+import getPostRoles from "@/libs/getPostRoles";
+//import createPost from "@/libs/postPost";
+import getMediaTypes from "@/libs/getMediaTypes";
+import router, { useRouter } from "next/navigation";
 // import { useRouter } from "next/navigation"; //for renavigation after finishing
-
-export const fetchPostData = async (postId: string) => {
-  // จำลองข้อมูลจาก backend
-  return {
-    postName: `The Amazing Rujroot: ${postId}`,
-    description: "This is a short film about life, dreams, and reality. Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan Shikanoko Nokonoko Koshitantan",
-    mediaType: "short",
-    roles: [
-      { label: "Director", value: "director" },
-      { label: "Editor", value: "editor" },
-    ],
-    images: [{ imgSrc: "/image/logo.jpg", imgFile: null }],
-  };
-};
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import getPostById from "@/libs/getPostById";
+import editPostById from "@/libs/editPostById";
 
 const optionSchema = z.object({
   label: z.string(),
@@ -71,104 +82,203 @@ const formSchema = z.object({
     .min(50, { message: "Description must be at least 50 characters." })
     .max(1000, { message: "Description must not exceed 1000 characters." }),
   //mock type, roles -> will need API to be updatable
-  type: z.enum(["media", "short", "drama", "ads"], {
-    required_error: "Please select your media type",
-  }),
+  type: z
+    .string({ required_error: "Please select your media type" })
+    .min(1, { message: "Please Select mediaType" }),
   roles: z
     .array(optionSchema)
     .min(1, { message: "Please choose at least one role." }),
 });
-//mock options -> will use API in later stage
-const OPTIONS: Option[] = [
-  { label: "Producer", value: "producer" },
-  { label: "Camera Operator", value: "camera operator" },
-  { label: "Director", value: "director" },
-  { label: "Cinematographer", value: "cinematographer" },
-  { label: "Editor", value: "editor" },
-  { label: "Sound Mixer", value: "sound mixer" },
-  { label: "Prop Master", value: "prop master" },
-  { label: "Audio Technician", value: "audio technician" },
-];
 
 export default function EditPostPage({
   initialPostId,
 }: {
   initialPostId: string;
 }) {
-    const { postId } = useParams();
-    const { toast } = useToast();
-    const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      postname: "",
-      description: "",
-      type: "media",
-      roles: [],
-    },
-  });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadPostData() {
-      if (!postId) return; // ป้องกัน undefined
-  
-      try {
-        setLoading(true);
-        console.log("Fetching post with ID:", postId);
-        
-        const data = await fetchPostData(postId.toString());
-  
-        const validTypes = ["media", "short", "drama", "ads"] as const;
-        const type = validTypes.includes(data.mediaType as any)
-          ? (data.mediaType as "media" | "short" | "drama" | "ads")
-          : "media"; // fallback
-  
-        form.reset({
-          postname: data.postName,
-          description: data.description,
-          type,
-          roles: data.roles,
-        });
-      } catch (error) {
-        console.error("Failed to fetch post data", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    loadPostData();
-  }, [initialPostId, form]);
-
-  
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const imageList = img.map((img) => img.imgFile);
-
-    const postImage = imageList.map((img) => URL.createObjectURL(img));
-
-    const postData = {
-      postProjectRoles: values.roles.map((obj) => obj.value),
-      postName: values.postname,
-      postMediaType: values.type,
-      postDescription: values.description,
-      postImages: postImage,
-    };
-    console.log(postData);
-    console.log(JSON.stringify(postData));
+  if (!session) {
+    setErrorMessage("This post does not exist.");
+    return <div className="flex justify-center py-10">No session...</div>;
   }
+
+  const token = session.user?.token;
+  const myUserID = session.user.id;
+  //console.log(token)
 
   interface imagePair {
     imgSrc: string;
     imgFile: File;
   }
 
+  interface IpostImageDisplay{
+    imageURL:string;
+    imageKey:string;
+  }
+  
+
   const [img, setImg] = useState<imagePair[]>([]);
+  const [postImages, setPostImages] = useState<IpostImageDisplay[]>([]);
+  const [postImagesKey, setPostImagesKey] = useState<string[]>([]);
+  const [deletedImageKey, setDeletedImageKey] = useState<string[]>([]);
   const [mostRecentImg, setMostRecentImg] = useState<string>("");
+  const [postRoles, setPostRoles] = useState<Option[] | null>(null);
+  const [mediaTypes, setMediaTypes] = useState<Option[] | null>(null);
+
+  useEffect(() => {
+    async function fetchOptions() {
+      try {
+        const [rolesResponse, mediaResponse] = await Promise.all([
+          getPostRoles(),
+          getMediaTypes(),
+        ]);
+
+        setPostRoles(
+          rolesResponse.data.data.map((role: PostRolesResponse) => ({
+            label: role.roleName,
+            value: role.id,
+          })),
+        );
+
+        /*setPostRoles(
+          Array.from(
+            new Map(
+              (rolesResponse.data.data as PostRolesResponse[]).map((role) => [
+                role.roleName, // Use roleName as the key to prevent duplicates
+                { label: role.roleName, value: role.id }
+              ])
+            ).values()
+          ) as Option[] // Cast the result to Option[] explicitly
+        );*/  
+        
+
+        setMediaTypes(
+          mediaResponse.data.data.map((media: MediaTypesResponse) => ({
+            label: media.mediaName,
+            value: media.id,
+          })),
+        );
+      } catch (error) {
+        console.error("Failed to fetch options:", error);
+      }
+    }
+    fetchOptions();
+  }, []);
+
+  const { postId } = useParams();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      postname: "",
+      description: "",
+      type: "",
+      roles: [],
+    },
+  });
+
+  useEffect(() => {
+    if (postRoles && mediaTypes && typeof postId === "string") {
+      getPostById(postId, token)
+        .then((data) => {
+          if (!data) {
+            setErrorMessage("This post doesn't exist.");
+          }
+
+          if (session.user?.id !== data.userID) {
+            setErrorMessage("You are not the producer of this post.");
+          }
+
+          if(data.postImageDisplay.length > 0){
+            setPostImages(data.postImageDisplay);
+            setPostImagesKey(data.postImagesKey);
+            setMostRecentImg(data.postImageDisplay[data.postImageDisplay.length-1].imageURL);
+          }
+
+          form.reset({
+            postname: data.postName || "",
+            description: data.postDescription || "",
+            type: data.postMediaType || "",
+            roles: data.postProjectRolesOut.map((role: { id: string; roleName: string }) => {
+              const foundRole = postRoles.find((r) => r.value === role.id); // Match by `id`
+              return foundRole || { label: role.roleName, value: role.id }; // Set value to `id`
+            }),                       
+          });
+        })
+        .catch((error) => {
+          console.error("Error loading post:", error);
+          setErrorMessage("This post does not exist.");
+        });
+    }
+  }, [postRoles, mediaTypes, postId, token, form]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    
+
+    const userID = session?.user.id;
+    if (!userID) return;
+    if (!postId) return;
+
+    //const postImage = imageList.map((img) => URL.createObjectURL(img));
+    const postData = {
+      postName: values.postname,
+      postDescription: values.description,
+      postImagesKey: postImagesKey.filter((key) => !deletedImageKey.includes(key)),
+      postStatus: "created",
+      userID: session?.user.id,
+      postMediaType: values.type,
+      //postImagesSend: be appended below,
+      keyImagesDelete: deletedImageKey,
+      postProjectRoles: values.roles.map((obj) => obj.value),  
+    };
+    console.log(postData);
+
+    const formData = new FormData()
+    const imageList = img.map((img) => img.imgFile);
+    if (imageList.length > 0) {
+      imageList.forEach((file) => {
+        formData.append("postImagesSend", file);  
+      });
+    }
+    formData.append('postData',JSON.stringify(postData))
+
+    // console.log("FormData")
+    // console.log(postData);
+
+    const postEditResponse = await editPostById(
+      postId.toString(),
+      formData,
+      token,
+    );
+    if (postEditResponse === null) {
+      toast({
+        variant: "destructive",
+        title: "Image uploading failed",
+        description: "Please try again.",
+      });
+      return;
+    }
+    toast({
+      variant: "default",
+      title: "Successful editing post",
+      description: "Redirecting you...",
+    });
+  }
+
+  // ตรวจสอบว่าเป็น IpostImageDisplay หรือไม่
+  const isIpostImageDisplay = (imgData: IpostImageDisplay | imagePair): imgData is IpostImageDisplay => {
+    return (imgData as IpostImageDisplay).imageKey !== undefined;  // เช็คว่า 'imageKey' มีอยู่ในข้อมูล
+  };
+
 
   const onImgChange = (e: any) => {
     if (e.target.files && e.target.files[0]) {
       const files: File[] = Array.from(e.target.files);
-      if (files.length + img.length > 3) {
+      if (files.length + img.length + postImages.length > 3) {
         toast({
           variant: "destructive",
           title: "Picture count limit",
@@ -201,199 +311,296 @@ export default function EditPostPage({
       setMostRecentImg(filenames[filenames.length - 1].imgSrc);
       const newImg = [...img, ...filenames];
       setImg(newImg);
+      //setMostRecentImg(img[img.length-1].imgSrc);
     }
   };
+
   const removeImg = (imgSrc: string) => {
-    setImg(img.filter((img) => img.imgSrc !== imgSrc));
-    console.log(img.length);
-    if (mostRecentImg === imgSrc && img.length > 1)
-      setMostRecentImg(img[img.length - 2].imgSrc);
+    const isUploadedImg = img.some((img) => img.imgSrc === imgSrc);
+    if(isUploadedImg){
+      const updatedImg = img.filter((img) => img.imgSrc !== imgSrc);
+      setImg(updatedImg);
+      if (mostRecentImg === imgSrc && updatedImg.length > 0) {
+        setMostRecentImg(updatedImg[updatedImg.length - 1].imgSrc);
+      }else if(postImages.length>0){
+        setMostRecentImg(postImages[postImages.length - 1].imageURL);
+      }
+    }else{
+      const removedImage = postImages.find((img) => img.imageURL === imgSrc);
+      if (removedImage) {
+        setDeletedImageKey((prev) => [...prev, removedImage.imageKey]);
+      }
+      const updatedPostImages = postImages.filter((img) => img.imageURL !== imgSrc);
+      setPostImages(updatedPostImages);
+      if (mostRecentImg === imgSrc && updatedPostImages.length > 0) {
+        setMostRecentImg(updatedPostImages[updatedPostImages.length - 1].imageURL);
+      }else if(img.length>0){
+        setMostRecentImg(img[img.length-1].imgSrc);
+      }
+    }
+    // setImg(img.filter((img) => img.imgSrc !== imgSrc));
+    // console.log(img.length);
+    // if (mostRecentImg === imgSrc && img.length > 1)
+    //   setMostRecentImg(img[img.length - 2].imgSrc);
   };
 
-  if (loading) return <div className="flex justify-center py-10">Loading...</div>;
+  if (!postRoles || !mediaTypes) {
+    return (
+      <div className="flex justify-center py-60">
+        No postRoles or mediaTypes...
+      </div>
+    );
+  }
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen">
-      <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18">
-        <Card className="w-[100%]">
-          <CardHeader>
-            <CardTitle className="justify-center flex">Edit Post</CardTitle>
-          </CardHeader>
-          <div className="flex flex-row">
-            <CardContent className="flex flex-col py-5 w-[60%]">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-8"
-                >
-                  <FormField
-                    control={form.control}
-                    name="postname"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Post name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Help Required" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Project Description</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="I'm making a short film."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Media Type</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Choose your media type." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectItem value="media">Media</SelectItem>
-                                <SelectItem value="short">Short</SelectItem>
-                                <SelectItem value="drama">Drama</SelectItem>
-                                <SelectItem value="ads">Ads</SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="roles"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role Requirement</FormLabel>
-                        <FormControl>
-                          <MultipleSelector
-                            {...field}
-                            defaultOptions={OPTIONS}
-                            placeholder="Choose roles required for your project"
-                            hidePlaceholderWhenSelected
-                            emptyIndicator={
-                              <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                No result found.
-                              </p>
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit">Edit Post</Button>
-                </form>
-              </Form>
-            </CardContent>
-            <CardContent className="w-[40%] py-5">
-              <CardTitle className="text-sm">Your Post Picture</CardTitle>
-              <div className="flex flex-col items-center">
-                <div className="h-1/2">
-                  {img.length !== 0 ? (
-                    <Image
-                      src={mostRecentImg}
-                      alt="Post Image Here"
-                      width={parent.innerWidth}
-                      height={parent.innerHeight}
-                      className="max-h-48 object-scale-down aspect-square"
-                      priority
-                      placeholder="empty"
+      {!session && (
+        <div className="flex justify-center py-10">No session...</div>
+      )}
+
+      {errorMessage && (
+        <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-20 px-18">
+          <Card className="w-[100%]">
+            <CardHeader>
+              <CardTitle className="justify-center flex">
+                {errorMessage}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+      )}
+
+      {session && !errorMessage && (
+        <div className="flex flex-wrap flex-row sm:w-[70%] w-[100%] my-12 px-18">
+          <Card className="w-[100%]">
+            <CardHeader>
+              <CardTitle className="justify-center flex">Edit Post</CardTitle>
+            </CardHeader>
+            <div className="flex flex-row">
+              <CardContent className="flex flex-col py-5 w-[60%]">
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-8"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="postname"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Post name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Help Required" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  ) : (
-                    <Image
-                      src="/image/logo.png"
-                      alt="Post Image Here"
-                      width={parent.innerWidth}
-                      height={parent.innerHeight}
-                      className="max-h-48 object-scale-down"
-                      priority
-                      placeholder="empty"
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Project Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="I'm making a short film."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  )}
-                </div>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  className="file:text-mainyellow-light file:font-medium bg-mainblue my-5 cursor-pointer hover:bg-mainblue-light text-white"
-                  placeholder="Your post picture"
-                  onChange={onImgChange}
-                  multiple
-                  disabled={img.length >= 3 ? true : false}
-                />
-                <div className="w-[80%] justify-center flex">
-                  <Carousel>
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Media Type</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Choose your media type." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  {mediaTypes.map((eachMediaType: Option) => (
+                                    <SelectItem
+                                      key={eachMediaType.value}
+                                      value={eachMediaType.value}
+                                    >
+                                      {eachMediaType.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="roles"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Role Requirement</FormLabel>
+                          <FormControl>
+                            <MultipleSelector
+                              {...field}
+                              defaultOptions={postRoles}
+                              placeholder="Choose roles required for your project"
+                              hidePlaceholderWhenSelected
+                              emptyIndicator={
+                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                  No result found.
+                                </p>
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {/*<Button type="submit">Edit Post</Button> */}
+                    <AlertDialog>
+                      <AlertDialogTrigger className=" bg-mainblue text-white p-3 rounded-md hover:bg-sky-700">
+                        Edit Post
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This post will be edited.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction className="bg-green-700" asChild>
+                            <Button
+                              onClick={() => form.handleSubmit(onSubmit)()}
+                            >
+                              Confirm
+                            </Button>
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </form>
+                </Form>
+              </CardContent>
+              <CardContent className="w-[40%] py-5">
+                <CardTitle className="text-sm">Your Post Picture</CardTitle>
+                <div className="flex flex-col items-center">
+                  <div className="h-1/2">
+
+                  <Carousel className="w-full h-full">
                     <CarouselContent>
-                      {img.length !== 0 ? (
-                        img.map((img) => (
+                        <CarouselItem>
+                        {(postImages.length !== 0 || img.length!==0 )? (
+                      // <Card className="relative w-full aspect-video" >
+                        <Image
+                          src={mostRecentImg}
+                          alt="Post Image Here"
+                        width={parent.innerWidth}
+                        height={parent.innerHeight}
+                          // filly
+                          className="max-h-48 object-scale-down"
+                          priority
+                          placeholder="empty"
+                      />
+                      // </Card>
+      
+                    ) : (
+                      <Image
+                        src="/image/logo.png"
+                        alt="Post Image Here"
+                        width={parent.innerWidth}
+                        height={parent.innerHeight}
+                        className="max-h-48 object-scale-down"
+                        priority
+                        placeholder="empty"
+                      />
+                    )}
+                        </CarouselItem>
+
+                      </CarouselContent>
+                  </Carousel>
+                  </div>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="file:text-mainyellow-light file:font-medium bg-mainblue my-5 cursor-pointer hover:bg-mainblue-light text-white"
+                    placeholder="Your post picture"
+                    onChange={onImgChange}
+                    multiple
+                    disabled={img.length+postImages.length >= 3 ? true : false}
+                  />
+                  <div className="w-[80%] justify-center flex">
+                    <Carousel className="w-full h-full">
+                      <CarouselContent>
+                        {(postImages.length > 0 || img.length > 0) ? (
+                          [...postImages, ...img].map((imgData, index) => (
+                            <CarouselItem
+                            key={isIpostImageDisplay(imgData) ? imgData.imageKey : imgData.imgSrc}
+                              className="relative pt-1 justify-center inline-flex flex-col group"
+                            >
+
+                              <Card className="relative w-[100%] aspect-video">
+                                <Image
+                                  src={isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc}
+                                  alt="Post Image Here"
+                                  // width={parent.innerWidth}
+                                  // height={parent.innerHeight}
+                                  fill
+                                  className="rounded-lg object-cover shadow-sm w-["
+                                  priority
+                                  placeholder="empty"
+                                  onClick={() => setMostRecentImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
+                                />
+                              </Card>
+                              
+                              <X
+                                className="absolute top-1 right-1 hidden group-hover:block
+                           bg-mainblue-lightest cursor-pointer"
+                                onClick={() => removeImg(isIpostImageDisplay(imgData) ? imgData.imageURL : imgData.imgSrc)}
+                              />
+                            </CarouselItem>
+                          ))
+                        ) : (
                           <CarouselItem
-                            key={img.imgSrc}
-                            className="relative pt-1 justify-center inline-flex flex-col group"
+                            key={"/image/logo.png"}
+                            className="pt-1"
                           >
                             <Image
-                              src={img.imgSrc}
+                              src="/image/logo.png"
                               alt="Post Image Here"
                               width={parent.innerWidth}
                               height={parent.innerHeight}
-                              className="max-h-48 object-contain aspect-square cursor-pointer bg-maingrey "
-                              priority
+                              className="max-h-48 object-scale-down"
                               placeholder="empty"
-                              onClick={() => setMostRecentImg(img.imgSrc)}
-                            />
-                            <X
-                              className="absolute top-1 right-1 hidden group-hover:block
-                           bg-mainblue-lightest cursor-pointer"
-                              onClick={() => removeImg(img.imgSrc)}
                             />
                           </CarouselItem>
-                        ))
-                      ) : (
-                        <CarouselItem key={"/image/logo.png"} className="pt-1">
-                          <Image
-                            src="/image/logo.png"
-                            alt="Post Image Here"
-                            width={parent.innerWidth}
-                            height={parent.innerHeight}
-                            className="max-h-48 object-scale-down"
-                            placeholder="empty"
-                          />
-                        </CarouselItem>
-                      )}
-                    </CarouselContent>
-                    <Label>Total item: {img.length}</Label>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </Carousel>
+                        )}
+                      </CarouselContent>
+                      <Label>Total item: {img.length+postImages.length}</Label>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                    </Carousel>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </div>
-        </Card>
-      </div>
+              </CardContent>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

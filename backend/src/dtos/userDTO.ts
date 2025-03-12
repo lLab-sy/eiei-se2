@@ -60,6 +60,8 @@ export class UserDTO {
   @IsOptional()
   @IsString()
   profileImage?: string;
+
+  file?: Express.Multer.File;
 }
 
 export interface searchReqDTO {
@@ -69,4 +71,52 @@ export interface searchReqDTO {
   minRating?: number;
   limit: number;
   page: number;
+}
+
+export class reviewDTO {
+  postName!: string;
+  producer!: string;
+  producerProfileImage?: string;
+  role!: string;
+  comment!: string;
+  reviewAt!: Date;
+  constructor(init: {postName: string, producer: string, producerProfileImage: string, role: string, comment: string, reviewAt:Date}){
+    this.postName = init.postName;
+    this.producer = init.producer;
+    this.producerProfileImage = init.producerProfileImage;
+    this.role = init.role;
+    this.comment = init.comment;
+    this.reviewAt = init.reviewAt;
+  }
+}
+
+export class reviewWithRatingDTO {
+  rating!: number;
+  amount!: number;
+  reviews!: reviewDTO[];
+  constructor(init: {rating: number, amount: number, reviews: reviewDTO[]}) {
+    this.rating = init.rating;
+    this.amount = init.amount;
+    this.reviews = init.reviews;
+  }
+}
+
+export class ReceivedReviewDTO{
+  reviewerName!: string;
+  reviewerProfileImage?: string;
+  ratingScore!: number;
+  comment!: string;
+  constructor(init:{reviewerName: string, reviewerProfileImage:string, ratingScore:number, comment:string}){
+    this.reviewerName = init.reviewerName;
+    this.reviewerProfileImage = init.reviewerProfileImage;
+    this.ratingScore = init.ratingScore;
+    this.comment = init.comment;
+  }
+}
+
+export class ReceivedReviewsDTO{
+  receivedReviews!: ReceivedReviewDTO[];
+  constructor(init:{receivedReviews: ReceivedReviewDTO[]}){
+    this.receivedReviews = init.receivedReviews;
+  }
 }

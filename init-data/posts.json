@@ -1,112 +1,363 @@
-[
-  {
-      "postName": "Graphic Design for Branding",
-      "postDescription": "Creating branding materials including logos and brochures.",
-      "postImages": ["https://example.com/design1.jpg"],
-      "postMediaType": "graphic",
-      "postProjectRoles": [{ "$oid": "65b1234567abcd1234ef5678" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-01-20T00:00:00.000Z",
-      "endDate": "2025-02-25T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b126" }
+[{
+  "_id": {
+    "$oid": "67cfeb192ee4822471477989"
   },
-  {
-      "postName": "Video Editing for Commercial",
-      "postDescription": "Editing a high-quality commercial for a new product launch.",
-      "postImages": ["https://example.com/video1.jpg"],
-      "postMediaType": "video",
-      "postProjectRoles": [{ "$oid": "65b8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-02-10T00:00:00.000Z",
-      "endDate": "2025-03-05T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b127" }
+  "postName": "my new post",
+  "postDescription": "test post 01 mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu",
+  "postImages": [
+    "7bdd79b17eda9b0ae09e3b87f0a1e98b3589d2b046cd00ec1bbbd2fb0ec26a69"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18c07c7f8482264c2aec"
   },
-  {
-      "postName": "Photography Session for Magazine",
-      "postDescription": "A fashion photoshoot for a well-known magazine.",
-      "postImages": ["https://example.com/photo1.jpg"],
-      "postMediaType": "photo",
-      "postProjectRoles": [{ "$oid": "65a1234567abcd1234ef5678" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-02-15T00:00:00.000Z",
-      "endDate": "2025-03-10T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b128" }
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    },
+    {
+      "$oid": "65b1234567abcd1234ef5678"
+    },
+    {
+      "$oid": "65c8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
   },
-  {
-      "postName": "Script Writing for TV Series",
-      "postDescription": "Writing an engaging script for a new drama series.",
-      "postImages": ["https://example.com/script1.jpg"],
-      "postMediaType": "text",
-      "postProjectRoles": [{ "$oid": "65c8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-03-01T00:00:00.000Z",
-      "endDate": "2025-04-15T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b129" }
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "in-progress",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b1234567abcd1234ef5678"
+          },
+          "offeredBy": 0,
+          "price": 1,
+          "createdAt": {
+            "$date": "2025-03-12T13:25:51.199Z"
+          },
+          "reason": "asdasdl;askfdl;askl;dfkasl;dkal;d"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "createdAt": {
+        "$date": "2025-03-12T13:25:51.199Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-12T13:25:51.199Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-11T07:49:45.668Z"
   },
-  {
-      "postName": "Animation for Kids Show",
-      "postDescription": "Creating engaging animations for an educational kids show.",
-      "postImages": ["https://example.com/animation1.jpg"],
-      "postMediaType": "animation",
-      "postProjectRoles": [{ "$oid": "65b8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-04-01T00:00:00.000Z",
-      "endDate": "2025-05-10T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b130" }
+  "updatedAt": {
+    "$date": "2025-03-12T13:25:51.202Z"
   },
-  {
-      "postName": "Voice Acting for Animated Movie",
-      "postDescription": "Recording voiceovers for a newly released animated feature.",
-      "postImages": ["https://example.com/voice1.jpg"],
-      "postMediaType": "audio",
-      "postProjectRoles": [{ "$oid": "65b1234567abcd1234ef5678" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-05-10T00:00:00.000Z",
-      "endDate": "2025-06-15T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b131" }
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67cfeb422ee4822471477990"
   },
-  {
-      "postName": "Music Composition for Indie Film",
-      "postDescription": "Composing original music for an independent film.",
-      "postImages": ["https://example.com/music1.jpg"],
-      "postMediaType": "audio",
-      "postProjectRoles": [{ "$oid": "65c8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-06-01T00:00:00.000Z",
-      "endDate": "2025-07-20T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b132" }
+  "postName": "my new post",
+  "postDescription": "test post 01 mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu",
+  "postImages": [
+    "7bdd79b17eda9b0ae09e3b87f0a1e98b3589d2b046cd00ec1bbbd2fb0ec26a69"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18ad7c7f8482264c2ae9"
   },
-  {
-      "postName": "Website UI Design",
-      "postDescription": "Creating an intuitive user interface for a startup website.",
-      "postImages": ["https://example.com/ui1.jpg"],
-      "postMediaType": "graphic",
-      "postProjectRoles": [{ "$oid": "65b8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-07-05T00:00:00.000Z",
-      "endDate": "2025-08-15T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b133" }
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
   },
-  {
-      "postName": "Podcast Editing",
-      "postDescription": "Editing and mixing audio for a popular podcast series.",
-      "postImages": ["https://example.com/podcast1.jpg"],
-      "postMediaType": "audio",
-      "postProjectRoles": [{ "$oid": "65a1234567abcd1234ef5678" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-08-01T00:00:00.000Z",
-      "endDate": "2025-09-10T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b134" }
+  "participants": [],
+  "createdAt": {
+    "$date": "2025-03-11T07:50:26.302Z"
   },
-  {
-      "postName": "Game Character Design",
-      "postDescription": "Designing 3D characters for an upcoming game release.",
-      "postImages": ["https://example.com/game1.jpg"],
-      "postMediaType": "graphic",
-      "postProjectRoles": [{ "$oid": "65c8765432abcd5678ef1234" }],
-      "postStatus": "in-progress",
-      "startDate": "2025-09-15T00:00:00.000Z",
-      "endDate": "2025-11-01T00:00:00.000Z",
-      "postDetailID": { "$oid": "65bd5b99a1c2a9d1f8e1b135" }
-  }
-]
+  "updatedAt": {
+    "$date": "2025-03-11T07:50:26.302Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67cfeb4c2ee4822471477995"
+  },
+  "postName": "my new post action 2",
+  "postDescription": "test post 01 mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu mairu",
+  "postImages": [
+    "7bdd79b17eda9b0ae09e3b87f0a1e98b3589d2b046cd00ec1bbbd2fb0ec26a69"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18ad7c7f8482264c2ae9"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "in-progress",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 1000000,
+          "createdAt": {
+            "$date": "2025-03-11T07:59:55.181Z"
+          },
+          "reason": "pom yak tam ngan nee mak mak kub, ps. pom keng mak"
+        },
+        {
+          "role": {
+            "$oid": "65b8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 100,
+          "createdAt": {
+            "$date": "2025-03-12T13:27:26.528Z"
+          },
+          "reason": "ma action mai kubma action mai kubma action mai kubma action mai kubma action mai kubma action mai kub"
+        }
+      ],
+      "ratingScore": null,
+      "comment": "",
+      "reviewedAt": null,
+      "createdAt": {
+        "$date": "2025-03-11T07:59:55.181Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-12T13:27:26.528Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-11T07:50:36.092Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-12T13:27:26.529Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d03277bb8b387af1a74815"
+  },
+  "postName": "nee post mai na kub",
+  "postDescription": "this work is easy money, trust me !!!!!!!!!!!!!!!!!!!!!!",
+  "postImages": [
+    "7bdd79b17eda9b0ae09e3b87f0a1e98b3589d2b046cd00ec1bbbd2fb0ec26a69"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18a37c7f8482264c2ae6"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    },
+    {
+      "$oid": "65b1234567abcd1234ef5678"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "in-progress",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 1,
+          "createdAt": {
+            "$date": "2025-03-12T07:03:51.251Z"
+          },
+          "reason": "pom yar jang kun na kub tae mai koi mee ngern tao lai, pee choy pom noi dai mai kub T^T"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "createdAt": {
+        "$date": "2025-03-12T07:03:51.251Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-12T07:03:51.251Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-11T12:54:15.870Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-12T07:03:51.252Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d061fa7baafcebfccffeb0"
+  },
+  "postName": "new post na kub hahahah",
+  "postDescription": "pom yak non mak mak mak mak mak mak mak mak mak mak mak mak mak mak mak mak mak mak mak mak mak",
+  "postImages": [
+    "7bdd79b17eda9b0ae09e3b87f0a1e98b3589d2b046cd00ec1bbbd2fb0ec26a69"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18a37c7f8482264c2ae6"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "success",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "candidate",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 1,
+          "createdAt": {
+            "$date": "2025-03-11T16:24:09.955Z"
+          },
+          "reason": "aow pai tae tam ngan dee dee na ai sus fku fku fku fku fku fku fku fku fku fku fku fku"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "createdAt": {
+        "$date": "2025-03-11T16:24:09.955Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-11T16:24:09.955Z"
+      }
+    },
+    {
+      "participantID": {
+        "$oid": "67d08477b8275a1423132bc2"
+      },
+      "status": "candidate",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 1,
+          "createdAt": {
+            "$date": "2025-03-11T16:24:09.955Z"
+          },
+          "reason": "aow pai tae tam ngan dee dee na ai sus fku fku fku fku fku fku fku fku fku fku fku fku"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "createdAt": {
+        "$date": "2025-03-11T16:24:09.955Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-11T16:24:09.955Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-11T16:16:58.302Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-11T16:24:09.957Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d1938c07f7f4ac7dc600c1"
+  },
+  "postName": "post mai 1234 5555555",
+  "postDescription": "new post nakub new post nakubnew post nakubnew post nakubnew post nakubnew post nakubnew post nakubnew post nakubnew post nakubnew post nakubnew post nakub",
+  "postImages": [
+    "bc832b483fb562098f8b79994397218a91d9920292757489e2e149b868fe6dfa",
+    "bd646cf82b4bac9da1ee82a06929e8473681ebf02fee67b32b69a644155ccbfa"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18ad7c7f8482264c2ae9"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65a1234567abcd1234ef5678"
+    },
+    {
+      "$oid": "65b1234567abcd1234ef5678"
+    },
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67d190d007f7f4ac7dc5ff15"
+  },
+  "participants": [],
+  "createdAt": {
+    "$date": "2025-03-12T14:00:44.448Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-12T14:00:44.448Z"
+  },
+  "__v": 0
+}]

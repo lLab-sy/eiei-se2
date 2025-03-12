@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import AuthContext from "@/components/AuthProvider"
 
 
 export default async function InLayout({children} : {children : React.ReactNode}){
@@ -8,6 +9,8 @@ export default async function InLayout({children} : {children : React.ReactNode}
         redirect('/login')
     }
     return (
-        children
+        <AuthContext session={session}>
+            {children}
+        </AuthContext>
     )
 }

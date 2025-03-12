@@ -1,24 +1,87 @@
 "use client";
 
-import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn, SearchCheck } from "lucide-react";
+import { JSX, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { setUser } from "@/redux/user/user.slice";
+import { clearStorage, setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import axios from "axios";
-import { signOut } from "next-auth/react";
+import { Avatar, AvatarImage } from "./ui/avatar";
+import HistoryProduction, { historyStateInterface } from "./HistoryProduction";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "./ui/button";
-
+import { signOut } from "next-auth/react";
+type menuItem = {
+  icon: JSX.Element;
+  label: string;
+  href: string;
+}
+const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, handleSignOut: Function}) => {
+  return (
+    <div>
+      <Dialog>
+        <DialogTrigger asChild>
+          {/* <Link href='/'>Logout</Link> */}
+          <Link
+                href={'/'}
+                className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                  "text-red-600 hover:text-red-700"
+                }`}
+                onClick={ async () => setIsMenuOpen(false)}
+              >
+                <LogOut className="w-5 h-5"/>
+                <span>Logout</span>
+            </Link>
+          {/* <Button variant="outline">Edit Profile</Button> */}
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Logout</DialogTitle>
+          </DialogHeader>
+          <div className="gap-4 py-4">
+            <span>Are you sure?</span>
+            
+          </div>
+          <DialogFooter>
+            <div className=' w-full text-white flex flex-row justify-between'>
+                <DialogClose asChild><Button className='bg-red-600'>No</Button></DialogClose>
+                <Button onClick={async () => {
+                  await handleSignOut()
+                }} className='bg-green-400'>Yes</Button>
+            </div>
+          </DialogFooter>  
+        </DialogContent>
+        
+      </Dialog>
+    </div>
+  )
+}
 const NavBar = (session: any) => {
-  const token = session?.session?.user?.token ?? ''
-
+  const token = session?.session?.user?.token ?? '';
+  const role = session?.session?.user?.role ?? '';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuItems, setMenuItems] = useState<menuItem[]>([])
   // const {data: session, status} = useSession()
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
   console.log('session', session)
+  const handleSignOut = async () => {
+    dispatch(clearStorage(''))
+    await signOut()
+    
+  }
+  
   
   // const handleLogout = async () => {
   //   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
@@ -36,7 +99,16 @@ const NavBar = (session: any) => {
       return;
     }
     // set token and set user from fetch data
+    const handleFetchProfileURL = async (id : string) => {
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/signed-profile/${id}`
+      const res= await axios.get(apiUrl)
+      const imageUrl = res?.data?.data ?? ""
+
+      dispatch(setProfileImageURL(imageUrl))
+      return imageUrl
+    }
     const handleFetch = async (fetchToken : string) => {
+      // if(role === 'producer') return;
 
       const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`
       const res = await axios.get(apiUrl, {
@@ -54,6 +126,9 @@ const NavBar = (session: any) => {
         throw new Error('Failed Data')
       }
       const returnUser = await res.data
+      // console.log('returnUser', returnUser)
+      await handleFetchProfileURL(returnUser.data._id)
+
       dispatch(setUser(returnUser.data))
       console.log('setuser', user.user)
       return () => controller.abort()
@@ -61,26 +136,67 @@ const NavBar = (session: any) => {
     handleFetch(token)
   }, [session.session, token])
 
-  const menuItems = [
-    { icon: <User className="w-5 h-5" />, label: "Profile", href: "/user-profile" },
-    {
-      icon: <FileText className="w-5 h-5" />,
-      label: "My Post",
-      href: "/my-post",
-    },
-    {
-      icon: <Gift className="w-5 h-5" />,
-      label: "My Offering",
-      href: "/my-offering",
-    },
-    {
-      icon: <Settings className="w-5 h-5" />,
-      label: "Setting",
-      href: "/setting",
-    },
-    // { icon: (session) ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />, label: (session) ? "Logout" : "Login", href: (session) ? "/api/auth/signout" : "/login" },
-  ];
-
+  useEffect(()=>{
+    if(!session.session || token === '') return;
+    const sessionMenuItems: menuItem[] = [
+      { 
+        icon: <User className="w-5 h-5" />, 
+        label: "Profile", 
+        href: "/user-profile" },
+      {
+        icon: <FileText className="w-5 h-5" />,
+        label: role === "producer" ? "My Post" : "Work History",
+        href: "/post-history",
+      },
+      ...(role === "producer" ? 
+      [{
+        icon: <Gift className="w-5 h-5" />,
+        label: "Create Post",
+        href: "/create-post",
+      },
+      {
+        icon: <SearchCheck className="w-5 h-5" />,
+        label: "Search for Professionals",
+        href: "/professionals", 
+      }] : 
+      []),
+      ...(role === "production professional" ? 
+      [{
+          icon: <SearchCheck className="w-5 h-5" />,
+          label: "Search for Posts",
+          href: "/posts", 
+      }] : 
+      []),
+      {
+        icon: <Gift className="w-5 h-5" />,
+        label: "My Offering",
+        href: "/my-offering",
+      },
+      {
+        icon: <Settings className="w-5 h-5" />,
+        label: "Setting",
+        href: "/setting",
+      },
+    ]
+    setMenuItems(sessionMenuItems)},[session.session,token]);
+    
+    const userId = user?.user?._id ?? ""
+    // console.log('userIdToFind', user)
+    const [historyDataArray, setHistoryDataArray] = useState<Array<historyStateInterface>>([])
+    const handleFetch = async () => {
+      const postStatus = 'created'
+      const query = `?userId=${userId}&postStatus=${postStatus}&limit=10&page=1`
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+      const res = await axios.get(apiUrl, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${session?.session?.user?.token}`,
+        },
+      });
+      setHistoryDataArray(res?.data?.data?.data)
+      console.log('resHistory', res)
+    } 
+    // handleFetch(userId, "created")
   return (
     <header className="bg-[#2B428C] text-white fixed m-auto w-[100%] z-50">
       <div className="flex justify-between items-center h-16 bg-[#2B428C] text-white">
@@ -88,7 +204,7 @@ const NavBar = (session: any) => {
         <Link href="/" className="flex items-center gap-2 pl-2">
           <div className="relative w-10 h-10">
             <Image
-              src="/BualoiDev-logo.png"
+              src="/image/logo-preview.png"
               alt="BualoiDev Logo"
               fill
               className="object-contain"
@@ -102,7 +218,7 @@ const NavBar = (session: any) => {
             </span>
           </div>
         </Link>
-
+        
         {/* Right Section */}
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
@@ -111,10 +227,24 @@ const NavBar = (session: any) => {
               await handleLogout()
               await signOut()
             }}>Logout</Button> : ''} */}
-            <span className="text-sm">Gender: {user?.user?.gender ?? "None"} {session.session ? 'In session' : 'out session'} {user?.user?.username ?? "Username"}</span>
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-gray-600" />
+            {/* <div className={`${session?.session ? "" : "hidden"}`}>
+             <HistoryProduction handleFetch={handleFetch} historyDataArray={historyDataArray}/>
+            </div> */}
+            <span className="text-sm">{session?.session?.user?.username ?? ""}</span>
+            {
+              (session?.session) ?
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+              {/* <User className="w-5 h-5 text-gray-600"/> */}
+
+              <Avatar>
+                <AvatarImage src={(!token) ? "" : user?.profileImageURL??""}/>
+              </Avatar>
+
+              
             </div>
+            :""
+            }
+            
           </div>
 
           {/* Menu Button */}
@@ -152,21 +282,27 @@ const NavBar = (session: any) => {
                 item.label === "Logout" ? "text-red-600 hover:text-red-700" : ""
               }`}
               onClick={() => setIsMenuOpen(false)}
+              prefetch={true}
             >
               {item.icon}
               <span>{item.label}</span>
             </Link>
           ))}
-          <Link
-              href={(session.session) ? '/api/auth/signout' : "/login"}
-              className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                session.session ? "text-red-600 hover:text-red-700" : ""
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {session ? (<LogOut className="w-5 h-5"/>) : (<LogIn className="w-5 h-5"/>)}
-              <span>{(session.session) ? "Logout" : "Login"}</span>
-          </Link>
+          {
+            session?.session ? 
+            <DialogLogout handleSignOut={handleSignOut} setIsMenuOpen={setIsMenuOpen}/>
+            :
+            <Link
+                href={(session.session) ? '/' : "/login"}
+                className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                  session.session ? "text-red-600 hover:text-red-700" : ""
+                }`}
+                onClick={ async () => setIsMenuOpen(false)}
+              >
+                {session ? (<LogOut className="w-5 h-5"/>) : (<LogIn className="w-5 h-5"/>)}
+                <span>{(session.session) ? "Logout" : "Login"}</span>
+            </Link>
+          }
         </div>
       </div>
 

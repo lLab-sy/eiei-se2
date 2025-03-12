@@ -1,8 +1,9 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface Professional {
   name: string;
@@ -10,6 +11,7 @@ interface Professional {
   id: string;
   role?: string;
 }
+
 
 const professionals: Professional[] = Array(4)
   .fill({
@@ -65,7 +67,7 @@ const ProfessionalList: FC = () => {
         ))}
       </div>
     </section>
-  );
+  ) ;
 };
 
 export default ProfessionalList;
