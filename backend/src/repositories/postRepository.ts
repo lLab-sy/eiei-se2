@@ -785,10 +785,15 @@ class PostRepository {
           const isReview = (participant.participantID as any).rating.some(
             (eachRating: { postID: any }) => eachRating.postID == post.id
           );
+          
+          let defaultName = (participant.participantID as any).username
+          if((participant.participantID as any).firstName) {
+            defaultName = (participant.participantID as any).firstName + ' ' + (participant.participantID as any).lastName
+          }
   
           return {
             id: (participant.participantID as any)._id.toString(),
-            label: `${(participant.participantID as any).username} - ${roleName}`,
+            label: `${defaultName} - ${roleName}`,
             isReview: isReview,
           };
         });

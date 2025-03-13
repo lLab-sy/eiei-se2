@@ -65,8 +65,8 @@ Given('has a target production professional', async function () {
 });
 
 Given('the producer has their own posts', async function () {
-  await page.waitForSelector('button[aria-controls="radix-:rc:"]');
-  await page.click('button[aria-controls="radix-:rc:"]');
+  await page.waitForSelector('button[role="combobox"]');
+  await page.click('button[role="combobox"]');
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
   await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
 });
@@ -79,7 +79,9 @@ Given('the producer fills out the offer details', async function () {
   
   await page.waitForSelector('input[name="price"]');
   await page.type('input[name="price"]', '500', {delay: 50});
-  await page.click('button[aria-controls="radix-:rg:"]');
+  await page.waitForSelector('button[role="combobox"]');
+  const offerCombobox = (await page.$$('button[role="combobox"]'))[1];
+  await offerCombobox.click();
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
   await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
 });
@@ -91,7 +93,8 @@ Given('the producer does not fill out the price', async function () {
   );
 
   await page.waitForSelector('button[role="combobox"]');
-  await page.click('button[aria-controls="radix-:rg:"]');
+  const offerCombobox = (await page.$$('button[role="combobox"]'))[1];
+  await offerCombobox.click();
   await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
   await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
 });

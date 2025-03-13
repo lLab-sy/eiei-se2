@@ -693,7 +693,7 @@ useEffect(() => {
                   { selectedOfferProducer?.offers?.length > 0 ? (
                     <div
                       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                      className="overflow-scroll flex flex-col w-[100%] max-h-[640px] items-center flex-wrap gap-5 mt-4"
+                      className="overflow-scroll flex w-[100%] max-h-[500px] border justify-center items-center flex-wrap gap-5 mt-4"
                     >
                       {selectedOfferProducer?.offers.map((offer, index) => (
                         <div key={index} className="mt-4 w-[90%] relative">
