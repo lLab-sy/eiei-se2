@@ -249,15 +249,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       throw new Error('Error in service layer: ' + error);
     }
   }
-  async createOffer(offerInput:ParticipantDetailDTO,postID:string,productionProfessionalID:string){
+  async createOffer(offerInput:ParticipantDetailDTO,postID:string,productionProfessionalID:string, myRole:string){
     try{
 
         //first find that have this production professional send offer to this first before
         const offerEvidence= await postRepository.checkProductionProInPost(postID,productionProfessionalID)
-        var offerModel:OfferDTO={
+        const offerModel:OfferDTO={
             price: offerInput.price,
             role: offerInput.roleID,
-            offeredBy: offerInput.offeredBy,
+            offeredBy: myRole=='producer'?1:0,
             createdAt: new Date() ,
             reason: offerInput.reason
         }
@@ -266,7 +266,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
         if(offerEvidence.length>0){
           response= await postRepository.addNewOffer(offerModel,postID,productionProfessionalID)
         }else{//Create New Object
-          var participantData= new ParticipantDetailDTO({
+          const participantData= new ParticipantDetailDTO({
             participantID: productionProfessionalID,
             status: 'in-progress',
             offer: [offerModel],
