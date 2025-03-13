@@ -340,6 +340,27 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
     }
   };
+
+  async getPostParticipants(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const postId = req.params.id;
+      if (!postId) {
+        sendResponse(res, "error", "", "Post ID is required", 400);
+        return;
+      }
+
+      const participants = await postService.getPostParticipants(postId);
+      console.log("Fetched participants:", participants); // Log fetched participants
+      sendResponse(
+        res,
+        "success",
+        participants,
+        "Successfully retrieved post participants"
+      );
+    } catch (err) {
+      sendResponse(res, "error", err, "Failed to retrieve post participants");
+    }
+  }
 }
 
 

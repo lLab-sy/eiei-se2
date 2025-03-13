@@ -73,6 +73,7 @@ class PostRepository {
                         postName: 1,
                         postDescription: 1,
                         postImages: 1,
+                        participants: 1,
                         postMediaType: 1, // Show mediaName instead of postMediaType
                         postStatus: 1,
                         startDate: 1,
@@ -127,6 +128,7 @@ class PostRepository {
                     postImages: 1,
                     postMediaType: 1,
                     postName: 1,
+                    participants: 1,
                     postProjectRolesOut: {
                       $arrayElemAt: [
                         '$participants.offer.role',
@@ -164,6 +166,7 @@ class PostRepository {
                     postImages: 1,
                     postMediaType: 1,
                     postName: 1,
+                    participants: 1,
                     postProjectRolesOut: {
                       $arrayElemAt: [
                         '$postProjectRolesOut',
@@ -414,7 +417,7 @@ class PostRepository {
                   "postStatus": "success", // post success
                   "participants.participantID": participantID, // Ensure has paticipant in post
                   "participants.status": "candidate", // cadidate only
-                  "participants.reviewedAt": { $exists: false }, // make sure that no review when add to this post
+                  // "participants.reviewedAt": null, // make sure that no review when add to this post
                 },
                 { $set: { 
                     "participants.$.ratingScore": newRating.ratingScore,
@@ -742,6 +745,56 @@ class PostRepository {
             throw new Error('Error fetching user posts from repository: ' + error);
         }
     }
+
+    async getPostParticipants(postId: string) {
+      try {
+        const objectId = new ObjectId(postId);
+        const post = await Post.findById(objectId)
+          .populate({
+            path: "participants.participantID",
+            // select: "username rating _id",
+          })
+          .populate({
+            path: "participants.offer.role",
+            select: "roleName",
+          });
+  
+        if (!post) {
+          throw new Error("Post not found");
+        }
+  
+        // กรองเฉพาะ participants ที่มีสถานะ "candidate"
+        const participants = post.participants.filter(
+          (p) => p.status === "candidate"
+        );
+        return participants.map((participant) => {
+          // หาบทบาทล่าสุดจาก offers (ถ้ามี)
+          const latestOffer =
+            participant.offer && participant.offer.length > 0
+              ? participant.offer[participant.offer.length - 1]
+              : null;
+  
+          const roleName =
+            latestOffer && latestOffer.role
+              ? (latestOffer.role as any).roleName
+              : "Unknown Role";
+  
+          const isReview = (participant.participantID as any).rating.some(
+            (eachRating: { postID: any }) => eachRating.postID == post.id
+          );
+  
+          return {
+            id: (participant.participantID as any)._id.toString(),
+            label: `${(participant.participantID as any).username} - ${roleName}`,
+            isReview: isReview,
+          };
+        });
+      } catch (error) {
+        throw new Error("Error fetching post participants: " + error);
+      }
+    }
+  
+  
 }
 
 

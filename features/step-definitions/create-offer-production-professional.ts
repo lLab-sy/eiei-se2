@@ -19,12 +19,12 @@ Given('the production professional is logged in', async function () {
     ]);
 
     await page.waitForSelector('input[name="username"]');
-    await page.type('input[name="username"]', 'production@test.com'
+    await page.type('input[name="username"]', 'testpf1'
       , {delay: 50}
     );
 
     await page.waitForSelector('input[name="password"]');
-    await page.type('input[name="password"]', 'production!'
+    await page.type('input[name="password"]', 'testpf1@#T'
       , {delay: 50}
     );
 
@@ -107,7 +107,7 @@ When('the production professional clicks create offer button', async function ()
 Then('ensure the system sends an offer to producer', async function () {
   await page.waitForSelector('li[role="status"][data-state="open"]', { visible: true });
   const toastMessage = await page.$eval('li[role="status"] .text-sm.font-semibold', el => el.textContent);
-  assert.strictEqual(toastMessage, "Successful post creation");
+  assert.strictEqual(toastMessage, "Successful offer creation");
 });
 
 Then('ensure that the system shows the offer in his production professional\'s all job', async function () {
