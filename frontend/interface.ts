@@ -1,5 +1,5 @@
 export interface PostData {
-    id:string
+    id?:string
     postName: string;
     postDescription: string;
     postImages?: string[];
@@ -11,8 +11,8 @@ export interface PostData {
     startDate?: string; 
     endDate?: string;  
     userID: string;
-    postImageDisplay:PostImageDisplay[]
-    participants: Participant[]
+    postImageDisplay?:PostImageDisplay[]
+    participants?: Participant[]
 }
 
 export interface Participant{
