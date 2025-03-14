@@ -83,11 +83,12 @@ export const participantDetailSchema = new Schema<ParticipantDetail>({
         type: Number,
         min: 0,
         max: 5,
-        required: true,
+        required: false,
     },
     comment: {
         type: String,
-        required: true,
+        default: '',
+        //required: true,
     },
     reviewedAt: {
         type: Date,

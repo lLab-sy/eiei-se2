@@ -2,10 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
-import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO } from '../dtos/postDTO';
+import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO, ChangeParticipantStatusDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
 import cloudService from '../services/cloudService';
+import { resourceLimits } from 'worker_threads';
+import { validate } from 'class-validator';
 
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
@@ -361,6 +363,26 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       sendResponse(res, "error", err, "Failed to retrieve post participants");
     }
   }
+
+
+  async changeParticipantStatus(req: AuthRequest, res: Response): Promise<void> {
+    try{
+      const dto = new ChangeParticipantStatusDTO(req.body);
+
+      const errors = await validate(dto);
+      if (errors.length > 0) {
+          sendResponse(res, 'error', errors, 'Invalid request body');
+          return;
+      }
+      
+      await postService.changeParticipantStatus(dto);
+      sendResponse(res, 'success', {}, 'Successfully changed participant status');
+    }catch(error){
+      console.log(error)
+      sendResponse(res, 'error', error, 'Failed to change participant status called from controller');
+    }
+  }
+
 }
 
 

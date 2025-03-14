@@ -689,4 +689,43 @@ router.get(
     postController.getPostParticipants as RequestHandler
   );
 
+  
+/**
+ * @swagger
+ * /api/v1/posts/participant-status:
+ *   patch:
+ *     summary: change participant status from in-progress to candidate or reject in specific post
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: [] 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - postID
+ *               - participantID
+ *               - statusToChange
+ *             properties:
+ *               postID:
+ *                 type: string
+ *                 description: The ID of the post associated with the offer
+ *               participantID:
+ *                 type: string
+ *                 description: The ID of the participant which the producer want to change status  
+ *               statusToChange:
+ *                 type: string
+ *                 description: The status to change to (candidate or reject) 
+ *     responses:
+ *       200:
+ *         description: Confirm offer successfully
+ *       400:
+ *         description: Bad request, invalid input
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/posts/participant-status', AuthMiddleware.authenticate as RequestHandler, postController.changeParticipantStatus as RequestHandler);
+
 export default router;
