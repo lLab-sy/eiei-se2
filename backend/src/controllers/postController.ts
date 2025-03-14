@@ -364,14 +364,19 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
   }
 
 
-  async producerConfirmOffer(req: AuthRequest, res: Response): Promise<void> {
+  async changeParticipantStatus(req: AuthRequest, res: Response): Promise<void> {
     try{
-      if(!req.body.postID || !req.body.productionProfessionalID){
+      if(!req.body.postID || !req.body.participantID || ! req.body.statusToChange){
           sendResponse(res, 'error', 'Missing some field of req.body');
           return;
       }
-      const result = await postService.producerConfirmOffer(req.body.postID,req.body.productionProfessionalID)
-      if(result) sendResponse(res, 'success',result, 'Successfully confirm offer');
+
+      if(req.body.statusToChange!="candidate" && req.body.statusToChange!="reject"){
+          sendResponse(res, 'error', 'Failed statusToChange');
+          return;
+      }
+      const result = await postService.changeParticipantStatus(req.body.postID,req.body.participantID,req.body.statusToChange);
+      if(result) sendResponse(res, 'success',result, 'Successfully change participant status');
     }catch(error){
       console.log(error)
       sendResponse(res, 'error', error, 'Failed to confirm offer called from controller');

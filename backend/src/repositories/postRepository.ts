@@ -794,7 +794,7 @@ class PostRepository {
       }
     }
 
-    public async producerConfirmOffer(postID:string,productionProfessionalID:string){
+    public async changeParticipantStatus(postID:string,participantID:string,statusToChange:string){
         try{
             const post: IPost | null = await Post.findOne({ _id: postID }).populate(['postProjectRoles']);
 
@@ -804,16 +804,21 @@ class PostRepository {
             }
 
             // Find the participant in the post's participants array
-            const participant = post.participants.find((p) => p.participantID.toString() === productionProfessionalID);
+            const participant = post.participants.find((p) => p.participantID.toString() === participantID);
 
             if (!participant) {
                 throw new Error('Participant not found');
             }
 
-            if(participant.status === 'in-progress'){
-                participant.status = 'candidate';
+            if(participant.status !== 'in-progress'){
+                throw new Error('Participant is not in progress');
             }
 
+            if(participant.status === 'in-progress' && statusToChange === 'candidate'){
+                participant.status = 'candidate';
+            }else if(participant.status === 'in-progress' && statusToChange === 'reject'){
+                participant.status = 'reject';
+            }
             await post.save();
             return post 
         }catch(error){

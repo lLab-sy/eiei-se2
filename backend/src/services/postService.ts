@@ -498,12 +498,12 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
-  async producerConfirmOffer(postID:string,productionProfessionalID:string): Promise<PostDTO|null>{
+  async changeParticipantStatus(postID:string,participantID:string,statusToChange:string): Promise<PostDTO|null>{
     try{
-        if (!postID || !productionProfessionalID) {
-          throw new Error("postID and productionProfessionalID are required");
+        if (!postID || !participantID || !statusToChange) {
+            throw new Error("postID, participantID and statusToChange are required");
         }
-        const post = await postRepository.producerConfirmOffer(postID,productionProfessionalID)
+        const post = await postRepository.changeParticipantStatus(postID,participantID,statusToChange);
         if (post!=null){
           const postImages = await Promise.all(
             post.postImages.map(async (eachImg) => {
