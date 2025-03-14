@@ -821,7 +821,9 @@ class PostRepository {
                 throw new Error('Participant not found');
             }
 
-            participant.status = 'candidate';
+            if(participant.status === 'in-progress'){
+                participant.status = 'candidate';
+            }
 
             await post.save();
             return post 
