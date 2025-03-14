@@ -1,5 +1,5 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO } from '../dtos/postDTO';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO, ChangeParticipantStatusDTO } from '../dtos/postDTO';
 import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
@@ -498,48 +498,11 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
-  async changeParticipantStatus(postID:string,participantID:string,statusToChange:string): Promise<PostDTO|null>{
+  async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
     try{
-        if (!postID || !participantID || !statusToChange) {
-            throw new Error("postID, participantID and statusToChange are required");
-        }
-        const post = await postRepository.changeParticipantStatus(postID,participantID,statusToChange);
-        if (post!=null){
-          const postImages = await Promise.all(
-            post.postImages.map(async (eachImg) => {
-                return await cloudService.getSignedUrlImageCloud(eachImg);
-            }));
-  
-            const postImageDisplay:ImageDisplayDTO[]=[];
-            for (let i = 0; i < postImages.length; i++) {
-              postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
-            }
-  
-            const result = new PostDTO({
-              id: post.id.toString(),
-              postName: post.postName as string,
-              postDescription: post.postDescription as string,
-              postImages: post.postImages as [string],
-              postMediaType: post.postMediaType.toString(),
-              postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
-                id: (eachRole as any)._id.toString(),
-                roleName: (eachRole as any).roleName
-              })),
-              postImageDisplay:postImageDisplay as ImageDisplayDTO[],
-              postImagesKey: post.postImages,
-              postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
-              participants: post.participants,
-              // postDetailID: post.postDetailID.toString() as string,
-              userID: post.userID.toString() as string,
-              startDate: post.startDate? post.startDate.toString():"",
-              endDate: post.endDate?post.endDate.toString():""
-            });
-            return result; 
-        }else{
-            return null
-        }
+        await postRepository.changeParticipantStatus(dto);
     }catch(error){
-      throw new Error('Error producer confirm offer in service layer: ' + error);
+      throw new Error('Error change participant status in service layer: ' + error);
     }
   }
 

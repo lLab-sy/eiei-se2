@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel } from '../models/postModel';
-import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
+import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
 import { Pipe } from 'stream';
@@ -794,17 +794,15 @@ class PostRepository {
       }
     }
 
-    public async changeParticipantStatus(postID:string,participantID:string,statusToChange:string){
+    public async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
         try{
-            const post: IPost | null = await Post.findOne({ _id: postID }).populate(['postProjectRoles']);
-
-            // Check if post is null
+            const post: IPost | null = await Post.findOne({ _id: dto.postID });
             if (!post) {
-                throw new Error(`Post with ID ${postID} not found`);
+                throw new Error(`Post with ID ${dto.postID} not found`);
             }
 
             // Find the participant in the post's participants array
-            const participant = post.participants.find((p) => p.participantID.toString() === participantID);
+            const participant = post.participants.find((p) => p.participantID.toString() === dto.participantID);
 
             if (!participant) {
                 throw new Error('Participant not found');
@@ -814,15 +812,10 @@ class PostRepository {
                 throw new Error('Participant is not in progress');
             }
 
-            if(participant.status === 'in-progress' && statusToChange === 'candidate'){
-                participant.status = 'candidate';
-            }else if(participant.status === 'in-progress' && statusToChange === 'reject'){
-                participant.status = 'reject';
-            }
+            participant.status = dto.statusToChange;
             await post.save();
-            return post 
         }catch(error){
-            throw new Error('Error producer confirm offer in repository: ' + error);
+            throw new Error('Error change participant status in repository: ' + error);
         }
     }
   
