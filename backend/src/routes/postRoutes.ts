@@ -689,7 +689,40 @@ router.get(
     postController.getPostParticipants as RequestHandler
   );
 
-//producer confirm offer from production professional
+  
+/**
+ * @swagger
+ * /api/v1/producer-confirm-offer:
+ *   patch:
+ *     summary: change participant status from in-progress to candidate in specific post
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: [] 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - postID
+ *               - productionProfessionalID
+ *             properties:
+ *               postID:
+ *                 type: string
+ *                 description: The ID of the post associated with the offer
+ *               productionProfessionalID:
+ *                 type: string
+ *                 description: The ID of the professional (participant) which the producer want to confirm      
+ *     responses:
+ *       200:
+ *         description: Confirm offer successfully
+ *       400:
+ *         description: Bad request, invalid input
+ *       500:
+ *         description: Internal server error
+ */
 router.patch('/producer-confirm-offer', AuthMiddleware.authenticate as RequestHandler, postController.producerConfirmOffer as RequestHandler);
+//producer confirm offer from production professional
 
 export default router;

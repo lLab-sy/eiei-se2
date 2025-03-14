@@ -796,17 +796,6 @@ class PostRepository {
 
     public async producerConfirmOffer(postID:string,productionProfessionalID:string){
         try{
-
-            // // Find the post with the given postID
-            // const objectId = new ObjectId(id);
-            // const post: IPost | null = await Post.findById(objectId).populate(['postProjectRoles']);
-            
-            // if (!post) {
-            //     throw new Error('Error fetching posts from repository: post is null');
-            // }
-
-            // return post
-
             const post: IPost | null = await Post.findOne({ _id: postID }).populate(['postProjectRoles']);
 
             // Check if post is null
