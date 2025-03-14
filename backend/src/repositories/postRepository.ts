@@ -793,6 +793,42 @@ class PostRepository {
         throw new Error("Error fetching post participants: " + error);
       }
     }
+
+    public async producerConfirmOffer(postID:string,productionProfessionalID:string){
+        try{
+
+            // // Find the post with the given postID
+            // const objectId = new ObjectId(id);
+            // const post: IPost | null = await Post.findById(objectId).populate(['postProjectRoles']);
+            
+            // if (!post) {
+            //     throw new Error('Error fetching posts from repository: post is null');
+            // }
+
+            // return post
+
+            const post: IPost | null = await Post.findOne({ _id: postID }).populate(['postProjectRoles']);
+
+            // Check if post is null
+            if (!post) {
+                throw new Error(`Post with ID ${postID} not found`);
+            }
+
+            // Find the participant in the post's participants array
+            const participant = post.participants.find((p) => p.participantID.toString() === productionProfessionalID);
+
+            if (!participant) {
+                throw new Error('Participant not found');
+            }
+
+            participant.status = 'candidate';
+
+            await post.save();
+            return post 
+        }catch(error){
+            throw new Error('Error producer confirm offer in repository: ' + error);
+        }
+    }
   
   
 }

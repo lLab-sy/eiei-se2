@@ -6,6 +6,7 @@ import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByPr
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
 import cloudService from '../services/cloudService';
+import { resourceLimits } from 'worker_threads';
 
 class PostController {
   async getAllPosts(req: Request, res: Response): Promise<void> {
@@ -361,6 +362,22 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       sendResponse(res, "error", err, "Failed to retrieve post participants");
     }
   }
+
+
+  async producerConfirmOffer(req: AuthRequest, res: Response): Promise<void> {
+    try{
+      if(!req.body.postID || !req.body.productionProfessionalID){
+          sendResponse(res, 'error', 'Missing some field of req.body');
+          return;
+      }
+      const result = await postService.producerConfirmOffer(req.body.postID,req.body.productionProfessionalID)
+      if(result) sendResponse(res, 'success',result, 'Successfully confirm offer');
+    }catch(error){
+      console.log(error)
+      sendResponse(res, 'error', error, 'Failed to confirm offer called from controller');
+    }
+  }
+
 }
 
 

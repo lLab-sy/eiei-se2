@@ -689,4 +689,7 @@ router.get(
     postController.getPostParticipants as RequestHandler
   );
 
+//producer confirm offer from production professional
+router.patch('/producer-confirm-offer', AuthMiddleware.authenticate as RequestHandler, postController.producerConfirmOffer as RequestHandler);
+
 export default router;

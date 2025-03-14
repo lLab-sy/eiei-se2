@@ -497,7 +497,52 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       throw new Error("Error in service layer: " + error);
     }
   }
+
+  async producerConfirmOffer(postID:string,productionProfessionalID:string): Promise<PostDTO|null>{
+    try{
+        if (!postID || !productionProfessionalID) {
+          throw new Error("postID and productionProfessionalID are required");
+        }
+        const post = await postRepository.producerConfirmOffer(postID,productionProfessionalID)
+        if (post!=null){
+          const postImages = await Promise.all(
+            post.postImages.map(async (eachImg) => {
+                return await cloudService.getSignedUrlImageCloud(eachImg);
+            }));
   
+            const postImageDisplay:ImageDisplayDTO[]=[];
+            for (let i = 0; i < postImages.length; i++) {
+              postImageDisplay.push({imageURL:postImages[i],imageKey:(post.postImages)[i]})
+            }
+  
+            const result = new PostDTO({
+              id: post.id.toString(),
+              postName: post.postName as string,
+              postDescription: post.postDescription as string,
+              postImages: post.postImages as [string],
+              postMediaType: post.postMediaType.toString(),
+              postProjectRolesOut: post.postProjectRoles.map(eachRole=>({    
+                id: (eachRole as any)._id.toString(),
+                roleName: (eachRole as any).roleName
+              })),
+              postImageDisplay:postImageDisplay as ImageDisplayDTO[],
+              postImagesKey: post.postImages,
+              postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+              participants: post.participants,
+              // postDetailID: post.postDetailID.toString() as string,
+              userID: post.userID.toString() as string,
+              startDate: post.startDate? post.startDate.toString():"",
+              endDate: post.endDate?post.endDate.toString():""
+            });
+            return result; 
+        }else{
+            return null
+        }
+    }catch(error){
+      throw new Error('Error producer confirm offer in service layer: ' + error);
+    }
+  }
+
 }
 
 // Export an instance of the service
