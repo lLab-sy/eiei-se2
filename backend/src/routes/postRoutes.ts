@@ -347,7 +347,74 @@ router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandle
  *         description: Server error
  */
 router.get('/posts/user/prof', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByProf as RequestHandler);
-
+/**
+ * @swagger
+ * /api/v1/posts/user/producer:
+ *   get:
+ *     summary: Get posts by a specific user
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: postStatus
+ *         schema:
+ *           type: string
+ *         description: The status of post
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of posts per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The current page number
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: "#/components/schemas/PostDTO"
+ *                     meta:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         totalItems:
+ *                           type: integer
+ *                           example: 5
+ *                         totalPages:
+ *                           type: integer
+ *                           example: 1
+ *                 message:
+ *                   type: string
+ *                   example: Successfully get posts
+ *       404:
+ *         description: Posts not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/user/producer', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByProducer as RequestHandler);
 /**
  * @swagger
  * /api/v1/posts:

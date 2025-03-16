@@ -309,6 +309,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       }else{
         if(!status.includes(req.query.postStatus as string)){
           sendResponse(res, 'error', '', 'bad request', 400)
+          return;
         }else{
           postStatus = req.query.postStatus as string
         }
@@ -340,7 +341,66 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
+      return;
     }
+  };
+
+  async getPostsByProducer(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const role=req.user.role
+      if(role=="producer"){
+      const userId = req.user.userId? req.user.userId as string: false;
+      const limit = req.query.limit ? Number(req.query.limit): 10;
+      const page = req.query.page ? Number(req.query.page): 1;
+      const status = ['created', 'in-progress', 'success', 'cancel'];
+      console.log("Status:",req.query.postStatus)
+      if (limit < 1 || page < 1 || !userId ) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+      
+      let postStatus;
+      if (!req.query.postStatus){
+        postStatus = '';
+      }else{
+        if(!status.includes(req.query.postStatus as string)){
+          sendResponse(res, 'error', '', 'bad request', 400)
+          return;
+        }else{
+          postStatus = req.query.postStatus as string
+        }
+          
+      }
+
+      const getPostByProfDTO: GetPostByProfDTO = {
+        page: page,
+        limit: limit,
+        userId: userId,
+        postStatus: postStatus as string
+      }
+
+      const posts = await postService.getPostsByProducer(getPostByProfDTO);
+      console.log("check")
+      if (!posts.meta.totalPages){
+        sendResponse(res, 'error', '', 'You have no relate posts.', 400);
+        return
+      }
+      if (posts.meta.totalPages < page) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+        sendResponse(res, 'success', posts, 'Successfully get posts', 200);
+        return;
+      }else {      
+        sendResponse(res, 'error', "", `unauthorized`, 400);
+        return;
+      }
+      
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
+      return;
+    }
+    return;
   };
 
   async getPostParticipants(req: AuthRequest, res: Response): Promise<void> {

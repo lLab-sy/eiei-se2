@@ -10,6 +10,14 @@ class PostProjectRoleDTO {
     roleName!: string;
 }
 
+class PostMediaDTO {
+    @ApiProperty({ description: 'Role ID', type: String })
+    id!: string;
+
+    @ApiProperty({ description: 'Role name', type: String })
+    mediaName!: string;
+}
+
 export interface ImageDisplayDTO{
     imageURL: string;
     imageKey: string;
@@ -206,6 +214,11 @@ export class PostDTO {
     @IsString()
     @IsNotEmpty()
     postMediaType!: string;
+
+    @ApiProperty({ description: 'The media type detail of the post', type: String })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypeOut!: PostMediaDTO;
 
     @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
     @IsArray()

@@ -18,6 +18,13 @@ const PostCard: React.FC<IPostCardProp> = ({
   imageUrl,
   id,
 }) => {
+
+  const formattedDescription = description.split('\n').map((line, index, array) => (
+    <React.Fragment key={index}>
+      {line}
+      {index < array.length - 1 && <br />}
+    </React.Fragment>
+  ));
     return (
     <div className="flex flex-col bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
         <img src={imageUrl == '' ? 'image/logo.png' : imageUrl} alt={title} className="w-full h-48 object-cover" />
@@ -34,7 +41,11 @@ const PostCard: React.FC<IPostCardProp> = ({
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mt-2">{description}</p>
+        <div className="h-16"> {/* Fixed height for 3 lines of text */}
+          <p className="text-sm text-gray-600 line-clamp-3 overflow-hidden">
+            {description}
+          </p>
+        </div>
 
         {/* Footer Section */}
         <div className="mt-auto pt-10">
