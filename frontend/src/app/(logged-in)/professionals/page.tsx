@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { ProfessionalsData, Professional } from "../../../../interface";
 import SearchBar from "@/components/SearchBar";
-import ProfessionalCard from "@/components/ProfessionalCrad";
+import ProfessionalCard from "@/components/ProfessionalCard";
 import Pagination from "@/components/Pagination";
 import getProfessionals from "@/libs/getProfessionals";
 
@@ -12,6 +12,7 @@ const PAGE_SIZE = 12;
 const ProfessionalsPage = () => {
 
   // requestFilter
+  // 
   const [requestFilter, setRequestFilter] = useState("&minRating=0");
 
   // page

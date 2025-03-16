@@ -793,7 +793,84 @@ class PostRepository {
         throw new Error("Error fetching post participants: " + error);
       }
     }
-  
+    public async getPostsByProducer(getPostByProducerReq: GetPostByProfRequestModel): Promise<GetPostByProfResponse>{ //no need to change name
+        try {
+            const { userId, postStatus, limit, page } = getPostByProducerReq;
+            const objectId = new mongoose.Types.ObjectId(userId);
+
+            const postStatusMatchStage: PipelineStage.Match = {
+                $match: {
+                  ...(postStatus && { postStatus }),
+                },
+            };
+            
+            const pipeline: PipelineStage[] = [postStatusMatchStage];
+
+            const matchStage1: PipelineStage.Match ={
+                $match: {
+                      'userID': objectId
+                    }
+            }
+            pipeline.push(matchStage1);
+
+            
+
+            const lookupStage1: PipelineStage.Lookup ={
+                $lookup: {
+                    from: "mediaTypes",
+                    localField: "postMediaType",
+                    foreignField: "_id",
+                    as: "postMediaTypeOut"
+                  }
+            }
+            pipeline.push(lookupStage1);
+
+            const projectStage1: PipelineStage.Project ={
+                $project: {
+                    postName:1,
+                    postDescription:1,
+                  postImages:1,
+                  postProjectRoles:1,
+                  postStatus:1,
+                  startDate:1,
+                  endDate:1,
+                  createdAt:1,
+                  updatedAt:1,
+                  postMediaType: {
+                    $arrayElemAt: ["$postMediaTypeOut", 0]
+                  }
+                }
+                
+            }
+            pipeline.push(projectStage1);
+
+
+            const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            //sort by date from new to old, push skip and limit
+            const sortStage: PipelineStage.Sort = {
+                $sort: { createdAt: -1 }
+            }
+            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+
+            const results = await Post.aggregate(pipeline)
+            const response: GetPostByProfResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            // console.log("ANSWER",response)
+            return response
+        } catch (error) {
+            throw new Error('Error fetching user posts from repository: ' + error);
+        }
+    }
   
 }
 

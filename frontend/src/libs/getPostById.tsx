@@ -30,6 +30,7 @@ export default async function getPostById(
   postId: string,
   token: string
 ){
+  console.log(postId,token)
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
 
   try {
@@ -44,7 +45,7 @@ export default async function getPostById(
       throw new Error("Failed to fetch post by ID");
     }
 
-    console.log("Hello Fetched Post Datassssssssssssssssssssssssssss:", response.data.data);
+    console.log("Hello Fetched Post Data:", response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching post by ID:", error);
