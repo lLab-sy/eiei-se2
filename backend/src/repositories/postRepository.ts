@@ -947,6 +947,44 @@ class PostRepository {
             throw new Error('Error fetching user posts from repository: ' + error);
         }
     }
+
+    public async sendSubmission(id:string, participantID:string): Promise<void>{
+        try {
+            // console.log("HELlo",postData)
+            await Post.findOneAndUpdate(
+                {
+                    _id: id,
+                    "postStatus": "in-progress", // post success
+                    "participants.participantID": participantID, // Ensure has paticipant in post
+                    "participants.status": "candidate", // cadidate only
+                    $expr: {
+                        $lt: [
+                          { $size: { $filter: { input: "$participants", as: "p", cond: { $eq: ["$$p.id", id] } } } },
+                          { $arrayElemAt: ["$participants.workQuota", 0] },
+                        ],
+                    },
+                  // "participants.reviewedAt": null, // make sure that no review when add to this post
+                },
+                { 
+                    $set: { 
+                        "participants.$.isSend": true,
+                    },
+                    $push: {
+                        "participants.$.submissions": new Date()
+                        // {
+                        //     $each: [new Date()],
+                        //     $slice: -"participants.$.workQuota"
+                        // } 
+                    }
+                }, // Update the matching element
+                { new: true, runValidators: true }
+            );
+            // const posts= await Post.findById(objectId);
+            return;
+        } catch (error) {
+            throw new Error('Error updating post in repository: ' + error);
+        }
+    }
   
 }
 

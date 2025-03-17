@@ -64,7 +64,7 @@ class PostController {
       }
 
       const postImageFiles = req?.files as Express.Multer.File[];
-      var postImages:string[]=[];
+      const postImages:string[]=[];
       postImageFiles?.map(async (eachImageBuffer)=>{
         const buffer = eachImageBuffer?.buffer
         const mimetype = eachImageBuffer?.mimetype
@@ -427,6 +427,25 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       sendResponse(res, "error", err, "Failed to retrieve post participants");
     }
   }
+
+  async sendSubmission(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const postID  = req.params.id
+      const userID = req.user.userId
+
+      if (req.user.role!="production professional") {
+        sendResponse(res, 'error', '', 'unauthorize', 401);
+        return;
+      }
+
+
+      await postService.sendSubmission(postID, userID)
+
+      sendResponse(res, 'success', {'status': 'success'}, 'Successfully add review to post');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to retrieve posts');
+    }
+  };
 }
 
 

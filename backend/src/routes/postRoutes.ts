@@ -255,6 +255,37 @@ router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandle
 
 /**
  * @swagger
+ * /api/v1/posts/{id}/sendSubmission:
+ *   post:
+ *     summary: Send submission to post by user (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       201:
+ *         description: The created post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PostDTO'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.post('/posts/:id/sendSubmission', AuthMiddleware.authenticate as RequestHandler, postController.sendSubmission as RequestHandler);
+
+
+/**
+ * @swagger
  * /api/v1/posts/user/prof:
  *   get:
  *     summary: Get posts by a specific user
