@@ -1,3 +1,13 @@
+"use client"
+import HistoryProductionContent from "@/components/HistoryProductionContent";
+import MyPostDetail from "@/components/MyPostDetail";
+import ProfessionalWorkingContent from "@/components/ProfessionalWorkingContent";
+import { useParams } from "next/navigation";
+import { PostData } from "../../../../../interface";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import getPostById from "@/libs/getPostById";
+import TaskSubmissionContent from "@/components/TaskSubmissionContent";
 import MyPostContentDetail from "@/components/MyPostContentPanel";
 
 // const mockMyPost :PostData= {
@@ -35,6 +45,57 @@ export default function MyPostContentPage(){
     return(
         <main className="min-h-screen bg-white-50">
            <MyPostContentDetail/>
+export default function MyPostContentPage(){
+    const { mid }: { mid: string } = useParams();
+    const { data: session } = useSession();
+    const userRole=session?.user.role;
+    const userID=session?.user.id;
+    const token=session?.user.token;
+    const username = session?.user.username ?? "";
+    const [post,setPost] = useState<PostData|null>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    
+    const [error, setError] = useState<string | null>(null);
+    useEffect(() => {
+          const fetchData = async () => {
+            try {
+              let response;
+              if (userRole === "producer") {
+                response = await getPostById(mid,session?.user.token??"") // ดึงโพสต์ของ producer 
+              } else if (userRole === "production professional") {
+                response = await getPostById(mid,session?.user.token??"") // ดึงโพสต์ของ Production Professional?
+              }
+              console.log("respons",response)
+              if (response) {
+                setPost(response);
+              }
+            } catch (err) {
+              setError("Failed to load posts. Please try again later.");
+            }
+        }
+            fetchData();
+        }, [userID, userRole]);
+        
+    return(
+        <main className="min-h-screen bg-white-50">
+            <div className="grid grid-cols-1 lg:grid-cols-2 my-5 h-full flex-auto">
+                <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
+                    <MyPostDetail post={post}/>
+                </div>
+                { userRole == "production professional" ? 
+                <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
+                    <TaskSubmissionContent
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    username = {username}
+                    />
+                </div>
+                :
+                <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
+                    <ProfessionalWorkingContent/>
+                </div>
+                }
+            </div>
         </main>
     )
 }
