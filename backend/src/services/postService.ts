@@ -545,6 +545,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
         throw new Error('Error in service layer: ' + error);
     }
   }
+
+  public async sendSubmission(id: string, participantID: string): Promise<void> {
+    try {
+      await postRepository.sendSubmission(id, participantID);
+      return;
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
   
   async startProject(postId: string, userId: string): Promise<void> {
     try {
