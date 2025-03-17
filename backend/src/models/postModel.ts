@@ -224,6 +224,16 @@ export interface GetPostByProfRequestModel {
     page: number;
 }
 
+export interface GetPostByProducerRequestModel {
+    userId: string;
+    postStatus: string;
+    limit: number;
+    page: number;
+    postMediaTypes: string[];
+    searchText: string;
+}
+
+
 export interface GetPostByProfResponse {
     data: IPost[];
     totalItems: number;

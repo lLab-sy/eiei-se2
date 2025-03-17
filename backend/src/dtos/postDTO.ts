@@ -405,3 +405,34 @@ export class GetPostByProfDTO {
     @IsNumber() 
     page!: number;
 }
+
+
+export class GetPostByProducerDTO {
+    @ApiProperty({ description: 'The id of user', type: String })
+    @IsString()
+    @IsNotEmpty()
+    userId!: string;
+
+    @ApiProperty({ description: 'The status of post', type: String })
+    @IsString()  
+    postStatus!: string;
+
+    @ApiProperty({ description: 'The number of post per page' })
+    @IsNumber()  
+    limit!: number;
+
+    @ApiProperty({ description: 'The current page' })
+    @IsNumber() 
+    page!: number;
+
+    @ApiProperty({ description: 'The media type of the post', type: [String] })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypes!: string[];
+
+    @ApiProperty({ description: 'The name of the post or project detail', type: String })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100, { message: 'searchText cannot be more than 100 characters' })
+    searchText!: string;
+}

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
+import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO, GetPostByProducerDTO } from '../dtos/postDTO';
 import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO, ChangeParticipantStatusDTO } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
@@ -347,13 +348,18 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
 
   async getPostsByProducer(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const role=req.user.role
-      if(role=="producer"){
+      const role=req.user.role;
+      const postMediaTypes = req.query.postMediaTypes as string[];
       const userId = req.user.userId? req.user.userId as string: false;
       const limit = req.query.limit ? Number(req.query.limit): 10;
       const page = req.query.page ? Number(req.query.page): 1;
       const status = ['created', 'in-progress', 'success', 'cancel'];
-      console.log("Status:",req.query.postStatus)
+
+
+      if(role!="producer"){
+        sendResponse(res, 'error', '', 'unauthorize', 401);
+      }
+
       if (limit < 1 || page < 1 || !userId ) {
         sendResponse(res, 'error', '', 'bad request', 400);
         return
@@ -372,35 +378,32 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
           
       }
 
-      const getPostByProfDTO: GetPostByProfDTO = {
+      const getPostByProducerDTO: GetPostByProducerDTO = {
         page: page,
         limit: limit,
         userId: userId,
-        postStatus: postStatus as string
+        postStatus: postStatus as string,
+        postMediaTypes: Array.isArray(postMediaTypes)?postMediaTypes: postMediaTypes? [postMediaTypes]: postMediaTypes,
+        searchText: req.query.searchText? req.query.searchText as string: '',
       }
-
-      const posts = await postService.getPostsByProducer(getPostByProfDTO);
-      console.log("check")
-      if (!posts.meta.totalPages){
-        sendResponse(res, 'error', '', 'You have no relate posts.', 400);
-        return
-      }
-      if (posts.meta.totalPages < page) {
-        sendResponse(res, 'error', '', 'bad request', 400);
-        return
-      }
-        sendResponse(res, 'success', posts, 'Successfully get posts', 200);
-        return;
-      }else {      
-        sendResponse(res, 'error', "", `unauthorized`, 400);
-        return;
+      console
+      const posts = await postService.getPostsByProducer(getPostByProducerDTO);
+      switch (true) {
+        case !posts.meta.totalPages:
+          sendResponse(res, "error", "", "You have no related posts.", 400);
+          return;
+        case posts.meta.totalPages < page:
+          sendResponse(res, "error", "", "bad request", 400);
+          return;
+        default:
+          sendResponse(res, "success", posts, "Successfully get posts", 200);
+          return;
       }
       
-    } catch (err) {
-      sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
-      return;
-    }
-    return;
+     } catch (err) {
+        sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
+        return;
+      }
   };
 
   async getPostParticipants(req: AuthRequest, res: Response): Promise<void> {
