@@ -1,5 +1,5 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO } from '../dtos/postDTO';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO, ChangeParticipantStatusDTO } from '../dtos/postDTO';
 import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
@@ -497,7 +497,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       throw new Error("Error in service layer: " + error);
     }
   }
-  
+
+  async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
+    try{
+        await postRepository.changeParticipantStatus(dto);
+    }catch(error){
+      throw new Error('Error change participant status in service layer: ' + error);
+    }
+  }
+
 }
 
 // Export an instance of the service
