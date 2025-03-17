@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
 import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO } from '../dtos/postDTO';
-import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
@@ -498,9 +498,9 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
-  async getPostsByProducer(getPostReq: GetPostByProfRequestModel): Promise<PaginatedResponseDTO<PostDTO>> { //no need to change name
+  async getPostsByProducer(getPostReq: GetPostByProducerRequestModel): Promise<PaginatedResponseDTO<PostDTO>> { //no need to change name
     try {
-        const postsReq: GetPostByProfRequestModel = getPostReq;
+        const postsReq: GetPostByProducerRequestModel = getPostReq;
         const res = await postRepository.getPostsByProducer(postsReq);
 
         const resDTO = await Promise.all(res.data.map(async (post) => {

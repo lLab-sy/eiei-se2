@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PostData, SearchPosts } from "../../../../interface";
 import Pagination from "@/components/Pagination";
 import Footer from "@/components/Footer";
@@ -9,6 +9,7 @@ import SearchPostBar from "@/components/SearchPostBar";
 import MyPostBar from "@/components/MyPostBar";
 import getPosts from "@/libs/getPosts";
 import getMyProducerPosts from "@/libs/getMyProducerPosts";
+import Link from "next/link";
 
 export default function MyPost() {
  
@@ -17,6 +18,7 @@ export default function MyPost() {
   const { data: session } = useSession();
   const userRole=session?.user.role
   const userID=session?.user.id
+  const userName=session?.user.username
   const token=session?.user.token
 
   const [PostsCurrentPage, setPostsCurrentPage] = useState<PostData[]|null>(null)  //Post That In one Page
@@ -26,6 +28,11 @@ export default function MyPost() {
   const [requestFilter, setRequestFilter] = useState("");
   const [dataResponse,setDataResponse]= useState<SearchPosts|null>(null);
   
+  const titles = ["My Post", `Welcome again ${userName}`, "My Project", "My Story", "My Work"];
+  const randomTitle = useMemo(() => {
+    return titles[Math.floor(Math.random() * titles.length)];
+  }, [])
+
   const handlePageChange = (page: number) => {
     setRequestPage("limit="+PAGE_SIZE.toString()+"&page="+page.toString());
     setCurrentPage(page);
@@ -87,10 +94,13 @@ export default function MyPost() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-12">
           {
           PostsCurrentPage.map((post, index) => (
-            <MyPostCard
-              key={index}
-              role={userRole??"admin"}        
-              />
+            <Link href={`/my-post/${post.id}`} key={index}>
+              <MyPostCard
+                key={index}
+                postDetail={post}
+                role={userRole??"admin"}        
+                />
+            </Link>
             ))
           }
  

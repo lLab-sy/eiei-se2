@@ -1,4 +1,5 @@
 export interface PostData {
+    postMediaTypeOut: any;
     id:string
     postName: string;
     postDescription: string;
@@ -30,6 +31,12 @@ export interface PostImageDisplay{
     imageURL:string;
     imageKey:string;
 }
+
+export interface postMediaTypeOut{
+    id:string;
+    mediaName:string;
+}
+
 export interface ReceivedReview{
     reviewerName: string;
     reviewerProfileImage: string;

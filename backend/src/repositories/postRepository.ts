@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { PipelineStage } from 'mongoose';
@@ -793,9 +793,9 @@ class PostRepository {
         throw new Error("Error fetching post participants: " + error);
       }
     }
-    public async getPostsByProducer(getPostByProducerReq: GetPostByProfRequestModel): Promise<GetPostByProfResponse>{ //no need to change name
+    public async getPostsByProducer(getPostByProducerReq: GetPostByProducerRequestModel): Promise<GetPostByProfResponse>{ //no need to change name
         try {
-            const { userId, postStatus, limit, page } = getPostByProducerReq;
+            const { userId, postStatus, limit, page, postMediaTypes, searchText  } = getPostByProducerReq;
             const objectId = new mongoose.Types.ObjectId(userId);
 
             const postStatusMatchStage: PipelineStage.Match = {
@@ -813,6 +813,29 @@ class PostRepository {
             }
             pipeline.push(matchStage1);
 
+            if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
+                pipeline.push({
+                    $match: {
+                        postMediaType: { $in: postMediaTypesID}
+                    }
+                })
+            }
+
+
+            if (searchText) {
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { postName: { $regex: searchText, $options: "i" } },
+                            { postDescription: { $regex: searchText, $options: "i" } }
+                        ]
+                    }
+                });
+            }
             
 
             const lookupStage1: PipelineStage.Lookup ={
