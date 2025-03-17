@@ -41,8 +41,11 @@ export default function MyPost() {
           
           var response;
           // console.log(requestPage + requestFilter);
+          
           try{
-            response= await getMyProducerPosts(requestPage + requestFilter,token??"")
+            if (userRole == "production professional"){
+              {/*wait for proper API <TO BE DISCUSSED> */}
+            } else response= await getMyProducerPosts(requestPage + requestFilter,token??"")
           }catch(error){
             setTotalPages(1);
             handlePageChange(1);
