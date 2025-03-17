@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { bool } from 'sharp';
 
 // Offer History Model
 export interface OfferHistory {
@@ -23,6 +24,12 @@ export interface ParticipantDetail {
     ratingScore: number;
     comment: string; 
     reviewedAt: Date|null; // Date of review for the participant
+
+    workQuota: number|3;
+    isSend: boolean|false;
+    isApprove: boolean|false;
+    submissions: Date[];
+
     createdAt: Date; // Date participant was first added (when first offer was made)
     updatedAt: Date; // Date when participant details were last updated
 }
@@ -92,6 +99,30 @@ export const participantDetailSchema = new Schema<ParticipantDetail>({
     reviewedAt: {
         type: Date,
     },
+
+    workQuota: {
+        type: Number,
+        default: 3,
+    },
+    isSend: {
+        type: Boolean,
+        default: false,
+    },
+    isApprove: {
+        type: Boolean,
+        default: false,
+    },
+    submissions: {
+        type: [Date],
+        default: [],
+        validate: {
+            validator: function (this: ParticipantDetail, submissions: Date[]) {
+                return submissions.length <= this.workQuota; // Ensure timestamps don't exceed maxEdit
+            },
+            message: (props) => `Submissions array cannot exceed ${props.value.length} items.`,
+        },
+    },
+
     createdAt: {
         type: Date,
         default: Date.now,
