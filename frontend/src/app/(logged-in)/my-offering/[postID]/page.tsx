@@ -32,6 +32,7 @@ import MyOfferingProducer from "@/components/MyOfferingProducer";
 import MyPostDetail from "@/components/MyPostDetail";
 import ProductionWorkingContent from "@/components/ProducerWorkingContent";
 import ProducerWorkingContent from "@/components/ProducerWorkingContent";
+import { Console } from "console";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -343,6 +344,7 @@ useEffect(() => {
         setPostState(response2)
         response = await getPrudcerOffers(token ?? "",postID); // ดึงโพสต์ของ producer
         setProducerOffers(response)
+        console.log(response2);
         // console.log("PRODUCER BY",response)
       } else if (userRole === "production professional") {
         const handleFetch = async (postID: string) => {
@@ -600,35 +602,21 @@ useEffect(() => {
     }
   };
 
-    let post: PostData = {
-        id: postID,
-        postName: "Sample Post",
-        postDescription: "This is a sample post description.",
-        postImages: [],
-        postImagesSend: [],
-        postMediaType: "image",
-        postProjectRoles: ["Role1", "Role2"],
-        postProjectRolesOut: [],
-        postStatus: "success",
-        startDate: "2023-01-01",
-        endDate: "2023-12-31",
-        userID: "user123",
-        postImageDisplay: [],
-        participants: []
-    };
-
   return (
     <main className="flex flex-col h-[100vh] gap-3 mb-5 relative">
       <div className="relative mt-20 flex flex-row gap-5 item-baseline w-full h-full">
         <div className="w-[50%] flex justify-center items-center h-[800px]">
           {/* ใช้ PostDetail component */}
-          <MyPostDetail post={post}/>
+          {postState && <MyPostDetail post={postState} />}
         </div>
 
         <div className="relative w-[44%] shadow-md h-[720px] rounded-lg">
           <div className='h-full'>
-            {userRole === "producer" && (
-              <ProducerWorkingContent />
+            {userRole === "producer"  && (
+              <ProducerWorkingContent 
+                participants={postState?.participants || []} 
+                mapRole={postState?.postProjectRolesOut || []} 
+              />
             )}
             {userRole === "production professional" && (
                 <div className="mt-4 p-4 h-full">

@@ -169,6 +169,7 @@ export interface MediaType{
     mediaName: string;
 }
 export interface OfferData{
+    role:string;
     roleID:string;
     productionProfessionalID:string;
     offeredBy: Number;

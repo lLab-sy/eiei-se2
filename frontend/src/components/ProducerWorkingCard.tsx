@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { Calendar } from "lucide-react";
+import { Calendar, Star, StarIcon } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
@@ -9,14 +9,15 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 interface ICardProp {
   id: string;
   status: string;
-  date: string;
+  date: Date;
   amount: string;
   postName: string;
   role: string;
-  startDate: string;
+  startDate: Date;
   description: string;
   productionName: string;
-  reviews: string;
+  reviews: number;
+  professionalImg: string;
 }
 
 export default function ProducerWorkingCard(offer: ICardProp){ 
@@ -39,7 +40,7 @@ export default function ProducerWorkingCard(offer: ICardProp){
         </div>
         <div className="flex items-center text-sm text-gray-500 mt-1 space-x-2">
           <Calendar size={14} />
-          <span>{offer.date}</span>
+          <span>{offer.date.toString()}</span>
         </div>
         <div className="mt-2 text-right text-lg font-semibold">{offer.amount} THB</div>
     </Card>
@@ -54,15 +55,21 @@ export default function ProducerWorkingCard(offer: ICardProp){
           </div>
           <div className="p-4">
             <div className="flex items-center space-x-2">
-              <div className="w-12 h-12 bg-gray-300 rounded-full" />
+            <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden">
+              <img 
+                src={offer.professionalImg || "/default-avatar.png"} 
+                alt="Production" 
+                className="w-full h-full object-cover" 
+              />
+            </div>
               <div>
                 <p className="font-semibold">From: {offer.productionName}</p>
-                <p className="text-sm text-gray-500">☆☆☆☆☆ ({offer.reviews} reviews)</p>
+                <p className="flex items-center gap-2 font-medium"><Star className="h-6 w-6 text-mainyellow fill-current" />{offer.reviews}</p>
               </div>
             </div>
             <hr className="my-3" />
             <p className="mt-2"><strong>Offered Price:</strong> <span className="font-bold">{offer.amount} THB</span></p>
-            <p><strong>Start Date:</strong> {offer.startDate}</p>
+            <p><strong>Start Date:</strong> {offer.startDate.toString()}</p>
             <p className="mt-2"><strong>Description</strong></p>
             <div className="mt-1 p-3 bg-gray-100 border rounded-md text-sm">
               {offer.description}

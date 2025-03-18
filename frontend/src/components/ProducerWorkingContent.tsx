@@ -1,89 +1,171 @@
 import { Calendar } from "lucide-react";
 import ProductionWorkingCard from "./ProducerWorkingCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { useState } from "react";
-import { Card } from "./ui/card";
+import { useEffect, useState } from "react";
+import { OfferData, Participant, PostRolesResponse, Professional } from "../../interface";
+import getUser from "@/libs/getUser";
 
-const offers = [
-    {
-        id: 1,
-        status: "Pending",
-        date: "2023-10-01",
-        amount: 1000,
-        postName: "Post 1",
-        role: "Actor",
-        startDate: "2023-10-10",
-        description: "Description 1"
-    },
-    {
-        id: 2,
-        status: "Completed",
-        date: "2023-10-02",
-        amount: 2000,
-        postName: "Post 2",
-        role: "Director",
-        startDate: "2023-10-11",
-        description: "Description 2"
-    },
-    {
-        id: 3,
-        status: "Rejected",
-        date: "2023-10-03",
-        amount: 1500,
-        postName: "Post 3",
-        role: "Actor",
-        startDate: "2023-10-12",
-        description: "Description 3"
+export default function ProducerWorkingContent({
+    participants,
+    mapRole,
+}: {
+    participants: Participant[];
+    mapRole: PostRolesResponse[];
+}) {
+    const [selectedRole, setSelectedRole] = useState("");
+    const [selectedProfessional, setSelectedProfessional] = useState("");
+    const [roleMap, setRoleMap] = useState<Map<string, OfferData[]>>(new Map());
+    const [nameMap, setNameMap] = useState<Map<string, OfferData[]>>(new Map());
+    const [mapRoles, setMapRoles] = useState<Map<string, string>>(new Map());
+    const [professionalMap, setProfessionalMap] = useState<Map<string, Professional>>(new Map());
+    const [offers, setOffers] = useState<OfferData[]>([]);
+
+    console.log(participants);
+
+    // Fetch professional data
+    const fetchProfessionalData = async (id: string) => {
+        try {
+            const responseData = await getUser(id);
+            setProfessionalMap((prevMap) => {
+                const newMap = new Map(prevMap);
+                newMap.set(id, responseData);
+                return newMap;
+            });
+        } catch (error) {
+            console.log("Professional Not Found");
+        }
+    };
+
+    // Map roles once when `mapRole` changes
+    useEffect(() => {
+        const roleMapping = new Map();
+        mapRole.forEach((role) => {
+            roleMapping.set(role.id, role.roleName);
+        });
+        setMapRoles(roleMapping);
+    }, [mapRole]);
+
+    // Fetch offers once when `participants` changes
+    useEffect(() => {
+        const newRoleMap = new Map<string, OfferData[]>();
+
+        participants.forEach((p) => {
+            fetchProfessionalData(p.participantID);
+            p.offer.forEach((o) => {
+                const existingOffers = newRoleMap.get(o.role) || [];
+                existingOffers.push(o);
+                newRoleMap.set(o.role, existingOffers);
+            });
+        });
+
+        setRoleMap(newRoleMap);
+    }, [participants]);
+
+    // Handle role selection
+    function handleSelectRole(roleID: string): void {
+        setSelectedRole(roleID);
+        setSelectedProfessional("");
+
+        const newNameMap = new Map<string, OfferData[]>();
+
+        participants.forEach((p) => {
+            p.offer.forEach((o) => {
+                if (o.role === roleID) {
+                    const existingOffers = newNameMap.get(p.participantID) || [];
+                    existingOffers.push(o);
+                    newNameMap.set(p.participantID, existingOffers);
+                }
+            });
+        });
+
+        setNameMap(newNameMap); // Update nameMap state
     }
-];
 
-export default function ProducerWorkingContent(){
-    const [selectedRole, setSelectedRole] = useState("Actor");
-    const [selectedProfessional, setSelectedProfessional] = useState("Tendo Souji");
+    function handleSelectProfessional(profID: string) {
+        setSelectedProfessional(profID);
 
-    return (
+        let professionalOffers: OfferData[] = [];
+        participants.forEach((p) => {
+            if(p.participantID === profID){ // same person
+                p.offer.forEach((o) => {
+                    if (o.role === selectedRole) { // same offer
+                        professionalOffers.push(o);
+                    }
+                });
+            }
+        });
+
+        setOffers(professionalOffers);
+    }
+
+    return participants.length === 0 ? (
+        <div>No Offer.</div>
+    ) : (
         <main className="bg-slate-480 rounded-lg h-full shadow-xl m-auto w-[100%]">
             <h1 className="text-start text-xl font-bold my-5 ml-8 p-0">Offer History</h1>
             <div className="w-[90%] m-auto content-center">
+                <h3 className="font-bold my-2">Selected Role</h3>
 
-            <h3 className="font-bold my-2">SelectedRole</h3>
-            <Select onValueChange={setSelectedRole} defaultValue={selectedRole}>
-            <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select role" />
-            </SelectTrigger>
-            <SelectContent>
-                <SelectItem value="Actor">Actor (5)</SelectItem>
-                <SelectItem value="Director">Director (2)</SelectItem>
-            </SelectContent>
-            </Select>
+                {/* Select Role */}
+                <Select onValueChange={handleSelectRole} value={selectedRole}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue
+                            placeholder={selectedRole === "" ? "Select role" : mapRoles.get(selectedRole)}
+                        />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {[...roleMap.entries()].map(([key, offers]) => (
+                            <SelectItem key={key} value={key}>
+                                {mapRoles.get(key)} ({offers.length})
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
-            <h3 className="font-bold my-2">Select a production professional</h3>
-            <Select onValueChange={setSelectedProfessional} defaultValue={selectedProfessional}>
-            <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a production professional" />
-            </SelectTrigger>
-            <SelectContent>
-                <SelectItem value="Tendo Souji">Tendo Souji</SelectItem>
-                <SelectItem value="John Doe">John Doe</SelectItem>
-            </SelectContent>
-            </Select>
-            
-            <div className="space-y-3 my-5 overflow-y-auto h-full max-h-[400px] m-auto">
-                {offers.map((offer) => (
-                <ProductionWorkingCard 
-                        id={offer.id.toString()}
-                        status={offer.status}
-                        date={offer.date}
-                        amount={offer.amount.toString()}
-                        postName={offer.postName}
-                        role={offer.role}
-                        startDate={offer.startDate}
-                        description={offer.description} 
-                        productionName={"test"} 
-                        reviews={"15"}                />
-                ))}
+                {/* Select Production Professional */}
+                {selectedRole !== "" && (
+                    <>
+                        <h3 className="font-bold my-2">Select a production professional</h3>
+                        <Select onValueChange={handleSelectProfessional} value={selectedProfessional}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue
+                                    placeholder={
+                                        selectedProfessional === "" ? "Select production professional" : selectedProfessional
+                                    }
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[...nameMap.entries()].map(([key, offers]) => (
+                                    <SelectItem key={key} value={key}>
+                                        {professionalMap.get(key)?.username} ({offers.length})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </>
+                )}
+
+                {/* Show Offers */}
+                {selectedProfessional !== "" && (
+                    <div className="space-y-3 my-5 overflow-y-auto h-full max-h-[400px] m-auto">
+                        {offers.map((offer, index) => (
+                    <ProductionWorkingCard 
+                            id={index.toString()}
+                            status={"Pending"}
+                            date={offer.createdAt}
+                            amount={offer.price.toString()}
+                            postName={offer.postID}
+                            role={mapRoles.get(offer.role) || ""}
+                            startDate={offer.createdAt}
+                            description={offer.reason} 
+                            productionName={professionalMap.get(selectedProfessional)?.username || ""} 
+                            reviews={professionalMap.get(selectedProfessional)?.avgRating || 0}
+                            professionalImg={professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png"}               
+                            />
+                    ))}
+                    </div>
+                )}
             </div>
-        </div>
         </main>
-      );
+    );
 }
