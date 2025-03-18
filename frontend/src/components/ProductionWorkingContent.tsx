@@ -5,13 +5,37 @@ import { useState } from "react";
 import { Card } from "./ui/card";
 
 const offers = [
-    { id: 3, status: "Pending", amount: 20000, date: "March 16, 2025 at 09:20 PM", color: "text-yellow-500" },
-    { id: 2, status: "Rejected", amount: 30000, date: "March 15, 2025 at 09:20 PM", color: "text-red-500" },
-    { id: 1, status: "Rejected", amount: 50000, date: "March 14, 2025 at 09:20 PM", color: "text-red-500" },
-    { id: 4, status: "Pending", amount: 20000, date: "March 16, 2025 at 09:20 PM", color: "text-yellow-500" },
-    { id: 5, status: "Rejected", amount: 30000, date: "March 15, 2025 at 09:20 PM", color: "text-red-500" },
-    { id: 6, status: "Rejected", amount: 50000, date: "March 14, 2025 at 09:20 PM", color: "text-red-500" },
-  ];
+    {
+        id: 1,
+        status: "Pending",
+        date: "2023-10-01",
+        amount: 1000,
+        postName: "Post 1",
+        role: "Actor",
+        startDate: "2023-10-10",
+        description: "Description 1"
+    },
+    {
+        id: 2,
+        status: "Completed",
+        date: "2023-10-02",
+        amount: 2000,
+        postName: "Post 2",
+        role: "Director",
+        startDate: "2023-10-11",
+        description: "Description 2"
+    },
+    {
+        id: 3,
+        status: "Rejected",
+        date: "2023-10-03",
+        amount: 1500,
+        postName: "Post 3",
+        role: "Actor",
+        startDate: "2023-10-12",
+        description: "Description 3"
+    }
+];
 
 export default function ProductionWorkingContent(){
     const [selectedRole, setSelectedRole] = useState("Actor");
@@ -46,22 +70,20 @@ export default function ProductionWorkingContent(){
             
             <div className="space-y-3 my-5 overflow-y-auto h-full max-h-[400px] m-auto">
                 {offers.map((offer) => (
-                <Card key={offer.id} className="p-4 border rounded-lg shadow-sm">
-                    <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Offer {offer.id}</h3>
-                    <span className={`font-semibold ${offer.color}`}>{offer.status}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500 mt-1 space-x-2">
-                    <Calendar size={14} />
-                    <span>{offer.date}</span>
-                    </div>
-                    <div className="mt-2 text-right text-lg font-semibold">{offer.amount} THB</div>
-                </Card>
+                <ProductionWorkingCard 
+                        id={offer.id.toString()}
+                        status={offer.status}
+                        date={offer.date}
+                        amount={offer.amount.toString()}
+                        postName={offer.postName}
+                        role={offer.role}
+                        startDate={offer.startDate}
+                        description={offer.description} 
+                        productionName={"test"} 
+                        reviews={"15"}                />
                 ))}
             </div>
-            
-
-                </div>
+        </div>
         </main>
       );
     {/*return(
