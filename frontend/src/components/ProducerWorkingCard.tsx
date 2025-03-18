@@ -28,11 +28,11 @@ export default function ProducerWorkingCard({
   postID: string, 
   participantID: string, 
   offer: ICardProp,
-  onStatusChange: () => void
+  onStatusChange: (participantID: string, status: string) => void
 }) {
   const [open, setOpen] = useState(false);
   const [offerStatus, setOfferStatus] = useState(offer.status);
-  
+
   const { data: session } = useSession();
   const token = session?.user?.token;
   const { toast } = useToast();
@@ -45,7 +45,8 @@ export default function ProducerWorkingCard({
         participantID: participantID,
         statusToChange: "reject"
       }, token);
-      onStatusChange();
+      onStatusChange(participantID, "reject");
+      setOfferStatus("Rejected");
       toast({
         variant: "default",
         title: "Successful Reject Offer.",
@@ -63,7 +64,8 @@ export default function ProducerWorkingCard({
         participantID: participantID,
         statusToChange: "candidate"
       }, token);
-      onStatusChange();
+      onStatusChange(participantID, "candidate");
+      setOfferStatus("Completed");
       toast({
         variant: "default",
         title: "Successful Confirm Offer.",
@@ -72,6 +74,10 @@ export default function ProducerWorkingCard({
       console.error("Token is undefined");
     }
   }
+
+  useEffect(() => {
+    setOfferStatus(offer.status);
+}, [offer]);
 
   return (
     <>
@@ -83,10 +89,10 @@ export default function ProducerWorkingCard({
         <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Offer {offer.id}</h3>
         <span className={`font-semibold ${
-                offer.status === "Rejected" ? "text-mainred-light" : 
-                offer.status === "Pending" ? "text-mainyellow" : 
-                offer.status === "Completed" ? "text-green-500" : "text-gray-500"
-            }`}>{offer.status}</span>
+               offerStatus === "Rejected" ? "text-mainred-light" : 
+               offerStatus === "Pending" ? "text-mainyellow" : 
+               offerStatus === "Completed" ? "text-green-500" : "text-gray-500"
+            }`}>{offerStatus}</span>
         </div>
         <div className="flex items-center text-sm text-gray-500 mt-1 space-x-2">
           <Calendar size={14} />

@@ -1,8 +1,10 @@
 import ProductionWorkingCard from "./ProducerWorkingCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useEffect, useState } from "react";
-import { OfferData, Participant, PostRolesResponse, Professional } from "../../interface";
+import { OfferData, Participant, PostData, PostRolesResponse, Professional } from "../../interface";
 import getUser from "@/libs/getUser";
+import getPostById from "@/libs/getPostById";
+import { useSession } from "next-auth/react";
 
 interface IOfferData {
     data: OfferData;
@@ -26,10 +28,8 @@ export default function ProducerWorkingContent({
     const [professionalMap, setProfessionalMap] = useState<Map<string, Professional>>(new Map());
     const [offers, setOffers] = useState<IOfferData[]>([]);
 
-    //handle when click confirm or reject
-    const handleStatusChange = () => {
-        handleSelectProfessional(selectedProfessional);
-    };
+    const { data: session } = useSession();
+    const token = session?.user?.token;
 
     // Fetch professional data
     const fetchProfessionalData = async (id: string) => {
@@ -54,7 +54,7 @@ export default function ProducerWorkingContent({
         setMapRoles(roleMapping);
     }, [mapRole]);
 
-    // Fetch offers once when `participants` changes
+    // Fetch offers once when `postState` changes
     useEffect(() => {
         const newRoleMap = new Map<string, OfferData[]>();
 
@@ -68,6 +68,11 @@ export default function ProducerWorkingContent({
         });
 
         setRoleMap(newRoleMap);
+        if(selectedRole && selectedProfessional){
+            console.log("recompute");
+            handleSelectRole(selectedRole);
+            handleSelectProfessional(selectedProfessional);
+        }
     }, [participants]);
 
     // Handle role selection
@@ -100,14 +105,20 @@ export default function ProducerWorkingContent({
                     const o : OfferData = p.offer[i];
                     if (o.role === selectedRole) { // same offer
                         const status = p.status;
-                        professionalOffers.push({ data: o, status: (i != p.offer.length - 1 ? "Rejected" : (status === "candidate" ? "Completed" : "Pending")) });
+                        professionalOffers.push({ data: o, status: (i != p.offer.length - 1 || status === "reject" ? "Rejected" : (status === "candidate" ? "Completed" : "Pending")) });
                     }
                 }
             }
         });
-        
 
         setOffers(professionalOffers);
+    }
+
+    function handleStatusChange(participantID: string, status: string): void {
+        participants.forEach(p =>{
+            if(p.participantID == participantID) p.status = status;
+        })
+        handleSelectProfessional(participantID);
     }
 
     return participants.length === 0 ? (

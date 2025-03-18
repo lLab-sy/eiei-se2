@@ -333,6 +333,7 @@ const token =session?.user.token
 const userID= session?.user.id
 const [producerOffers,setProducerOffers] =useState<OfferHistoryResponseData[]|null>(null)
 const [selectedOfferProducer,setSelectedOfferProducer] =useState<OfferHistoryResponseData|null>(null)
+
 useEffect(() => {
   const fetchData = async () => {
     try {
@@ -612,11 +613,11 @@ useEffect(() => {
 
         <div className="relative w-[44%] shadow-md h-[720px] rounded-lg">
           <div className='h-full'>
-            {userRole === "producer"  && (
+            {postState && userRole === "producer"  && (
               <ProducerWorkingContent 
                 postID={postID}
                 participants={postState?.participants || []} 
-                mapRole={postState?.postProjectRolesOut || []} 
+                mapRole={postState?.postProjectRolesOut || []}
               />
             )}
             {userRole === "production professional" && (
