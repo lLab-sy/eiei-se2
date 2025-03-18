@@ -1,14 +1,20 @@
-import { Calendar } from "lucide-react";
 import ProductionWorkingCard from "./ProducerWorkingCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useEffect, useState } from "react";
 import { OfferData, Participant, PostRolesResponse, Professional } from "../../interface";
 import getUser from "@/libs/getUser";
 
+interface IOfferData {
+    data: OfferData;
+    status: string;
+  }
+
 export default function ProducerWorkingContent({
+    postID,
     participants,
     mapRole,
 }: {
+    postID: string;
     participants: Participant[];
     mapRole: PostRolesResponse[];
 }) {
@@ -18,9 +24,12 @@ export default function ProducerWorkingContent({
     const [nameMap, setNameMap] = useState<Map<string, OfferData[]>>(new Map());
     const [mapRoles, setMapRoles] = useState<Map<string, string>>(new Map());
     const [professionalMap, setProfessionalMap] = useState<Map<string, Professional>>(new Map());
-    const [offers, setOffers] = useState<OfferData[]>([]);
+    const [offers, setOffers] = useState<IOfferData[]>([]);
 
-    console.log(participants);
+    //handle when click confirm or reject
+    const handleStatusChange = () => {
+        handleSelectProfessional(selectedProfessional);
+    };
 
     // Fetch professional data
     const fetchProfessionalData = async (id: string) => {
@@ -84,16 +93,19 @@ export default function ProducerWorkingContent({
     function handleSelectProfessional(profID: string) {
         setSelectedProfessional(profID);
 
-        let professionalOffers: OfferData[] = [];
+        let professionalOffers: IOfferData[] = [];
         participants.forEach((p) => {
             if(p.participantID === profID){ // same person
-                p.offer.forEach((o) => {
+                for(let i = 0; i < p.offer.length; ++i){
+                    const o : OfferData = p.offer[i];
                     if (o.role === selectedRole) { // same offer
-                        professionalOffers.push(o);
+                        const status = p.status;
+                        professionalOffers.push({ data: o, status: (i != p.offer.length - 1 ? "Rejected" : (status === "candidate" ? "Completed" : "Pending")) });
                     }
-                });
+                }
             }
         });
+        
 
         setOffers(professionalOffers);
     }
@@ -149,18 +161,23 @@ export default function ProducerWorkingContent({
                 {selectedProfessional !== "" && (
                     <div className="space-y-3 my-5 overflow-y-auto h-full max-h-[400px] m-auto">
                         {offers.map((offer, index) => (
-                    <ProductionWorkingCard 
-                            id={index.toString()}
-                            status={"Pending"}
-                            date={offer.createdAt}
-                            amount={offer.price.toString()}
-                            postName={offer.postID}
-                            role={mapRoles.get(offer.role) || ""}
-                            startDate={offer.createdAt}
-                            description={offer.reason} 
-                            productionName={professionalMap.get(selectedProfessional)?.username || ""} 
-                            reviews={professionalMap.get(selectedProfessional)?.avgRating || 0}
-                            professionalImg={professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png"}               
+                    <ProductionWorkingCard
+                    postID={postID}
+                    participantID={selectedProfessional}
+                    offer={{
+                        id: index.toString(),
+                        status: offer.status,
+                        date: offer.data.createdAt,
+                        amount: offer.data.price.toString(),
+                        role: mapRoles.get(offer.data.role) || "",
+                        startDate: offer.data.createdAt,
+                        postName: index.toString(),
+                        description: offer.data.reason,
+                        productionName: professionalMap.get(selectedProfessional)?.username || "",
+                        reviews: professionalMap.get(selectedProfessional)?.avgRating || 0,
+                        professionalImg: professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png"
+                    }}
+                    onStatusChange={handleStatusChange}                 
                             />
                     ))}
                     </div>

@@ -614,6 +614,7 @@ useEffect(() => {
           <div className='h-full'>
             {userRole === "producer"  && (
               <ProducerWorkingContent 
+                postID={postID}
                 participants={postState?.participants || []} 
                 mapRole={postState?.postProjectRolesOut || []} 
               />

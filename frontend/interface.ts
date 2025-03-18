@@ -209,3 +209,9 @@ export interface PostParticipant {
     id: string;
     label: string;
 }
+
+export interface ChangeParticipantStatus{
+    postID: string;
+    participantID: string;
+    statusToChange: string;
+}
