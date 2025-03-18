@@ -1,11 +1,11 @@
-@createofferproduction
+@createoffer @createofferproduction
 Feature: Production Professional Create Offer to Producer
     As a production professional
     I want to create offer to the producer of the post I want 
     So that I can work on a project I am interested in
 
     Background:
-        Given the production professional is logged in  
+        Given the "production professional" is logged in  
         And has target post
 
     Scenario: Successfully create an offer to a producer
