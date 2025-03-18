@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject, IsMongoId } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongoose';
 import { PostRoleDTO } from './postRoleDTO';
@@ -45,6 +45,24 @@ export interface OfferDetailDTO{
     offeredBy: number;
     createdAt: Date;
     reason: string;
+}
+
+export class ChangeParticipantStatusDTO {
+    @IsMongoId()
+    @IsNotEmpty()
+    postID!: string;
+
+    @IsMongoId()
+    @IsNotEmpty()
+    participantID!: string;
+
+    @IsEnum(['candidate', 'reject'])
+    @IsNotEmpty()
+    statusToChange!: 'candidate' | 'reject';
+
+    constructor(partial: Partial<ChangeParticipantStatusDTO>) {
+        Object.assign(this, partial);
+    }
 }
 
 export class ParticipantDetailDTO {  
