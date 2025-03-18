@@ -19,7 +19,7 @@ interface ICardProp {
   reviews: string;
 }
 
-export default function ProductionWorkingCard(offer: ICardProp){ 
+export default function ProducerWorkingCard(offer: ICardProp){ 
   const [open, setOpen] = useState(false);
   return (
     <>
