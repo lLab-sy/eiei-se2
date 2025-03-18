@@ -138,7 +138,7 @@ const ProfessionalsPage = () => {
             <PostCard
               key={index}
               title={post.postName}
-              description={post.postDescription}
+              description={post.postDescription.length > 100 ? post.postDescription.slice(0, 100) + '...' : post.postDescription}
               imageUrl={(post.postImages && post.postImages.length != 0)  ? post.postImages[0] : ''} 
               role={getRoleById(post.postProjectRoles || [])} 
               mediaType={getMediaNameById(post.postMediaType)}

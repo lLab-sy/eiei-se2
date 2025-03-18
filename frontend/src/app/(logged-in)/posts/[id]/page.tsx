@@ -116,6 +116,13 @@ const PostDetail = () => {
       }
   },[dataResponse]);
 
+  useEffect(()=>{
+    if(dataReviews && dataReviews.receivedReviews){
+      dataReviews.receivedReviews = dataReviews.receivedReviews.filter((e) => e.ratingScore > 0);
+      console.log(dataReviews);
+    }
+  }, [dataReviews])
+
   if (!dataResponse || !ownerResponse) {
     fetchData();
     return (
