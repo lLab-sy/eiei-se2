@@ -63,7 +63,7 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
         ? postDetail.postImages[0]
         : "image/logo.png";
     return(
-        <div className=" bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.01] h-[144px] w-[400px] p-2">
+        <div className=" bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.01] h-[144px] w-[450px] p-2">
             <div className="grid grid-cols-7 gap-2 w-[100%] h-full">
                 <div className="col-span-4 rounded-lg overflow-hidden w-[100%] relative">
                     <Image
@@ -98,17 +98,22 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
                         </>
                     ) : (
                         <>
-                        <div className="flex items-center text-gray-600 text-sm mb-1">
-                            <User className="w-4 h-4 mr-2 text-mainblue-light" />
-                            <p>Producer: {post.producerName?.producerName || "Unknown"}</p>
-                        </div>
+
                         <div className="flex items-center text-gray-600 text-sm mb-1">
                             <Film className="w-4 h-4 mr-2 text-mainblue-light" />
-                            <p>Role: {post.postProjectRolesOutProfessional?.roleName}</p>
+                            <p className="flex">Type: {postDetail.postMediaTypeOut.mediaName}</p>
                         </div>
                         <div className="flex items-center text-gray-600 text-sm">
                             <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
-                            <p>Completed: {EndDate}</p>
+                            <p>
+                            {postDetail.postStatus === "in-progress"
+                          ? "During Develop"
+                          : postDetail.postStatus === "created"
+                          ? "Wait"
+                          : postDetail.postStatus==="success"
+                          ? `EndDate: ${displayDate}`
+                          : `-`}
+                            </p>
                         </div>
                         </>
                         )}

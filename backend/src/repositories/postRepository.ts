@@ -689,7 +689,7 @@ class PostRepository {
 
     public async getPostsByProf(getPostByProfReq: GetPostByProfRequestModel): Promise<GetPostByProfResponse>{
         try {
-            const { userId, postStatus, limit, page } = getPostByProfReq;
+            const { userId, postStatus, limit, page, postMediaTypes, searchText  } = getPostByProfReq;
             const objectId = new mongoose.Types.ObjectId(userId);
 
             const postStatusMatchStage: PipelineStage.Match = {
@@ -707,6 +707,30 @@ class PostRepository {
             }
             pipeline.push(matchStage1);
 
+            if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
+                pipeline.push({
+                    $match: {
+                        postMediaType: { $in: postMediaTypesID}
+                    }
+                })
+            }
+
+
+            if (searchText) {
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { postName: { $regex: searchText, $options: "i" } },
+                            { postDescription: { $regex: searchText, $options: "i" } }
+                        ]
+                    }
+                });
+            }
+
             const unwindStage: PipelineStage.Unwind = {
                 $unwind: { path: '$participants' }
             }
@@ -718,6 +742,35 @@ class PostRepository {
                   }
             }
             pipeline.push(matchStage2);
+
+            const lookupStage1: PipelineStage.Lookup ={
+                $lookup: {
+                    from: "mediaTypes",
+                    localField: "postMediaType",
+                    foreignField: "_id",
+                    as: "postMediaTypeOut"
+                  }
+            }
+            pipeline.push(lookupStage1);
+
+            const projectStage1: PipelineStage.Project ={
+                $project: {
+                    postName:1,
+                    postDescription:1,
+                  postImages:1,
+                  postProjectRoles:1,
+                  postStatus:1,
+                  startDate:1,
+                  endDate:1,
+                  createdAt:1,
+                  updatedAt:1,
+                  postMediaType: {
+                    $arrayElemAt: ["$postMediaTypeOut", 0]
+                  }
+                }
+                
+            }
+            pipeline.push(projectStage1);
 
             const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
@@ -739,7 +792,7 @@ class PostRepository {
                 data: results,
                 totalItems: totalItems
             }
-            console.log("ANSWER",response)
+            console.log("ANSWER Prof",response)
             return response
         } catch (error) {
             throw new Error('Error fetching user posts from repository: ' + error);

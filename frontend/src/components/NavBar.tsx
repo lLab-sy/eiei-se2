@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "./ui/button";
 import { signOut } from "next-auth/react";
+import { FaHistory } from "react-icons/fa";
 type menuItem = {
   icon: JSX.Element;
   label: string;
@@ -144,8 +145,13 @@ const NavBar = (session: any) => {
         label: "Profile", 
         href: "/user-profile" },
       {
-        icon: <FileText className="w-5 h-5" />,
-        label: role === "producer" ? "My Post" : "Work History",
+          icon: <FileText className="w-5 h-5" />,
+          label:  "My Post",
+          href: "/my-post",
+      },
+      {
+        icon: <FaHistory className="w-5 h-5" />,
+        label: role === "producer" ? "My Post History" : "Work History",
         href: "/post-history",
       },
       ...(role === "producer" ? 

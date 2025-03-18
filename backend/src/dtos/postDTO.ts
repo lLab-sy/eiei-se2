@@ -386,6 +386,17 @@ export class GetPostByProfDTO {
     @ApiProperty({ description: 'The current page' })
     @IsNumber() 
     page!: number;
+
+    @ApiProperty({ description: 'The media type of the post', type: [String] })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypes!: string[];
+
+    @ApiProperty({ description: 'The name of the post or project detail', type: String })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100, { message: 'searchText cannot be more than 100 characters' })
+    searchText!: string;
 }
 
 
