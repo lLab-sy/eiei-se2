@@ -222,6 +222,8 @@ export interface GetPostByProfRequestModel {
     postStatus: string;
     limit: number;
     page: number;
+    postMediaTypes: string[];
+    searchText: string;
 }
 
 export interface GetPostByProducerRequestModel {

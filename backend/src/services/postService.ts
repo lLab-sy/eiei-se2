@@ -466,7 +466,10 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: [postImage] as [string],
-                postMediaType: post.postMediaType.toString() as string,
+                postMediaTypeOut: {    
+                  id: (post.postMediaType as any)._id.toString() as string,
+                  mediaName: (post.postMediaType as any).mediaName as string
+                },
                 postProjectRoles: post.postProjectRoles.map(eachRole => eachRole.toString()) as [string],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 startDate: post.startDate ? post.startDate : "",  

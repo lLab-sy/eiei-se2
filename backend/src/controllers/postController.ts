@@ -293,12 +293,16 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
   async getPostsByProf(req: AuthRequest, res: Response): Promise<void> {
     try {
       const role=req.user.role
-      if(role=="production professional"){
+      if(role!="production professional"){
+        sendResponse(res, 'error', "", `unauthorized`, 400);
+        return;
+      }
       const userId = req.user.userId? req.user.userId as string: false;
       const limit = req.query.limit ? Number(req.query.limit): 10;
       const page = req.query.page ? Number(req.query.page): 1;
       const status = ['created', 'in-progress', 'success', 'cancel'];
-      
+      const postMediaTypes = req.query.postMediaTypes as string[];
+
       if (limit < 1 || page < 1 || !userId ) {
         sendResponse(res, 'error', '', 'bad request', 400);
         return
@@ -321,7 +325,9 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
         page: page,
         limit: limit,
         userId: userId,
-        postStatus: postStatus as string
+        postStatus: postStatus as string,
+        postMediaTypes: Array.isArray(postMediaTypes)?postMediaTypes: postMediaTypes? [postMediaTypes]: postMediaTypes,
+        searchText: req.query.searchText? req.query.searchText as string: '',
       }
 
       const posts = await postService.getPostsByProf(getPostByProfDTO);
@@ -335,10 +341,8 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
         return
       }
       sendResponse(res, 'success', posts, 'Successfully get posts', 200);
-      }else {      
-        sendResponse(res, 'error', "", `unauthorized`, 400);
-        return;
-      }
+      return;
+     
       
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to search posts at controller', 500);
