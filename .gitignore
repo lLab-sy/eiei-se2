@@ -18,3 +18,6 @@ Thumbs.db
 # Ignore build and output directories
 dist/
 build/
+
+# Ignore reports
+reports
