@@ -43,6 +43,8 @@ import axios from "axios";
 import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import { CircularProgress } from "@mui/material";
 import ReviewProfessional from "@/components/ReviewProfessional";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 //missing
 //sort position form error
@@ -312,29 +314,27 @@ export default function UserPage() {
     { label: "Gatsby", value: "gatsby", disable: true },
     { label: "Astro", value: "astro" },
   ];
-
+  const [mobilePageState, setMobilePageState] = useState(0)
+  const router = useRouter()
   return (
-    <main className=" min-h-screen flex bg-mainblue-light relative items-center justify-center">
-      <div className="flex justify-around w-[80%] h-[800px]">
-        <Card className="w-[400px] h-[700px] flex flex-col">
+    <main className="h-[100vh] lg:min-h-screen flex bg-mainblue-light relative lg:items-center lg:justify-center">
+      <ArrowLeft onClick={() => router.push('/')} className='lg:hidden z-10 absolute top-5 left-5' size={50}/>
+      <div className={` flex lg:justify-around lg:w-[80%] lg:h-[800px]`}>
+        <Card className={`${mobilePageState == 0 ? "" : "hidden"} bg-slate-100 lg:bg-white  lg:visible h-[100vh] w-[100vw] lg:w-[400px]  lg:h-[700px] lg:flex lg:flex-col`}>
           <CardHeader>
-            <CardTitle>Profile</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center">
-            <div className="text-xl text-center font-bold flex justify-center h-[50px] items-center">
+            <CardTitle className='flex justify-center text-2xl lg:text-2xl lg:justify-start w-full'>Profile</CardTitle>          </CardHeader>
+          <CardContent className=" flex flex-col items-center">
+            <div className="mt-5 lg:mt-0 order-2 lg:order-1 text-xl text-center font-bold flex justify-center h-[50px] items-center">
               {userData.firstName} {userData.middleName} {userData.lastName}
             </div>
-            {/* <div className="bg-black w-[150px] h-[150px] rounded-full">
-              <Image src={} alt=''/>
-            </div> */}
             {loadingImage ? (
-              <Avatar className="size-60 bg-slate-400 flex justify-center items-center">
+              <Avatar className="order-1 lg:order-2 bg-slate-400 flex justify-center items-center">
                 <CircularProgress size={60} />
               </Avatar>
             ) : (
-              <Avatar className="size-60">
+              <Avatar className="order-1 lg:order-2 size-60">
                 <AvatarImage src={img.image} alt="" />
-                <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
+                <AvatarFallback className=" border border-black rounded-full"></AvatarFallback>
               </Avatar>
             )}
             {/* <CircularProgress size={60}/>
@@ -342,7 +342,7 @@ export default function UserPage() {
               <AvatarImage src={img.image} alt="" />
               <AvatarFallback className="border border-black rounded-full"></AvatarFallback>
             </Avatar> */}
-            <div className="w-full flex flex-col items-center justify-center">
+            <div className="mt-5 lg:mt-0 order-3 lg:order-2 lg:w-full lg:flex flex-col items-center justify-center">
               <label
                 htmlFor="picture"
                 className="mt-5 w-[50%] bg-blue-500 text-white text-xl py-2 px-4 rounded-lg cursor-pointer text-center"
@@ -357,25 +357,34 @@ export default function UserPage() {
                 onChange={onImageChange}
               />
             </div>
+            <div className='flex items-start order-6  bottom-0 w-[90%] left-[50%] translate-x-[-50%]  h-[20vh] absolute lg:hidden'>
+              <div className='bg-white flex justify-between items-center w-full rounded-xl h-[20%]'>
+                <div onClick={() => setMobilePageState(0)} className={`${mobilePageState == 0 ? "bg-slate-300" : ""} cursor-pointer ${(user.user.role === 'production professional') ? "w-[33%]" : "w-[50%]"} h-full flex justify-center items-center rounded-lg`}>Profile Image</div>
+                <div onClick={() => setMobilePageState(1)} className={`${mobilePageState == 1 ? "bg-slate-300" : ""} cursor-pointer ${(user.user.role === 'production professional') ? "w-[33%]" : "w-[50%]"} h-full flex justify-center items-center rounded-lg`}>Edit Profile</div>
+                {(user.user.role === 'production professional') ? 
+                  <div onClick={() => setMobilePageState(2)} className={`${mobilePageState == 2 ? "bg-slate-300" : ""} cursor-pointer w-[33%] h-full flex justify-center items-center rounded-lg`}>Review</div>
+                :""}
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className=" relative w-[500px] flex flex-col">
-          <CardHeader className="">
-            <CardTitle>Edit Profile ({user.user.role})</CardTitle>
+        <Card className={`${mobilePageState == 1 ? "" : "hidden"} w-[100vw] h-[100vh] lg:h-full relative lg:w-[500px] lg:flex lg:flex-col`}>
+          <CardHeader className="h-[17%] lg:h-[10%] flex items-start justify-end">
+            <CardTitle className=''>Edit Profile ({user.user.role})</CardTitle>
           </CardHeader>
-          <CardContent className="w-[500px] flex flex-col relative h-full">
+          <CardContent className="h-[65%] w-full lg:w-[500px] flex flex-col relative lg:h-full">
             <div className="flex flex-row w-[60%] justify-between">
               <Link
                 href={"#"}
                 onClick={() => setClick(0)}
-                className={` ${styles.divLine} text-nowrap  hover:after:scale-x-100 after:bg-blue-200 after:content-[''] after:w-[70px] after:h-[4px] after:absolute  after:left-[5%] after:top-[4.8%] ${click == 0 ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={` ${styles.divLine} relative  text-nowrap  hover:after:scale-x-100 after:bg-blue-200 after:content-[''] after:w-[70px] after:h-[4px] after:absolute  after:left-[0%] after:top-[145%] ${click == 0 ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 User Info
               </Link>
               <Link
                 href={"#"}
                 onClick={() => setClick(1)}
-                className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[147px] after:h-[4px] after:absolute after:left-[29%] after:top-[4.8%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
+                className={`${styles.divLines} ml-[24%] relative text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[147px] after:h-[4px] after:absolute after:left-[-5%] after:top-[145%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
               >
                 Billing Information
               </Link>
@@ -385,7 +394,7 @@ export default function UserPage() {
                 <Link
                   href={"#"}
                   onClick={() => setClick(2)}
-                  className={`${styles.divLines} ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[55px] after:h-[4px] after:absolute after:left-[67%] after:top-[4.8%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
+                  className={`${styles.divLines} relative ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[55px] after:h-[4px] after:absolute after:left-[-30%] after:top-[145%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
                 >
                   Skill
                 </Link>
@@ -408,7 +417,7 @@ export default function UserPage() {
                       name="firstName"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem className="w-[40%">
+                        <FormItem className="w-[40%]">
                           <FormLabel className="">First Name</FormLabel>
                           <FormControl>
                             <Input disabled={!isEdit} {...field} type="text" />
@@ -548,7 +557,7 @@ export default function UserPage() {
                         variant={`${isEdit ? "destructive" : "default"}`}
                         type="reset"
                         onClick={() => setIsEdit(!isEdit)}
-                        className={` w-[30%]`}
+                        className={`${isEdit ? "" : "w-full"} lg:w-[30%]`}
                       >
                         {isEdit ? "Cancel" : "Edit"}
                       </Button>
@@ -689,7 +698,7 @@ export default function UserPage() {
                         variant={`${isEdit ? "destructive" : "default"}`}
                         type="reset"
                         onClick={() => setIsEdit(!isEdit)}
-                        className={`w-[30%]`}
+                        className={`${isEdit ? "" : "w-full"} lg:w-[30%]`}
                       >
                         {isEdit ? "Cancel" : "Edit"}
                       </Button>
@@ -772,7 +781,7 @@ export default function UserPage() {
                       variant={`${isEdit ? "destructive" : "default"}`}
                       type="reset"
                       onClick={() => setIsEdit(!isEdit)}
-                      className={` w-[30%]`}
+                      className={`${isEdit ? "" : "w-full"} lg:w-[30%]`}
                     >
                       {isEdit ? "Cancel" : "Edit"}
                     </Button>
@@ -780,20 +789,36 @@ export default function UserPage() {
                 </fieldset>
               </form>
             </Form>
+            
           </CardContent>
+          <div className='flex items-start order-6  bottom-0 w-[90%] left-[50%] translate-x-[-50%] h-[20vh] absolute lg:hidden'>
+              <div className='bg-white flex justify-between items-center w-full rounded-xl h-[20%]'>
+              <div onClick={() => setMobilePageState(0)} className={`${mobilePageState == 0 ? "bg-slate-300" : ""} cursor-pointer ${(user.user.role === 'production professional') ? "w-[33%]" : "w-[50%]"} h-full flex justify-center items-center rounded-lg`}>Profile Image</div>
+                <div onClick={() => setMobilePageState(1)} className={`${mobilePageState == 1 ? "bg-slate-300" : ""} cursor-pointer ${(user.user.role === 'production professional') ? "w-[33%]" : "w-[50%]"} h-full flex justify-center items-center rounded-lg`}>Edit Profile</div>
+                {(user.user.role === 'production professional') ? 
+                  <div onClick={() => setMobilePageState(2)} className={`${mobilePageState == 2 ? "bg-slate-300" : ""} cursor-pointer w-[33%] h-full flex justify-center items-center rounded-lg`}>Review</div>
+                :""}
+              </div>
+            </div>
         </Card>
         {
           (user.user.role === 'production professional') ?
-          <Card className='w-[535px] h-[800px] relative'>
-          <CardHeader>
+          <Card className={`${mobilePageState == 2 ? "" : "hidden"} bg-slate-100 lg:bg-white w-[100vw] h-[100vh] lg:inline lg:w-[535px] lg:h-[800px] relative`}>
+          <CardHeader className='hidden lg:block'>
               <CardTitle>Your Review</CardTitle>
           </CardHeader>
           <CardContent className='h-full'>
             <Separator className="mt-1"/>
-            <div className='mt-5 h-[80%]'>
+            <div className='mt-16 lg:mt-5 h-[70%] lg:h-[80%]'>
               <ReviewProfessional id={userData?._id ?? ""} />
             </div>
-
+            <div className='flex items-start order-6  bottom-0 w-[90%] left-[50%] translate-x-[-50%] h-[20vh] absolute lg:hidden'>
+              <div className='bg-white flex justify-between items-center w-full rounded-xl h-[20%]'>
+                <div onClick={() => setMobilePageState(0)} className={`${mobilePageState == 0 ? "bg-slate-300" : ""} cursor-pointer w-[33%] h-full flex justify-center items-center rounded-lg`}>Profile Image</div>
+                <div onClick={() => setMobilePageState(1)} className={`${mobilePageState == 1 ? "bg-slate-300" : ""} cursor-pointer w-[33%] h-full flex justify-center items-center rounded-lg`}>Edit Profile</div>
+                <div onClick={() => setMobilePageState(2)} className={`${mobilePageState == 2 ? "bg-slate-300" : ""} cursor-pointer w-[33%] h-full flex justify-center items-center rounded-lg`}>Review</div>
+              </div>
+            </div>
           </CardContent>
         </Card> : ""
         }
