@@ -406,6 +406,35 @@ class PostRepository {
         }
     }
 
+    public async startProject(postId: string, userId: string): Promise<void> {
+        try {
+            if (!postId) {
+                throw new Error("Id is required");
+            }
+
+            const result = await Post.findOneAndUpdate(
+                {
+                    _id: postId,
+                    "postStatus": "waiting", // have at least 1 cadidate
+                    "userID": userId 
+                },
+                { $set: { 
+                    "postStatus": 'in-progress'
+                 }}, // Update the matching element
+                { new: true, runValidators: true }
+            );
+            
+            if (!result) {
+                throw new Error('Post not found or post status not match');
+            }
+
+            return;
+        }
+        catch(err){
+            throw new Error('Error in postRepository startProject : ' + err)
+		}
+	}
+
     public async addPostReview(postID: string, participantID: string, newRating: PaticipantRating) {
         try {
             if (!postID) {
@@ -794,6 +823,8 @@ class PostRepository {
       }
     }
 
+    
+
     public async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
         try{
             const post: IPost | null = await Post.findOne({ _id: dto.postID });
@@ -818,7 +849,7 @@ class PostRepository {
             throw new Error('Error change participant status in repository: ' + error);
         }
     }
-  
+    
   
 }
 

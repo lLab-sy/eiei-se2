@@ -364,6 +364,32 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     }
   }
 
+  async startProject(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const postId = req.params.id;
+      const userId = req.user.userId;
+      if (!postId) {
+        sendResponse(res, "error", "", "Post ID is required", 400);
+        return;
+      }
+
+      if(req.user.role!="producer"){
+        sendResponse(res.status(401), 'error', 'Unauthorize to delete post');
+        return;
+      } 
+
+      await postService.startProject(postId, userId);
+      sendResponse(
+        res,
+        "success",
+        "",
+        "Successfully change post status to in-progress"
+      );
+    } catch (err) {
+      sendResponse(res, "error", err, "Failed to change post status to in-progress");
+    }
+  }
+
 
   async changeParticipantStatus(req: AuthRequest, res: Response): Promise<void> {
     try{
