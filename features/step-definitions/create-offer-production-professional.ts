@@ -19,7 +19,7 @@ Given('the production professional is logged in', async function () {
     ]);
 
     await page.waitForSelector('input[name="username"]');
-    await page.type('input[name="username"]', 'testpf1'
+    await page.type('input[name="username"]', 'user'
       , {delay: 50}
     );
 

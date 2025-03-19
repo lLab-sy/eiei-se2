@@ -1,6 +1,6 @@
 import axios from "axios"
 export default async function getPostUser(userID:string){ //Producer can only use
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts?userID=${userID}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts?userID=${userID}&postStatus=created`
     console.log(apiUrl)
     try{
         const response= await axios.get(apiUrl)

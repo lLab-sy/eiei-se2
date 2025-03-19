@@ -149,16 +149,7 @@ export default function CreatePostPage() {
     if(!userID){
       return;
     }
-    // const response = await uploadImage({imageFiles : imageList, token : ''})
-    // if (response === null) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Image uploading failed",
-    //     description: "Please try again.",
-    //   })
-    //   return
-    // }
-    // const postImage: string[] = response.data
+   
 
     //mock image
     const postData:PostData = {
@@ -170,10 +161,12 @@ export default function CreatePostPage() {
       postDescription: values.description
     };
  
+    
     const formData = new FormData()
 
     const imageList = img.map((eachImg) => eachImg.imgFile);
 
+    
     if (imageList.length > 0) {
       imageList.forEach((file) => {
         formData.append("postImagesSend", file);  
@@ -182,6 +175,14 @@ export default function CreatePostPage() {
     formData.append('postData',JSON.stringify(postData))
     console.log("FormData")
     const postCreateResponse = await createPost(formData,token)
+    if (imageList.length==0) {
+      toast({
+        variant: "destructive",
+        title: "Image not found",
+        description: "Please upload at least one image.",
+      })
+      return
+    }
     if (postCreateResponse === null) {
       toast({
         variant: "destructive",

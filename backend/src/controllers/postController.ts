@@ -166,9 +166,9 @@ class PostController {
     try{
       const myRole = req.user.role
       // console.log(req.body)
-      // if(!req.body.roleID || !req.body.productionProfessionalID || !req.body.price){
-      //     sendResponse(res, 'error', 'Failed to deleted offer');
-      // }
+      if(req.body.postStatus!="created"){
+          sendResponse(res, 'error',"", 'Can not create offer',400);
+      }
       const offer = await postService.createOffer(req.body,req.body.postID,req.body.productionProfessionalID)
       sendResponse(res, 'success',offer, 'Successfully create offer');
     }catch(error){
@@ -227,7 +227,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     }
     // console.log(offers.meta.totalPages)
     if (!offers.meta.totalPages){
-      sendResponse(res, 'error', '', 'You have no offer.', 400);
+      sendResponse(res, 'success', [], 'You have no offer.', 200);
       return
     }
     if (offers.meta.totalPages < page) {
