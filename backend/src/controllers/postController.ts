@@ -446,6 +446,27 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
   };
+
+  async sendApprove(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const postID  = req.params.id
+      const userID  = req.params.userId
+
+      // const userID = req.user.userId
+
+      if (req.user.role!="producer") {
+        sendResponse(res, 'error', '', 'unauthorize', 401);
+        return;
+      }
+
+
+      await postService.sendApprove(postID, userID)
+
+      sendResponse(res, 'success', {'status': 'success'}, 'Successfully approve post');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to approve posts');
+    }
+  };
 }
 
 
