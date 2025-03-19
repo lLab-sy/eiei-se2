@@ -441,7 +441,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
 
       await postService.sendSubmission(postID, userID)
 
-      sendResponse(res, 'success', {'status': 'success'}, 'Successfully add review to post');
+      sendResponse(res, 'success', {'status': 'success'}, 'Successfully send submission to post');
     } catch (err) {
       sendResponse(res, 'error', err, 'Failed to retrieve posts');
     }
