@@ -951,38 +951,35 @@ class PostRepository {
     public async sendSubmission(id:string, participantID:string): Promise<void>{
         try {
             // console.log("HELlo",postData)
-            await Post.findOneAndUpdate(
+            const post = await Post.findOneAndUpdate(
                 {
                     _id: id,
                     "postStatus": "in-progress", // post success
                     "participants.participantID": participantID, // Ensure has paticipant in post
                     "participants.status": "candidate", // cadidate only
-                    $expr: {
-                        $lt: [
-                          { $size: { $filter: { input: "$participants", as: "p", cond: { $eq: ["$$p.id", id] } } } },
-                          { $arrayElemAt: ["$participants.workQuota", 0] },
-                        ],
-                    },
+                    "participants.workQuota": { $gt: 0 }
                   // "participants.reviewedAt": null, // make sure that no review when add to this post
                 },
                 { 
                     $set: { 
                         "participants.$.isSend": true,
                     },
+                    $inc: { "participants.$.workQuota": -1 },
                     $push: {
                         "participants.$.submissions": new Date()
-                        // {
-                        //     $each: [new Date()],
-                        //     $slice: -"participants.$.workQuota"
-                        // } 
                     }
                 }, // Update the matching element
                 { new: true, runValidators: true }
             );
+
+            if (!post) {
+                throw new Error('Post not found or no more quota')
+            }
+
             // const posts= await Post.findById(objectId);
             return;
         } catch (error) {
-            throw new Error('Error updating post in repository: ' + error);
+            throw new Error('Error submission in post repository: ' + error);
         }
     }
   
