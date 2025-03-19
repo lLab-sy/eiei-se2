@@ -58,6 +58,14 @@ export interface OfferDetailDTO{
 export class ChangeParticipantStatusDTO {
     @IsMongoId()
     @IsNotEmpty()
+    actionBy!: string;
+
+    @IsEnum(['production professional', 'producer'])
+    @IsNotEmpty()
+    role!: 'production professional' | 'producer';
+
+    @IsMongoId()
+    @IsNotEmpty()
     postID!: string;
 
     @IsMongoId()

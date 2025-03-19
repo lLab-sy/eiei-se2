@@ -1060,6 +1060,11 @@ class PostRepository {
                 throw new Error(`Post with ID ${dto.postID} not found`);
             }
 
+            // Check producerId to matach with userID from post
+            if(dto.role === 'producer' && post.userID.toString() !== dto.actionBy){
+                throw new Error(`You do not have permission to access or modify this post(Post ID: ${dto.postID})`);
+            }
+
             // Find the participant in the post's participants array
             const participant = post.participants.find((p) => p.participantID.toString() === dto.participantID);
 
