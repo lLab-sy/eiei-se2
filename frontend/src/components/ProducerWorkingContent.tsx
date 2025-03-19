@@ -173,6 +173,7 @@ export default function ProducerWorkingContent({
                     <div className="space-y-3 my-5 overflow-y-auto h-full max-h-[400px] m-auto">
                         {offers.map((offer, index) => (
                     <ProductionWorkingCard
+                    key = {index}
                     postID={postID}
                     participantID={selectedProfessional}
                     offer={{
