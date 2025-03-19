@@ -86,7 +86,7 @@ const ProfessionalsPage = () => {
               <ProfessionalCard
                 key={index}
                 title={professional?.firstName + " " + professional?.lastName}
-                description={professional?.description || ""}
+                description={professional?.description ? (professional.description.length > 100 ? professional.description.slice(0, 100) : professional.description) : ""}
                 imageUrl={professional?.imageUrl || ""}
                 skill={professional?.skill}
                 ratings={Number(professional?.avgRating) || 0}

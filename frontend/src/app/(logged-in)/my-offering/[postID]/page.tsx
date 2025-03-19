@@ -28,6 +28,11 @@ import PostDetail from "@/components/PostDetail";
 import getPostById from "@/libs/getPostById";
 import getPrudcerOffers from "@/libs/getProducerOffers";
 import axios from "axios";
+import MyOfferingProducer from "@/components/MyOfferingProducer";
+import MyPostDetail from "@/components/MyPostDetail";
+import ProductionWorkingContent from "@/components/ProducerWorkingContent";
+import ProducerWorkingContent from "@/components/ProducerWorkingContent";
+import { Console } from "console";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -328,6 +333,7 @@ const token =session?.user.token
 const userID= session?.user.id
 const [producerOffers,setProducerOffers] =useState<OfferHistoryResponseData[]|null>(null)
 const [selectedOfferProducer,setSelectedOfferProducer] =useState<OfferHistoryResponseData|null>(null)
+
 useEffect(() => {
   const fetchData = async () => {
     try {
@@ -339,6 +345,7 @@ useEffect(() => {
         setPostState(response2)
         response = await getPrudcerOffers(token ?? "",postID); // ดึงโพสต์ของ producer
         setProducerOffers(response)
+        console.log(response2);
         // console.log("PRODUCER BY",response)
       } else if (userRole === "production professional") {
         const handleFetch = async (postID: string) => {
@@ -596,128 +603,22 @@ useEffect(() => {
     }
   };
 
-  
-
   return (
     <main className="flex flex-col h-[100vh] gap-3 mb-5 relative">
       <div className="relative mt-20 flex flex-row gap-5 item-baseline w-full h-full">
         <div className="w-[50%] flex justify-center items-center h-[800px]">
           {/* ใช้ PostDetail component */}
-          <PostDetail
-            postState={postState}
-            startDate={startDate}
-            endDate={endDate}
-          />
+          {postState && <MyPostDetail post={postState} />}
         </div>
 
         <div className="relative w-[44%] shadow-md h-[720px] rounded-lg">
           <div className='h-full'>
-            {userRole === "producer" && (
-              <div className="w-full">
-                <div className="flex flex-col p-4">
-                  {/* <div className="flex justify-between items-center">
-                    <h3 className="text-2xl font-bold mb-2">ผู้สมัคร</h3>
-                    <button
-                      onClick={toggleViewMode}
-                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                    >
-                      {viewMode === "individual"
-                        ? "ดูแบบเปรียบเทียบ"
-                        : "ดูแบบรายคน"}
-                    </button>
-                  </div> */}
-                  {producerOffers!=null ? (
-                    <div className="flex flex-col gap-3">
-                        {/* SELECT PERSON INSTEAD FOR NOW */}
-
-                        <Select
-                          onValueChange={handleSelectProducerChange}
-                          // value={postState.?.id || ""}
-                        >
-                          <SelectTrigger className="shadow-lg">
-                            <SelectValue placeholder="Choose your Candidate" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              {producerOffers.map((eachPost: OfferHistoryResponseData) => (
-                                <SelectItem key={eachPost._id} value={eachPost._id}>
-                                  {eachPost.offers[0].userName}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-
-
-                      {/* <RoleDropdown
-                        selectedRole={selectedRole}
-                        availableRoles={availableRoles}
-                        onSelectRole={handleSelectRole}
-                        postProjectRoles={postState?.postProjectRolesOut}
-                      /> */}
-                      {/* แสดงรายชื่อ Professional ตาม Role ที่เลือก */}
-                      {/* {selectedRole && (
-                        <ProfessionalSelector
-                          professionals={getProfessionalsByRole(selectedRole)}
-                          selectedProfessionalId={selectedProfessionalId}
-                          onSelect={handleSelectProfessional}
-                        />
-                      )} */}
-                    </div>
-                  ): (
-                    <div className="mt-10 text-center text-gray-500">
-                      You have no offer for now.
-                    </div>
-                  )}
-                </div>
-                {//Instead Same As Tien
-                viewMode === "individual" && selectedProfessionalId && (
-                  // <OfferHistory
-                  //   offers={
-                  //     mockProfessionalOffers[
-                  //       selectedProfessionalId as keyof typeof mockProfessionalOffers
-                  //     ] || []
-                  //   }
-                  //   professionalName={
-                  //     professionals.find((p) => p.id === selectedProfessionalId)
-                  //       ?.name || ""
-                  //   }
-                  //   userRole={userRole}
-                  //   isLatestOffer={isLatestOffer}
-                  //   onAccept={handleAcceptOffer}
-                  //   onReject={handleRejectOffer}
-                  // />
-                  <div className="mt-4 p-4 h-full">
-                  <span className="text-2xl font-bold">My Offering</span>
-        
-                  { selectedOfferProducer?.offers?.length > 0 ? (
-                    <div
-                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                      className="overflow-scroll flex flex-col w-[100%] max-h-[640px] items-center flex-wrap gap-5 mt-4"
-                    >
-                      {selectedOfferProducer?.offers.map((offer, index) => (
-                        <div key={index} className="mt-4 w-[90%] relative">
-                          <HistoryProductionContent data={offer} />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="mt-10 text-center text-gray-500">
-                      You have no offer for now.
-                    </div>
-                  )}
-                </div>
-                )
-                
-                }
-                {/* {viewMode === "comparison" && (
-                  <ComparisonView
-                    roleBasedOffers={roleBasedOffers}
-                    onAccept={handleAcceptOffer}
-                    onReject={handleRejectOffer}
-                  />
-                )} */}
-              </div>
+            {postState && userRole === "producer"  && (
+              <ProducerWorkingContent 
+                postID={postID}
+                participants={postState?.participants || []} 
+                mapRole={postState?.postProjectRolesOut || []}
+              />
             )}
             {userRole === "production professional" && (
                 <div className="mt-4 p-4 h-full">

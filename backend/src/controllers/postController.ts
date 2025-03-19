@@ -367,14 +367,15 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
 
   async changeParticipantStatus(req: AuthRequest, res: Response): Promise<void> {
     try{
+      console.log("1");
       const dto = new ChangeParticipantStatusDTO(req.body);
-
+      console.log("2");
       const errors = await validate(dto);
       if (errors.length > 0) {
           sendResponse(res, 'error', errors, 'Invalid request body');
           return;
       }
-      
+      console.log("3");
       await postService.changeParticipantStatus(dto);
       sendResponse(res, 'success', {}, 'Successfully changed participant status');
     }catch(error){

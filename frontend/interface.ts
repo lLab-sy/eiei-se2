@@ -169,6 +169,7 @@ export interface MediaType{
     mediaName: string;
 }
 export interface OfferData{
+    role:string;
     roleID:string;
     productionProfessionalID:string;
     offeredBy: Number;
@@ -207,4 +208,10 @@ export interface ReviewData{
 export interface PostParticipant {
     id: string;
     label: string;
+}
+
+export interface ChangeParticipantStatus{
+    postID: string;
+    participantID: string;
+    statusToChange: string;
 }
