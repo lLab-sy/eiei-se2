@@ -27,7 +27,7 @@ interface ratingCounterInterface {
 
 
 
-interface reviewDataInterface {
+export interface reviewDataInterface {
   amount: number;
   rating: number;
   reviews: Array<reviewInterface>;
