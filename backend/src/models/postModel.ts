@@ -226,6 +226,7 @@ export interface GetOfferRequestModel {
 }
 
 export interface OfferHistoryForGetOfferResponse {
+    participantID: string;
     _id: string;
     userName:string;
     postName: string;

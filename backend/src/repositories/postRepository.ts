@@ -669,6 +669,7 @@ class PostRepository {
                     reason: '$participants.offer.reason',
                     offeredBy: '$participants.offer.offerBy',
                     status: "$participants.status",
+                    participantID: '$participants.participantID',
                     createdAt: '$participants.offer.createdAt'
                   }
             }
