@@ -34,7 +34,7 @@ export interface IPost extends Document {
     postImages: string[];
     postMediaType: mongoose.Schema.Types.ObjectId;
     postProjectRoles: mongoose.Schema.Types.ObjectId[]; 
-    postStatus: 'created' | 'in-progress' | 'success' | 'cancel';
+    postStatus: 'created' | 'waiting' | 'in-progress' | 'success' | 'cancel';
     startDate?: string;
     endDate?: string;
     postDetailID: mongoose.Schema.Types.ObjectId;
