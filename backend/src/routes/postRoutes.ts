@@ -309,6 +309,38 @@ router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandle
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
 router.post('/posts/:id/sendSubmission', AuthMiddleware.authenticate as RequestHandler, postController.sendSubmission as RequestHandler);
 
+/**
+ * @swagger
+ * /api/v1/posts/{id}/sendApprove:
+ *   put:
+ *     summary: Send approve to post by producer (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: userId
+ *         required: false
+ *         description: The unique identifier of the candidate (if not assume all)
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully approve post
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.put('/posts/:id/sendApprove', AuthMiddleware.authenticate as RequestHandler, postController.sendApprove as RequestHandler);
+
 
 /**
  * @swagger

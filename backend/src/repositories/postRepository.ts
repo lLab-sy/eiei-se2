@@ -4,7 +4,7 @@ import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel } from '../models/postModel';
 import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
-import mongoose, { PipelineStage } from 'mongoose';
+import mongoose, { FilterQuery, PipelineStage, UpdateQuery } from 'mongoose';
 import { Pipe } from 'stream';
 
 class PostRepository {
@@ -1014,6 +1014,42 @@ class PostRepository {
         }
     }
     
+    public async sendApprove(id:string, participantID:string): Promise<void>{
+        try {
+            // console.log("HELlo",postData)
+
+            const filter: FilterQuery<IPost> = {
+                _id: id,
+                "postStatus": "in-progress", // post success
+                "participants.status": "candidate",
+            }
+
+            if (participantID) {
+                filter["participants.participantID"] = participantID
+            }
+
+            const update: UpdateQuery<IPost> = {
+                $set: { 
+                    "participants.$.isApprove": true,
+                }
+            }
+
+            const post = await Post.findOneAndUpdate(
+                filter,
+                update,
+                { new: true, runValidators: true }
+            );
+
+            if (!post) {
+                throw new Error('Post not found')
+            }
+
+            // const posts= await Post.findById(objectId);
+            return;
+        } catch (error) {
+            throw new Error('Error submission in post repository: ' + error);
+        }
+    }
 
     public async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
         try{
