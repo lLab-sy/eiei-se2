@@ -115,12 +115,6 @@ export const participantDetailSchema = new Schema<ParticipantDetail>({
     submissions: {
         type: [Date],
         default: [],
-        validate: {
-            validator: function (this: ParticipantDetail, submissions: Date[]) {
-                return submissions.length <= this.workQuota; // Ensure timestamps don't exceed maxEdit
-            },
-            message: (props) => `Submissions array cannot exceed ${props.value.length} items.`,
-        },
     },
 
     createdAt: {
