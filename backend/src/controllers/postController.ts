@@ -501,7 +501,31 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     }
   }
 
+  async getPostParticipant(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const postId = req.params.id;
+      let userId = req.user.userId;
+      
+      if (!postId) {
+        sendResponse(res, "error", "", "Post ID is required", 400);
+        return;
+      }
 
+      if(req.user.role=="producer"){
+        userId=''
+      } 
+
+      const post = await postService.getPostParticipant(postId, userId);
+      sendResponse(
+        res,
+        "success",
+        post,
+        "Successfully change post status to in-progress"
+      );
+    } catch (err) {
+      sendResponse(res, "error", err, "Failed to change post status to in-progress");
+    }
+  }
   async changeParticipantStatus(req: AuthRequest, res: Response): Promise<void> {
     try{
       console.log("1");
