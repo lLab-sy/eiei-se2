@@ -1,5 +1,5 @@
 import { IWorldOptions, setWorldConstructor, World } from "@cucumber/cucumber";
-import puppeteer, { Browser, Page, BrowserContext } from "puppeteer";
+import { BrowserContext, Page } from "@playwright/test";
 
 export interface ICustomWorld extends World {
   context?: BrowserContext;

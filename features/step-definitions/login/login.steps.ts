@@ -1,7 +1,6 @@
-import { Given, When, Then, setDefaultTimeout, world } from '@cucumber/cucumber';
-import puppeteer, { Browser, Page, ElementHandle } from 'puppeteer';
+import { Given, world } from '@cucumber/cucumber';
 import { ICustomWorld } from '../../utils/custom-world';
-import assert from "assert";
+import { expect} from "@playwright/test";
 
 let customWorld: ICustomWorld = world;
 
@@ -22,23 +21,13 @@ Given("the {string} is logged in", async function (role) {
       password = 'norole@#T'
   }
   if (page){
-    await page.goto("http://localhost:3000/",{waitUntil: 'load', timeout: 0});
-    await page.waitForSelector('button.p-2.hover\\:bg-blue-800');
-    await page.click('button.p-2.hover\\:bg-blue-800');
-    // await page.$eval(`a[href='/login']`, element => element.click());
-    await Promise.all([
-        page.waitForNavigation({waitUntil: 'load', timeout: 0}), 
-        await page.$eval(`a[href='/login']`, element => element.click())
-      ]);
-      await page.waitForSelector('input[name="username"]');
-      await page.type('input[name="username"]', username, {delay: 50});
-  
-      await page.waitForSelector('input[name="password"]');
-      await page.type('input[name="password"]', password, {delay: 50});
-  
-      await Promise.all([
-        page.waitForNavigation(), 
-        await page.click('[type="submit"]')
-      ]);
+    await page.goto("/",{waitUntil: 'load', timeout: 0});
+    await page.waitForLoadState("domcontentloaded");
+
+    await page.getByRole("button").click();
+    await page.getByText("Login").click();
+    await page.getByRole('textbox', { name: 'username' }).fill(username);
+    await page.getByRole('textbox', { name: 'password' }).fill(password);
+    await page.getByRole('button', { name: 'Login'}).click()
   }
 });
