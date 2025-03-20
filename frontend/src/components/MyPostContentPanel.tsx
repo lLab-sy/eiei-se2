@@ -8,12 +8,14 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import getPostById from "@/libs/getPostById";
 import { LinearProgress } from "@mui/material";
+import TaskSubmissionContent from "./TaskSubmissionContent";
 export default function MyPostContentDetail(){
         const { mid }: { mid: string } = useParams();
         const { data: session } = useSession();
         const userRole=session?.user.role
         const userID=session?.user.id
-        const token=session?.user.token
+        const username = session?.user.username ?? "";
+        const [isOpen, setIsOpen] = useState(false);
         const [post,setPost] = useState<PostData|null>(null)
         const [error, setError] = useState<string | null>(null);
         useEffect(() => {
@@ -23,7 +25,7 @@ export default function MyPostContentDetail(){
                   if (userRole === "producer") {
                     response = await getPostById(mid,session?.user.token??"") // ดึงโพสต์ของ producer 
                   } else if (userRole === "production professional") {
-         
+                    response = await getPostById(mid,session?.user.token??"")
                   }
                   console.log("respons",response)
                   if (response) {
@@ -42,9 +44,22 @@ export default function MyPostContentDetail(){
                 {post?<MyPostDetail post={post}/>:<LinearProgress/>}
         </div>
             <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
-                <ProfessionalWorkingContent pid={mid}/>
+            { userRole == "production professional" ? 
+                <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
+                    <TaskSubmissionContent
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    username = {username}
+                    />
+                </div>
+                :
+                <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
+                    <ProfessionalWorkingContent pid={mid}/>
+                </div>
+                }
             </div>
         </div>
         </>
     )
 }
+
