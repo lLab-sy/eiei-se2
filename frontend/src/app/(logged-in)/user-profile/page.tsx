@@ -322,9 +322,9 @@ export default function UserPage() {
       <div className={` flex lg:justify-around lg:w-[80%] lg:h-[800px]`}>
         <Card className={`${mobilePageState == 0 ? "" : "hidden"} bg-slate-100 lg:bg-white  lg:visible h-[100vh] w-[100vw] lg:w-[400px]  lg:h-[700px] lg:flex lg:flex-col`}>
           <CardHeader>
-            <CardTitle className='flex justify-center text-2xl lg:text-2xl lg:justify-start w-full'>Profile</CardTitle>          </CardHeader>
+            <CardTitle className='flex justify-center text-3xl lg:text-2xl lg:justify-start w-full'>Profile</CardTitle>          </CardHeader>
           <CardContent className=" flex flex-col items-center">
-            <div className="mt-5 lg:mt-0 order-2 lg:order-1 text-xl text-center font-bold flex justify-center h-[50px] items-center">
+            <div className="mt-5 lg:mt-0 order-2 lg:order-1 text-2xl lg:text-xl text-center font-bold flex justify-center h-[50px] items-center">
               {userData.firstName} {userData.middleName} {userData.lastName}
             </div>
             {loadingImage ? (
@@ -332,7 +332,7 @@ export default function UserPage() {
                 <CircularProgress size={60} />
               </Avatar>
             ) : (
-              <Avatar className="order-1 lg:order-2 size-60">
+              <Avatar className="order-1 lg:order-2 size-80 lg:size-60">
                 <AvatarImage src={img.image} alt="" />
                 <AvatarFallback className=" border border-black rounded-full"></AvatarFallback>
               </Avatar>
@@ -368,7 +368,7 @@ export default function UserPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className={`${mobilePageState == 1 ? "" : "hidden"} w-[100vw] h-[100vh] lg:h-full relative lg:w-[500px] lg:flex lg:flex-col`}>
+        <Card className={`${mobilePageState == 1 ? "" : "hidden"} w-[100vw] h-[100vh] lg:h-[700px] relative lg:w-[500px] lg:flex lg:flex-col`}>
           <CardHeader className="h-[17%] lg:h-[10%] flex items-start justify-end">
             <CardTitle className=''>Edit Profile ({user.user.role})</CardTitle>
           </CardHeader>
@@ -547,7 +547,7 @@ export default function UserPage() {
                       className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
                     >
                       <Button
-                        className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-green-400 hover:bg-green-500`}
+                        className={`${isEdit ? "" : "hidden"}  w-[40%] lg:w-[30%] text-white bg-green-400 hover:bg-green-500`}
                         type="submit"
                         onSubmit={form.handleSubmit(handleSubmit)}
                       >
@@ -557,7 +557,7 @@ export default function UserPage() {
                         variant={`${isEdit ? "destructive" : "default"}`}
                         type="reset"
                         onClick={() => setIsEdit(!isEdit)}
-                        className={`${isEdit ? "" : "w-full"} lg:w-[30%]`}
+                        className={`${isEdit ? "w-[40%] lg:w-[30%]" : "w-full"} lg:w-[30%]`}
                       >
                         {isEdit ? "Cancel" : "Edit"}
                       </Button>
@@ -688,7 +688,7 @@ export default function UserPage() {
                       className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
                     >
                       <Button
-                        className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-maingreen hover:bg-maingreen-light`}
+                        className={`${isEdit ? "" : "hidden"}  w-[40%] lg:w-[30%] text-white bg-maingreen hover:bg-maingreen-light`}
                         type="submit"
                         onSubmit={form.handleSubmit(handleSubmit)}
                       >
@@ -698,7 +698,7 @@ export default function UserPage() {
                         variant={`${isEdit ? "destructive" : "default"}`}
                         type="reset"
                         onClick={() => setIsEdit(!isEdit)}
-                        className={`${isEdit ? "" : "w-full"} lg:w-[30%]`}
+                        className={`${isEdit ? "w-[40%] lg:w-[30%]" : "w-full"} lg:w-[30%]`}
                       >
                         {isEdit ? "Cancel" : "Edit"}
                       </Button>
@@ -771,7 +771,7 @@ export default function UserPage() {
                     className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
                   >
                     <Button
-                      className={`${isEdit ? "" : "hidden"}  w-[30%] text-white bg-maingreen hover:bg-maingreen-light`}
+                      className={`${isEdit ? "" : "hidden"}  w-[40%] lg:w-[30%] text-white bg-maingreen hover:bg-maingreen-light`}
                       type="submit"
                       onSubmit={form.handleSubmit(handleSubmit)}
                     >
@@ -781,7 +781,7 @@ export default function UserPage() {
                       variant={`${isEdit ? "destructive" : "default"}`}
                       type="reset"
                       onClick={() => setIsEdit(!isEdit)}
-                      className={`${isEdit ? "" : "w-full"} lg:w-[30%]`}
+                      className={`${isEdit ? "w-[40%] lg:w-[30%]" : "w-full"} lg:w-[30%]`}
                     >
                       {isEdit ? "Cancel" : "Edit"}
                     </Button>
@@ -803,7 +803,7 @@ export default function UserPage() {
         </Card>
         {
           (user.user.role === 'production professional') ?
-          <Card className={`${mobilePageState == 2 ? "" : "hidden"} bg-slate-100 lg:bg-white w-[100vw] h-[100vh] lg:inline lg:w-[535px] lg:h-[800px] relative`}>
+          <Card className={`${mobilePageState == 2 ? "" : "hidden"} bg-slate-100 lg:bg-white w-[100vw] h-[100vh] lg:inline lg:w-[535px] lg:h-[700px] relative`}>
           <CardHeader className='hidden lg:block'>
               <CardTitle>Your Review</CardTitle>
           </CardHeader>
