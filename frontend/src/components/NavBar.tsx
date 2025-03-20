@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "./ui/button";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { FaHistory } from "react-icons/fa";
 type menuItem = {
   icon: JSX.Element;
@@ -29,17 +30,24 @@ type menuItem = {
   href: string;
 }
 const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, handleSignOut: Function}) => {
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  const handleSignOutTrigger = async () => {
+    setOpen(false);
+    await handleSignOut();
+    // router.push('/')
+  }
   return (
     <div>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {/* <Link href='/'>Logout</Link> */}
           <Link
-                href={'/'}
+                href={'#'}
                 className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
                   "text-red-600 hover:text-red-700"
                 }`}
-                onClick={ async () => setIsMenuOpen(false)}
+                onClick={ async () => {setIsMenuOpen(false)}}
               >
                 <LogOut className="w-5 h-5"/>
                 <span>Logout</span>
@@ -58,7 +66,7 @@ const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, 
             <div className=' w-full text-white flex flex-row justify-between'>
                 <DialogClose asChild><Button className='bg-red-600'>No</Button></DialogClose>
                 <Button onClick={async () => {
-                  await handleSignOut()
+                  await handleSignOutTrigger()
                 }} className='bg-green-400'>Yes</Button>
             </div>
           </DialogFooter>  
@@ -78,9 +86,9 @@ const NavBar = (session: any) => {
   const user: any = useSelector<RootState>(state => state.user)
   console.log('session', session)
   const handleSignOut = async () => {
-    dispatch(clearStorage(''))
-    await signOut()
     
+    await signOut();
+    dispatch(clearStorage(''));
   }
   
   

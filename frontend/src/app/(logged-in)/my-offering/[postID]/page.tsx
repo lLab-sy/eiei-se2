@@ -42,9 +42,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Rating } from "@mui/material";
+import { Checkbox, Rating } from "@mui/material";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import MyOfferingProducer from "@/components/MyOfferingProducer";
 import MyPostDetail from "@/components/MyPostDetail";
 import ProductionWorkingContent from "@/components/ProducerWorkingContent";
@@ -95,6 +96,7 @@ interface userReturn {
 
 const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {setOfferStatus:Function, setOfferArray: Function, token : string | undefined,postID: string, offer : historyStateInterface}) => {
   console.log('offerDataNew', offer)
+  
   token = token ?? ""
   const offerDate = new Date(offer.createdAt)
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
@@ -145,6 +147,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     setIsChanged(1)
     setTextState("")
     setCanConfirm(false)
+    setCheckboxState(false)
     // setTimeout(() => {}, 1000)
     // setIsChanged(false)
   }
@@ -169,6 +172,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     }
     setOpen(false)
     setTextState('')
+    setCheckboxState(false)
     setLoading(false)
   }
   const [textState, setTextState] = useState('')
@@ -178,7 +182,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
   const [ratingCount, setRatingCount] = useState(0)
   const handleTriggerDialog = async () => {
     const user = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`)
-    setTextState(""); setCanConfirm(false); setIsChanged(0)
+    setTextState(""); setCanConfirm(false); setIsChanged(0); setCheckboxState(false)
     const data : userReturn = user.data.data
     console.log('getUserDialog', data)
     const count = data.rating.length
@@ -190,6 +194,15 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     setRatingCount(count)
     setReviewState(sumRating == 0 || count == 0? 0 : Math.round(sumRating / count))
   }
+  const router = useRouter()
+  const handleCounterOffer = (postID: string) => {
+    if(isChanged == 3){
+      setOpen(false)
+      router.push(`/create-offer/${postID}`)
+    }
+    else setIsChanged(3)
+  }
+  const [checkboxState, setCheckboxState] = useState(false)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -206,17 +219,25 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
           (isChanged > 0) ? 
           <div className='gap-3 flex flex-col'>
             <span>{isChanged == 1 ? "If you reject this offer, you won’t be able to make another offer on this post in the future. " : ""}</span>
-            <span className={`${isChanged == 1 ? "text-red-500" : "text-green-600"}`}>Please type '{isChanged == 1 ? "Reject Offer" : "Confirm Offer"}' to {isChanged == 1 ? "decline":"accept this offer."}.</span>
-            <Input value={textState} onChange={(e) => {
-              setTextState(e.target.value)
-              // console.log("e", e.target.value)
-              if(e.target.value == ((isChanged == 1) ? "Reject Offer" : "Confirm Offer")){
-                setCanConfirm(true)
-              }
-              else{
-                setCanConfirm(false)
-              }
-            }}/>
+            <span className={`${isChanged == 1 ? "text-red-500" : (isChanged == 3) ? "text-black" : "text-black"}`}> {isChanged == 1 ? "Please type 'Reject Offer' to decline." : (isChanged==3) ?"You are about to be redirected to the Create Offer page. Are you sure?" : "Are you sure to accept this offer."}</span>
+            {
+              (isChanged == 1) ? 
+              <Input value={textState} onChange={(e) => {
+                setTextState(e.target.value)
+                // console.log("e", e.target.value)
+                if(e.target.value == ((isChanged == 1) ? "Reject Offer" : "Confirm Offer")){
+                  setCanConfirm(true)
+                }
+                else{
+                  setCanConfirm(false)
+                }
+              }}/>
+              : (isChanged == 3) ?<div></div> : <div>
+                <Checkbox value={checkboxState} onChange={(e) => setCheckboxState(e.target.checked)}/>
+                <Label>Confirmed</Label>
+              </div>              
+            }
+            
           </div> : ""
         }
         <div className={`${isChanged>0 ? "hidden" : ""}`}>
@@ -258,8 +279,9 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
             {
               (offer.status === 'in-progress') ? 
               <div className='flex justify-around w-full'>
-                <Button onClick={(isChanged > 0) ? () => {setIsChanged(0); setCanConfirm(false); setTextState("")}: handleRejectOffer} className='w-[25%] rounded-lg' variant={'destructive'}>{isChanged > 0 ? "No" :"Reject Offer"}</Button>
-                <Button onClick={isChanged > 0 ? () => {(isChanged == 2) ? handleClickConfirmOffer(true) : handleClickConfirmOffer(false)} : handleConfirmOffer} className='w-[30%] rounded-lg bg-lime-500 text-white hover:bg-lime-600' disabled={((canCanfirm && isChanged > 0 ) || (isChanged == 0)) ? false : true}>{isChanged ? "Yes" :"Confirm Offer"}</Button>
+                <Button onClick={(isChanged > 0) ? () => {setIsChanged(0); setCanConfirm(false); setTextState(""); setCheckboxState(false)}: handleRejectOffer} className='w-[25%] rounded-lg' variant={'destructive'}>{isChanged > 0 ? "No" :"Reject Offer"}</Button>
+                <Button onClick={() => {handleCounterOffer(postID)}} className={`${isChanged == 3 ? "hidden" : ""}`}>Counter Offer</Button>
+                <Button onClick={isChanged > 0 ? () => {(isChanged == 2) ? handleClickConfirmOffer(true) : (isChanged == 3) ? handleCounterOffer(postID) : handleClickConfirmOffer(false)} : handleConfirmOffer} className='w-[30%] rounded-lg bg-lime-500 text-white hover:bg-lime-600' disabled={(((canCanfirm || checkboxState || isChanged==3) && isChanged > 0 ) || (isChanged == 0)) ? false : true}>{isChanged ? "Yes" :"Confirm Offer"}</Button>
               </div>
               :
               <span className='text-lg'>You have successfully <span className={`${offer.status === 'reject' ? 'text-red-500' : 'text-green-600'}`}>{offer.status === 'reject' ? 'rejected' : 'confirmed'}</span> this offer.</span>

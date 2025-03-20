@@ -26,6 +26,7 @@ import { RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { createUser } from "./action";
+import Image from "next/image";
 
 const formSchema = z
   .object({
@@ -99,43 +100,22 @@ export default function RegisterPage() {
   };
   return (
     <main className="flex justify-center items-center min-h-screen bg-slate-200">
-      <Card className="w-[400px] shadow-lg">
+      <Card className=" flex flex-col justify-start w-[100vw] h-[100vh] md:h-full md:w-[400px] shadow-lg">
         <CardHeader className='relative'>
-        {/* <div className='absolute right-[-23%] top-2'>
-              <div className="w-[150px] flex">
-                <svg height={50} width={50} xmlns="http://www.w3.org/2000/svg">
-                  <circle r={22.5} cx={25} cy={25} fill="blue" />
-                  <circle
-                    r={16}
-                    cx={27.5}
-                    cy={22.5}
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="1.5"
-                  />
-                  <circle
-                    r={10}
-                    cx={29.5}
-                    cy={21}
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="1.5"
-                  />
-                  <circle
-                    r={4}
-                    cx={32}
-                    cy={19}
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-                
-              </div>
-          </div> */}
+        
           <CardTitle className="flex justify-center relative">
-            <span>Sign up to EiEi</span>
-            
+            <CardTitle className="flex flex-col items-center relative">
+            <div className="relative size-40 flex md:hidden">
+              <Image
+                src="/image/logo-preview.png"
+                alt="BualoiDev Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="mt-2 md:mt-0">Sign up to EiEi</span>
+          </CardTitle>
           </CardTitle>
         </CardHeader>
         <CardContent className="">
@@ -226,7 +206,7 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Register</Button>
+              <Button className='w-full md:w-[25%]' type="submit">Register</Button>
               </fieldset>
             </form>
           </Form>
