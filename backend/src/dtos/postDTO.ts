@@ -97,7 +97,7 @@ export class ParticipantDetailDTO {
     @ApiProperty({ description: 'Unique identifier of the participant', type: String })
     @IsString()
     @IsNotEmpty()
-    participantID!: string| ObjectId;
+    participantID!: string;
 
     @ApiProperty({ description: 'useName of the participant', type: String })
     @IsString()
