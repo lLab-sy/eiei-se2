@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
-import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO, ChangeParticipantStatusDTO, GetPostByProducerDTO } from '../dtos/postDTO';
+import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO, ChangeParticipantStatusDTO, GetPostByProducerDTO, SendApproveRequest } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
 import cloudService from '../services/cloudService';
@@ -451,16 +451,23 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
 
   async sendApprove(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const postID  = req.params.id
-      const userID  = req.query.userId ? req.query.userId as string: ''
+      const postId  = req.params.id
+      const userId  = req.query.userId ? req.query.userId as string: ''
+      const isApprove = req.query.isApprove=='false' ? false : true
 
+      const reqDTO: SendApproveRequest = {
+        postId: postId,
+        userId: userId,
+        isApprove: isApprove
+      }
+      
       if (req.user.role!="producer") {
         sendResponse(res, 'error', '', 'unauthorize', 401);
         return;
       }
 
 
-      await postService.sendApprove(postID, userID)
+      await postService.sendApprove(reqDTO)
 
       sendResponse(res, 'success', {'status': 'success'}, 'Successfully approve post');
     } catch (err) {
