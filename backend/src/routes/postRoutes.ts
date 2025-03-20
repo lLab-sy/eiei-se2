@@ -215,6 +215,32 @@ const upload = multer({
  */
 router.get('/posts/search', postController.searchPost);
 
+/**
+ * @swagger
+ * /api/v1/posts/{id}/startProject:
+ *   put:
+ *     summary: Change post status to in-progress (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Complete start project
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.put('/posts/:id/startProject', AuthMiddleware.authenticate as RequestHandler, postController.startProject as RequestHandler);
+
 
 /**
  * @swagger

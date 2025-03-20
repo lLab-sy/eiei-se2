@@ -498,6 +498,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
+  async startProject(postId: string, userId: string): Promise<void> {
+    try {
+      await postRepository.startProject(postId, userId);
+      return;
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+
   async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
     try{
         await postRepository.changeParticipantStatus(dto);
