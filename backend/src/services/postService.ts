@@ -1,8 +1,6 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO } from '../dtos/postDTO';
-import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO, ChangeParticipantStatusDTO } from '../dtos/postDTO';
-import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';

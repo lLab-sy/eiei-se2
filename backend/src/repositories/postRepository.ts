@@ -1,7 +1,5 @@
 import { ObjectId } from 'mongodb';
 import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
-import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel } from '../models/postModel';
 import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { FilterQuery, PipelineStage, UpdateQuery } from 'mongoose';
