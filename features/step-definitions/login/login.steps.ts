@@ -4,7 +4,7 @@ import { expect} from "@playwright/test";
 
 let customWorld: ICustomWorld = world;
 
-Given("the {string} is logged in", async function (role) {
+Given("the {string} is logged in", async function (role:string) {
   const page = customWorld.page;
   let username : string, password : string;
   switch(role) {
@@ -13,8 +13,8 @@ Given("the {string} is logged in", async function (role) {
       password = 'testpd1@#T';
       break;
     case 'production professional':
-      username = 'testpd1';
-      password = 'testpd1@#T';
+      username = 'testpf1';
+      password = 'testpf1@#T';
       break;
     default:
       username = 'norole'

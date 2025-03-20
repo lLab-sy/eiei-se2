@@ -10,10 +10,10 @@ Feature: Production Professional Create Offer to Producer
 
     Scenario: Successfully create an offer to a producer
         Given the production professional fills out the offer details
-        When the production professional clicks create offer button
-        Then ensure the system sends an offer to producer 
+        When "Send Offer" button is clicked
+        Then ensure the system displays status message "Successful offer creation" 
 
     Scenario: Failed to create an offer to a producer
         Given the production professional does not fill out the price
-        When the production professional clicks create offer button
+        When "Send Offer" button is clicked
         Then ensure the system sends a message failed to create an offer with a production professional.

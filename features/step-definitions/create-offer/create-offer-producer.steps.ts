@@ -42,18 +42,6 @@ Given('the producer fills out the offer details', async function () {
     const roleOptions = page.getByRole('option');
     const count = await roleOptions.count();
     await roleOptions.nth(Math.floor(Math.random() * count)).click();
-    // await page.waitForSelector('textarea[name="description"]', { visible: true });
-    // await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field'
-    //   , {delay: 25}
-    // );
-    
-    // await page.waitForSelector('input[name="price"]');
-    // await page.type('input[name="price"]', '500', {delay: 50});
-    // await page.waitForSelector('button[role="combobox"]');
-    // const offerCombobox = (await page.$$('button[role="combobox"]'))[1];
-    // await offerCombobox.click();
-    // await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
-    // await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
   }
 });
 
@@ -66,43 +54,19 @@ Given('the producer does not fill out the price', async function () {
     const roleOptions = page.getByRole('option');
     const count = await roleOptions.count();
     await roleOptions.nth(Math.floor(Math.random() * count)).click();
-    // await page.waitForSelector('textarea[name="description"]', { visible: true });
-    // await page.type('textarea[name="description"]', 'This should be how the description for any offer normally looks like in the input field'
-    //   , {delay: 25}
-    // );
-    
-    // await page.waitForSelector('input[name="price"]');
-    // await page.type('input[name="price"]', '500', {delay: 50});
-    // await page.waitForSelector('button[role="combobox"]');
-    // const offerCombobox = (await page.$$('button[role="combobox"]'))[1];
-    // await offerCombobox.click();
-    // await page.waitForSelector('[data-radix-popper-content-wrapper]', { visible: true });
-    // await page.click('[data-radix-popper-content-wrapper] div:nth-child(1)');
   }
 });
 
-When('the producer clicks create offer button', async function () {
-  const page = customWorld.page;
-  if (page){
-    await page.getByRole('button',{name:"Send Offer"}).click();
-    await page.getByRole('button',{name: "Confirm"}).click();
-    // await page.click('button[aria-haspopup="dialog"]');
-    // await page.waitForSelector('div[role="alertdialog"]', { visible: true });
-    // await page.waitForSelector('button.bg-green-700', { visible: true });
-    // await page.click('button.bg-green-700');
-  }
-});
-
-Then('ensure the system sends an offer to production professional', async function () {
-  const page = customWorld.page;
-  if (page){
-    const successMessage = page.getByText("Successful offer creation", {exact: true})
-    expect(successMessage).toBeVisible();
-    // await page.waitForSelector('li[role="status"][data-state="open"]', { visible: true });
-    // const toastMessage = await page.$eval('li[role="status"] .text-sm.font-semibold', el => el.textContent);
-    // assert.strictEqual(toastMessage, "Successful offer creation");
-  }
-});
+// Then('ensure the system sends an offer to production professional', async function () {
+//   const page = customWorld.page;
+//   if (page){
+//     const successMessage = page.getByText("Successful offer creation", {exact: true})
+//     expect(successMessage).toBeVisible();
+//     // await page.waitForSelector('li[role="status"][data-state="open"]', { visible: true });
+//     // const toastMessage = await page.$eval('li[role="status"] .text-sm.font-semibold', el => el.textContent);
+//     // assert.strictEqual(toastMessage, "Successful offer creation");
+//   }
+// });
 
 Then('ensure the system shows the offer in producer post\'s offer list', async function () {
   return 'pending';
