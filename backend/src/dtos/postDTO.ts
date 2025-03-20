@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject, IsMongoId, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongoose';
 import { PostRoleDTO } from './postRoleDTO';
@@ -71,6 +71,18 @@ export class ChangeParticipantStatusDTO {
     constructor(partial: Partial<ChangeParticipantStatusDTO>) {
         Object.assign(this, partial);
     }
+}
+
+export class SendApproveRequest {
+    @IsNotEmpty()
+    @IsString()
+    postId!: string;
+
+    @IsString()
+    userId: string = '';
+
+    @IsBoolean()
+    isApprove: boolean = false;
 }
 
 export class ParticipantDetailDTO {  
