@@ -33,14 +33,14 @@ export default function TaskSubmissionContent({isOpen,
     //             fetchData();
     //         }, []);
     const [post,setPost] = useState<PostData|null>(null)
-    const [files, setFiles] = useState<File[] |null>(null);
+    // const [files, setFiles] = useState<File[] |null>(null);
 
-    const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-        event.preventDefault();
-        const droppedFiles = Array.from(event.dataTransfer.files);
-        setFiles(droppedFiles);
-        console.log(droppedFiles)
-    };
+    // const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    //     event.preventDefault();
+    //     const droppedFiles = Array.from(event.dataTransfer.files);
+    //     setFiles(droppedFiles);
+    //     console.log(droppedFiles)
+    // };
 
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault(); // Allows the drop event
@@ -81,23 +81,24 @@ export default function TaskSubmissionContent({isOpen,
                         <DialogTitle>Task Submission: {username}</DialogTitle>
                     </DialogHeader>
                     <div className="flex-row flex">
-                        <UploadCloud className="w-10 h-10"/>
+                        {/* <UploadCloud className="w-10 h-10"/>
                         <div className="flex-col flex ml-2">
                             <p className="font-bold text-xl">Upload Files</p>
                             <p className = "">Select and upload the files of your choice</p>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="justify-items-center bg-slate-200 rounded-sm border-dashed border-4 border-maingrey"
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}>
-                        <UploadCloud className="mb-5"/>
+                    // onDrop={handleDrop}
+                    // onDragOver={handleDragOver}
+                    >
+                        {/* <UploadCloud className="mb-5"/>
                         {files?.length === 0 ?
                             <p className="">Choose a file</p>
                         :
                             files?.map((file) => 
                             <p key={file.name}>{file.name}</p>
                         )
-                        }
+                        } */}
                     </div>
                     <DialogFooter className="gap-3 relative">
                         <Button className="bg-mainred hover:bg-mainred-light absolute left-0">
