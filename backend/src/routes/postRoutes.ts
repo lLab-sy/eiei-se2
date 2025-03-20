@@ -298,7 +298,7 @@ router.post('/posts/:id/sendSubmission', AuthMiddleware.authenticate as RequestH
  *         description: The unique identifier of the post
  *         schema:
  *           type: string
- *       - in: path
+ *       - in: query
  *         name: userId
  *         required: false
  *         description: The unique identifier of the candidate (if not assume all)
