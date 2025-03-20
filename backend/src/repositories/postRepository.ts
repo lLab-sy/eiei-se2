@@ -684,7 +684,8 @@ class PostRepository {
                     reason: 1,
                     offeredBy: 1,
                     status:1,
-                    createdAt: 1
+                    createdAt: 1,
+                    participantID: 1,
                   }
             }
             pipeline.push(projectStage);
