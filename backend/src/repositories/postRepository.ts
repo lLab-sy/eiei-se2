@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel, SendApproveRequestModel } from '../models/postModel';
 import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
-import mongoose, { FilterQuery, PipelineStage, UpdateQuery } from 'mongoose';
+import mongoose, { FilterQuery, PipelineStage, ProjectionFields, UpdateQuery } from 'mongoose';
 import { Pipe } from 'stream';
 
 class PostRepository {
@@ -976,6 +976,46 @@ class PostRepository {
             return response
         } catch (error) {
             throw new Error('Error fetching user posts from repository: ' + error);
+        }
+    }
+    
+    public async getPostParticipant(id:string, participantID:string): Promise<ParticipantDetail[]> {
+        try {
+            // console.log("HELlo",postData)
+
+            const filter: FilterQuery<IPost> = {
+                _id: id
+            }
+
+            if (participantID != '') {
+                filter["participants.participantID"] = participantID
+            }
+
+            const project: ProjectionFields<IPost> = {};
+
+            switch (true) {
+                case participantID!='': project['participants.$'] = 1;break;
+                default: project['participants'] = {
+                    $filter: {
+                      input: "$participants",
+                      as: "p",
+                      cond: { $eq: ["$$p.status", "candidate"] },
+                    },
+                }
+            }
+
+            const post:IPost[]|null = await Post.find(
+                filter,
+                project
+            );
+
+            if (!post) {
+                throw new Error('Post or participant not found')
+            }
+
+            return post[0].participants;
+        } catch (error) {
+            throw new Error('Error getPostParticipant in post repository: ' + error);
         }
     }
 

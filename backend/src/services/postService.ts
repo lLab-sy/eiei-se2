@@ -572,6 +572,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
+  async getPostParticipant(postId: string, userId: string): Promise<ParticipantDetail[]> {
+    try {
+      const participants = await postRepository.getPostParticipant(postId, userId);
+      return participants
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+
   async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
     try{
         await postRepository.changeParticipantStatus(dto);
