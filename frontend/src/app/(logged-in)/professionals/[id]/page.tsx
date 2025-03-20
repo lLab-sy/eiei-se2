@@ -54,7 +54,7 @@ const ProfessionalDetail = () => {
   }
 
   const ProfessionalInfo = {
-    id: dataResponse,
+    id: dataResponse._id,
     firstName: dataResponse.firstName,
     lastName: dataResponse.lastName,
     email: dataResponse.email,
