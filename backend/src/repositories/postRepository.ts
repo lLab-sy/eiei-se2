@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
-import mongoose, { PipelineStage } from 'mongoose';
+import mongoose, { FilterQuery, PipelineStage, UpdateQuery } from 'mongoose';
 import { Pipe } from 'stream';
 
 class PostRepository {
@@ -718,7 +718,7 @@ class PostRepository {
 
     public async getPostsByProf(getPostByProfReq: GetPostByProfRequestModel): Promise<GetPostByProfResponse>{
         try {
-            const { userId, postStatus, limit, page } = getPostByProfReq;
+            const { userId, postStatus, limit, page, postMediaTypes, searchText  } = getPostByProfReq;
             const objectId = new mongoose.Types.ObjectId(userId);
 
             const postStatusMatchStage: PipelineStage.Match = {
@@ -736,6 +736,30 @@ class PostRepository {
             }
             pipeline.push(matchStage1);
 
+            if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
+                pipeline.push({
+                    $match: {
+                        postMediaType: { $in: postMediaTypesID}
+                    }
+                })
+            }
+
+
+            if (searchText) {
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { postName: { $regex: searchText, $options: "i" } },
+                            { postDescription: { $regex: searchText, $options: "i" } }
+                        ]
+                    }
+                });
+            }
+
             const unwindStage: PipelineStage.Unwind = {
                 $unwind: { path: '$participants' }
             }
@@ -747,6 +771,35 @@ class PostRepository {
                   }
             }
             pipeline.push(matchStage2);
+
+            const lookupStage1: PipelineStage.Lookup ={
+                $lookup: {
+                    from: "mediaTypes",
+                    localField: "postMediaType",
+                    foreignField: "_id",
+                    as: "postMediaTypeOut"
+                  }
+            }
+            pipeline.push(lookupStage1);
+
+            const projectStage1: PipelineStage.Project ={
+                $project: {
+                    postName:1,
+                    postDescription:1,
+                  postImages:1,
+                  postProjectRoles:1,
+                  postStatus:1,
+                  startDate:1,
+                  endDate:1,
+                  createdAt:1,
+                  updatedAt:1,
+                  postMediaType: {
+                    $arrayElemAt: ["$postMediaTypeOut", 0]
+                  }
+                }
+                
+            }
+            pipeline.push(projectStage1);
 
             const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
@@ -768,7 +821,7 @@ class PostRepository {
                 data: results,
                 totalItems: totalItems
             }
-            console.log("ANSWER",response)
+            console.log("ANSWER Prof",response)
             return response
         } catch (error) {
             throw new Error('Error fetching user posts from repository: ' + error);
@@ -822,8 +875,182 @@ class PostRepository {
         throw new Error("Error fetching post participants: " + error);
       }
     }
+    public async getPostsByProducer(getPostByProducerReq: GetPostByProducerRequestModel): Promise<GetPostByProfResponse>{ //no need to change name
+        try {
+            const { userId, postStatus, limit, page, postMediaTypes, searchText  } = getPostByProducerReq;
+            const objectId = new mongoose.Types.ObjectId(userId);
 
+            const postStatusMatchStage: PipelineStage.Match = {
+                $match: {
+                  ...(postStatus && { postStatus }),
+                },
+            };
+            
+            const pipeline: PipelineStage[] = [postStatusMatchStage];
+
+            const matchStage1: PipelineStage.Match ={
+                $match: {
+                      'userID': objectId
+                    }
+            }
+            pipeline.push(matchStage1);
+
+            if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
+                pipeline.push({
+                    $match: {
+                        postMediaType: { $in: postMediaTypesID}
+                    }
+                })
+            }
+
+
+            if (searchText) {
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { postName: { $regex: searchText, $options: "i" } },
+                            { postDescription: { $regex: searchText, $options: "i" } }
+                        ]
+                    }
+                });
+            }
+            
+
+            const lookupStage1: PipelineStage.Lookup ={
+                $lookup: {
+                    from: "mediaTypes",
+                    localField: "postMediaType",
+                    foreignField: "_id",
+                    as: "postMediaTypeOut"
+                  }
+            }
+            pipeline.push(lookupStage1);
+
+            const projectStage1: PipelineStage.Project ={
+                $project: {
+                    postName:1,
+                    postDescription:1,
+                  postImages:1,
+                  postProjectRoles:1,
+                  postStatus:1,
+                  startDate:1,
+                  endDate:1,
+                  createdAt:1,
+                  updatedAt:1,
+                  postMediaType: {
+                    $arrayElemAt: ["$postMediaTypeOut", 0]
+                  }
+                }
+                
+            }
+            pipeline.push(projectStage1);
+
+
+            const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            //sort by date from new to old, push skip and limit
+            const sortStage: PipelineStage.Sort = {
+                $sort: { createdAt: -1 }
+            }
+            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+
+            const results = await Post.aggregate(pipeline)
+            const response: GetPostByProfResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            // console.log("ANSWER",response)
+            return response
+        } catch (error) {
+            throw new Error('Error fetching user posts from repository: ' + error);
+        }
+    }
+
+    public async sendSubmission(id:string, participantID:string): Promise<void>{
+        try {
+            // console.log("HELlo",postData)
+            const post = await Post.findOneAndUpdate(
+                {
+                    _id: id,
+                    "postStatus": "in-progress", // post success
+                    "participants.participantID": participantID, // Ensure has paticipant in post
+                    "participants.status": "candidate", // cadidate only
+                    "participants.workQuota": { $gt: 0 }
+                  // "participants.reviewedAt": null, // make sure that no review when add to this post
+                },
+                { 
+                    $set: { 
+                        "participants.$.isSend": true,
+                    },
+                    $inc: { "participants.$.workQuota": -1 },
+                    $push: {
+                        "participants.$.submissions": new Date()
+                    }
+                }, // Update the matching element
+                { new: true, runValidators: true }
+            );
+
+            if (!post) {
+                throw new Error('Post not found or no more quota')
+            }
+
+            // const posts= await Post.findById(objectId);
+            return;
+        } catch (error) {
+            throw new Error('Error submission in post repository: ' + error);
+        }
+    }
     
+    public async sendApprove(id:string, participantID:string): Promise<void>{
+        try {
+            // console.log("HELlo",postData)
+
+            const filter: FilterQuery<IPost> = {
+                _id: id,
+                "postStatus": "in-progress", // post success
+                "participants.status": "candidate",
+            }
+
+            if (participantID != '') {
+                filter["participants.participantID"] = participantID
+            }
+            const update: UpdateQuery<IPost> = {
+                $set: { 
+                    "participants.$.isApprove": true,
+                }
+            }
+
+            if (participantID == '') {
+                update['postStatus'] = 'success'
+            }
+
+            const post = await Post.findOneAndUpdate(
+                filter,
+                update,
+                { new: true, runValidators: true }
+            );
+
+            if (!post) {
+                throw new Error('Post not found')
+            }
+
+            // const posts= await Post.findById(objectId);
+            return;
+        } catch (error) {
+            throw new Error('Error submission in post repository: ' + error);
+        }
+    }
 
     public async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
         try{

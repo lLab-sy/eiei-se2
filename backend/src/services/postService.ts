@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
 import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO, ChangeParticipantStatusDTO } from '../dtos/postDTO';
-import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
@@ -464,7 +464,10 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: [postImage] as [string],
-                postMediaType: post.postMediaType.toString() as string,
+                postMediaTypeOut: {    
+                  id: (post.postMediaType as any)._id.toString() as string,
+                  mediaName: (post.postMediaType as any).mediaName as string
+                },
                 postProjectRoles: post.postProjectRoles.map(eachRole => eachRole.toString()) as [string],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 startDate: post.startDate ? post.startDate : "",  
@@ -498,6 +501,67 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
+  async getPostsByProducer(getPostReq: GetPostByProducerRequestModel): Promise<PaginatedResponseDTO<PostDTO>> { //no need to change name
+    try {
+        const postsReq: GetPostByProducerRequestModel = getPostReq;
+        const res = await postRepository.getPostsByProducer(postsReq);
+
+        const resDTO = await Promise.all(res.data.map(async (post) => {
+            let postImage = post.postImages[0] 
+                ? await cloudService.getSignedUrlImageCloud(post.postImages[0] as string) 
+                : '';
+            // console.log('postImage',postImage)
+            return new PostDTO({
+                id: post._id?.toString(),
+                postName: post.postName as string,
+                postDescription: post.postDescription as string,
+                postImages: [postImage] as [string],
+                postProjectRoles: post.postProjectRoles.map(eachRole => eachRole.toString()) as [string],
+                postMediaTypeOut: {    
+                  id: (post.postMediaType as any)._id.toString() as string,
+                  mediaName: (post.postMediaType as any).mediaName as string
+                },
+                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                startDate: post.startDate ? post.startDate : "",  
+                endDate: post.endDate ? post.endDate : ""
+            });
+        }));
+
+        const response: PaginatedResponseDTO<PostDTO> = {
+            data: resDTO,
+            meta: {
+                page: getPostReq.page,
+                limit: getPostReq.limit,
+                totalItems: res.totalItems,
+                totalPages: Math.ceil(res.totalItems / getPostReq.limit)
+            } as PaginationMetaDTO
+        };
+
+        return response;
+    } catch (error) {
+        console.error('Error in service layer:', error);
+        throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  public async sendSubmission(id: string, participantID: string): Promise<void> {
+    try {
+      await postRepository.sendSubmission(id, participantID);
+      return;
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  public async sendApprove(id: string, participantID: string): Promise<void> {
+    try {
+      await postRepository.sendApprove(id, participantID);
+      return;
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+  
   async startProject(postId: string, userId: string): Promise<void> {
     try {
       await postRepository.startProject(postId, userId);

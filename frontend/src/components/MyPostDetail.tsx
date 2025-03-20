@@ -12,8 +12,8 @@ import Image from "next/image";
 export default function MyPostDetail({post}:{post:PostData}) {
   if(!post){
     return(
-        <div className="w-[80%] h-[100%] rounded-3xl shadow-lg m-auto">
-             You have no post detail.
+        <div className="w-[80%] h-[100%] rounded-3xl shadow-lg m-auto content-center">
+             <p className="text-center font-bold">You have no post detail.</p>
         </div>
     )
   }

@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Award } from "lucide-react";
 
-interface ProfessionalCradProp {
+interface ProfessionalCardProp {
   title: string;
   skill: string[];
   description: string;
@@ -13,7 +13,7 @@ interface ProfessionalCradProp {
   experience: number;
 }
 
-const ProfessionalCrad: React.FC<ProfessionalCradProp> = ({
+const ProfessionalCard: React.FC<ProfessionalCardProp> = ({
   title,
   skill,
   description,
@@ -62,4 +62,4 @@ const ProfessionalCrad: React.FC<ProfessionalCradProp> = ({
     );
 };
 
-export default ProfessionalCrad;
+export default ProfessionalCard;

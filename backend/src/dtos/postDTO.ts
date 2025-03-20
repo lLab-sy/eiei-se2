@@ -10,6 +10,14 @@ class PostProjectRoleDTO {
     roleName!: string;
 }
 
+class PostMediaDTO {
+    @ApiProperty({ description: 'Role ID', type: String })
+    id!: string;
+
+    @ApiProperty({ description: 'Role name', type: String })
+    mediaName!: string;
+}
+
 export interface ImageDisplayDTO{
     imageURL: string;
     imageKey: string;
@@ -207,6 +215,11 @@ export class PostDTO {
     @IsNotEmpty()
     postMediaType!: string;
 
+    @ApiProperty({ description: 'The media type detail of the post', type: String })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypeOut!: PostMediaDTO;
+
     @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
     @IsArray()
     @IsString({ each: true }) 
@@ -391,4 +404,46 @@ export class GetPostByProfDTO {
     @ApiProperty({ description: 'The current page' })
     @IsNumber() 
     page!: number;
+
+    @ApiProperty({ description: 'The media type of the post', type: [String] })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypes!: string[];
+
+    @ApiProperty({ description: 'The name of the post or project detail', type: String })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100, { message: 'searchText cannot be more than 100 characters' })
+    searchText!: string;
+}
+
+
+export class GetPostByProducerDTO {
+    @ApiProperty({ description: 'The id of user', type: String })
+    @IsString()
+    @IsNotEmpty()
+    userId!: string;
+
+    @ApiProperty({ description: 'The status of post', type: String })
+    @IsString()  
+    postStatus!: string;
+
+    @ApiProperty({ description: 'The number of post per page' })
+    @IsNumber()  
+    limit!: number;
+
+    @ApiProperty({ description: 'The current page' })
+    @IsNumber() 
+    page!: number;
+
+    @ApiProperty({ description: 'The media type of the post', type: [String] })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypes!: string[];
+
+    @ApiProperty({ description: 'The name of the post or project detail', type: String })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100, { message: 'searchText cannot be more than 100 characters' })
+    searchText!: string;
 }
