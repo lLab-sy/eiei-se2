@@ -453,9 +453,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
   async sendApprove(req: AuthRequest, res: Response): Promise<void> {
     try {
       const postID  = req.params.id
-      const userID  = req.params.userId
-
-      // const userID = req.user.userId
+      const userID  = req.query.userId ? req.query.userId as string: ''
 
       if (req.user.role!="producer") {
         sendResponse(res, 'error', '', 'unauthorize', 401);

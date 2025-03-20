@@ -1024,14 +1024,17 @@ class PostRepository {
                 "participants.status": "candidate",
             }
 
-            if (participantID) {
+            if (participantID != '') {
                 filter["participants.participantID"] = participantID
             }
-
             const update: UpdateQuery<IPost> = {
                 $set: { 
                     "participants.$.isApprove": true,
                 }
+            }
+
+            if (participantID == '') {
+                update['postStatus'] = 'success'
             }
 
             const post = await Post.findOneAndUpdate(
