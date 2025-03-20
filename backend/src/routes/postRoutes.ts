@@ -330,6 +330,12 @@ router.post('/posts/:id/sendSubmission', AuthMiddleware.authenticate as RequestH
  *         description: The unique identifier of the candidate (if not assume all)
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: isApprove
+ *         required: false
+ *         description: approve = 1, reject = 0
+ *         schema:
+ *           type: boolean
  *     responses:
  *       200:
  *         description: Successfully approve post

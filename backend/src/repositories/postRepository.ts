@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel, SendApproveRequestModel } from '../models/postModel';
 import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
 import mongoose, { FilterQuery, PipelineStage, UpdateQuery } from 'mongoose';
@@ -1012,27 +1012,28 @@ class PostRepository {
         }
     }
     
-    public async sendApprove(id:string, participantID:string): Promise<void>{
+    public async sendApprove(sendApproveReq: SendApproveRequestModel): Promise<void>{
         try {
             // console.log("HELlo",postData)
 
             const filter: FilterQuery<IPost> = {
-                _id: id,
+                _id: sendApproveReq.postId,
                 "postStatus": "in-progress", // post success
                 "participants.status": "candidate",
             }
 
-            if (participantID != '') {
-                filter["participants.participantID"] = participantID
+            if (sendApproveReq.userId != '') {
+                filter["participants.participantID"] = sendApproveReq.userId
             }
             const update: UpdateQuery<IPost> = {
                 $set: { 
-                    "participants.$.isApprove": true,
+                    "participants.$.isApprove": sendApproveReq.isApprove,
                 }
             }
 
-            if (participantID == '') {
-                update['postStatus'] = 'success'
+            switch (true) {
+                case sendApproveReq.userId == '' && sendApproveReq.isApprove: update['postStatus'] = 'success';break;
+                case !sendApproveReq.isApprove: update['participants.$.isSend'] = false;break;
             }
 
             const post = await Post.findOneAndUpdate(
