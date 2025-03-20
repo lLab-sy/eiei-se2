@@ -42,22 +42,13 @@ export interface ReceivedReview{
     reviewerProfileImage: string;
     ratingScore: number;
     comment: string;
+    reviewAt: string;
 }
 
 export interface ReceivedReviews{
     receivedReviews: ReceivedReview[];
 }
 
-export interface ReceivedReview{
-    reviewerName: string;
-    reviewerProfileImage: string;
-    ratingScore: number;
-    comment: string;
-}
-
-export interface ReceivedReviews{
-    receivedReviews: ReceivedReview[];
-}
 export interface SearchPosts{
     data: PostData[];
     meta: MetaData;

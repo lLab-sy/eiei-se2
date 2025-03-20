@@ -1,10 +1,9 @@
 import { Rating } from "@mui/material";
 import { User } from "lucide-react";
-import { reviewInterface } from "./ReviewProfessional";
-import Image from "next/image";
 import { Avatar, AvatarImage } from "./ui/avatar";
+import { ReceivedReview } from "../../interface";
 
-export default function ReviewContent({data, rating} : {data : reviewInterface, rating : number}) {
+export default function ReviewProducerContent({data, rating} : {data : ReceivedReview, rating : number}) {
 
   
   const date2: Date = new Date();
@@ -17,16 +16,15 @@ export default function ReviewContent({data, rating} : {data : reviewInterface, 
       <div className="flex justify-between">
         <div className='flex'>
           {
-            (!data?.producerProfileImage) ?
+            (!data?.reviewerProfileImage) ?
             <User size={48}/> : 
             <Avatar className='mr-2'>
-              <AvatarImage src={data?.producerProfileImage}/>
+              <AvatarImage src={data?.reviewerProfileImage}/>
             </Avatar>
-            // <Image width={10} height={10} src={data?.producerProfileImage} alt=''/>
           }
           
           <div className='flex flex-col'>
-            <span className='text-sm'>{`${data.producer} (${data.postName})`}</span>
+            <span className='text-sm'>{`${data.reviewerName}`}</span>
             <Rating
               size="small"
               readOnly

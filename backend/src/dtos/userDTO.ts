@@ -106,11 +106,13 @@ export class ReceivedReviewDTO{
   reviewerProfileImage?: string;
   ratingScore!: number;
   comment!: string;
-  constructor(init:{reviewerName: string, reviewerProfileImage:string, ratingScore:number, comment:string}){
+  reviewAt!: string;
+  constructor(init:{reviewerName: string, reviewerProfileImage:string, ratingScore:number, comment:string, reviewAt: string}){
     this.reviewerName = init.reviewerName;
     this.reviewerProfileImage = init.reviewerProfileImage;
     this.ratingScore = init.ratingScore;
     this.comment = init.comment;
+    this.reviewAt = init.reviewAt;
   }
 }
 

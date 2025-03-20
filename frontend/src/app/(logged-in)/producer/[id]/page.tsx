@@ -8,6 +8,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Mail, Phone, User } from "lucide-react";
 import getUser from "@/libs/getUser";
 import { UserData } from "../../../../../interface";
+import ReviewProducer from "@/components/ReviewProducer";
 
 const ProducerProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -86,6 +87,10 @@ const ProducerProfile = () => {
               <Phone className="h-5 w-5 text-maingreen" /> {ProducerInfo.phoneNumber}
             </p>
           </div>
+        
+          <h3 className="text-xl font-bold text-main-gery text-center">Producer's Previously Received Reviews</h3>
+          <ReviewProducer id={id}/>
+
         </CardContent>
       </Card>
     </div>
