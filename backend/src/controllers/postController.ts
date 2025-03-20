@@ -368,13 +368,14 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     try {
       const postId = req.params.id;
       const userId = req.user.userId;
+      
       if (!postId) {
         sendResponse(res, "error", "", "Post ID is required", 400);
         return;
       }
 
       if(req.user.role!="producer"){
-        sendResponse(res.status(401), 'error', 'Unauthorize to delete post');
+        sendResponse(res.status(401), 'error', 'Unauthorize');
         return;
       } 
 
