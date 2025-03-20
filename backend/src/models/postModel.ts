@@ -260,6 +260,11 @@ export interface GetPostByProducerRequestModel {
     searchText: string;
 }
 
+export interface SendApproveRequestModel {
+    postId: string;
+    userId: string;
+    isApprove: boolean;
+}
 
 export interface GetPostByProfResponse {
     data: IPost[];
