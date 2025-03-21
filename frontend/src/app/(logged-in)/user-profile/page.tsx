@@ -45,6 +45,8 @@ import { CircularProgress } from "@mui/material";
 import ReviewProfessional from "@/components/ReviewProfessional";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { signOut } from "@/auth";
+import { useSession } from "next-auth/react";
 
 //missing
 //sort position form error
@@ -130,6 +132,7 @@ export default function UserPage() {
       gender: userData?.gender,
     },
   });
+  
   useEffect(() => {
     if (userData) {
       form.reset({
