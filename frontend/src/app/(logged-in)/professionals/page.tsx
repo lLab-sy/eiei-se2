@@ -86,13 +86,13 @@ const ProfessionalsPage = () => {
             {professtionalsCurrentPage.map((professional, index) => (
               <ProfessionalCard
                 key={index}
-                title={professional?.firstName + " " + professional?.lastName}
+                title={professional.firstName ? (professional.firstName + " " + professional.lastName) : professional.username }
                 description={professional?.description ? (professional.description.length > 100 ? professional.description.slice(0, 100) : professional.description) : ""}
                 imageUrl={professional?.imageUrl || ""}
                 skill={professional?.skill}
                 ratings={Number(professional?.avgRating) || 0}
-                occupation={professional?.occupation}
-                experience={professional?.experience}
+                occupation={professional?.occupation || ""}
+                experience={professional?.experience || 0}
                 id={professional?._id}
               />
             ))}
