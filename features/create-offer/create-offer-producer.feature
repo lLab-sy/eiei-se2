@@ -6,7 +6,7 @@ Feature: Producer Create Offer to Production Professional
 
     Background:
         Given the "producer" is logged in
-        And has a target production professional
+        And the producer has a target production professional and "Send Offer"
 
     Scenario: Successfully create an offer to a production professional
         Given the producer has their own posts
