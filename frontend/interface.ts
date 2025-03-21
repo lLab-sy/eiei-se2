@@ -16,6 +16,7 @@ export interface PostData {
     participants: Participant[]
 }
 
+
 export interface Participant{
     comment:string,
     createdAt:Date,
@@ -24,7 +25,18 @@ export interface Participant{
     ratingScore:string,
     reviewedAt?:Date,
     status: string,
-    updatedAt: Date;
+    updatedAt: Date
+    // --
+    workQuota?:number,
+    isSend?:boolean,
+    isApprove?:boolean,
+    submissions?:Date[]
+
+}
+
+export interface ApproveData{
+    userId:string,
+    isApprove:boolean
 }
 
 export interface PostImageDisplay{

@@ -249,6 +249,7 @@ export interface GetPostByProfRequestModel {
     page: number;
     postMediaTypes: string[];
     searchText: string;
+    participantStatus:string;
 }
 
 export interface GetPostByProducerRequestModel {
