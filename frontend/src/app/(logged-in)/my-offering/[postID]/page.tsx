@@ -51,6 +51,7 @@ import MyPostDetail from "@/components/MyPostDetail";
 import ProductionWorkingContent from "@/components/ProducerWorkingContent";
 import ProducerWorkingContent from "@/components/ProducerWorkingContent";
 import { Console } from "console";
+import { useToast } from "@/hooks/use-toast";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -96,7 +97,7 @@ interface userReturn {
 
 const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {setOfferStatus:Function, setOfferArray: Function, token : string | undefined,postID: string, offer : historyStateInterface}) => {
   console.log('offerDataNew', offer)
-  
+  const { toast } = useToast()
   token = token ?? ""
   const offerDate = new Date(offer.createdAt)
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
@@ -165,15 +166,28 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     const updateOfferRes = await handleFetch(userId)
     console.log('updatedOfferRes', updateOfferRes)
     const offerArray : Array<historyStateInterface> = updateOfferRes?.data?.data?.data
-    
+    if(res?.data?.status !== 'success'){
+      toast({
+        title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
+        description : `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
+        variant: "destructive"
+      })
+      return;
+    }
     setOfferArray(offerArray);
     if(offerArray.length > 0){
       setOfferStatus(offerArray[0]?.status ?? "")
     }
+    console.log('resOfferStatusConfirm', res)
     setOpen(false)
     setTextState('')
     setCheckboxState(false)
     setLoading(false)
+    toast({
+      title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
+      description: `${isConfirm ? "Confirm" : "Reject"} this offer successfully`,
+      
+    })
   }
   const [textState, setTextState] = useState('')
   // console.log('textState', textState)
