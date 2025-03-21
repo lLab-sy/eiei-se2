@@ -54,7 +54,7 @@ export default function MyPostContentDetail(){
                 </div>
                 :
                 <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
-                    <ProfessionalWorkingContent pid={mid}/>
+                    <ProfessionalWorkingContent setPostDetail={setPost} pid={mid}/>
                 </div>
                 }
             </div>
