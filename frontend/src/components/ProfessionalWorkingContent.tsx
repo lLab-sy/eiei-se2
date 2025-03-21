@@ -235,7 +235,7 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
                             <p className="">Work Quota</p>
                         </div>
                     </div>
-                    <div className="overflow-y-auto h-full max-h-[400px] m-auto bg-slate-100">
+                    <div className="overflow-y-auto h-full max-h-[400px] m-auto bg-slate-100" data-testid="Professional-working-cards">
                     {participantsRight ? (
                         participantsRight.map((eachCard: Participant) => (
                             <ProfessionalWorkingCard key={eachCard.participantID} postStatus={postStatus} participantDetail={eachCard} setRefreshKey={refreshParticipants}/>
@@ -252,7 +252,7 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
 
             {postStatus === "created" && userRole=="producer" && (
                 <Link href={`/edit-post/${mid}`}>
-                    <Button className="absolute bg-maingreen-light text-white p-3 rounded-md hover:bg-sky-700 shadow-lg right-5 bottom-5">
+                    <Button className="absolute bg-maingreen-light text-white p-3 rounded-md hover:bg-sky-700 shadow-lg right-5 bottom-5" data-test-id="edit-mypost-button">
                             Edit Post
                     </Button>
                </Link>
