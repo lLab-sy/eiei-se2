@@ -1069,7 +1069,7 @@ class PostRepository {
         }
     }
     
-    public async sendApprove(sendApproveReq: SendApproveRequestModel): Promise<void>{
+    public async sendApprove(sendApproveReq: SendApproveRequestModel): Promise<void> {
         try {
             console.log("My userID", sendApproveReq.userId);
     
