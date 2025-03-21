@@ -488,7 +488,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
         sendResponse(res.status(401), 'error', 'Unauthorize');
         return;
       } 
-
+      
       await postService.startProject(postId, userId);
       sendResponse(
         res,

@@ -17,13 +17,129 @@ import { useEffect, useState } from "react";
 import getPostById from "@/libs/getPostById";
 import { LinearProgress } from "@mui/material";
 import Link from "next/link";
-export default function ProfessionalWorkingContent({pid}:{pid:string}){
+import axios from "axios";
+// const StartProjectButton = ({ post, setPost, userRole }: { userRole: string, post: PostData, setPost:Function }) => {
+//     const { data: session } = useSession();
+//     const token = session?.user.token;
+//     console.log("postDataDialog", post);
+//     const handleStartProject = async (token: string) => {
+//       const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${post.id}/startProject`;
+//       setIsLoading(true);
+//       await axios.put(
+//         apiUrl,
+//         {},
+//         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } },
+//       );
+//       const fetchData = async () => {
+//           let response;
+//           if (userRole === "producer") {
+//             response = await getPostById(post.id, session?.user.token ?? ""); // ดึงโพสต์ของ producer
+//           } else if (userRole === "production professional") {
+//             response = await getPostById(post.id, session?.user.token ?? "");
+//           }
+//           console.log("respons", response);
+//           if (response) {
+//             setPost(response);
+//           }
+         
+//       };
+//       await fetchData();
+//       setIsLoading(false);
+//       setOpen(false);
+//     };
+//     const [open, setOpen] = useState(false);
+//     const [isLoading, setIsLoading] = useState(false);
+//     return (
+//       <Dialog open={open} onOpenChange={setOpen}>
+//         <DialogTrigger asChild>
+//           <Button
+//             className={`h-[40px] mt-[20px] w-[40%] text-lg self-end ${post?.postStatus === "in-progress" ? "bg-green-500" : ""}`}
+//           >
+//             {post?.postStatus === "created"
+//               ? "Start a project"
+//               : post?.postStatus === "in-progress"
+//                 ? "Mark as completed"
+//                 : ""}
+//           </Button>
+//         </DialogTrigger>
+//         <DialogContent className="">
+//           <DialogHeader className="">
+//             <DialogTitle className="">Confirm Start the project</DialogTitle>
+//           </DialogHeader>
+//           {isLoading ? (
+//             <CircularProgress />
+//           ) : (
+//             <div>
+//               <span>
+//                 Your are about to start the project '{post?.postName ?? ""}'. This
+//                 action will initiate the production phase. Do you want to proceed?
+//               </span>
+//               <div className="flex justify-center mt-5">
+//                 <div className="w-[75%] h-[90px] flex bg-mainyellow-light text-mainred justify-center items-center rounded-lg">
+//                   <span className="w-[90%] h-[85%]">
+//                     Warning: Some required roles for this project are still
+//                     unfilled. The following positions.
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+//           )}
+  
+//           <div className="w-full flex justify-around mt-5">
+//             <Button
+//               disabled={isLoading}
+//               onClick={() => setOpen(false)}
+//               variant={"destructive"}
+//               className="w-[25%] h-[80%] rounded-lg"
+//             >
+//               Cancel
+//             </Button>
+//             <Button
+//               disabled={isLoading}
+//               onClick={() => handleStartProject(token ?? "")}
+//               className="hover:bg-green-500 w-[35%] h-[80%] rounded-lg text-white bg-green-600"
+//             >
+//               Confirm
+//             </Button>
+//           </div>
+//         </DialogContent>
+//       </Dialog>
+//     );
+//   };
+export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:string, setPostDetail: Function}){
         const { data: session } = useSession();
         const userRole=session?.user.role
         const userID=session?.user.id
         const token=session?.user.token
         const [post,setPost] = useState<PostData|null>(null)
         const [error, setError] = useState<string | null>(null);
+        const [isloading, setIsLoading] = useState(false)
+        const handleStartProject = async (token: string) => {
+            const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${pid}/startProject`;
+            setIsLoading(true);
+            const res = await axios.put(
+              apiUrl,
+              {},
+              { withCredentials: true, headers: { Authorization: `Bearer ${token}` } },
+            );
+            console.log('resStartProject', res)
+            const fetchData = async () => {
+                let response;
+                if (userRole === "producer") {
+                  response = await getPostById(pid, session?.user.token ?? ""); // ดึงโพสต์ของ producer
+                } else if (userRole === "production professional") {
+                  response = await getPostById(pid, session?.user.token ?? "");
+                }
+                console.log("respons", response);
+                if (response) {
+                  setPost(response);
+                  setPostDetail(response)
+                }
+               
+            };
+            await fetchData();
+            setIsLoading(false);
+          };
         useEffect(() => {
               const fetchData = async () => {
                 try {
@@ -49,6 +165,7 @@ export default function ProfessionalWorkingContent({pid}:{pid:string}){
         <LinearProgress />
         </main>
     }
+    
     return(
         <main className="bg-slate-480 rounded-lg h-full shadow-xl m-auto w-[100%] relative">
             <div className="grid grid-cols-1  w-full">
@@ -110,7 +227,7 @@ export default function ProfessionalWorkingContent({pid}:{pid:string}){
                             <AlertDialogDescription asChild>
                             <div className="flex flex-col gap-2">
                                 <p className="text-black">You are about to start the project 
-                                'Short Film: The Lost Memory'. This action will initiate the production phase. Do you want to proceed?</p>
+                                {post.postName}. This action will initiate the production phase. Do you want to proceed?</p>
                                 <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">
                                 Warning: Some required roles for this project are still unfilled. The following positions. 
                                 </div>
@@ -120,13 +237,13 @@ export default function ProfessionalWorkingContent({pid}:{pid:string}){
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction className="bg-maingreen" asChild>
-                                <Button>Confirm</Button>
+                                <Button onClick={() => handleStartProject(token ?? "")}>Confirm</Button>
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
             )}
-
+            
             {post.postStatus === "in-progress" && (
                 <AlertDialog>
                     <AlertDialogTrigger className="absolute bg-maingreen-light text-white p-3 rounded-md hover:bg-sky-700 shadow-lg right-5 bottom-5">
