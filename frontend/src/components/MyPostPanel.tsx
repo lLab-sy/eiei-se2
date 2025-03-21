@@ -93,12 +93,12 @@ export default function MyPostPanel(){
       {/* Grid Layout */}
       <div className="min-h-screen p-14 bg-gray-50 px-8 lg:px-20">
       {PostsCurrentPage && PostsCurrentPage.length>0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-12" data-testid="Post-cards-container">
           {
           PostsCurrentPage.map((post, index) => (
             <Link href={`/my-post/${post.id}`} key={index}>
               <MyPostCard
-                key={index}
+                key={post.id+'-'+index}
                 postDetail={post}
                 role={userRole??"admin"}      
                 />
@@ -110,7 +110,6 @@ export default function MyPostPanel(){
         : PostsCurrentPage && PostsCurrentPage.length === 0 ? (
           <div className="flex justify-center items-center text-xl text-gray-600">
             You have no posts in this phase.
-            <LinearProgress/>
           </div>
         ): 
         (

@@ -150,6 +150,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
         />
         <button
           onClick={handleSearch}
+          data-test-id="search-button"
           className="bg-blue-500 text-white rounded-full px-4 py-2 ml-2 hover:bg-blue-600 transition-colors"
         >
           Search
@@ -157,6 +158,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
       </div>
       <div className="relative flex items-center gap-4 px-4 w-full mt-4"> 
         <button
+          data-test-id="select-mediaType"
           className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm w-[40%]"
           onClick={() => toggleModal("Media")}
         >
@@ -166,6 +168,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
         <Select
           onValueChange={handleSelectPostStatus}
           value={selectPostStatus}
+          data-test-id="select-postStatus"
         >
           <SelectTrigger className="shadow-lg w-[40%]">
             <SelectValue placeholder="Choose your Post" />
