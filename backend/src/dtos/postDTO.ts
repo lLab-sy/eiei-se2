@@ -437,6 +437,10 @@ export class GetPostByProfDTO {
     @IsString()  
     postStatus!: string;
 
+    @ApiProperty({ description: 'The status of participant', type: String })
+    @IsString()  
+    participantStatus!:string
+
     @ApiProperty({ description: 'The number of post per page' })
     @IsNumber()  
     limit!: number;

@@ -99,12 +99,14 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
 
     if(text != "") result += "&searchText="+text;
 
+    let searchMedias:string[]=[]
     if(selectedMedia.length != 0){
       selectedMedia.forEach(select => {
-        result += "&postMediaTypes=" + select.id;
+         searchMedias.push(select.id)
       });
     }
 
+    result += "&postMediaTypes=" + searchMedias.join(",");
     result+="&postStatus="+selectPostStatus
     // if(selectedRole.length != 0){
     //   selectedRole.forEach(select => {
@@ -170,7 +172,10 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-                <SelectItem value={"created"}>
+              <SelectItem value={"created"}>
+                    Created
+                </SelectItem>
+                <SelectItem value={"waiting"}>
                     Waiting
                 </SelectItem>
                 <SelectItem value={"in-progress"}>
