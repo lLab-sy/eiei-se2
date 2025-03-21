@@ -10,6 +10,7 @@ import { Professional, ReceivedReviews} from "../../../../../interface";
 import getUser from "@/libs/getUser";
 import ReviewCard from "@/components/ReviewCard";
 import getReviewProfesstional from "@/libs/getReviewProfesstional";
+import ReviewProfessional from "@/components/ReviewProfessional";
 
 const ProfessionalDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,19 +55,20 @@ const ProfessionalDetail = () => {
   }
 
   const ProfessionalInfo = {
-    id: dataResponse,
-    firstName: dataResponse.firstName,
-    lastName: dataResponse.lastName,
-    email: dataResponse.email,
-    phoneNumber: dataResponse.phoneNumber,
-    gender: dataResponse.gender,
+    id: dataResponse._id,
+    firstName: dataResponse.firstName || "N/A",
+    lastName: dataResponse.lastName || "N/A",
+    email: dataResponse.email || "N/A",
+    phoneNumber: dataResponse.phoneNumber || "N/A",
+    gender: dataResponse.gender || "N/A",
     profileImage: dataResponse.imageUrl,
-    description: dataResponse.description,
-    occupation: dataResponse.occupation,
-    skill: dataResponse.skill,
-    experience: dataResponse.experience,
-    rating: dataResponse.rating,
-    avgRating: dataResponse.avgRating,
+    description: dataResponse.description || "",
+    occupation: dataResponse.occupation || "",
+    skill: dataResponse.skill || [],
+    experience: dataResponse.experience || 0.0,
+    rating: dataResponse.rating || 0.0,
+    avgRating: dataResponse.avgRating || 0.0,
+    username: dataResponse.username
   };
 
   return (
@@ -113,12 +115,15 @@ const ProfessionalDetail = () => {
 
           {/* Professional Info */}
           <div className="w-full text-center space-y-3">
-            <h2 className="text-2xl font-bold text-main-gery">{ProfessionalInfo.firstName} {ProfessionalInfo.lastName}</h2>
-            <div className="w-full text-center">
+            {ProfessionalInfo.firstName != "N/A" ? 
+              <h2 className="text-2xl font-bold text-main-gery">{ProfessionalInfo.firstName} {ProfessionalInfo.lastName}</h2> :
+              <h2 className="text-2xl font-bold text-main-gery">{ProfessionalInfo.username}</h2>
+            }
+            {ProfessionalInfo.occupation != "" ? <div className="w-full text-center">
               <span className="bg-blue-100 text-mainblue-lightest text-sm px-3 py-2 rounded-full shadow-sm"> {ProfessionalInfo.occupation} </span>
-            </div>
+            </div> : <></>}
           </div>
-          <p>&nbsp;&nbsp;&nbsp;&nbsp;{ProfessionalInfo.description}</p>
+          {ProfessionalInfo.description != "" ? <p>&nbsp;&nbsp;&nbsp;&nbsp;{ProfessionalInfo.description}</p> : <></>}
           
           <div className="grid grid-cols-2 gap-10 place-items-start h-full">
             {/* Project Status Section */}
@@ -142,7 +147,7 @@ const ProfessionalDetail = () => {
           </div>
 
           {/* Skills Section */}
-          <div className="flex items-center gap-2 justify-center">
+          {ProfessionalInfo.skill.length != 0 ?  <div className="flex items-center gap-2 justify-center">
             <div className="flex flex-wrap gap-2 ">
               <h3 className="font-semibold text-maingrey text-center">Roles : </h3>
               {ProfessionalInfo.skill.map((skill) => (
@@ -151,33 +156,19 @@ const ProfessionalDetail = () => {
                 </span>
               ))}
             </div>
-          </div>
+          </div> : <></>}
 
           <div className="mt-6 flex justify-center">
             <a href={`/create-offer/${id}`} className="bg-mainblue-lightest text-white py-3 px-8 rounded-lg shadow-md hover:bg-mainblue-light transition-colors duration-300">
-              Contact
+              Send Offer
             </a>
           </div>
 
             {/*Review Section*/}
-          <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Previously Received Reviews</h2>
-            {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
-              dataReviews.receivedReviews.map((review, index) => (
-                <ReviewCard
-                        key={index}
-                        index={index}
-                        reviewerName={review.reviewerName}
-                        reviewerProfileImage={review.reviewerProfileImage}
-                        ratingScore={review.ratingScore}
-                        comment={review.comment}
-                      />
-              ))
-            ) : (
-              <p className="text-gray-500">No reviews yet.</p>
-            )}
+            <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Previously Received Reviews</h3>
+            <ReviewProfessional id={id} />
 
-          </div>
+
         </CardContent>
       </Card>
     </div>

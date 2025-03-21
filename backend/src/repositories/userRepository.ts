@@ -287,6 +287,7 @@ class UserRepository {
                         "participants.ratingScore": 1,
                         "participants.comment": 1,
                         "participants.status": 1,
+                        "participants.reviewedAt": 1,
                         _id: 0
                       }
                     },
@@ -296,10 +297,11 @@ class UserRepository {
                       }
                     },
                     {
-                      $match:
-                        {
-                          "participants.status": "candidate"
+                      $match: {
+                        "participants.ratingScore": {
+                          $gt: 0
                         }
+                      }
                     },
                     {
                       $lookup: {
@@ -329,7 +331,8 @@ class UserRepository {
                         ratingScore: "$participants.ratingScore",
                         comment: "$participants.comment",
                         username: "$rating.username",
-                        profileImage: "$rating.profileImage"
+                        profileImage: "$rating.profileImage",
+                        reviewAt: "$participants.reviewedAt"
                       }
                     },
                     {
@@ -340,7 +343,8 @@ class UserRepository {
                             ratingScore: "$ratingScore",
                             comment: "$comment",
                             reviewerName: "$username",
-                            reviewerProfileImage: "$profileImage"
+                            reviewerProfileImage: "$profileImage",
+                            reviewAt: "$reviewAt"
                           }
                         }
                       }
