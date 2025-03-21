@@ -90,7 +90,7 @@ export default function ReviewProducer({ id }: { id: string }) {
             {/* <Star size={90} color="#ffbb00" strokeWidth={3} /> */}
             <span className="text-5xl">{(avg) ? avg : 0}</span>
             <span className="text-lg">Out of 5</span>
-            <Rating value={avg} readOnly />
+            <Rating value={avg} precision={0.5} readOnly />
           </div>
           <div className="  w-[60%] flex flex-col">
             <span className="flex items-center">
