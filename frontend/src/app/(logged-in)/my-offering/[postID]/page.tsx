@@ -600,7 +600,10 @@ useEffect(() => {
         };
         handleFetch(postID);
       }
-    };
+    }catch(err){
+      console.log(err)
+    }
+  }
     fetchData();
   }, [userID, userRole]);
   //*********************************** */

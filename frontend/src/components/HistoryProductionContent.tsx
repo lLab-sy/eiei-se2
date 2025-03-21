@@ -21,11 +21,11 @@ export default function HistoryProductionContent({
   const getStatusText = (status: string) => {
     switch (status) {
       case "candidate":
-        return "Employed";
+        return "Completed";
       case "reject":
-        return "Banned";
+        return "Rejected";
       case "in-progress":
-        return "Waiting";
+        return "In-progress";
       default:
         return status;
     }
@@ -59,9 +59,9 @@ export default function HistoryProductionContent({
         <div>
           <span
             className={
-              data.status === "candidate"
+              data.status === "in-progress"
                 ? "text-yellow-500"
-                : data.status === "in-progress"
+                : data.status === "candidate"
                   ? "text-green-500"
                   : "text-red-500"
             }
