@@ -266,7 +266,7 @@ router.put('/posts/:id/startProject', AuthMiddleware.authenticate as RequestHand
  */
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
 router.get('/posts/getPostParticipant/:id', AuthMiddleware.authenticate as RequestHandler, postController.getPostParticipant as RequestHandler);
-
+// 
 
 /**
  * @swagger
