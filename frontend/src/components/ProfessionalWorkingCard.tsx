@@ -76,7 +76,7 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
         {postStatus === "in-progress" && participantDetail.isSend && !participantDetail.isApprove && (
         <>
         <AlertDialog>
-          <AlertDialogTrigger><CheckBoxIcon className="  bg-maingreen hover:brightness-110 cursor-pointer hover:bg-mainblue-dark" /></AlertDialogTrigger>
+          <AlertDialogTrigger><CheckBoxIcon data-test-id={`Approve-${participantDetail.participantID}`} className="bg-maingreen hover:brightness-110 cursor-pointer hover:bg-mainblue-dark" /></AlertDialogTrigger>
           <AlertDialogContent>
               <AlertDialogHeader>
               <AlertDialogTitle>Are You Sure to Confirm This Task</AlertDialogTitle>
@@ -97,7 +97,7 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
           </AlertDialogContent>
         </AlertDialog>
         <AlertDialog>
-          <AlertDialogTrigger><DisabledByDefaultIcon className="bg-mainred hover:brightness-110 cursor-pointer hover:bg-mainblue-dark"/></AlertDialogTrigger>
+          <AlertDialogTrigger><DisabledByDefaultIcon data-test-id={`Reject-${participantDetail.participantID}`} className="bg-mainred hover:brightness-110 cursor-pointer hover:bg-mainblue-dark"/></AlertDialogTrigger>
           <AlertDialogContent>
               <AlertDialogHeader>
               <AlertDialogTitle>Are You Sure to Request to fix Task</AlertDialogTitle>
