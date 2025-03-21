@@ -23,7 +23,7 @@ export default function MyPostPanel(){
       const [PostsCurrentPage, setPostsCurrentPage] = useState<PostData[]|null>(null)  //Post That In one Page
       const [currentPage, setCurrentPage] = useState(1); //In Page ... (number)
       const [totalPages, setTotalPages] = useState(1); //All Page (What it contain)
-      const [requestPage, setRequestPage] = useState("limit="+PAGE_SIZE.toString()+"&page=1+&postStatus=created"); //Case of Change PAGE
+      const [requestPage, setRequestPage] = useState("limit="+PAGE_SIZE.toString()+"&page=1&postStatus=created"); //Case of Change PAGE
       const [requestFilter, setRequestFilter] = useState("");
       const [dataResponse,setDataResponse]= useState<SearchPosts|null>(null);
       
@@ -52,7 +52,7 @@ export default function MyPostPanel(){
                 if(userRole=="producer"){
                   response= await getMyProducerPosts(requestPage + requestFilter,token??"")
                 }else if(userRole=="production professional"){
-                  response= await getMyProductionProfessionalPosts(requestPage + requestFilter,token??"")
+                  response= await getMyProductionProfessionalPosts(requestPage + requestFilter,token??"",userID??"","candidate")
                 }
               }catch(error){
                 setTotalPages(1);
@@ -92,7 +92,7 @@ export default function MyPostPanel(){
       
       {/* Grid Layout */}
       <div className="min-h-screen p-14 bg-gray-50 px-8 lg:px-20">
-      {PostsCurrentPage ? (
+      {PostsCurrentPage && PostsCurrentPage.length>0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-12">
           {
           PostsCurrentPage.map((post, index) => (
@@ -105,14 +105,15 @@ export default function MyPostPanel(){
             </Link>
             ))
           }
- 
-          {/* <MyPostCard role={userRole??"admin"}/>
-          <MyPostCard role={userRole??"admin"}/>
-          <MyPostCard role={userRole??"admin"}/>
-          <MyPostCard role={userRole??"admin"} isReview={true}/> */}
-
         </div>
-        ) : (
+        ) 
+        : PostsCurrentPage && PostsCurrentPage.length === 0 ? (
+          <div className="flex justify-center items-center text-xl text-gray-600">
+            You have no posts in this phase.
+            <LinearProgress/>
+          </div>
+        ): 
+        (
           <div className="flex justify-center items-center text-xl text-gray-600">
             Loading Data ...
             <LinearProgress/>
