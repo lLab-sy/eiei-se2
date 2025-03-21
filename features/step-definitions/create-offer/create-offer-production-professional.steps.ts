@@ -5,7 +5,7 @@ import { expect } from "@playwright/test"
 
 let customWorld: ICustomWorld = world;
 
-Given('has target post', async function () {
+Given('the production professional has a target post and {string}', async function (action:string) {
   const page = customWorld.page;
   if (page){
     await page.waitForLoadState("domcontentloaded");
@@ -16,7 +16,7 @@ Given('has target post', async function () {
     const count = await posts.count();
     await posts.nth(Math.floor(Math.random() * count)).click()
     await page.waitForLoadState("domcontentloaded");
-    await page.getByText("Send Offer", {exact: true}).click();  
+    await page.getByText(action, {exact: true}).click();  
     }
   }
 );

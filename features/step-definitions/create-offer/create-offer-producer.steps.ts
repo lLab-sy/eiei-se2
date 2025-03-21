@@ -5,7 +5,7 @@ import { expect } from '@playwright/test';
 
 let customWorld: ICustomWorld = world;
 
-Given('has a target production professional', async function () {
+Given('the producer has a target production professional and {string}', async function (action:string) {
   const page = customWorld.page;
   if (page){
     await page.waitForLoadState("domcontentloaded");
@@ -17,7 +17,7 @@ Given('has a target production professional', async function () {
     const count = await professionals.count();
     await professionals.nth(Math.floor(Math.random() * count)).click()
     await page.waitForLoadState("domcontentloaded");
-    await page.getByText("Contact", {exact: true}).click();    
+    await page.getByText(action, {exact: true}).click();  
   }
 });
 

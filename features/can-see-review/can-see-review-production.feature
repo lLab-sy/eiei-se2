@@ -7,8 +7,16 @@ Feature: Production Professional Can See Review on User Profile
     Background:
         Given the "production professional" is logged in
     
-    Scenario: Production Professional wants to check rating score
+    @pfcheckself
+    Scenario: Production Professional wants to check self rating score
         When I visit "Profile"
-        Then I should see my review section
+        Then "Production Professional" should see "their own" review section
         And I should see at least one review
-        And reviews should be displayed correctly
+        And the reviews should be displayed correctly
+    
+    @pfcheckpd
+    Scenario: Production Professional wants to check a Producer's rating score
+        When the production professional has a target post and "View Producer Profile"
+        Then "Production Professional" should see "producer's" review section
+        And I should see at least one review
+        And the reviews should be displayed correctly
