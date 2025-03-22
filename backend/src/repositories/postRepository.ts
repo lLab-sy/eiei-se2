@@ -667,7 +667,7 @@ class PostRepository {
                     },
                     currentWage: '$participants.offer.price',
                     reason: '$participants.offer.reason',
-                    offeredBy: '$participants.offer.offerBy',
+                    offeredBy: '$participants.offer.offeredBy',
                     status: "$participants.status",
                     participantID: '$participants.participantID',
                     createdAt: '$participants.offer.createdAt'
