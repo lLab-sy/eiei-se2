@@ -32,8 +32,8 @@ export default function HistoryProductionContent({
   };
 
   // ทำให้ offeredBy แสดงเป็นภาษาไทย
-  const getOfferByText = (offeredBy: boolean) => {
-    return offeredBy ? "Producer" : "Professional";
+  const getOfferByText = (offeredBy: number) => {
+    return offeredBy==1 ? "Producer" : "Professional";
   };
   
   return (
@@ -44,7 +44,7 @@ export default function HistoryProductionContent({
             <Airplay size={16} className="text-gray-700" />
           </div>
           <span className="font-medium">Offer By:</span>
-          <span>{getOfferByText(false)}</span>
+          <span>{getOfferByText(data?.offeredBy)}</span>
         </div>
         <div className="flex items-center gap-1">
           <Bitcoin size={16} className="text-gray-700" />

@@ -217,6 +217,11 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     else setIsChanged(3)
   }
   const [checkboxState, setCheckboxState] = useState(false)
+  const offerRole = (offer.offeredBy == 1 ? "producer" : "production professional")
+  const canOffer = (offer.offeredBy == 1 ? "producer" : "production professional") !== session?.user.role
+  console.log('offer rolename', offerRole)
+  console.log('session role', session?.user.role)
+  console.log("canOFfer",canOffer)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -260,7 +265,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
               <AvatarImage src=""/>
             </Avatar>
             <div className='flex flex-col'>
-              <span>{`From: Producer`}</span>
+              <span>{`From: ${offer.offeredBy == 0 ? "Professional" : "Producer"} `}</span>
               <div className='flex'>
                 <Rating value={reviewState} readOnly/>
                 <span>{ratingCount} (review)</span>
@@ -295,7 +300,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
               <div className='flex justify-around w-full'>
                 <Button onClick={(isChanged > 0) ? () => {setIsChanged(0); setCanConfirm(false); setTextState(""); setCheckboxState(false)}: handleRejectOffer} className='w-[25%] rounded-lg' variant={'destructive'}>{isChanged > 0 ? "No" :"Reject Offer"}</Button>
                 <Button onClick={() => {handleCounterOffer(postID)}} className={`${isChanged == 3 ? "hidden" : ""}`}>Counter Offer</Button>
-                <Button onClick={isChanged > 0 ? () => {(isChanged == 2) ? handleClickConfirmOffer(true) : (isChanged == 3) ? handleCounterOffer(postID) : handleClickConfirmOffer(false)} : handleConfirmOffer} className='w-[30%] rounded-lg bg-lime-500 text-white hover:bg-lime-600' disabled={(((canCanfirm || checkboxState || isChanged==3) && isChanged > 0 ) || (isChanged == 0)) ? false : true}>{isChanged ? "Yes" :"Confirm Offer"}</Button>
+                <Button onClick={isChanged > 0 ? () => {(isChanged == 2) ? handleClickConfirmOffer(true) : (isChanged == 3) ? handleCounterOffer(postID) : handleClickConfirmOffer(false)} : handleConfirmOffer} className='w-[30%] rounded-lg bg-lime-500 text-white hover:bg-lime-600' disabled={(((canCanfirm || checkboxState || isChanged==3) && isChanged > 0 ) || (isChanged == 0) && (canOffer)) ? false : true}>{isChanged ? "Yes" :"Confirm Offer"}</Button>
               </div>
               :
               <span className='text-lg'>You have successfully <span className={`${offer.status === 'reject' ? 'text-red-500' : 'text-green-600'}`}>{offer.status === 'reject' ? 'rejected' : 'confirmed'}</span> this offer.</span>

@@ -16,6 +16,7 @@ export interface historyStateInterface {
   createdAt : string,
   status: string,
   participantID: string,
+  offeredBy : number,
 }
 export default function HistoryProduction({handleFetch, historyDataArray} : {historyDataArray : Array<historyStateInterface>, handleFetch: Function}) {
   const mockData = [
