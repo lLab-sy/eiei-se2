@@ -1077,6 +1077,16 @@ class PostRepository {
                 throw new Error('Participant is not in progress');
             }
 
+            const latestOffer = participant.offer.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+            if (!latestOffer) {
+                throw new Error('No offers found for this participant');
+            }
+
+            if ((latestOffer.offeredBy === (dto.role === "producer"? 1:0)) && dto.statusToChange === "candidate") {
+                throw new Error("Cannot confirm offer which is created by yourself");
+            }
+
             participant.status = dto.statusToChange;
             await post.save();
         }catch(error){
