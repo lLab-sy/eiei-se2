@@ -300,7 +300,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       const limit = req.query.limit ? Number(req.query.limit): 10;
       const page = req.query.page ? Number(req.query.page): 1;
       const status = ['created', 'in-progress', 'success', 'cancel','waiting'];
-      const postMediaTypes = req.query.postMediaTypes as string[];
+      const postMediaTypesString = req.query.postMediaTypes as string ;
       if (limit < 1 || page < 1 || !userId ) {
         sendResponse(res, 'error', '', 'bad request', 400);
         return
@@ -317,6 +317,11 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
           postStatus = req.query.postStatus as string
         }
           
+      }
+
+      let postMediaTypes:string[]=[];
+      if(postMediaTypesString && postMediaTypesString!=""){
+        postMediaTypes=postMediaTypesString.split(",")
       }
 
       const participantAllStatus = ['in-progress', 'reject', 'candidate'];
@@ -344,7 +349,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       }
 
       const posts = await postService.getPostsByProf(getPostByProfDTO);
-      console.log(posts.meta.totalPages,posts.meta.totalPages,page)
+      // console.log(posts.meta.totalPages,posts.meta.totalPages,page)
       if(posts.data.length==0){
           posts.meta.totalPages=1;
       }
@@ -385,7 +390,6 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       if(postMediaTypesString && postMediaTypesString!=""){
         postMediaTypes=postMediaTypesString.split(",")
       }
-      console.log("postMedia",postMediaTypes)
 
       if (limit < 1 || page < 1 || !userId ) {
         sendResponse(res, 'error', '', 'bad request', 400);
@@ -415,6 +419,9 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       }
       console
       const posts = await postService.getPostsByProducer(getPostByProducerDTO);
+      if(posts.data.length==0){
+        posts.meta.totalPages=1;
+      }
       switch (true) {
         case !posts.meta.totalPages:
           sendResponse(res, "error", "", "You have no related posts.", 400);
