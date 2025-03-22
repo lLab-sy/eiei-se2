@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Participant, PostParticipant } from "../../interface";
+import { Participant, ParticipantForRight, PostParticipant } from "../../interface";
 
 export default async function getPostParticipantCandidate(
   postId: string,
@@ -13,7 +13,7 @@ export default async function getPostParticipantCandidate(
 
     const response = await axios.get<{
       status: string;
-      data: Participant[];
+      data: ParticipantForRight[];
       message: string;
     }>(apiUrl,{  headers: {
         Authorization: `Bearer ${token}`,
