@@ -21,19 +21,19 @@ export default function HistoryProductionContent({
   const getStatusText = (status: string) => {
     switch (status) {
       case "candidate":
-        return "Employed";
+        return "Completed";
       case "reject":
-        return "Banned";
+        return "Rejected";
       case "in-progress":
-        return "Waiting";
+        return "In-progress";
       default:
         return status;
     }
   };
 
   // ทำให้ offeredBy แสดงเป็นภาษาไทย
-  const getOfferByText = (offeredBy: boolean) => {
-    return offeredBy ? "Producer" : "Professional";
+  const getOfferByText = (offeredBy: number) => {
+    return offeredBy==1 ? "Producer" : "Professional";
   };
   
   return (
@@ -44,7 +44,7 @@ export default function HistoryProductionContent({
             <Airplay size={16} className="text-gray-700" />
           </div>
           <span className="font-medium">Offer By:</span>
-          <span>{getOfferByText(data.offeredBy)}</span>
+          <span>{getOfferByText(data?.offeredBy)}</span>
         </div>
         <div className="flex items-center gap-1">
           <Bitcoin size={16} className="text-gray-700" />
@@ -57,18 +57,17 @@ export default function HistoryProductionContent({
           <span className="font-medium">Role:</span> {data.roleName}
         </div>
         <div>
-          {/* <span className="font-medium">Status:</span>
           <span
             className={
-              data.status === "candidate"
+              data.status === "in-progress"
                 ? "text-yellow-500"
-                : data.status === "in-progress"
+                : data.status === "candidate"
                   ? "text-green-500"
                   : "text-red-500"
             }
           >
             {" " + getStatusText(data.status)}
-          </span> */}
+          </span>
         </div>
         <div className="col-span-2">
           <span className="font-medium">Offer Time:</span> {displayDate}
