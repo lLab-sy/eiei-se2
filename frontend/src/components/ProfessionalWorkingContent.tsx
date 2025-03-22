@@ -21,8 +21,6 @@ import { useParams } from "next/navigation";
 import getPostParticipantCandidate from "@/libs/getPostParticipantCandidate";
 import putApproveWork from "@/libs/putApproveWork";
 import { toast } from "@/hooks/use-toast";
-export default function ProfessionalWorkingContent({ postStatus,refreshPost }: { postStatus: string,refreshPost:Function }) {
-        const { mid }: { mid: string } = useParams();
 import axios from "axios";
 // const StartProjectButton = ({ post, setPost, userRole }: { userRole: string, post: PostData, setPost:Function }) => {
 //     const { data: session } = useSession();
@@ -112,7 +110,8 @@ import axios from "axios";
 //       </Dialog>
 //     );
 //   };
-export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:string, setPostDetail: Function}){
+export default function ProfessionalWorkingContent({postStatus, refreshPost}:{postStatus:string, refreshPost: Function}){
+        const { mid }: { mid: string } = useParams();
         const { data: session } = useSession();
         const userRole=session?.user.role
         const userID=session?.user.id
@@ -123,8 +122,11 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
         const [refreshKey, setRefreshKey] = useState(0);
         const [error, setError] = useState<string | null>(null);
         const [isloading, setIsLoading] = useState(false)
+        const [noFinishCandidate,setNoFinishCandidate]=useState<string[]>([])
+
+
         const handleStartProject = async (token: string) => {
-            const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${pid}/startProject`;
+            const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${mid}/startProject`;
             setIsLoading(true);
             const res = await axios.put(
               apiUrl,
@@ -132,24 +134,23 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
               { withCredentials: true, headers: { Authorization: `Bearer ${token}` } },
             );
             console.log('resStartProject', res)
-            const fetchData = async () => {
-                let response;
-                if (userRole === "producer") {
-                  response = await getPostById(pid, session?.user.token ?? ""); // ดึงโพสต์ของ producer
-                } else if (userRole === "production professional") {
-                  response = await getPostById(pid, session?.user.token ?? "");
-                }
-                console.log("respons", response);
-                if (response) {
-                  setPost(response);
-                  setPostDetail(response)
-                }
-               
-            };
-            await fetchData();
             setIsLoading(false);
+
+            if (!res) {
+                toast({
+                    variant: "destructive",
+                    title: "Something went wrong.",
+                    description: "Please try again.",
+                })
+                return
+            }
+                toast({
+                variant: "default",
+                title: "Successful approve work",
+                description: `Mask post success.`,
+            })
+            refreshPost()
           };
-        const [noFinishCandidate,setNoFinishCandidate]=useState<string[]>([])
 
         useEffect(() => {
               const fetchData = async () => {
@@ -270,7 +271,7 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
                             <AlertDialogDescription asChild>
                             <div className="flex flex-col gap-2">
                                 <p className="text-black">You are about to start the project 
-                                {post.postName}. This action will initiate the production phase. Do you want to proceed?</p>
+                                This action will initiate the production phase. Do you want to proceed?</p>
                                 <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">
                                 Warning: Some required roles for this project are still unfilled. The following positions. 
                                 </div>

@@ -419,7 +419,8 @@ class PostRepository {
                     "userID": userId 
                 },
                 { $set: { 
-                    "postStatus": 'in-progress'
+                    "postStatus": 'in-progress',
+                    "startDate":new Date()
                  }}, // Update the matching element
                 { new: true, runValidators: true }
             );
