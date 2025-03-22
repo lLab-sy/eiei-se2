@@ -1,4 +1,4 @@
-import { PostData } from "../../interface";
+import { ParticipantForRight, PostData } from "../../interface";
 import ProfessionalWorkingCard from "./ProfessionalWorkingCard";
 import TaskSubmissionCard from "./TaskSubmissionCard";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -10,29 +10,49 @@ import {
     DialogTitle,
     DialogFooter,
   } from "@/components/ui/dialog";
-import { UploadCloud } from "lucide-react";
+import { Loader2, UploadCloud } from "lucide-react";
+import getPostParticipantCandidate from "@/libs/getPostParticipantCandidate";
+import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { CircularProgress, LinearProgress } from "@mui/material";
+import postSendWork from "@/libs/postSendWork";
+import { toast } from "@/hooks/use-toast";
 
 export default function TaskSubmissionContent({isOpen,
-    setIsOpen, username
+    setIsOpen,postStatus
     }:{isOpen: boolean;
       setIsOpen: Dispatch<SetStateAction<boolean>>;
-      username : string
+      postStatus:string;
       }){
-    // useEffect(() => {
-    //           const fetchData = async () => {
-    //         //     try {
-    //         //         // const response = await // ดึงโพสต์ของ Production Professional?
-    //         //         // console.log("respons",response)
-    //         //     //   if (response) {
-    //         //     //     setPost(response);
-    //         //     //   }
-    //         //     // } catch (err) {
-    //         //     //   setError("Failed to load posts. Please try again later.");
-    //         //     // }
-    //         }
-    //             fetchData();
-    //         }, []);
-    const [post,setPost] = useState<PostData|null>(null)
+
+        const { mid }: { mid: string } = useParams();
+        const { data: session } = useSession();
+        const userRole=session?.user.role
+        const userID=session?.user.id
+        const username = session?.user.username ?? "";
+        const token =session?.user.token;
+        const [participantsRight, setParticipantsRight] = useState<ParticipantForRight | null>(null);
+        const [refreshKey, setRefreshKey] = useState(0);
+        const [error, setError] = useState<string | null>(null);
+        
+           useEffect(() => {
+                 const fetchData = async () => {
+                   try {
+                     let response;
+                     if (userRole === "production professional") {
+                       response = await getPostParticipantCandidate(mid,session?.user.token??"") // ดึงโพสต์ของ producer 
+                     } else if (userRole === "production professional") {
+            
+                     }
+                     if (response) {
+                       setParticipantsRight(response[0]);
+                     }
+                   } catch (err) {
+                     setError("Failed to load posts. Please try again later.");
+                   }
+               }
+                   fetchData();
+               }, [userID, userRole,refreshKey]);
     // const [files, setFiles] = useState<File[] |null>(null);
 
     // const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -41,6 +61,29 @@ export default function TaskSubmissionContent({isOpen,
     //     setFiles(droppedFiles);
     //     console.log(droppedFiles)
     // };
+    const refreshParticipants = () => {
+        setRefreshKey((prevKey) => prevKey + 1);
+    };
+
+    async function sendWork () {
+        const postCreateResponse = await postSendWork(mid,token??"")
+        if (!postCreateResponse) {
+            toast({
+                variant: "destructive",
+                title: "Something went wrong.",
+                description: "Please try again.",
+            })
+            return
+        }
+ 
+            refreshParticipants()
+            toast({
+            variant: "default",
+            title: "Successful approve work",
+            description: `Mask post success.`,
+        })
+        setIsOpen(false)
+    }
 
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault(); // Allows the drop event
@@ -62,18 +105,30 @@ export default function TaskSubmissionContent({isOpen,
                         </div>
                     </div>
                     <div className="overflow-y-auto h-full max-h-[450px] m-auto bg-slate-400">
-                        <TaskSubmissionCard/>
-                        <TaskSubmissionCard/>
-                        <TaskSubmissionCard/>
-                        <TaskSubmissionCard/>
+                    {participantsRight && participantsRight.submissions && (participantsRight.submissions?.length-1)>0 ? (
+                        participantsRight.submissions.map((eachData, index) => (
+                            <TaskSubmissionCard 
+                                key={index} 
+                                isApprove={participantsRight.isApprove??false} 
+                                isSend={participantsRight.isSend??false} 
+                                workIter={index} 
+                                workTime={eachData} 
+                                latest={index==(participantsRight.submissions?.length-1)}
+                            />
+                        ))
+                    ) : (
+                        <div className="text-small text-center bg-white font-bold">
+                            Our Working is going to start soon.
+                        </div>
+                    )}
                     </div>
                     
                 </div>
             </div>
             <div className="flex absolute justify-end bottom-2 right-5">
-                <Button onClick={()=>setIsOpen(true)}>
+            {!participantsRight?.isSend && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>0 && <Button onClick={()=>setIsOpen(true)}>
                     Submit new task
-                </Button>
+                </Button>}
             </div>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent className="sm:max-w-lg">
@@ -101,10 +156,10 @@ export default function TaskSubmissionContent({isOpen,
                         } */}
                     </div>
                     <DialogFooter className="gap-3 relative">
-                        <Button className="bg-mainred hover:bg-mainred-light absolute left-0">
+                        <Button className="bg-mainred hover:bg-mainred-light absolute left-0" onClick={(e)=>{setIsOpen(false)}}>
                             Cancel
                         </Button>
-                        <Button className="bg-maingreen hover:bg-maingreen-light">
+                        <Button className="bg-maingreen hover:bg-maingreen-light" onClick={sendWork}>
                             Confirm
                         </Button>
                     </DialogFooter>

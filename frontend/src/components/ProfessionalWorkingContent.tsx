@@ -11,7 +11,7 @@ import {
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
   import { Button } from "./ui/button";
-import { ApproveData, Participant, PostData } from "../../interface";
+import { ApproveData, Participant, ParticipantForRight, PostData } from "../../interface";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import getPostById from "@/libs/getPostById";
@@ -119,7 +119,7 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
         const username = session?.user.username ?? "";
         const token =session?.user.token;
         const [isOpen, setIsOpen] = useState(false);
-        const [participantsRight, setParticipantsRight] = useState<Participant[] | null>(null);
+        const [participantsRight, setParticipantsRight] = useState<ParticipantForRight[] | null>(null);
         const [refreshKey, setRefreshKey] = useState(0);
         const [error, setError] = useState<string | null>(null);
         const [isloading, setIsLoading] = useState(false)
@@ -165,9 +165,9 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
 
                     let particpantNoFinish:string[]=[];
                     response?.forEach((eachParticipant)=>{
-                        console.log("part",eachParticipant.participantID)
+                        // console.log("part",eachParticipant.participantIDs)
                         if(!eachParticipant.isSend && eachParticipant.workQuota && eachParticipant.workQuota>0){
-                            particpantNoFinish.push(eachParticipant.participantID)
+                            particpantNoFinish.push(eachParticipant.participantID?.firstname?eachParticipant.participantID?.firstname:eachParticipant.participantID?.username)
                         }
                     })
                     setNoFinishCandidate(particpantNoFinish)
@@ -237,8 +237,8 @@ export default function ProfessionalWorkingContent({pid, setPostDetail}:{pid:str
                     </div>
                     <div className="overflow-y-auto h-full max-h-[400px] m-auto bg-slate-100" data-testid="Professional-working-cards">
                     {participantsRight ? (
-                        participantsRight.map((eachCard: Participant) => (
-                            <ProfessionalWorkingCard key={eachCard.participantID} postStatus={postStatus} participantDetail={eachCard} setRefreshKey={refreshParticipants}/>
+                        participantsRight.map((eachCard: ParticipantForRight) => (
+                            <ProfessionalWorkingCard key={eachCard.participantID._id} postStatus={postStatus} participantDetail={eachCard} setRefreshKey={refreshParticipants}/>
                         ))
                     ) : (
                         <LinearProgress/>

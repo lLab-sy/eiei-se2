@@ -16,14 +16,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "./ui/button";
-import { ApproveData, Participant } from "../../interface";
+import { ApproveData, Participant, ParticipantForRight } from "../../interface";
 import putApproveWork from "@/libs/putApproveWork";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 
-export default function ProfessionalWorkingCard({postStatus,participantDetail,setRefreshKey}:{postStatus?:string,participantDetail:Participant,setRefreshKey:Function}){ 
+export default function ProfessionalWorkingCard({postStatus,participantDetail,setRefreshKey}:{postStatus?:string,participantDetail:ParticipantForRight,setRefreshKey:Function}){ 
 //   const offerDate = new Date(data.createdAt);
 //   const displayDate = offerDate.toLocaleString("en-US", {
 //     year: "numeric",
@@ -55,7 +55,7 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
       toast({
       variant: "default",
       title: "Successful approve work",
-      description: `Balance is go to ${participantDetail.participantID}.`,
+      description: `Balance is go to ${participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}.`,
     })
 
   }
@@ -63,10 +63,10 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
   return (
     <div className="w-full grid grid-cols-10 bg-slate-100 m-auto text-sm my-2 p-5 font-medium text-center whitespace-normal break-words h-[30px] items-center content-center">
         <div className="col-span-2">
-            <p className="">{participantDetail.participantID}</p>
+            <p className="">{participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}</p>
         </div>
         <div className="col-span-2">
-            <p className="">{participantDetail.offer[participantDetail.offer.length - 1].role}</p>
+            <p className="">{participantDetail.offer[participantDetail.offer.length - 1].role.roleName}</p>
         </div>
         <div className="col-span-2">
             <p className="text-sm">{participantDetail.isSend?"Sent":"In-Progress"}</p>
@@ -76,42 +76,42 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
         {postStatus === "in-progress" && participantDetail.isSend && !participantDetail.isApprove && (
         <>
         <AlertDialog>
-          <AlertDialogTrigger><CheckBoxIcon data-test-id={`Approve-${participantDetail.participantID}`} className="bg-maingreen hover:brightness-110 cursor-pointer hover:bg-mainblue-dark" /></AlertDialogTrigger>
+          <AlertDialogTrigger><CheckBoxIcon data-test-id={`Approve-${participantDetail.participantID._id}`} className="bg-maingreen hover:brightness-110 cursor-pointer hover:bg-mainblue-dark" /></AlertDialogTrigger>
           <AlertDialogContent>
               <AlertDialogHeader>
               <AlertDialogTitle>Are You Sure to Confirm This Task</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="flex flex-col gap-2">
                     <p className="text-black">This submission will mark this task as complete according to the agreement. </p>
-                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">{`Upon confirmation, ${participantDetail.offer[participantDetail.offer.length - 1].price} Baht will be transferred to the ${participantDetail.participantID} account.`}</div>
+                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">{`Upon confirmation, ${participantDetail.offer[participantDetail.offer.length - 1].price} Baht will be transferred to the ${participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username} account.`}</div>
                 </div>
               </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction className="bg-maingreen" asChild> 
-                    <Button onClick={(e:any)=>{sendApprove(true,participantDetail.participantID)}}
+                    <Button onClick={(e:any)=>{sendApprove(true,participantDetail.participantID._id)}}
                       >Confirm</Button>
                   </AlertDialogAction>
               </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
         <AlertDialog>
-          <AlertDialogTrigger><DisabledByDefaultIcon data-test-id={`Reject-${participantDetail.participantID}`} className="bg-mainred hover:brightness-110 cursor-pointer hover:bg-mainblue-dark"/></AlertDialogTrigger>
+          <AlertDialogTrigger><DisabledByDefaultIcon data-test-id={`Reject-${participantDetail.participantID._id}`} className="bg-mainred hover:brightness-110 cursor-pointer hover:bg-mainblue-dark"/></AlertDialogTrigger>
           <AlertDialogContent>
               <AlertDialogHeader>
               <AlertDialogTitle>Are You Sure to Request to fix Task</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="flex flex-col gap-2">
-                    <p className="text-black">Requesting a resubmission from ${participantDetail.participantID}. ${participantDetail.participantID}  will need to make corrections and resubmit the work.</p>
-                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">Important: If revisions reach 0, the ${participantDetail.participantID} will no longer to send and payment will be voided for all parties.</div>
+                    <p className="text-black">Requesting a resubmission from ${participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}. ${participantDetail.participantID.username}  will need to make corrections and resubmit the work.</p>
+                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">Important: If revisions reach 0, the {participantDetail.participantID.username} will no longer to send and payment will be voided for all parties.</div>
                 </div>
               </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction className="bg-green-700" asChild> 
-                    <Button onClick={(e:any)=>{sendApprove(false,participantDetail.participantID)}}
+                    <Button onClick={(e:any)=>{sendApprove(false,participantDetail.participantID._id)}}
                       >Confirm</Button>
                   </AlertDialogAction>
               </AlertDialogFooter>
