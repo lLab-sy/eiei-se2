@@ -52,11 +52,11 @@ export default function MyPostContentDetail(){
             <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
             { userRole == "production professional" ? 
                 <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
-                    <TaskSubmissionContent
+                    {post?<TaskSubmissionContent
                     isOpen={isOpen}
                     setIsOpen={setIsOpen}
-                    username = {username}
-                    />
+                    postStatus={post.postStatus}
+                    />:<LinearProgress/>}
                 </div>
                 :
                 <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">

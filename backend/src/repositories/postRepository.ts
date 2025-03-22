@@ -1017,7 +1017,11 @@ class PostRepository {
             const post:IPost[]|null = await Post.find(
                 filter,
                 project
-            );
+            ).populate({path:"participants.offer.role"})
+            .populate({
+                path:"participants.participantID",
+                select:"username _id firstname middlename lastname"
+            });
 
             if (!post) {
                 throw new Error('Post or participant not found')
