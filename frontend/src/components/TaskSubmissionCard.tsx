@@ -33,7 +33,7 @@ export default function ProfessionalWorkingCard({workIter,isSend,isApprove,workT
             <p className="text-sm"> {latest&&isApprove?"complete":"in-progress"}</p>
         </div>
         <div className="col-span-2">
-            <p className=""> {workIter}/5</p>
+            <p className=""> {workIter+1}/3</p>
         </div>
         <div className="col-span-3">
             <p className=""> {new Date(workTime).toLocaleString("en-US", {
