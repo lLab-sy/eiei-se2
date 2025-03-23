@@ -8,16 +8,24 @@ let reviewSection: Locator
 Then("{string} should see {string} review section", async function(current:string,owner:string) {
     const page = customWorld.page
     if (page){
+        await page.waitForLoadState('domcontentloaded');
         switch (owner){
             case 'their own':
-                // await page.waitForURL('**/user-profile');
-                await page.waitForLoadState('domcontentloaded');
-                reviewSection = page.locator('div.rounded-lg.border.bg-card.text-card-foreground').nth(2)
-                expect(reviewSection).toContainText('Your Review');
-            case "producer's":
-                // await page.waitForURL('**/producer/**')
-                await page.waitForLoadState('domcontentloaded');
-                expect(page.getByRole('heading',{name: "Producer's Previously Received Reviews", exact: true})).not.toBeNull()
+                const reviewHeader = page.getByText('Your Review')
+                await expect(reviewHeader).toBeVisible();
+                reviewSection = page.locator('div.rounded-lg.border.bg-card.text-card-foreground').filter({has: reviewHeader}).first()
+                await expect(page.getByText('Your Review')).toBeVisible();
+            default:
+                let expectedtext: string = ""
+                switch(owner){
+                    case "producer's":
+                        expectedtext = "Producer's Previously Received Reviews"
+                    case "production professional's":
+                        expectedtext = "Previously Received Reviews"
+                    default:
+                        expectedtext = "Received Reviews"
+                }
+                expect(page.getByRole('heading',{name: expectedtext, exact: true})).not.toBeNull()
                 reviewSection = page.locator('div.h-full.overflow-y-auto.scroll-p-0');
                 await reviewSection.waitFor({timeout: 2000});
                 expect(reviewSection).not.toBeNull();
