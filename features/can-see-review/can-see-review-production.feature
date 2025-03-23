@@ -1,8 +1,12 @@
-@review
+@review @reviewpf
 Feature: Production Professional Can See Review on User Profile
     As a production professional
     I want to see user reviews
     So that I can see review from producer
+
+    As a production professional
+    I want to see producers' reviews
+    So that I can make informed decisions about whether to work with them
 
     Background:
         Given the "production professional" is logged in

@@ -17,7 +17,9 @@ Given('the producer has a target production professional and {string}', async fu
     const count = await professionals.count();
     await professionals.nth(Math.floor(Math.random() * count)).click()
     await page.waitForLoadState("domcontentloaded");
-    await page.getByText(action, {exact: true}).click();  
+    if (action !== "Does Nothing") {
+      await page.getByText(action, {exact: true}).click();  
+    }
   }
 });
 
