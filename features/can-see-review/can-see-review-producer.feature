@@ -13,3 +13,10 @@ Feature: Producer Can See Review on Production Professional Page
         Then "Producer" should see "production professional's" review section
         And I should see at least one review
         And the reviews should be displayed correctly
+
+    @pdcheckpfvoid
+    Scenario: Producer checks a Production Professional without rating score
+        When the producer has a target production professional that has no rating score
+        Then "Producer" should see "production professional's" review section
+        And I should not see any review
+        And the reviews should be empty
