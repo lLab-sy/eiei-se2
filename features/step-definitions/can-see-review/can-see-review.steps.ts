@@ -46,7 +46,6 @@ Then('I should see at least one review', async function () {
     const page = customWorld.page;
     if (page) {
         const reviewList = reviewSection.locator('div.flex.flex-col.p-3.my-2.w-\\[97\\%\\].bg-slate-50.rounded-lg');
-        reviewList.waitFor();
         expect(reviewList.nth(0)).not.toBeNull();
     }
   });
@@ -89,10 +88,12 @@ When('the producer has a target production professional that has {string} rating
     }
     await page.waitForLoadState("domcontentloaded");
     await page.getByRole('banner').getByRole('button').click();
-    await page.getByText("Search for Professionals").click();
+    await page.getByRole('link',{name:"Search for Professionals"}).click();
     await page.waitForLoadState("domcontentloaded");
+    console.log(await page.getByText(ratingText).allInnerTexts())
     const target = await page.locator('div.flex.flex-col.bg-white.rounded-2xl').filter({hasText: ratingText}).all()
-    await target[0].getByRole('link', {name:"View More"}).click();
+    console.log(await page.getByRole('link', {name: "View More"}).all())
+    await target[0].getByRole('link', {name: "View More"}).click();
   }
 })
 
