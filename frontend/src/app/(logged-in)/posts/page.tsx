@@ -161,7 +161,7 @@ const ProfessionalsPage = () => {
           onPageChange={handlePageChange}
         />
       </div>
-      <Footer />
+      {/* <Footer /> */}
       
     </div>
   );

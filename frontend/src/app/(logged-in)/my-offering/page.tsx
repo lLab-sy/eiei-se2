@@ -119,7 +119,7 @@ export default function OfferPage() {
     return result;
   };
   return (
-    <main className="h-[140vh] flex flex-col gap-3 relative">
+    <main className="min-h-screen h-[140vh] flex flex-col gap-3 relative">
       <div className="mt-20 gap-5 flex flex-col">
         <span className="text-5xl font-bold flex justify-center">
           My Offering

@@ -14,6 +14,10 @@ class PostController {
     try {
       //Handler Query
       const reqQuery= {...req.query}
+      if(req.query.postStatus && req.query.postStatus!=""){
+        let datas:string=req.query.postStatus as string
+        req.query.postStatus=datas.split(',')
+      }
       const removeFields=['select','sort']
       removeFields.forEach(param=> delete reqQuery[param])
       let queryStr=JSON.stringify(req.query);
@@ -169,7 +173,7 @@ class PostController {
       // if(!req.body.roleID || !req.body.productionProfessionalID || !req.body.price){
       //     sendResponse(res, 'error', 'Failed to deleted offer');
       // }
-      const offer = await postService.createOffer(req.body,req.body.postID,req.body.productionProfessionalID)
+      const offer = await postService.createOffer(req.body,req.body.postID,req.body.productionProfessionalID, myRole)
       sendResponse(res, 'success',offer, 'Successfully create offer');
     }catch(error){
       sendResponse(res, 'error', error, 'Failed to created offer');
@@ -559,15 +563,32 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
   }
   async changeParticipantStatus(req: AuthRequest, res: Response): Promise<void> {
     try{
-      console.log("1");
+      const roles = ["production professional", "producer"] as const;
+      type Role = (typeof roles)[number];
+      
+      const userId = req.user.userId? req.user.userId as string: false;
+      const userRole = req.user?.role;
+
+      if (!userId || !userRole || !roles.includes(userRole as Role)) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+      const role: Role = userRole as Role;
+
+      //professional check userId and participantId match
+      if(userRole === "production professional" &&  userId !== req.body.participantID) {
+        sendResponse(res, 'error', '', 'bad request', 400);
+        return
+      }
+      
       const dto = new ChangeParticipantStatusDTO(req.body);
-      console.log("2");
+      dto.actionBy = userId;
+      dto.role = role;
       const errors = await validate(dto);
       if (errors.length > 0) {
           sendResponse(res, 'error', errors, 'Invalid request body');
           return;
       }
-      console.log("3");
       await postService.changeParticipantStatus(dto);
       sendResponse(res, 'success', {}, 'Successfully changed participant status');
     }catch(error){

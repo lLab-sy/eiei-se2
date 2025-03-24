@@ -40,8 +40,8 @@ class PostService {
                 postImageDisplay:postImageDisplay as ImageDisplayDTO[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 participant: post.participants.map(participant => new ParticipantDetailDTO({
-                  participantID: (participant.participantID as any)._id.toString(),
-                  participantName: (participant.participantID as any).username,
+                  participantID: (participant.participantID as any)?._id.toString(),
+                  participantName: (participant.participantID as any)?.username,
                   status: participant.status,
                   // offer: participant.offer.map(offer => ({
                   //   role: offer.role.toString(), 
@@ -249,15 +249,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       throw new Error('Error in service layer: ' + error);
     }
   }
-  async createOffer(offerInput:ParticipantDetailDTO,postID:string,productionProfessionalID:string){
+  async createOffer(offerInput:ParticipantDetailDTO,postID:string,productionProfessionalID:string,myRole:string){
     try{
 
         //first find that have this production professional send offer to this first before
         const offerEvidence= await postRepository.checkProductionProInPost(postID,productionProfessionalID)
-        var offerModel:OfferDTO={
+        const offerModel:OfferDTO={
             price: offerInput.price,
             role: offerInput.roleID,
-            offeredBy: offerInput.offeredBy,
+            offeredBy: myRole=='producer'?1:0,
             createdAt: new Date() ,
             reason: offerInput.reason
         }
@@ -266,7 +266,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
         if(offerEvidence.length>0){
           response= await postRepository.addNewOffer(offerModel,postID,productionProfessionalID)
         }else{//Create New Object
-          var participantData= new ParticipantDetailDTO({
+          const participantData= new ParticipantDetailDTO({
             participantID: productionProfessionalID,
             status: 'in-progress',
             offer: [offerModel],
@@ -364,19 +364,20 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       var res;
         res = await postRepository.getOffer(offerRequest);
 
-      const resDTO = res.data.map((offer) => {
-        return new OfferResponseDTO({
-          _id: offer._id as string,
-          postName: offer.postName,
-          userName: offer._id as string,
-          roleName: offer.roleName, // Role offered to the participant
-          currentWage: offer.currentWage, // The amount offered for the role
-          reason: offer.reason,
-          offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
-          status: offer.status,
-          createdAt: offer.createdAt
-        })         
-      });
+        const resDTO = res.data.map((offer) => {
+          return new OfferResponseDTO({
+            _id: offer._id as string,
+            postName: offer.postName,
+            userName: offer._id as string,
+            roleName: offer.roleName, // Role offered to the participant
+            currentWage: offer.currentWage, // The amount offered for the role
+            reason: offer.reason,
+            offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
+            status: offer.status,
+            createdAt: offer.createdAt,
+            participantID : offer.participantID as string,
+          })
+        });
       const response: PaginatedResponseDTO<OfferResponseDTO> = {
         data: resDTO,
         meta: {

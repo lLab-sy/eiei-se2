@@ -170,7 +170,7 @@ const postSchema = new Schema<IPost>({
     },
     postStatus: {
         type: String,
-        enum: ['created', 'in-progress', 'success', 'cancel'],
+        enum: ['created', 'waiting', 'in-progress', 'success', 'cancel'],
         required: true,
     },
     startDate: {
@@ -226,6 +226,7 @@ export interface GetOfferRequestModel {
 }
 
 export interface OfferHistoryForGetOfferResponse {
+    participantID: string;
     _id: string;
     userName:string;
     postName: string;
