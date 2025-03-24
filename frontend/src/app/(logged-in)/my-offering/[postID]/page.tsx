@@ -937,7 +937,7 @@ export default function OfferPostContent() {
 
   // สำหรับ Producer - การตอบรับหรือปฏิเสธข้อเสนอ
   const handleAcceptOffer = (offerId: string) => {
-    console.log(`ตอบรับข้อเสนอ ${offerId}`);
+    // console.log(`ตอบรับข้อเสนอ ${offerId}`);
     // ทำการตอบรับข้อเสนอจริงๆ ควรเรียก API ที่เหมาะสม
 
     // อัพเดทข้อมูลของข้อเสนอในโหมดดูรายคน
@@ -959,7 +959,7 @@ export default function OfferPostContent() {
   };
 
   const handleRejectOffer = (offerId: string) => {
-    console.log(`ปฏิเสธข้อเสนอ ${offerId}`);
+    // console.log(`ปฏิเสธข้อเสนอ ${offerId}`);
     // ทำการปฏิเสธข้อเสนอจริงๆ ควรเรียก API ที่เหมาะสม
 
     // อัพเดทข้อมูลของข้อเสนอในโหมดดูรายคน
@@ -1012,7 +1012,7 @@ export default function OfferPostContent() {
       tmpselectedOfferProducer &&
       tmpselectedOfferProducer._id !== selectedOfferProducer?._id
     ) {
-      console.log("ChangPerson", tmpselectedOfferProducer);
+      // console.log("ChangPerson", tmpselectedOfferProducer);
       setSelectedOfferProducer(tmpselectedOfferProducer);
     }
   };

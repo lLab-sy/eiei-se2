@@ -281,7 +281,7 @@ export default function ProfessionalWorkingContent({postStatus, refreshPost}:{po
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction className="bg-maingreen" asChild>
-                                <Button onClick={() => handleStartProject(token ?? "")}>Confirm</Button>
+                                <Button disabled={participantsRight.length==0} onClick={() => handleStartProject(token ?? "")}>Confirm</Button>
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

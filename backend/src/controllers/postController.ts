@@ -14,6 +14,10 @@ class PostController {
     try {
       //Handler Query
       const reqQuery= {...req.query}
+      if(req.query.postStatus && req.query.postStatus!=""){
+        let datas:string=req.query.postStatus as string
+        req.query.postStatus=datas.split(',')
+      }
       const removeFields=['select','sort']
       removeFields.forEach(param=> delete reqQuery[param])
       let queryStr=JSON.stringify(req.query);
