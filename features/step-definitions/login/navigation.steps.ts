@@ -29,6 +29,7 @@ Given("the {string} is logged in", async function (role:string) {
     await page.getByRole('textbox', { name: 'username' }).fill(username);
     await page.getByRole('textbox', { name: 'password' }).fill(password);
     await page.getByRole('button', { name: 'Login'}).click()
+    await page.waitForURL("/",{waitUntil:'domcontentloaded'})
   }
 });
 

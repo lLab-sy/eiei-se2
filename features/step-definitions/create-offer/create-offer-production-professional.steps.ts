@@ -10,13 +10,14 @@ Given('the production professional has a target post and {string}', async functi
   if (page){
     await page.waitForLoadState("domcontentloaded");
     await page.getByRole('banner').getByRole('button').click();
-    await page.getByText("Search for Posts").click();
-    const posts = page.getByText("View More");
+    await page.getByRole('link',{name:"Search for Posts"}).click();
+    await page.waitForURL('**\/posts', {waitUntil:'domcontentloaded'})
+    const posts = page.getByRole('link',{name:"View More"});
     expect(posts).not.toBeNull();
     const count = await posts.count();
     await posts.nth(Math.floor(Math.random() * count)).click()
-    await page.waitForLoadState("domcontentloaded");
-    await page.getByText(action, {exact: true}).click();  
+    await page.waitForURL('**\/posts\/**', {waitUntil:'domcontentloaded'})
+    await page.getByRole('link',{name: action, exact: true}).click();  
     }
   }
 );
@@ -24,6 +25,7 @@ Given('the production professional has a target post and {string}', async functi
 Given('the production professional fills out the offer details', async function () {
   const page = customWorld.page;
   if (page){
+    await page.waitForURL('**\/create-offer\/**', {waitUntil:'domcontentloaded'})
     await page.getByRole('textbox', { name: 'description' }).fill('This should be how the description for any offer');
     await page.getByPlaceholder('200').fill('500');
     const roleBox = page.getByRole('combobox');
@@ -37,6 +39,7 @@ Given('the production professional fills out the offer details', async function 
 Given('the production professional does not fill out the price', async function () {
   const page = customWorld.page;
   if (page){
+    await page.waitForURL('**\/create-offer\/**', {waitUntil:'domcontentloaded'})
     await page.getByRole('textbox', { name: 'description' }).fill('This should be how the description for any offer');
     const roleBox = page.getByRole('combobox');
     await roleBox.click();
