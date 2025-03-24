@@ -2,7 +2,7 @@ import { LaunchOptions } from "@playwright/test";
 import { DotenvParseOutput, config as loadEnv } from "dotenv";
 
 const dotenvParseOutput: DotenvParseOutput | undefined = loadEnv({
-  path: ".env",
+  path: "features/.env",
 }).parsed;
 
 let slowMo: number = parseInt(

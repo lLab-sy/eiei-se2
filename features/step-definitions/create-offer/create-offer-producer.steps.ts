@@ -12,11 +12,13 @@ Given('the producer has a target production professional and {string}', async fu
     await page.getByRole('banner').getByRole('button').click();
     await page.getByText("Search for Professionals").click();
 
-    const professionals = page.getByText("View More");
+    await page.waitForURL('**\/professionals', {waitUntil:'domcontentloaded'})
+    const professionals = page.getByRole('link',{name:"View More"});
     expect(professionals).not.toBeNull();
     const count = await professionals.count();
     await professionals.nth(Math.floor(Math.random() * count)).click()
-    await page.waitForLoadState("domcontentloaded");
+
+    await page.waitForURL('**\/professionals\/**', {waitUntil:'domcontentloaded'})
     if (action !== "Does Nothing") {
       await page.getByText(action, {exact: true}).click();  
     }
@@ -26,6 +28,7 @@ Given('the producer has a target production professional and {string}', async fu
 Given('the producer has their own posts', async function () {
   const page = customWorld.page;
   if (page){
+    await page.waitForURL('**\/create-offer\/**', {waitUntil:'domcontentloaded'})
     const postBox = page.getByRole('combobox').nth(0);
     await postBox.click();
     const postOptions = page.getByRole('option');

@@ -8,23 +8,31 @@ let reviewSection: Locator
 Then("{string} should see {string} review section", async function(current:string,owner:string) {
     const page = customWorld.page
     if (page){
-        await page.waitForLoadState('domcontentloaded');
         switch (owner){
             case 'their own':
-                const reviewHeader = page.getByText('Your Review')
-                await expect(reviewHeader).toBeVisible();
-                reviewSection = page.locator('div.rounded-lg.border.bg-card.text-card-foreground').filter({has: reviewHeader}).first()
+                await page.waitForURL('**\/user-profile',{waitUntil: 'domcontentloaded'})
+                const reviewHeader = await page.getByText('Your Review').all()
+                expect(reviewHeader).not.toStrictEqual([]);
+                reviewSection = page.locator('div.rounded-lg.border').filter({has: reviewHeader[0]}).first()
+                //console.log('Find Review Section\n',await page.locator('div.rounded-lg.border.bg-card.text-card-foreground').filter({hasText: 'Your Review'}).all())
                 await expect(page.getByText('Your Review')).toBeVisible();
+                break;
             default:
                 let expectedtext: string = ""
+                let waitForURL:string = ''
                 switch(owner){
                     case "producer's":
                         expectedtext = "Producer's Previously Received Reviews"
+                        waitForURL = "**\/producer\/**"
+                        break
                     case "production professional's":
                         expectedtext = "Previously Received Reviews"
+                        waitForURL = "**\/professionals\/**"
+                        break
                     default:
                         expectedtext = "Received Reviews"
                 }
+                await page.waitForURL(waitForURL,{waitUntil:'domcontentloaded'})
                 expect(page.getByRole('heading',{name: expectedtext, exact: true})).not.toBeNull()
                 reviewSection = page.locator('div.h-full.overflow-y-auto.scroll-p-0');
                 await reviewSection.waitFor({timeout: 2000});
@@ -38,8 +46,7 @@ Then('I should see at least one review', async function () {
     const page = customWorld.page;
     if (page) {
         const reviewList = reviewSection.locator('div.flex.flex-col.p-3.my-2.w-\\[97\\%\\].bg-slate-50.rounded-lg');
-        reviewList.waitFor({timeout: 2000})
-        console.log(await reviewList.all())
+        reviewList.waitFor();
         expect(reviewList.nth(0)).not.toBeNull();
     }
   });
@@ -68,16 +75,24 @@ Then('I should see at least one review', async function () {
     }
   });
 
-When('the producer has a target production professional that has no rating score', async () => {
+When('the producer has a target production professional that has {string} rating score', async (rating:string) => {
   // Write code here that turns the phrase above into concrete actions
   const page = customWorld.page;
   if (page){
+    let ratingText: RegExp
+    switch (rating) {
+        case "no":
+            ratingText = /0\.0/
+            break
+        default:
+            ratingText = /(?!0\.0)\d\.\d/
+    }
     await page.waitForLoadState("domcontentloaded");
     await page.getByRole('banner').getByRole('button').click();
     await page.getByText("Search for Professionals").click();
     await page.waitForLoadState("domcontentloaded");
-    const zeroReviewed = page.locator('div.flex.flex-col.bg-white.rounded-2xl').filter({has: page.getByText('0.0')})
-    await zeroReviewed.getByText("View More").click();
+    const target = await page.locator('div.flex.flex-col.bg-white.rounded-2xl').filter({hasText: ratingText}).all()
+    await target[0].getByRole('link', {name:"View More"}).click();
   }
 })
 
@@ -86,7 +101,6 @@ Then('I should not see any review', async () => {
   const page = customWorld.page;
     if (page) {
         const reviewList = reviewSection.locator('div.flex.flex-col.p-3.my-2.w-\\[97\\%\\].bg-slate-50.rounded-lg');
-        console.log("REVIEW LIST",await reviewList.all(),'\n')
         expect(await reviewList.all()).toStrictEqual([])
         await expect(page.getByText('No Review',{exact: true})).toBeVisible();
     }
@@ -97,7 +111,6 @@ Then('the reviews should be empty', async () => {
     let numbers: string[]
     if (page)
     {
-        const ratingHash: Record<string, number> = {};
         numbers = (await reviewSection.locator('div.w-\\[60\\%\\].flex.flex-col').allInnerTexts())[0].split('\n');
         for (let i = 0; i < numbers.length; i += 2) {
             expect(numbers[i+1]).toStrictEqual('0')
