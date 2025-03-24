@@ -20,6 +20,7 @@ interface ICardProp {
   productionName: string;
   reviews: number;
   professionalImg: string;
+  offeredBy: number;
 }
 
 export default function ProducerWorkingCard({ 
@@ -36,6 +37,7 @@ export default function ProducerWorkingCard({
   const { data: session } = useSession();
   const token = session?.user?.token;
   const { toast } = useToast();
+  const fromWho = offer.offeredBy === 0 ? "Production Professional" : "Producer";
 
   function handleReject(): void {
     setOpen(false);
@@ -119,7 +121,7 @@ export default function ProducerWorkingCard({
               />
             </div>
               <div>
-                <p className="font-semibold">From: {offer.productionName}</p>
+                <p className="font-semibold">From: {fromWho}</p>
                 <p className="flex items-center gap-2 font-medium"><Star className="h-6 w-6 text-mainyellow fill-current" />{offer.reviews}</p>
               </div>
             </div>
@@ -137,8 +139,19 @@ export default function ProducerWorkingCard({
             </div>
           </div>
           <div className="flex justify-between p-4">
-            {offerStatus === "Pending" && <Button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleReject}>Reject Offer</Button>}
-            {offerStatus === "Pending" && <Button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleConfirm}>Confirm Offer</Button>}
+            {offerStatus === "Pending" && 
+              <Button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleReject}>
+                Reject Offer
+              </Button>}
+            {offerStatus === "Pending" && 
+              <Button className="bg-mainblue-light text-white px-4 py-2 rounded" onClick={handleReject}>
+                Counter Offer
+              </Button>}
+            {offerStatus === "Pending" && 
+              <Button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleConfirm}
+              disabled={fromWho === "Producer"}>
+                Confirm Offer
+              </Button>}
           </div>
 
           <DialogHeader>
