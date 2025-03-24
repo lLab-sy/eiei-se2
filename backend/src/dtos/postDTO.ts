@@ -246,7 +246,7 @@ export class PostDTO {
     @ApiProperty({ description: 'The status of the post', enum: ['created', 'in-progress', 'success', 'cancel'] })
     @IsString()
     @IsEnum(['created', 'in-progress', 'success', 'cancel'], { message: 'Status must be one of: created, in-progress, success, cancel' })
-    postStatus!: 'created' | 'in-progress' | 'success' | 'cancel';
+    postStatus!: 'created' | 'waiting' | 'in-progress' | 'success' | 'cancel';
 
     @ApiProperty({ description: 'The start date of the post' })
     @IsString()  

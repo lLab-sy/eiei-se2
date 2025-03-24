@@ -1068,13 +1068,11 @@ class PostRepository {
 
             // Find the participant in the post's participants array
             const participant = post.participants.find((p) => p.participantID.toString() === dto.participantID);
-
-            if (!participant) {
-                throw new Error('Participant not found');
-            }
-
-            if(participant.status !== 'in-progress'){
-                throw new Error('Participant is not in progress');
+            
+            switch(true) {
+                case !participant: throw new Error('Participant not found');break;
+                case participant && participant.status !== 'in-progress': throw new Error('Participant is not in progress');break;
+                case dto.statusToChange == 'candidate' && post.postStatus == 'created' : post.postStatus = 'waiting';break;
             }
 
             const latestOffer = participant.offer.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
