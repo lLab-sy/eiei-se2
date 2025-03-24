@@ -103,7 +103,7 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
               <AlertDialogTitle>Are You Sure to Request to fix Task</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="flex flex-col gap-2">
-                    <p className="text-black">Requesting a resubmission from ${participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}. ${participantDetail.participantID.username}  will need to make corrections and resubmit the work.</p>
+                    <p className="text-black">Requesting a resubmission from {participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}. {participantDetail.participantID.username}  will need to make corrections and resubmit the work.</p>
                     <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">Important: If revisions reach 0, the {participantDetail.participantID.username} will no longer to send and payment will be voided for all parties.</div>
                 </div>
               </AlertDialogDescription>

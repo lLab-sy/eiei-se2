@@ -30,6 +30,7 @@ export default function ProducerWorkingContent({
 
     const { data: session } = useSession();
     const token = session?.user?.token;
+    console.log("Offers 24/3/2568",offers)
 
     // Fetch professional data
     const fetchProfessionalData = async (id: string) => {
@@ -187,7 +188,8 @@ export default function ProducerWorkingContent({
                         description: offer.data.reason,
                         productionName: professionalMap.get(selectedProfessional)?.username || "",
                         reviews: professionalMap.get(selectedProfessional)?.avgRating || 0,
-                        professionalImg: professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png"
+                        professionalImg: professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png",
+                        offeredBy: Number(offer.data.offeredBy)
                     }}
                     onStatusChange={handleStatusChange}                 
                             />
