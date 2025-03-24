@@ -7,6 +7,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import patchChangeParticipantStatus from "@/libs/patchChangeParticipantStatus";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface ICardProp {
   id: string;
@@ -18,6 +19,7 @@ interface ICardProp {
   startDate: Date;
   description: string;
   productionName: string;
+  productionID: string;
   reviews: number;
   professionalImg: string;
   offeredBy: number;
@@ -32,11 +34,13 @@ export default function ProducerWorkingCard({
   onStatusChange: (participantID: string, status: string) => void
 }) {
   const [open, setOpen] = useState(false);
+  const [openCounter, setOpenCounter] = useState(false);
   const [offerStatus, setOfferStatus] = useState(offer.status);
 
   const { data: session } = useSession();
   const token = session?.user?.token;
   const { toast } = useToast();
+  const router = useRouter();
   const fromWho = offer.offeredBy === 0 ? "Production Professional" : "Producer";
 
   function handleReject(): void {
@@ -75,6 +79,20 @@ export default function ProducerWorkingCard({
     } else {
       console.error("Token is undefined");
     }
+  }
+
+  function handleCounter(): void {
+    setOpen(false);
+    setOpenCounter(true);
+  }
+
+  function handleCounterNo(): void {
+    setOpenCounter(false);
+  }
+
+  function handleCounterYes(): void {
+    setOpenCounter(false);
+    router.push(`/create-offer/${offer.productionID}`)
   }
 
   useEffect(() => {
@@ -144,7 +162,7 @@ export default function ProducerWorkingCard({
                 Reject Offer
               </Button>}
             {offerStatus === "Pending" && 
-              <Button className="bg-mainblue-light text-white px-4 py-2 rounded" onClick={handleReject}>
+              <Button className="bg-mainblue-light text-white px-4 py-2 rounded" onClick={handleCounter}>
                 Counter Offer
               </Button>}
             {offerStatus === "Pending" && 
@@ -162,6 +180,34 @@ export default function ProducerWorkingCard({
           
         </DialogContent>
       </Dialog>
+
+      <Dialog open={openCounter} onOpenChange={setOpenCounter}>
+        <DialogContent className="max-w-lg p-0 rounded-lg border shadow-lg overflow-hidden" >
+          
+          <div className="bg-blue-700 text-white p-4">
+            <h2 className="text-lg font-bold">Offer {offer.postName}</h2>
+            <p className="text-sm">Role: {offer.role}</p>
+          </div>
+          <div className="flex justify-between p-4"> You are about to be redirected to the Create Offer page. Are you sure? </div>
+          <div className="flex justify-between p-4">
+              <Button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleCounterNo}>
+                No
+              </Button>
+              <Button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleCounterYes}>
+                Yes
+              </Button>
+
+          </div>
+
+          <DialogHeader>
+            <DialogTitle>
+              <VisuallyHidden>Counter Offer</VisuallyHidden>
+            </DialogTitle>
+          </DialogHeader>
+          
+        </DialogContent>
+    </Dialog>
+
     </>
   );
 }
