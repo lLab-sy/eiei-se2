@@ -2,7 +2,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
     "@aws-sdk/s3-request-presigner": "^3.750.0",
-    "@cucumber/cucumber": "^11.2.0",
     "@playwright/test": "^1.51.1",
     "bcrypt": "^5.1.1",
     "chai": "^5.2.0",
@@ -14,6 +13,7 @@
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^11.2.0",
     "@types/aws-sdk": "^0.0.42",
     "@types/chai": "^5.2.0",
     "@types/multer": "^1.4.12",
