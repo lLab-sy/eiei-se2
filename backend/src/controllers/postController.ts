@@ -169,7 +169,7 @@ class PostController {
       // if(!req.body.roleID || !req.body.productionProfessionalID || !req.body.price){
       //     sendResponse(res, 'error', 'Failed to deleted offer');
       // }
-      const offer = await postService.createOffer(req.body,req.body.postID,req.body.productionProfessionalID)
+      const offer = await postService.createOffer(req.body,req.body.postID,req.body.productionProfessionalID, myRole)
       sendResponse(res, 'success',offer, 'Successfully create offer');
     }catch(error){
       sendResponse(res, 'error', error, 'Failed to created offer');
