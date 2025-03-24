@@ -186,6 +186,7 @@ export default function ProducerWorkingContent({
                         postName: index.toString(),
                         description: offer.data.reason,
                         productionName: professionalMap.get(selectedProfessional)?.username || "",
+                        productionID:  professionalMap.get(selectedProfessional)?._id || "",
                         reviews: professionalMap.get(selectedProfessional)?.avgRating || 0,
                         professionalImg: professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png"
                     }}
