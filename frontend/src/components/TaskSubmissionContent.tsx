@@ -105,7 +105,7 @@ export default function TaskSubmissionContent({isOpen,
                         </div>
                     </div>
                     <div className="overflow-y-auto h-full max-h-[450px] m-auto bg-slate-400">
-                    {participantsRight && participantsRight.submissions && (participantsRight.submissions?.length-1)>0 ? (
+                    {participantsRight && participantsRight.submissions && (participantsRight.submissions?.length-1)>=0 ? (
                         participantsRight.submissions.map((eachData, index) => (
                             <TaskSubmissionCard 
                                 key={index} 
@@ -126,9 +126,9 @@ export default function TaskSubmissionContent({isOpen,
                 </div>
             </div>
             <div className="flex absolute justify-end bottom-2 right-5">
-            {!participantsRight?.isSend && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>0 && <Button onClick={()=>setIsOpen(true)}>
+            {!participantsRight?.isSend && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>0 ? <Button onClick={()=>setIsOpen(true)}>
                     Submit new task
-                </Button>}
+                </Button>:""}
             </div>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent className="sm:max-w-lg">
