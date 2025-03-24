@@ -58,6 +58,14 @@ export interface OfferDetailDTO{
 export class ChangeParticipantStatusDTO {
     @IsMongoId()
     @IsNotEmpty()
+    actionBy!: string;
+
+    @IsEnum(['production professional', 'producer'])
+    @IsNotEmpty()
+    role!: 'production professional' | 'producer';
+
+    @IsMongoId()
+    @IsNotEmpty()
     postID!: string;
 
     @IsMongoId()
@@ -364,6 +372,7 @@ export class OfferResponseDTO {
     offeredBy!: number; // User ID should be better than 0/1 ?
     status!: string;
     createdAt!: Date;
+    participantID?: string;
     constructor(
         init : {_id: string,
         postName: string,
@@ -373,6 +382,7 @@ export class OfferResponseDTO {
         userName:string,
         offeredBy: number,
         status: string,
+        participantID?: string,
         createdAt: Date}
       ) {
         this._id = init._id;
@@ -384,6 +394,8 @@ export class OfferResponseDTO {
         this.offeredBy = init.offeredBy;
         this.status = init.status;
         this.createdAt = init.createdAt;
+        this.participantID = init.participantID;
+
       }
 }
 

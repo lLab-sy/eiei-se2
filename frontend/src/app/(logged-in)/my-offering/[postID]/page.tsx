@@ -315,6 +315,47 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
   );
 };
 
+        <p
+            className={`text-sm w-full m-auto text-end font-semibold ${
+                post.postStatus === "created" ? "text-mainblue-light" : 
+                post.postStatus === "waiting" ? "text-mainblue-dark" : 
+                post.postStatus === "in-progress" ? "text-mainyellow" : 
+                post.postStatus === "success" ? "text-green-500" : "text-gray-500"
+            }`}
+            >
+            Status: {post.postStatus}
+        </p>
+
+        <Carousel className="col-span-2 w-full h-[40%] flex-auto">
+                <CarouselContent>
+                    {post?.postImageDisplay.map((image, index) => (
+                    <CarouselItem key={index}>
+                        <Card className="relative w-full aspect-video">
+                            <Image
+                            src={image.imageURL}
+                            alt={`Project Image ${index + 1}`}
+                            fill
+                            className="object-cover rounded-lg w-full h-full"
+                            />
+                        </Card>
+                    </CarouselItem>
+                    ))}
+                </CarouselContent>
+                {/* <CarouselPrevious className="left-2" /> */}
+                {/* <CarouselNext className="right-2" /> */}
+        </Carousel>
+
+        <Separator className="mt-5 col-span-2 h-1" />
+        <div className="col-span-2 p-6 mt-4 rounded-lg h-[20%] ">
+          <span className="text-xl font-bold ">Post Description</span>
+          <div className="mt-2 w-full border max-h-[150px] rounded-xl bg-slate-50 overflow-auto p-3">
+            {post.postDescription}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 export default function OfferPostContent() {
   const user: any = useSelector<RootState>((state) => state.user.user);
   console.log('userDataOffer', user)
@@ -872,7 +913,7 @@ useEffect(() => {
       <div className="relative mt-20 flex flex-row gap-5 item-baseline w-full h-full">
         <div className="w-[50%] flex justify-center items-center h-[800px]">
           {/* ใช้ PostDetail component */}
-          {postState && <MyPostDetail post={postState} />}
+          {postState && (userRole == 'producer') ? <MyPostDetail post={postState} /> : <ProductionPostDetail post={postState}/>}
         </div>
 
         <div className="relative w-[44%] shadow-md h-[720px] rounded-lg">

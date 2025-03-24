@@ -364,19 +364,20 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       var res;
         res = await postRepository.getOffer(offerRequest);
 
-      const resDTO = res.data.map((offer) => {
-        return new OfferResponseDTO({
-          _id: offer._id as string,
-          postName: offer.postName,
-          userName: offer._id as string,
-          roleName: offer.roleName, // Role offered to the participant
-          currentWage: offer.currentWage, // The amount offered for the role
-          reason: offer.reason,
-          offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
-          status: offer.status,
-          createdAt: offer.createdAt
-        })         
-      });
+        const resDTO = res.data.map((offer) => {
+          return new OfferResponseDTO({
+            _id: offer._id as string,
+            postName: offer.postName,
+            userName: offer._id as string,
+            roleName: offer.roleName, // Role offered to the participant
+            currentWage: offer.currentWage, // The amount offered for the role
+            reason: offer.reason,
+            offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
+            status: offer.status,
+            createdAt: offer.createdAt,
+            participantID : offer.participantID as string,
+          })
+        });
       const response: PaginatedResponseDTO<OfferResponseDTO> = {
         data: resDTO,
         meta: {

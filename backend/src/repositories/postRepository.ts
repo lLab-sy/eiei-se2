@@ -667,8 +667,9 @@ class PostRepository {
                     },
                     currentWage: '$participants.offer.price',
                     reason: '$participants.offer.reason',
-                    offeredBy: '$participants.offer.offerBy',
+                    offeredBy: '$participants.offer.offeredBy',
                     status: "$participants.status",
+                    participantID: '$participants.participantID',
                     createdAt: '$participants.offer.createdAt'
                   }
             }
@@ -683,7 +684,8 @@ class PostRepository {
                     reason: 1,
                     offeredBy: 1,
                     status:1,
-                    createdAt: 1
+                    createdAt: 1,
+                    participantID: 1,
                   }
             }
             pipeline.push(projectStage);
@@ -1059,6 +1061,11 @@ class PostRepository {
                 throw new Error(`Post with ID ${dto.postID} not found`);
             }
 
+            // Check producerId to matach with userID from post
+            if(dto.role === 'producer' && post.userID.toString() !== dto.actionBy){
+                throw new Error(`You do not have permission to access or modify this post(Post ID: ${dto.postID})`);
+            }
+
             // Find the participant in the post's participants array
             const participant = post.participants.find((p) => p.participantID.toString() === dto.participantID);
 
@@ -1068,6 +1075,16 @@ class PostRepository {
 
             if(participant.status !== 'in-progress'){
                 throw new Error('Participant is not in progress');
+            }
+
+            const latestOffer = participant.offer.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+            if (!latestOffer) {
+                throw new Error('No offers found for this participant');
+            }
+
+            if ((latestOffer.offeredBy === (dto.role === "producer"? 1:0)) && dto.statusToChange === "candidate") {
+                throw new Error("Cannot confirm offer which is created by yourself");
             }
 
             participant.status = dto.statusToChange;
