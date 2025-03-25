@@ -69,7 +69,7 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
             <p className="">{participantDetail.offer[participantDetail.offer.length - 1].role.roleName}</p>
         </div>
         <div className="col-span-2">
-            <p className="text-sm">{participantDetail.isSend?"Sent":"In-Progress"}</p>
+            <p className="text-sm">{participantDetail.isApprove?"Approved" : (participantDetail.isSend?"Sent":"In-Progress")}</p>
         </div>
         <div className="col-span-2 space-x-1">
         {/* แล้วต่อไปต้องมี isSend ด้วย */}
