@@ -724,14 +724,21 @@ class PostRepository {
             const { userId, postStatus, limit, page, postMediaTypes, searchText,participantStatus  } = getPostByProfReq;
             const objectId = new mongoose.Types.ObjectId(userId);
 
-            const postStatusMatchStage: PipelineStage.Match = {
-                $match: {
-                  ...(postStatus && { postStatus }),
-                },
-            };
+            // const postStatusMatchStage: PipelineStage.Match = {
+            //     $match: {
+            //       ...(postStatus && { postStatus }),
+            //     },
+            // };
             
-            const pipeline: PipelineStage[] = [postStatusMatchStage];
-
+            // const pipeline: PipelineStage[] = [postStatusMatchStage];
+            const pipeline: PipelineStage[] = [];
+            if (postStatus?.length) {
+                pipeline.push({
+                    $match: {
+                        postStatus: { $in: postStatus}
+                    }
+                })
+            }
             const matchStage1: PipelineStage.Match ={
                 $match: {
                       'participants.participantID': objectId

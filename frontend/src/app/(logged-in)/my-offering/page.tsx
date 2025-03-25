@@ -51,7 +51,7 @@ export default function OfferPage() {
         if (userRole === "producer") {
           response = await getPostUser(userID); // ดึงโพสต์ของ producer
         } else if (userRole === "production professional") {
-          const postStatus = "created";
+          const postStatus = "created,waiting";
           const query = `?postStatus=${postStatus}&limit=10&page=1`;
           const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/user/prof${query}`;
           const res = await axios.get(apiUrl, {

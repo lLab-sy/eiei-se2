@@ -435,7 +435,7 @@ export class GetPostByProfDTO {
 
     @ApiProperty({ description: 'The status of post', type: String })
     @IsString()  
-    postStatus!: string;
+    postStatus!: string[];
 
     @ApiProperty({ description: 'The status of participant', type: String })
     @IsString()  
