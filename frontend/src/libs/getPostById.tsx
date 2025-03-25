@@ -30,7 +30,7 @@ export default async function getPostById(
   postId: string,
   token: string
 ){
-  console.log(postId,token)
+  // console.log(postId,token)
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
 
   try {

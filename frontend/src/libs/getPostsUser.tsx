@@ -1,6 +1,10 @@
 import axios from "axios"
-export default async function getPostUser(userID:string){ //Producer can only use
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts?userID=${userID}`
+export default async function getPostUser(userID:string,status?:boolean){ //Producer can only use
+    let offerDo="";
+    if(status){
+        offerDo="&postStatus=created,waiting"
+    }
+    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts?userID=${userID}`+offerDo
     console.log(apiUrl)
     try{
         const response= await axios.get(apiUrl)

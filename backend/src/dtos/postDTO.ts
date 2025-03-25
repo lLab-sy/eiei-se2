@@ -1,6 +1,6 @@
-import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject, IsMongoId, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectId } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 import { PostRoleDTO } from './postRoleDTO';
 class PostProjectRoleDTO {
     @ApiProperty({ description: 'Role ID', type: String })
@@ -81,6 +81,18 @@ export class ChangeParticipantStatusDTO {
     }
 }
 
+export class SendApproveRequest {
+    @IsNotEmpty()
+    @IsString()
+    postId!: string;
+
+    @IsString()
+    userId: string = '';
+
+    @IsBoolean()
+    isApprove: boolean = false;
+}
+
 export class ParticipantDetailDTO {  
     @ApiProperty({ description: 'Unique identifier of the participant', type: String })
     @IsString()
@@ -108,6 +120,22 @@ export class ParticipantDetailDTO {
     offeredBy!: number;
 
     offer!: OfferDTO[]; // Array of offers received by the participant
+
+
+    @IsNumber()
+    @IsNotEmpty()
+    workQuota!: number;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    isSend!: boolean;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    isApprove!: boolean;
+
+    @IsArray()
+    submissions!: Date[];
 
     @ApiProperty({ description: 'Participant rating score', type: Number })
     @IsNumber()
@@ -407,7 +435,11 @@ export class GetPostByProfDTO {
 
     @ApiProperty({ description: 'The status of post', type: String })
     @IsString()  
-    postStatus!: string;
+    postStatus!: string[];
+
+    @ApiProperty({ description: 'The status of participant', type: String })
+    @IsString()  
+    participantStatus!:string
 
     @ApiProperty({ description: 'The number of post per page' })
     @IsNumber()  

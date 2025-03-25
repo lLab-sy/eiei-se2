@@ -102,7 +102,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
   const offerDate = new Date(offer.createdAt)
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
   const {data : session} = useSession()
-  console.log('sessionDataInConfirmOffer', session)
+  // console.log('sessionDataInConfirmOffer', session)
   const userId = session?.user?.id ?? ""
   const handleStatusChange = async (status : StatusChangeType) => {
     const body = {
@@ -110,7 +110,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
       participantID : offer.participantID,
       statusToChange : status
     }
-    console.log('body', body)
+    // console.log('body', body)
     const res = await axios.patch(apiUrl, body, {
       withCredentials: true,
       headers : {
@@ -164,7 +164,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     setLoading(true)
     const res = await handleStatusChange((isConfirm) ? StatusChangeType.Candidate : StatusChangeType.Reject)
     const updateOfferRes = await handleFetch(userId)
-    console.log('updatedOfferRes', updateOfferRes)
+    // console.log('updatedOfferRes', updateOfferRes)
     const offerArray : Array<historyStateInterface> = updateOfferRes?.data?.data?.data
     if(res?.data?.status !== 'success'){
       toast({
@@ -178,7 +178,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     if(offerArray.length > 0){
       setOfferStatus(offerArray[0]?.status ?? "")
     }
-    console.log('resOfferStatusConfirm', res)
+    // console.log('resOfferStatusConfirm', res)
     setOpen(false)
     setTextState('')
     setCheckboxState(false)
@@ -198,8 +198,9 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     const user = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`)
     setTextState(""); setCanConfirm(false); setIsChanged(0); setCheckboxState(false)
     const data : userReturn = user.data.data
+    // console.log("offer paticipant",offer)
     console.log('getUserDialog', data)
-    const count = data.rating.length
+    const count = data?.rating?.length??0
     let sumRating = 0
     
     for(const object of data.rating){
@@ -219,9 +220,9 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
   const [checkboxState, setCheckboxState] = useState(false)
   const offerRole = (offer.offeredBy == 1 ? "producer" : "production professional")
   const canOffer = (offer.offeredBy == 1 ? "producer" : "production professional") !== session?.user.role
-  console.log('offer rolename', offerRole)
-  console.log('session role', session?.user.role)
-  console.log("canOFfer",canOffer)
+  // console.log('offer rolename', offerRole)
+  // console.log('session role', session?.user.role)
+  // console.log("canOFfer",canOffer)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -358,7 +359,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
 // }
 export default function OfferPostContent() {
   const user: any = useSelector<RootState>((state) => state.user.user);
-  console.log('userDataOffer', user)
+  // console.log('userDataOffer', user)
   const { data: session } = useSession();
   const { postID }: { postID: string } = useParams();
   const router = useRouter();
@@ -639,12 +640,12 @@ useEffect(() => {
       let response;
       let response2;
       if (userRole === "producer") {
-        console.log('userRole1', userRole)
+        // console.log('userRole1', userRole)
         response2 = await getPostById(postID,token ?? "") 
         setPostState(response2)
         response = await getPrudcerOffers(token ?? "",postID); // ดึงโพสต์ของ producer
         setProducerOffers(response)
-        console.log(response2);
+        // console.log(response2);
         // console.log("PRODUCER BY",response)
       } else if (userRole === "production professional") {
         const handleFetch = async (postID: string) => {
@@ -714,14 +715,14 @@ useEffect(() => {
   };
 
   const userId = user?._id ?? "";
-  console.log('offerArray', offerArray)
+  // console.log('offerArray', offerArray)
   useEffect(() => {
     // สมมติว่าเราดึงบทบาทของผู้ใช้จาก session หรือ Redux store
-    console.log("sessionMyOffer", session);
+    // console.log("sessionMyOffer", session);
     const role = session?.user?.role; // สมมติว่าเป็น producer ในตัวอย่างนี้
 
     setUserRole(role as "producer" | "production professional");
-    console.log("userRoleAfter", userRole);
+    // console.log("userRoleAfter", userRole);
     if (role === "producer") {
       // เลือก professional คนแรกโดยค่าเริ่มต้น (ถ้ามี)
       if (professionals.length > 0) {
@@ -828,7 +829,7 @@ useEffect(() => {
 
   // สำหรับ Producer - การตอบรับหรือปฏิเสธข้อเสนอ
   const handleAcceptOffer = (offerId: string) => {
-    console.log(`ตอบรับข้อเสนอ ${offerId}`);
+    // console.log(`ตอบรับข้อเสนอ ${offerId}`);
     // ทำการตอบรับข้อเสนอจริงๆ ควรเรียก API ที่เหมาะสม
 
     // อัพเดทข้อมูลของข้อเสนอในโหมดดูรายคน
@@ -850,7 +851,7 @@ useEffect(() => {
   };
 
   const handleRejectOffer = (offerId: string) => {
-    console.log(`ปฏิเสธข้อเสนอ ${offerId}`);
+    // console.log(`ปฏิเสธข้อเสนอ ${offerId}`);
     // ทำการปฏิเสธข้อเสนอจริงๆ ควรเรียก API ที่เหมาะสม
 
     // อัพเดทข้อมูลของข้อเสนอในโหมดดูรายคน
@@ -903,13 +904,13 @@ useEffect(() => {
       tmpselectedOfferProducer &&
       tmpselectedOfferProducer._id !== selectedOfferProducer?._id
     ) {
-      console.log("ChangPerson", tmpselectedOfferProducer);
+      // console.log("ChangPerson", tmpselectedOfferProducer);
       setSelectedOfferProducer(tmpselectedOfferProducer);
     }
   };
 
   return (
-    <main className="flex flex-col h-[100vh] gap-3 mb-5 relative">
+    <main className="flex flex-col h-[130vh] gap-3 mb-5 relative">
       <div className="relative mt-20 flex flex-row gap-5 item-baseline w-full h-full">
         <div className="w-[50%] flex justify-center items-center h-[800px]">
           {/* ใช้ PostDetail component */}

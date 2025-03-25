@@ -245,11 +245,12 @@ export interface GetOfferResponse {
 
 export interface GetPostByProfRequestModel {
     userId: string;
-    postStatus: string;
+    postStatus: string[];
     limit: number;
     page: number;
     postMediaTypes: string[];
     searchText: string;
+    participantStatus:string;
 }
 
 export interface GetPostByProducerRequestModel {
@@ -261,6 +262,11 @@ export interface GetPostByProducerRequestModel {
     searchText: string;
 }
 
+export interface SendApproveRequestModel {
+    postId: string;
+    userId: string;
+    isApprove: boolean;
+}
 
 export interface GetPostByProfResponse {
     data: IPost[];

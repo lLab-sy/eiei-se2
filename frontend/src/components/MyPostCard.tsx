@@ -39,6 +39,11 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
       })
     : "N/A";
     
+    const date2: Date = new Date();
+    const date1: Date = new Date(postDetail.endDate??"");
+    const diffTime: number = date2.getTime() - date1.getTime();
+    const diffDays: number = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
      async function onSubmit(values: z.infer<typeof formSchema>) {
         if (values.comment.length < 10) {
           toast({
@@ -63,7 +68,7 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
         ? postDetail.postImages[0]
         : "image/logo.png";
     return(
-        <div className=" bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.01] h-[144px] w-[450px] p-2">
+        <div className=" bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.01] h-[144px] w-[400px] p-2">
             <div className="grid grid-cols-7 gap-2 w-[100%] h-full">
                 <div className="col-span-4 rounded-lg overflow-hidden w-[100%] relative">
                     <Image
@@ -90,8 +95,10 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
                           ? "During Develop"
                           : postDetail.postStatus === "created"
                           ? "Wait"
+                          : postDetail.postStatus === "waiting"
+                          ? "Wait"
                           : postDetail.postStatus==="success"
-                          ? `EndDate: ${displayDate}`
+                          ? `EndDate:  ${diffDays == 0 ? `Today` : `${diffDays} day ago`}`
                           : `-`}
                             </p>
                         </div>
@@ -109,6 +116,8 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
                             {postDetail.postStatus === "in-progress"
                           ? "During Develop"
                           : postDetail.postStatus === "created"
+                          ? "Wait"
+                          : postDetail.postStatus === "waiting"
                           ? "Wait"
                           : postDetail.postStatus==="success"
                           ? `EndDate: ${displayDate}`

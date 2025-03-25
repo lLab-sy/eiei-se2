@@ -2,7 +2,7 @@
 
 import { Switch } from "./ui/switch";
 
-export default function ProfessionalWorkingCard(){ 
+export default function ProfessionalWorkingCard({workIter,isSend,isApprove,workTime,latest}:{workIter:number,isSend:boolean,isApprove:boolean,workTime:Date,latest:boolean}){ 
 //   const offerDate = new Date(data.createdAt);
 //   const displayDate = offerDate.toLocaleString("en-US", {
 //     year: "numeric",
@@ -30,13 +30,13 @@ export default function ProfessionalWorkingCard(){
   return (
     <div className="w-full grid grid-cols-7 bg-slate-400 m-auto text-sm my-2 p-5 font-medium text-center whitespace-normal break-words h-[30px] items-center content-center">
         <div className="col-span-2">
-            <p className="text-sm">In-Progress</p>
+            <p className="text-sm"> {latest&&isApprove?"complete":"in-progress"}</p>
         </div>
         <div className="col-span-2">
-            <p className=""> 0/5</p>
+            <p className=""> {workIter+1}/3</p>
         </div>
         <div className="col-span-3">
-            <p className=""> {new Date().toLocaleString("en-US", {
+            <p className=""> {new Date(workTime).toLocaleString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",

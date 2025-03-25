@@ -25,7 +25,7 @@ export default function MyPostDetail({post}:{post:PostData}) {
             <p className="text-md w-full m-auto font-bold col-span-1 h-[20%]">Post {post.postName}</p>
         </div>
 
-        <p
+        <p data-test-id="post-status"
             className={`text-sm w-full m-auto text-end font-semibold ${
                 post.postStatus === "created" ? "text-mainblue-light" : 
                 post.postStatus === "waiting" ? "text-mainblue-dark" : 
