@@ -99,14 +99,12 @@ export default function ProducerWorkingContent({
         setSelectedProfessional(profID);
 
         let professionalOffers: IOfferData[] = [];
-
+        let filtterRoleOffers: IOfferData[] = [];
         participants.forEach((p) => {
             if(p.participantID === profID){ // same person
                 for(let i = 0; i < p.offer.length; ++i){
                     const o : OfferData = p.offer[i];
-                    if (o.role === selectedRole) { // same offer
-                        professionalOffers.push({ data: o, status: p.status });
-                    }
+                    professionalOffers.push({ data: o, status: p.status });
                 }
             }
         });
@@ -118,10 +116,12 @@ export default function ProducerWorkingContent({
         // recompute status
         for(let i = 0; i < professionalOffers.length; ++i){
             const status = professionalOffers[i].status;
-            professionalOffers[i].status = (i != 0 || status === "reject" ? "Rejected" : (status === "candidate" ? "Completed" : "Pending"));
+            if (professionalOffers[i].data.role === selectedRole) { // same offer
+                filtterRoleOffers.push({data: professionalOffers[i].data, status: (i != 0 || status === "reject" ? "Rejected" : (status === "candidate" ? "Completed" : "Pending"))})
+            }
         }
 
-        setOffers(professionalOffers);
+        setOffers(filtterRoleOffers);
     }
 
     function handleStatusChange(participantID: string, status: string): void {
