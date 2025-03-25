@@ -245,7 +245,7 @@ export interface GetOfferResponse {
 
 export interface GetPostByProfRequestModel {
     userId: string;
-    postStatus: string;
+    postStatus: string[];
     limit: number;
     page: number;
     postMediaTypes: string[];

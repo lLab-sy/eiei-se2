@@ -295,6 +295,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
 
   async getPostsByProf(req: AuthRequest, res: Response): Promise<void> {
     try {
+      // 
       const role=req.user.role
       if(role!="production professional"){
         sendResponse(res, 'error', "", `unauthorized`, 400);
@@ -310,18 +311,25 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
         return
       }
       
-      let postStatus;
+      let postStatus:string[]=[];
       if (!req.query.postStatus){
-        postStatus = '';
+          postStatus = [];
       }else{
-        if(!status.includes(req.query.postStatus as string)){
-          sendResponse(res, 'error', '', 'bad request', 400)
-          return;
-        }else{
-          postStatus = req.query.postStatus as string
-        }
+          let postStatusString=req.query.postStatus as string
+          postStatus = postStatusString.split(",") as string []
+          if(postStatus.length>5){
+             sendResponse(res, 'error', '', 'bad request', 400)
+             return;
+          }
+          status.map((eachStatus)=>{
+            if(!status.includes(eachStatus as string)){
+              sendResponse(res, 'error', '', 'bad request', 400)
+              return;
+            }
+          })
           
       }
+      console.log("postStatusssssssssssssssssssssssssssss",postStatus)
 
       let postMediaTypes:string[]=[];
       if(postMediaTypesString && postMediaTypesString!=""){
@@ -341,12 +349,11 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
         }
           
       }
-
       const getPostByProfDTO: GetPostByProfDTO = {
         page: page,
         limit: limit,
         userId: userId,
-        postStatus: postStatus as string,
+        postStatus: postStatus as string[],
         participantStatus: participantStatus as string,
         postMediaTypes: Array.isArray(postMediaTypes)?postMediaTypes: postMediaTypes? [postMediaTypes]: postMediaTypes,
         searchText: req.query.searchText? req.query.searchText as string: '',

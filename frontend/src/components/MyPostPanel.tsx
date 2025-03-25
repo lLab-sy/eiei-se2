@@ -23,7 +23,8 @@ export default function MyPostPanel(){
       const [PostsCurrentPage, setPostsCurrentPage] = useState<PostData[]|null>(null)  //Post That In one Page
       const [currentPage, setCurrentPage] = useState(1); //In Page ... (number)
       const [totalPages, setTotalPages] = useState(1); //All Page (What it contain)
-      const [requestPage, setRequestPage] = useState("limit="+PAGE_SIZE.toString()+"&page=1&postStatus=created"); //Case of Change PAGE
+      const initState= userRole==="producer"?"created":"waiting";
+      const [requestPage, setRequestPage] = useState("limit="+PAGE_SIZE.toString()+"&page=1&postStatus="+initState); //Case of Change PAGE
       const [requestFilter, setRequestFilter] = useState("");
       const [dataResponse,setDataResponse]= useState<SearchPosts|null>(null);
       

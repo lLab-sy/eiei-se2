@@ -27,7 +27,7 @@ export default function OfferPage() {
     return <>Unautorize</>;
   }
 
-  console.log(session);
+  // console.log(session);
 
   //----------------------------------------------------------------
   // useEffect(() => {
@@ -52,7 +52,7 @@ export default function OfferPage() {
         if (userRole === "producer") {
           response = await getPostUser(userID); // ดึงโพสต์ของ producer
         } else if (userRole === "production professional") {
-          const postStatus = "created";
+          const postStatus = "created,waiting";
           const query = `?postStatus=${postStatus}&limit=10&page=1`;
           const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/user/prof${query}`;
           const res = await axios.get(apiUrl, {
@@ -64,7 +64,7 @@ export default function OfferPage() {
           response = res?.data?.data?.data;
         }
 
-        console.log("response", response);
+        console.log("response offer prof", response);
         setPostArray(response);
       } catch (err) {
         setError("Failed to load posts. Please try again later.");
@@ -74,8 +74,8 @@ export default function OfferPage() {
   }, [userID, userRole]); // ใช้ pid และ token ใน dependency array
 
   const userData: any = useSelector<RootState>((state) => state.user.user);
-  console.log("userDataPostHistory", userData);
-  console.log("postArrayData", postArray);
+  // console.log("userDataPostHistory", userData);
+  // console.log("postArrayData", postArray);
   const router = useRouter();
   const handleChangePage = (postID: string) => {
     router.push(`/my-offering/${postID}`);

@@ -13,12 +13,15 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
+import { useSession } from "next-auth/react";
 // 
 interface SearchPostBarProps {
   onSearch: (filter: string) => void;
 }
 
 const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
+  const { data: session } = useSession();
+  const userRole=session?.user.role
   const [openType, setOpenType] = useState("");
   const [text, setText] = useState("");
 
@@ -26,7 +29,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
 
   const [selectedMedia, setSelectedMedia] = useState<MediaType[]>([]);
   const [selectedRole, setSelectedRole] = useState<RoleType[]>([]);
-  const [selectPostStatus,setSelectPostStatus]=useState<string>("created")
+  const [selectPostStatus,setSelectPostStatus]=useState<string>(userRole==="producer"?"created":"waiting")
 
   const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
 //   const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
@@ -175,9 +178,9 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value={"created"}>
+              {userRole === "producer" && <SelectItem value={"created"}>
                     Created
-                </SelectItem>
+                </SelectItem>}
                 <SelectItem value={"waiting"}>
                     Waiting
                 </SelectItem>
