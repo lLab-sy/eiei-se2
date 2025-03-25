@@ -30,7 +30,6 @@ export default function ProducerWorkingContent({
 
     const { data: session } = useSession();
     const token = session?.user?.token;
-    console.log("Offers 24/3/2568",offers)
 
     // Fetch professional data
     const fetchProfessionalData = async (id: string) => {
@@ -112,6 +111,10 @@ export default function ProducerWorkingContent({
             }
         });
 
+        professionalOffers.sort((a, b) => {
+            return new Date(b.data.createdAt).getTime() - new Date(a.data.createdAt).getTime();
+        });
+             
         setOffers(professionalOffers);
     }
 
