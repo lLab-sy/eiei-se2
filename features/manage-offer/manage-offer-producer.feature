@@ -11,30 +11,32 @@ Feature: Producer Reject or Confirm offers from Production Professional
     Background:
         Given the "producer" is logged in
         And I visit "My Offering"
-        And choose a post to view offerings
-        # And choose a post named "my new post action 2"
 
     @pdconfirmoffer
     Scenario: Producer confirms offer from Production Professional
-        Given the producer choose a "Pending" offer
+        Given choose a post named "Post with Offer From PF to PD"
+        And the producer choose a "Pending" offer
         When the producer confirms the offer
         Then the producer's offer status is changed to "Completed"
     
-    @pdrejectoffer
-    Scenario: Producer rejects offer from Production Professional
-        Given the producer choose a "Pending" offer
-        When the producer rejects the offer
-        Then the producer's offer status is changed to "Rejected"
-
     @pdcounteroffer
-    Scenario: Producer propose a counteroffer to the Producer
-        Given the producer choose a "Pending" offer
+    Scenario: Producer propose a counteroffer to the Production Professional
+        Given choose a post named "Post with Offer From PF to PD 2"
+        And the producer choose a "Pending" offer
         When the producer wants to create a counteroffer
         Then the producer should be redirected to "create-offer" page
 
+    @pdrejectoffer
+    Scenario: Producer rejects offer from Production Professional
+        Given choose a post named "Post with Offer From PF to PD 2"
+        And the producer choose a "Pending" offer
+        When the producer rejects the offer
+        Then the producer's offer status is changed to "Rejected"
+
     @pdconfirmselfoffer
     Scenario: Producer tries to confirm their own offer
-        Given the producer choose a "Pending" offer
+        Given choose a post named "Post with Offer From PD to PF"
+        And the producer choose a "Pending" offer
         And the offer owner is the producer
         When the producer confirms the offer
         Then the producer should not be able to confirm the offer

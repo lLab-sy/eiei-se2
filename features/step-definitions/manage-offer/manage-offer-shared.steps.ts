@@ -18,8 +18,7 @@ Given("choose a post named {string}", async function (postName:string) {
   const page = customWorld.page;
   if (page) {
     page.waitForURL('**/my-offering', {waitUntil: 'domcontentloaded'});
-    const posts = page.locator('div.cursor-pointer').filter({hasText: postName})
-    const count = await posts.count()
-    await posts.nth(Math.floor(Math.random()*count)).getByRole('link').click()
+    const targetPost = page.locator('div.cursor-pointer').filter({has: page.getByRole('heading',{name: postName, exact: true})})
+    await targetPost.first().getByRole('link').click()
   }
 });

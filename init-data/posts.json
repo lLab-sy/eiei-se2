@@ -528,5 +528,321 @@
     "$date": "2025-03-25T12:14:16.198Z"
   },
   "__v": 1
+},
+{
+  "_id": {
+    "$oid": "67e2dc3097c598ecb91e61a2"
+  },
+  "postName": "Post with Offer From PF to PD",
+  "postDescription": "Post with 2 Offers From PF to PD, Description Length must be at least 50",
+  "postImages": [
+    "d34260175891f5558cd0c6d795803d4ed218f5316baa75a8fb691f76b3175ab2"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18c07c7f8482264c2aec"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    },
+    {
+      "$oid": "65b1234567abcd1234ef5678"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "in-progress",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 500,
+          "createdAt": {
+            "$date": "2025-03-25T16:40:33.013Z"
+          },
+          "reason": "First Offer From PF to PD, 500"
+        },
+        {
+          "role": {
+            "$oid": "65b8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 1000,
+          "createdAt": {
+            "$date": "2025-03-25T16:41:01.769Z"
+          },
+          "reason": "Second Offer From PF to PD, 1000, Actor"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 3,
+      "isSend": false,
+      "isApprove": false,
+      "submissions": [],
+      "createdAt": {
+        "$date": "2025-03-25T16:40:33.013Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-25T16:41:01.769Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-25T16:39:12.694Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-25T16:41:01.770Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67e2dd2497c598ecb91e623a"
+  },
+  "postName": "Post with Offer From PD to PF",
+  "postDescription": "Post with 2 Offers From PD to PF, Description Length must be at least 50",
+  "postImages": [
+    "abe05139cbda687fbf198b165f6afb6570026e10c00c802a518b9c131a63089b"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18ad7c7f8482264c2ae9"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65a1234567abcd1234ef5678"
+    },
+    {
+      "$oid": "65c8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "in-progress",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65c8765432abcd5678ef1234"
+          },
+          "offeredBy": 1,
+          "price": 500,
+          "createdAt": {
+            "$date": "2025-03-25T16:44:26.602Z"
+          },
+          "reason": "First Offer From PD to PF, 500"
+        },
+        {
+          "role": {
+            "$oid": "65c8765432abcd5678ef1234"
+          },
+          "offeredBy": 1,
+          "price": 1000,
+          "createdAt": {
+            "$date": "2025-03-25T16:44:53.113Z"
+          },
+          "reason": "Second offer from PD to PF, 1000, Writer"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 3,
+      "isSend": false,
+      "isApprove": false,
+      "submissions": [],
+      "createdAt": {
+        "$date": "2025-03-25T16:44:26.602Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-25T16:44:53.113Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-25T16:43:16.762Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-25T16:44:53.113Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67e2e2514c2ac4b3730da348"
+  },
+  "postName": "Post with Offer From PF to PD 2",
+  "postDescription": "Post with 2 Offers From PF to PD 2, Description must be at least 50 Characters",
+  "postImages": [
+    "85b1098043096783ea5d000cbcf0eb2a1e637df8bded98a47f44651bfdf7b83c"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18c07c7f8482264c2aec"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65a1234567abcd1234ef5678"
+    },
+    {
+      "$oid": "65c8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "in-progress",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65c8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 777,
+          "createdAt": {
+            "$date": "2025-03-25T17:06:04.988Z"
+          },
+          "reason": "First Offer, PF to PD, 777"
+        },
+        {
+          "role": {
+            "$oid": "65c8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 1472,
+          "createdAt": {
+            "$date": "2025-03-25T17:06:49.604Z"
+          },
+          "reason": "Second Offer: PF to PD 2, 1472, Writer"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 3,
+      "isSend": false,
+      "isApprove": false,
+      "submissions": [],
+      "createdAt": {
+        "$date": "2025-03-25T17:06:04.989Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-25T17:06:49.604Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-25T17:05:22.029Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-25T17:06:49.605Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67e2e01697c598ecb91e63c8"
+  },
+  "postName": "Post with Offer From PD to PF 2",
+  "postDescription": "Post with 2 Offers From PD to PF V.2, Description Length must be at least 50",
+  "postImages": [
+    "8084108c50ab6521558649a5a9cd7eb6cd84f4f155934a0cf69075a142c43bdb"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18a37c7f8482264c2ae6"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    },
+    {
+      "$oid": "65b1234567abcd1234ef5678"
+    }
+  ],
+  "postStatus": "created",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "in-progress",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b1234567abcd1234ef5678"
+          },
+          "offeredBy": 1,
+          "price": 450,
+          "createdAt": {
+            "$date": "2025-03-25T16:58:42.615Z"
+          },
+          "reason": "First Offer, PD to PF 2, 450"
+        },
+        {
+          "role": {
+            "$oid": "65b1234567abcd1234ef5678"
+          },
+          "offeredBy": 1,
+          "price": 9000,
+          "createdAt": {
+            "$date": "2025-03-25T16:59:07.496Z"
+          },
+          "reason": "Second Offer, PD to PF 2, 9000"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 3,
+      "isSend": false,
+      "isApprove": false,
+      "submissions": [],
+      "createdAt": {
+        "$date": "2025-03-25T16:58:42.615Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-25T16:59:07.496Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-25T16:55:50.818Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-25T16:59:07.497Z"
+  },
+  "__v": 0
 }
 ]
