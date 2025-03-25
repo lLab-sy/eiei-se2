@@ -489,7 +489,6 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       const postId  = req.params.id
       const userId  = req.query.userId ? req.query.userId as string: ''
       const isApprove = req.query.isApprove=='false' ? false : true
-      console.log("Im now get here")
       const reqDTO: SendApproveRequest = {
         postId: postId,
         userId: userId,
