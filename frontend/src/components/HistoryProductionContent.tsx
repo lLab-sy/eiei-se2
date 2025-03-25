@@ -25,7 +25,7 @@ export default function HistoryProductionContent({
       case "reject":
         return "Rejected";
       case "in-progress":
-        return "In-progress";
+        return "Pending";
       default:
         return status;
     }
@@ -60,10 +60,10 @@ export default function HistoryProductionContent({
           <span
             className={
               data.status === "in-progress"
-                ? "text-yellow-500"
+                ? "text-mainyellow"
                 : data.status === "candidate"
-                  ? "text-green-500"
-                  : "text-red-500"
+                  ? "text-maingreen-light"
+                  : "text-mainred-light"
             }
           >
             {" " + getStatusText(data.status)}

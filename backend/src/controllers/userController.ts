@@ -53,8 +53,8 @@ class UserController {
             // sent data from frontend FormData({'userData' : stringify json, 'profileImage' : File})
             // after pass by middleware => file
             const profileImageFile = req?.file;
-            console.log('parse user data', req.body.userData[0])
-            const userData = JSON.parse(req.body.userData[0]); 
+            const userData = JSON.parse(req.body.userData);
+            console.log('userData', userData)
             if((userData.password && userData.password.length < 8)){
                 sendResponse(res, 'error', 'Password Length should be more than 8')
                 return;
@@ -74,6 +74,7 @@ class UserController {
                     return;
                 }
                 const user = await userService.getUserById(id)
+                console.log('userProfileImage', user?.profileImage)
                 const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName()
                 const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, imageKey)
                 const userDataWithImageKey = {

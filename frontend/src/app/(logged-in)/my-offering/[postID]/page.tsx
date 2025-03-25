@@ -42,7 +42,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Checkbox, Rating } from "@mui/material";
+import { Checkbox, CircularProgress, Rating } from "@mui/material";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,6 +52,7 @@ import ProductionWorkingContent from "@/components/ProducerWorkingContent";
 import ProducerWorkingContent from "@/components/ProducerWorkingContent";
 import { Console } from "console";
 import { useToast } from "@/hooks/use-toast";
+import { User } from "lucide-react";
 
 // สร้าง interface สำหรับข้อมูลของ Production Professional
 interface ProfessionalData {
@@ -77,50 +78,64 @@ interface RoleBasedOffer {
   }[];
 }
 interface reviewUserDataInterface {
-  comment : string,
-  createdAt: string,
-  postID: string,
-  ratingScore: number,
-  _id: string,
+  comment: string;
+  createdAt: string;
+  postID: string;
+  ratingScore: number;
+  _id: string;
 }
 enum StatusChangeType {
-  Candidate = 'candidate',
-  Reject = 'reject'
+  Candidate = "candidate",
+  Reject = "reject",
 }
 
 interface userReturn {
-  firstName: string,
-  middleName:string,
-  lastName:string,
-  rating: Array<reviewUserDataInterface>
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  rating: Array<reviewUserDataInterface>;
+  profileImage: string;
+  username : string;
+  role : string;
 }
 
-const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {setOfferStatus:Function, setOfferArray: Function, token : string | undefined,postID: string, offer : historyStateInterface}) => {
-  console.log('offerDataNew', offer)
-  const { toast } = useToast()
-  token = token ?? ""
-  const offerDate = new Date(offer.createdAt)
+const ConfirmOffer = ({
+  offer,
+  postID,
+  token,
+  setOfferArray,
+  setOfferStatus,
+}: {
+  setOfferStatus: Function;
+  setOfferArray: Function;
+  token: string | undefined;
+  postID: string;
+  offer: historyStateInterface;
+}) => {
+  const { toast } = useToast();
+  token = token ?? "";
+  const offerDate = new Date(offer.createdAt);
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
-  const {data : session} = useSession()
-  console.log('sessionDataInConfirmOffer', session)
-  const userId = session?.user?.id ?? ""
-  const handleStatusChange = async (status : StatusChangeType) => {
+  const { data: session } = useSession();
+
+  const userId = session?.user?.id ?? "";
+  const handleStatusChange = async (status: StatusChangeType) => {
     const body = {
-      postID : postID,
-      participantID : offer.participantID,
-      statusToChange : status
-    }
-    console.log('body', body)
+      postID: postID,
+      participantID: offer.participantID,
+      statusToChange: status,
+    };
+
     const res = await axios.patch(apiUrl, body, {
       withCredentials: true,
-      headers : {
-        Authorization : `Bearer ${token}`,
-        'Content-Type' : 'application/json',
-        'Accept' : "*/*"
-      }
-    })
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Accept: "*/*",
+      },
+    });
     return res;
-  }
+  };
   const handleFetch = async (userId: string) => {
     const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
@@ -129,10 +144,9 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
       headers: {
         Authorization: `Bearer ${token ?? ""}`,
       },
-    
-  });
-  return res
-}
+    });
+    return res;
+  };
 
   const displayDate = offerDate.toLocaleString("en-US", {
     year: "numeric",
@@ -141,185 +155,281 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
     hour: "2-digit",
     minute: "2-digit",
   });
-  const [open, setOpen] = useState(false)
-  const [isChanged, setIsChanged] = useState(0)
-  const [canCanfirm, setCanConfirm] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [isChanged, setIsChanged] = useState(0);
+  const [canCanfirm, setCanConfirm] = useState(false);
   const handleRejectOffer = () => {
-    setIsChanged(1)
-    setTextState("")
-    setCanConfirm(false)
-    setCheckboxState(false)
+    setIsChanged(1);
+    setTextState("");
+    setCanConfirm(false);
+    setCheckboxState(false);
     // setTimeout(() => {}, 1000)
     // setIsChanged(false)
-  }
+  };
   const handleConfirmOffer = () => {
-    if(isChanged == 0){
-      setIsChanged(2)
+    if (isChanged == 0) {
+      setIsChanged(2);
     }
-  }
-  const [loading, setLoading] = useState(false)
-  const handleClickConfirmOffer = async (isConfirm : boolean) => {
+  };
+  const [loading, setLoading] = useState(false);
+  const handleClickConfirmOffer = async (isConfirm: boolean) => {
     // setTextState("")
     // alert(1)
-    setLoading(true)
-    const res = await handleStatusChange((isConfirm) ? StatusChangeType.Candidate : StatusChangeType.Reject)
-    const updateOfferRes = await handleFetch(userId)
-    console.log('updatedOfferRes', updateOfferRes)
-    const offerArray : Array<historyStateInterface> = updateOfferRes?.data?.data?.data
-    if(res?.data?.status !== 'success'){
+    setLoading(true);
+    const res = await handleStatusChange(
+      isConfirm ? StatusChangeType.Candidate : StatusChangeType.Reject,
+    );
+    const updateOfferRes = await handleFetch(userId);
+    const offerArray: Array<historyStateInterface> =
+      updateOfferRes?.data?.data?.data;
+    if (res?.data?.status !== "success") {
       toast({
         title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
-        description : `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
-        variant: "destructive"
-      })
+        description: `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
+        variant: "destructive",
+      });
       return;
     }
     setOfferArray(offerArray);
-    if(offerArray.length > 0){
-      setOfferStatus(offerArray[0]?.status ?? "")
+    if (offerArray.length > 0) {
+      setOfferStatus(offerArray[0]?.status ?? "");
     }
-    console.log('resOfferStatusConfirm', res)
-    setOpen(false)
-    setTextState('')
-    setCheckboxState(false)
-    setLoading(false)
+    setOpen(false);
+    setTextState("");
+    setCheckboxState(false);
+    setLoading(false);
     toast({
       title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
       description: `${isConfirm ? "Confirm" : "Reject"} this offer successfully`,
-      
-    })
-  }
-  const [textState, setTextState] = useState('')
+    });
+  };
+  const [textState, setTextState] = useState("");
   // console.log('textState', textState)
-
-  const [reviewState, setReviewState] = useState(0)
-  const [ratingCount, setRatingCount] = useState(0)
+  const [profileImageState, setProfileImageState] = useState("");
+  const [reviewState, setReviewState] = useState(0);
+  const [ratingCount, setRatingCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [name, setName] = useState("");
   const handleTriggerDialog = async () => {
-    const user = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`)
-    setTextState(""); setCanConfirm(false); setIsChanged(0); setCheckboxState(false)
-    const data : userReturn = user.data.data
-    console.log('getUserDialog', data)
-    const count = data.rating.length
-    let sumRating = 0
-    
-    for(const object of data.rating){
-      sumRating += object.ratingScore
+    const user = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`,
+    );
+    setTextState("");
+    setCanConfirm(false);
+    setIsChanged(0);
+    setCheckboxState(false);
+    const data: userReturn = user.data.data;
+    console.log('data', data)
+    setProfileImageState(data?.profileImage ?? "");
+    setName(data?.username);
+    const count = data.rating.length;
+    let sumRating = 0;
+    for (const object of data.rating) {
+      sumRating += object.ratingScore;
     }
-    setRatingCount(count)
-    setReviewState(sumRating == 0 || count == 0? 0 : Math.round(sumRating / count))
-  }
-  const router = useRouter()
+    setRatingCount(count);
+    setReviewState(
+      sumRating == 0 || count == 0 ? 0 : Math.round(sumRating / count),
+    );
+  };
+  const router = useRouter();
   const handleCounterOffer = (postID: string) => {
-    if(isChanged == 3){
-      setOpen(false)
-      router.push(`/create-offer/${postID}`)
-    }
-    else setIsChanged(3)
-  }
-  const [checkboxState, setCheckboxState] = useState(false)
-  const offerRole = (offer.offeredBy == 1 ? "producer" : "production professional")
-  const canOffer = (offer.offeredBy == 1 ? "producer" : "production professional") !== session?.user.role
-  console.log('offer rolename', offerRole)
-  console.log('session role', session?.user.role)
-  console.log("canOFfer",canOffer)
+    if (isChanged == 3) {
+      setOpen(false);
+      router.push(`/create-offer/${postID}`);
+    } else setIsChanged(3);
+  };
+
+  const [checkboxState, setCheckboxState] = useState(false);
+  const offerRole =
+    offer.offeredBy == 1 ? "producer" : "production professional";
+  const canOffer =
+    (offer.offeredBy == 1 ? "producer" : "production professional") !==
+    session?.user.role;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div onClick={handleTriggerDialog} className="mt-4 pb-1 w-[90%] relative">
+        <div
+          onClick={handleTriggerDialog}
+          className="mt-4 pb-1 w-[90%] relative"
+        >
           <HistoryProductionContent data={offer} />
         </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{(isChanged == 1) ? "Reject Offer" : "Confirm Offer"}: {offer.postName}</DialogTitle>
+          <DialogTitle>
+            {isChanged == 1 ? "Reject Offer" : "Confirm Offer"}:{" "}
+            {offer.postName}
+          </DialogTitle>
           <DialogDescription>Role: {offer.roleName}</DialogDescription>
         </DialogHeader>
-        {
-          (isChanged > 0) ? 
-          <div className='gap-3 flex flex-col'>
-            <span>{isChanged == 1 ? "If you reject this offer, you won’t be able to make another offer on this post in the future. " : ""}</span>
-            <span className={`${isChanged == 1 ? "text-red-500" : (isChanged == 3) ? "text-black" : "text-black"}`}> {isChanged == 1 ? "Please type 'Reject Offer' to decline." : (isChanged==3) ?"You are about to be redirected to the Create Offer page. Are you sure?" : "Are you sure to accept this offer."}</span>
-            {
-              (isChanged == 1) ? 
-              <Input value={textState} onChange={(e) => {
-                setTextState(e.target.value)
-                // console.log("e", e.target.value)
-                if(e.target.value == ((isChanged == 1) ? "Reject Offer" : "Confirm Offer")){
-                  setCanConfirm(true)
-                }
-                else{
-                  setCanConfirm(false)
-                }
-              }}/>
-              : (isChanged == 3) ?<div></div> : <div>
-                <Checkbox value={checkboxState} onChange={(e) => setCheckboxState(e.target.checked)}/>
+        {isChanged > 0 ? (
+          <div className="gap-3 flex flex-col">
+            <span>
+              {isChanged == 1
+                ? "If you reject this offer, you won’t be able to make another offer on this post in the future. "
+                : ""}
+            </span>
+            <span
+              className={`${isChanged == 1 ? "text-mainred" : isChanged == 3 ? "text-black" : "text-black"}`}
+            >
+              {" "}
+              {isChanged == 1
+                ? "Please type 'Reject Offer' to decline."
+                : isChanged == 3
+                  ? "You are about to be redirected to the Create Offer page. Are you sure?"
+                  : "Are you sure to accept this offer."}
+            </span>
+            {isChanged == 1 ? (
+              <Input
+                value={textState}
+                onChange={(e) => {
+                  setTextState(e.target.value);
+                  // console.log("e", e.target.value)
+                  if (
+                    e.target.value ==
+                    (isChanged == 1 ? "Reject Offer" : "Confirm Offer")
+                  ) {
+                    setCanConfirm(true);
+                  } else {
+                    setCanConfirm(false);
+                  }
+                }}
+              />
+            ) : isChanged == 3 ? (
+              <div></div>
+            ) : (
+              <div>
+                <Checkbox
+                  value={checkboxState}
+                  onChange={(e) => setCheckboxState(e.target.checked)}
+                />
                 <Label>Confirmed</Label>
-              </div>              
-            }
-            
-          </div> : ""
-        }
-        <div className={`${isChanged>0 ? "hidden" : ""}`}>
+              </div>
+            )}
+          </div>
+        ) : (
+          ""
+        )}
+        <div className={`${isChanged > 0 ? "hidden" : ""}`}>
           <div className={`flex flex-row gap-3`}>
-            <Avatar className='bg-black'>
-              <AvatarImage src=""/>
+            <Avatar className="border flex justify-center items-center">
+              {/* {
+                isLoading && profileImageState &&
+                <CircularProgress size={20}/>
+
+              }
+              {
+                (profileImageState) ? 
+                <AvatarImage onLoad={() => setIsLoading(false)} onError={() => setIsLoading(false)} src={profileImageState ?? "/"}/>
+                      :
+                <User />
+              } */}
+              <User />
             </Avatar>
-            <div className='flex flex-col'>
-              <span>{`From: ${offer.offeredBy == 0 ? "Professional" : "Producer"} `}</span>
-              <div className='flex'>
-                <Rating value={reviewState} readOnly/>
+            <div className="flex flex-col">
+              <span>{`From: ${name} `}</span>
+              <div className="flex">
+                <Rating value={reviewState} readOnly />
                 <span>{ratingCount} (review)</span>
               </div>
             </div>
           </div>
-          <Separator className='bg-black my-2' />
+          <Separator className="bg-black my-2" />
           <div>
-            <span>Offer detail</span>
-            <div className='flex justify-between'>
+            <span className="text-xl font-bold">Offer Detail</span>
+            <div className="flex justify-between">
               <span>Offered Price:</span>
               <span>{`${offer.currentWage} THB`}</span>
             </div>
-            <div className='flex justify-between'>
+            <div className="flex justify-between">
               <span>Start Date:</span>
               <span>{displayDate}</span>
             </div>
-            <div className='flex flex-col'>
+            <div className="flex flex-col">
               <span>Description</span>
-              <div className='w-[100%] flex justify-center items-center bg-slate-50 h-[300px] rounded-xl'>
-                <span className='w-[80%] h-[80%]'>
-                  {offer.reason}
-                </span>
+              <div className="w-[100%] flex justify-center items-center bg-slate-50 h-[300px] rounded-xl">
+                <span className="w-[80%] h-[80%]">{offer.reason}</span>
               </div>
             </div>
           </div>
         </div>
         <DialogFooter>
-          <div className='w-full flex justify-center'>
-            {
-              (offer.status === 'in-progress') ? 
-              <div className='flex justify-around w-full'>
-                <Button onClick={(isChanged > 0) ? () => {setIsChanged(0); setCanConfirm(false); setTextState(""); setCheckboxState(false)}: handleRejectOffer} className='w-[25%] rounded-lg' variant={'destructive'}>{isChanged > 0 ? "No" :"Reject Offer"}</Button>
-                <Button onClick={() => {handleCounterOffer(postID)}} className={`${isChanged == 3 ? "hidden" : ""}`}>Counter Offer</Button>
-                <Button onClick={isChanged > 0 ? () => {(isChanged == 2) ? handleClickConfirmOffer(true) : (isChanged == 3) ? handleCounterOffer(postID) : handleClickConfirmOffer(false)} : handleConfirmOffer} className='w-[30%] rounded-lg bg-lime-500 text-white hover:bg-lime-600' disabled={(((canCanfirm || checkboxState || isChanged==3) && isChanged > 0 ) || (isChanged == 0) && (canOffer)) ? false : true}>{isChanged ? "Yes" :"Confirm Offer"}</Button>
+          <div className="w-full flex justify-center">
+            {offer.status === "in-progress" ? (
+              <div className="flex justify-around w-full">
+                <Button
+                  onClick={
+                    isChanged > 0
+                      ? () => {
+                          setIsChanged(0);
+                          setCanConfirm(false);
+                          setTextState("");
+                          setCheckboxState(false);
+                        }
+                      : handleRejectOffer
+                  }
+                  className="w-[25%] rounded-lg bg-mainred hover:bg-mainred-light"
+                >
+                  {isChanged > 0 ? "No" : "Reject Offer"}
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleCounterOffer(postID);
+                  }}
+                  className={`${isChanged == 3 ? "hidden" : ""}`}
+                >
+                  Counter Offer
+                </Button>
+                <Button
+                  onClick={
+                    isChanged > 0
+                      ? () => {
+                          isChanged == 2
+                            ? handleClickConfirmOffer(true)
+                            : isChanged == 3
+                              ? handleCounterOffer(postID)
+                              : handleClickConfirmOffer(false);
+                        }
+                      : handleConfirmOffer
+                  }
+                  className="w-[30%] rounded-lg bg-maingreen text-white hover:bg-maingreen-light"
+                  disabled={
+                    ((canCanfirm || checkboxState || isChanged == 3) &&
+                      isChanged > 0) ||
+                    (isChanged == 0 && canOffer)
+                      ? false
+                      : true
+                  }
+                >
+                  {isChanged ? "Yes" : "Confirm Offer"}
+                </Button>
               </div>
-              :
-              <span className='text-lg'>You have successfully <span className={`${offer.status === 'reject' ? 'text-red-500' : 'text-green-600'}`}>{offer.status === 'reject' ? 'rejected' : 'confirmed'}</span> this offer.</span>
-            }
-            
+            ) : (
+              <span className="text-lg">
+                You have successfully{" "}
+                <span
+                  className={`${offer.status === "reject" ? "text-mainred-light" : "text-maingreen-light"}`}
+                >
+                  {offer.status === "reject" ? "rejected" : "confirmed"}
+                </span>{" "}
+                this offer.
+              </span>
+            )}
           </div>
         </DialogFooter>
       </DialogContent>
-      
-    
     </Dialog>
   );
 };
 
 //         <p
 //             className={`text-sm w-full m-auto text-end font-semibold ${
-//                 post.postStatus === "created" ? "text-mainblue-light" : 
-//                 post.postStatus === "waiting" ? "text-mainblue-dark" : 
-//                 post.postStatus === "in-progress" ? "text-mainyellow" : 
+//                 post.postStatus === "created" ? "text-mainblue-light" :
+//                 post.postStatus === "waiting" ? "text-mainblue-dark" :
+//                 post.postStatus === "in-progress" ? "text-mainyellow" :
 //                 post.postStatus === "success" ? "text-green-500" : "text-gray-500"
 //             }`}
 //             >
@@ -358,7 +468,7 @@ const ConfirmOffer = ({offer, postID, token, setOfferArray, setOfferStatus} : {s
 // }
 export default function OfferPostContent() {
   const user: any = useSelector<RootState>((state) => state.user.user);
-  console.log('userDataOffer', user)
+
   const { data: session } = useSession();
   const { postID }: { postID: string } = useParams();
   const router = useRouter();
@@ -378,7 +488,7 @@ export default function OfferPostContent() {
   const [availableRoles, setAvailableRoles] = useState<string[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   // Mock data สำหรับรายชื่อ Production Professional ที่ส่งข้อเสนอมา
   const [professionals, setProfessionals] = useState<ProfessionalData[]>([
     {
@@ -628,42 +738,42 @@ export default function OfferPostContent() {
 
   //------------------------------------------------------------------------------------
 
-const token =session?.user.token
-const userID= session?.user.id
-const [producerOffers,setProducerOffers] =useState<OfferHistoryResponseData[]|null>(null)
-const [selectedOfferProducer,setSelectedOfferProducer] =useState<OfferHistoryResponseData|null>(null)
+  const token = session?.user.token;
+  const userID = session?.user.id;
+  const [producerOffers, setProducerOffers] = useState<
+    OfferHistoryResponseData[] | null
+  >(null);
+  const [selectedOfferProducer, setSelectedOfferProducer] =
+    useState<OfferHistoryResponseData | null>(null);
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      let response;
-      let response2;
-      if (userRole === "producer") {
-        console.log('userRole1', userRole)
-        response2 = await getPostById(postID,token ?? "") 
-        setPostState(response2)
-        response = await getPrudcerOffers(token ?? "",postID); // ดึงโพสต์ของ producer
-        setProducerOffers(response)
-        console.log(response2);
-        // console.log("PRODUCER BY",response)
-      } else if (userRole === "production professional") {
-        const handleFetch = async (postID: string) => {
-          const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postID}`;
-          const res = await axios.get(apiUrl);
-          setPostState(res?.data?.data ?? {});
-          // console.log("postImageDisplay", res?.data?.data?.postImageDisplay?.[0])
-          const postImageDisplay = res?.data?.data?.postImageDisplay?.[0]
-          // console.log('postImageDisplay', postImageDisplay)
-          // console.log('imageDisplayUrl', postImageDisplay.imageUrl)
-          // setPostImageState(res?.data?.data?.postImageDisplay?.[0].imageURL ?? "")
-          
-        };
-        handleFetch(postID);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let response;
+        let response2;
+        if (userRole === "producer") {
+          response2 = await getPostById(postID, token ?? "");
+          setPostState(response2);
+          response = await getPrudcerOffers(token ?? "", postID); // ดึงโพสต์ของ producer
+          setProducerOffers(response);
+          // console.log("PRODUCER BY",response)
+        } else if (userRole === "production professional") {
+          const handleFetch = async (postID: string) => {
+            const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postID}`;
+            const res = await axios.get(apiUrl);
+            setPostState(res?.data?.data ?? {});
+            // console.log("postImageDisplay", res?.data?.data?.postImageDisplay?.[0])
+            const postImageDisplay = res?.data?.data?.postImageDisplay?.[0];
+            // console.log('postImageDisplay', postImageDisplay)
+            // console.log('imageDisplayUrl', postImageDisplay.imageUrl)
+            // setPostImageState(res?.data?.data?.postImageDisplay?.[0].imageURL ?? "")
+          };
+          handleFetch(postID);
+        }
+      } catch (err) {
+        console.log(err);
       }
-    }catch(err){
-      console.log(err)
-    }
-  }
+    };
     fetchData();
   }, [userID, userRole]);
   //*********************************** */
@@ -714,14 +824,14 @@ useEffect(() => {
   };
 
   const userId = user?._id ?? "";
-  console.log('offerArray', offerArray)
+
   useEffect(() => {
     // สมมติว่าเราดึงบทบาทของผู้ใช้จาก session หรือ Redux store
-    console.log("sessionMyOffer", session);
+
     const role = session?.user?.role; // สมมติว่าเป็น producer ในตัวอย่างนี้
 
     setUserRole(role as "producer" | "production professional");
-    console.log("userRoleAfter", userRole);
+
     if (role === "producer") {
       // เลือก professional คนแรกโดยค่าเริ่มต้น (ถ้ามี)
       if (professionals.length > 0) {
@@ -757,7 +867,7 @@ useEffect(() => {
       ] || [],
     );
   };
-  const [offerStatus, setOfferStatus] = useState('')
+  const [offerStatus, setOfferStatus] = useState("");
   useEffect(() => {
     const handleFetch = async (userId: string) => {
       const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
@@ -768,12 +878,11 @@ useEffect(() => {
           Authorization: `Bearer ${session?.user?.token ?? ""}`,
         },
       });
-      const offerArray = res?.data?.data?.data
+      const offerArray = res?.data?.data?.data;
       setOfferArray(offerArray);
-      if(offerArray.length > 0){
-        setOfferStatus(offerArray[0]?.status ?? "")
+      if (offerArray.length > 0) {
+        setOfferStatus(offerArray[0]?.status ?? "");
       }
-      
     };
     // console.log(userRole)
     if (userRole == "production professional") {
@@ -909,7 +1018,7 @@ useEffect(() => {
   };
 
   return (
-    <main className="flex flex-col h-[100vh] gap-3 mb-5 relative">
+    <main className="flex flex-col min-h-screen gap-3 mb-5 relative">
       <div className="relative mt-20 flex flex-row gap-5 item-baseline w-full h-full">
         <div className="w-[50%] flex justify-center items-center h-[800px]">
           {/* ใช้ PostDetail component */}
@@ -918,11 +1027,11 @@ useEffect(() => {
         </div>
 
         <div className="relative w-[44%] shadow-md h-[720px] rounded-lg">
-          <div className='h-full'>
-            {postState && userRole === "producer"  && (
-              <ProducerWorkingContent 
+          <div className="h-full">
+            {postState && userRole === "producer" && (
+              <ProducerWorkingContent
                 postID={postID}
-                participants={postState?.participants || []} 
+                participants={postState?.participants || []}
                 mapRole={postState?.postProjectRolesOut || []}
               />
             )}
@@ -935,9 +1044,18 @@ useEffect(() => {
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                     className="overflow-scroll flex w-[100%] justify-center max-h-[640px] items-center flex-wrap gap-5 mt-4"
                   >
-                    
                     {offerArray.map((offer, index) => (
-                      <ConfirmOffer setOfferArray={setOfferArray} token={token} setOfferStatus={setOfferStatus} postID={postID} offer={{...offer, status: (index==0) ? offer.status : "reject"}} key={index}/>
+                      <ConfirmOffer
+                        setOfferArray={setOfferArray}
+                        token={token}
+                        setOfferStatus={setOfferStatus}
+                        postID={postID}
+                        offer={{
+                          ...offer,
+                          status: index == 0 ? offer.status : "reject",
+                        }}
+                        key={index}
+                      />
                     ))}
                   </div>
                 ) : (
