@@ -132,7 +132,9 @@ export default function ProducerWorkingContent({
     }
 
     return participants.length === 0 ? (
-        <div>No Offer.</div>
+        <main className="bg-slate-480 rounded-lg h-full shadow-xl m-auto w-[100%] flex items-center justify-center">
+            <h1 className="text-center text-4xl font-bold my-5 p-0">No Offer</h1>
+        </main>
     ) : (
         <main className="bg-slate-480 rounded-lg h-full shadow-xl m-auto w-[100%]">
             <h1 className="text-start text-xl font-bold my-5 ml-8 p-0">Offer History</h1>
