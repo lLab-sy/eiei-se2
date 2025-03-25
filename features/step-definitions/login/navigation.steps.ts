@@ -37,6 +37,6 @@ When("I visit {string}", async function (pageName:string) {
     const page = customWorld.page;
     if (page) {
         await page.getByRole('banner').getByRole('button').click();
-        await page.getByRole('link', { name: pageName }).click();
+        await page.getByRole('link', { name: pageName, exact: true }).click();
     }
 });
