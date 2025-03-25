@@ -99,13 +99,13 @@ export default function ProducerWorkingContent({
         setSelectedProfessional(profID);
 
         let professionalOffers: IOfferData[] = [];
+
         participants.forEach((p) => {
             if(p.participantID === profID){ // same person
                 for(let i = 0; i < p.offer.length; ++i){
                     const o : OfferData = p.offer[i];
                     if (o.role === selectedRole) { // same offer
-                        const status = p.status;
-                        professionalOffers.push({ data: o, status: (i != p.offer.length - 1 || status === "reject" ? "Rejected" : (status === "candidate" ? "Completed" : "Pending")) });
+                        professionalOffers.push({ data: o, status: p.status });
                     }
                 }
             }
@@ -114,7 +114,13 @@ export default function ProducerWorkingContent({
         professionalOffers.sort((a, b) => {
             return new Date(b.data.createdAt).getTime() - new Date(a.data.createdAt).getTime();
         });
-             
+
+        // recompute status
+        for(let i = 0; i < professionalOffers.length; ++i){
+            const status = professionalOffers[i].status;
+            professionalOffers[i].status = (i != 0 || status === "reject" ? "Rejected" : (status === "candidate" ? "Completed" : "Pending"));
+        }
+
         setOffers(professionalOffers);
     }
 
