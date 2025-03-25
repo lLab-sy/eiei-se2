@@ -343,7 +343,7 @@ class PostRepository {
 
             matchStage.push({
               $match: {
-                postStatus: "created"
+                postStatus: { $in: ["created", "waiting"] }
               }
             })
             
@@ -1078,8 +1078,6 @@ class PostRepository {
     
     public async sendApprove(sendApproveReq: SendApproveRequestModel): Promise<void> {
         try {
-            console.log("My userID", sendApproveReq.userId);
-    
             const filter: FilterQuery<IPost> = {
                 _id: sendApproveReq.postId,
                 postStatus: "in-progress",
@@ -1099,7 +1097,11 @@ class PostRepository {
                 }
             } else if (sendApproveReq.isApprove) {
                 // ถ้า userId เป็น "" และกำลัง approve -> เปลี่ยน postStatus เป็น "success"
-                update["$set"] = { postStatus: "success",endDate: new Date()  };
+                update["$set"] = { 
+                    postStatus: "success",
+                    endDate: new Date(), 
+                };
+                update["$set"]["participants.$[].isApprove"] = true;
             }
     
             const post = await Post.findOneAndUpdate(
