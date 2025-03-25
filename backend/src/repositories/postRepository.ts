@@ -342,9 +342,9 @@ class PostRepository {
             const matchStage: PipelineStage[] = [];
 
             matchStage.push({
-              $match: {
-                postStatus: "created"
-              }
+                $match: {
+                  postStatus: { $in: ["created", "waiting"] }
+                }
             })
             
             if (searchText) {
