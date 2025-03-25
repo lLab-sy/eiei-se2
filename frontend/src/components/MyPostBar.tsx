@@ -173,9 +173,9 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
           <SelectTrigger className="shadow-lg w-[40%]">
             <SelectValue placeholder="Choose your Post" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent data-test-id="select-postStatus-2">
             <SelectGroup>
-              <SelectItem value={"created"}>
+              <SelectItem value={"created"} data-test-id="select-create-option">
                     Created
                 </SelectItem>
                 <SelectItem value={"waiting"}>
