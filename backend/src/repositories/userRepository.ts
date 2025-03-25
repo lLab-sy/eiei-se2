@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import {User, IUser } from '../models/userModel';
 import Post from '../models/postModel';
 import { error } from 'console';
+import cloudService from '../services/cloudService';
 
 //change to similar to test using input as I user
 
@@ -40,9 +41,11 @@ class UserRepository {
     async getUserByID(userID: string){
         try{
             const user = await User.findById(userID);
+            
             if(!user){
                 throw new Error("User not found.")
             }
+            console.log('userGetById', user)
             return user;
         } catch(err){
             throw new Error('Error logging in user in repository: ' + err);

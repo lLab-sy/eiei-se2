@@ -84,7 +84,6 @@ const NavBar = (session: any) => {
   // const {data: session, status} = useSession()
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
-  console.log('session', session)
   const handleSignOut = async () => {
     
     await signOut();
@@ -126,7 +125,6 @@ const NavBar = (session: any) => {
           Authorization: `Bearer ${fetchToken}`
         }
       })
-      console.log('res', res)
       const controller = new AbortController()
       if(!res){
         throw new Error('Failed to Fetch')
@@ -139,7 +137,6 @@ const NavBar = (session: any) => {
       await handleFetchProfileURL(returnUser.data._id)
 
       dispatch(setUser(returnUser.data))
-      console.log('setuser', user.user)
       return () => controller.abort()
     }
     handleFetch(token)
@@ -208,7 +205,6 @@ const NavBar = (session: any) => {
         },
       });
       setHistoryDataArray(res?.data?.data?.data)
-      console.log('resHistory', res)
     } 
     // handleFetch(userId, "created")
   return (

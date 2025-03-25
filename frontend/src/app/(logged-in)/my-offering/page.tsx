@@ -27,7 +27,6 @@ export default function OfferPage() {
     return <>Unautorize</>;
   }
 
-  console.log(session);
 
   //----------------------------------------------------------------
   // useEffect(() => {
@@ -63,8 +62,6 @@ export default function OfferPage() {
           });
           response = res?.data?.data?.data;
         }
-
-        console.log("response", response);
         setPostArray(response);
       } catch (err) {
         setError("Failed to load posts. Please try again later.");
@@ -74,8 +71,6 @@ export default function OfferPage() {
   }, [userID, userRole]); // ใช้ pid และ token ใน dependency array
 
   const userData: any = useSelector<RootState>((state) => state.user.user);
-  console.log("userDataPostHistory", userData);
-  console.log("postArrayData", postArray);
   const router = useRouter();
   const handleChangePage = (postID: string) => {
     router.push(`/my-offering/${postID}`);
@@ -119,68 +114,36 @@ export default function OfferPage() {
     return result;
   };
   return (
-    <main className="h-[140vh] flex flex-col gap-3 relative">
+    <main className=" min-h-screen mb-5 flex flex-col gap-3 relative">
       <div className="mt-20 gap-5 flex flex-col">
         <span className="text-5xl font-bold flex justify-center">
           My Offering
         </span>
         <span className="text-4xl font-bold flex justify-start ml-7">Post</span>
-        {userData?.role === "producer" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-12 max-w-full">
           {postArray && postArray?.length > 0
-              ? postArray.map((post, index) => (
-                  <div
-                    key={index}
-                    className="cursor-pointer"
-                    onClick={() => handleChangePage(post?.id!)}
-                  >
-                    <PostCard
-                      key={index}
-                      title={post.postName}
-                      description={post.postDescription}
-                      imageUrl={
-                        post.postImages && post.postImages.length != 0
-                          ? post.postImages[0]
-                          : ""
-                      }
-                      role={getRoleById(post.postProjectRoles || [])}
-                      mediaType={getMediaNameById(post.postMediaType)}
-                      id={post.id}
-                    />
-                  </div>
-                ))
-              : ""}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-12">
-            {postArray && postArray?.length > 0
-              ? postArray.map((post, index) => (
-                  <div
-                    key={index}
-                    className="cursor-pointer"
-                    onClick={() => handleChangePage(post?.id!)}
-                  >
-                    <PostCard
-                      title={post.postName}
-                      description={
-                        post.postDescription.length > 10
-                          ? post.postDescription.substring(0, 10) + "..."
-                          : post.postDescription
-                      }
-                      imageUrl={
-                        post.postImages && post.postImages.length !== 0
-                          ? post.postImages[0]
-                          : ""
-                      }
-                      role={getRoleById(post.postProjectRoles || [])}
-                      mediaType={getMediaNameById(post.postMediaType)}
-                      id={post.id}
-                    />
-                  </div>
-                ))
-              : ""}
-          </div>
-        )}
+            ? postArray.map((post, index) => (
+                <div
+                  key={index}
+                  className="cursor-pointer"
+                  onClick={() => handleChangePage(post?.id!)}
+                >
+                  <PostCard
+                    title={post.postName}
+                    description={post.postDescription}
+                    imageUrl={
+                      post.postImages && post.postImages.length !== 0
+                        ? post.postImages[0]
+                        : ""
+                    }
+                    role={getRoleById(post.postProjectRoles || [])}
+                    mediaType={getMediaNameById(post.postMediaType)}
+                    id={post.id}
+                  />
+                </div>
+              ))
+            : ""}
+        </div>
       </div>
     </main>
   );

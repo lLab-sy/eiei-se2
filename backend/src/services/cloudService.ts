@@ -16,14 +16,8 @@ class CloudService {
       if(!imageKey){ // check null undefined or empty strings
         imageKey = this.getKeyName()
       }
-      const resizeBuffer = await sharp(buffer)
-        .resize({
-          height: 1920,
-          width: 1080,
-          fit: "contain",
-        })
-        .toBuffer();
-      await s3Client.uploadFile(resizeBuffer, imageKey, mimetype);
+
+      await s3Client.uploadFile(buffer, imageKey, mimetype);
       const url = await s3Client.createSignedURL(imageKey)
       return {
         imageKey, //เก็บ แค่อันนี้พอ
@@ -68,6 +62,7 @@ class CloudService {
   }
   async getUrlWithImageNameAndUploadToCloud(buffer : Buffer, mimetype:string, imageKey : string){
     try{
+      console.log('imageKey', imageKey)
       const {url, imageKey : imageName} = await this.uploadImageToCloud(buffer, mimetype, imageKey)
       return {
         url,
