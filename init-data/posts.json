@@ -844,5 +844,306 @@
     "$date": "2025-03-25T16:59:07.497Z"
   },
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d82b1d84500e08c1b32c87"
+  },
+  "postName": "test post for 2-4 producer",
+  "postDescription": "mai ruuuuuuuuuuuuuuuuuuuuuuuuu mai ruuuuuuuuuuuuuuuuuuuuuuuuu",
+  "postImages": [
+    "a6512bb7d53e134554490e23290e5ecb1c2524d0a2e84f1c331d799147593691"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18ad7c7f8482264c2ae9"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65b8765432abcd5678ef1234"
+    },
+    {
+      "$oid": "65c8765432abcd5678ef1234"
+    }
+  ],
+  "postStatus": "in-progress",
+  "startDate": "",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "candidate",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65c8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 5,
+          "createdAt": {
+            "$date": "2025-03-17T15:50:26.493Z"
+          },
+          "reason": "eun neeeeeneeeeeneeeeeneeeeeneeeeeneeeeeneeeeeneeeeeneeeeeneeeee"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 1,
+      "isSend": false,
+      "isApprove": false,
+      "submissions": [
+        {
+          "$date": "2025-03-19T06:46:59.732Z"
+        },
+        {
+          "$date": "2025-03-19T06:51:28.825Z"
+        }
+      ],
+      "createdAt": {
+        "$date": "1970-01-01T00:00:00Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-17T15:50:26.493Z"
+      }
+    },
+    {
+      "participantID": {
+        "$oid": "67e24feb35bbc2cf1cebdab8"
+      },
+      "status": "candidate",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65c8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 5,
+          "createdAt": {
+            "$date": "2025-03-17T15:50:26.493Z"
+          },
+          "reason": "test for approve"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 1,
+      "isSend": true,
+      "isApprove": false,
+      "submissions": [
+        {
+          "$date": "2025-03-19T06:46:59.732Z"
+        },
+        {
+          "$date": "2025-03-19T06:47:01.263Z"
+        }
+      ],
+      "createdAt": {
+        "$date": "2025-03-17T15:50:26.493Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-17T15:50:26.493Z"
+      }
+    },
+    {
+      "participantID": {
+        "$oid": "67e2500735bbc2cf1cebdabc"
+      },
+      "status": "candidate",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65c8765432abcd5678ef1234"
+          },
+          "offeredBy": 0,
+          "price": 5,
+          "createdAt": {
+            "$date": "2025-03-17T15:50:26.493Z"
+          },
+          "reason": "test for reject"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 1,
+      "isSend": true,
+      "isApprove": false,
+      "submissions": [
+        {
+          "$date": "2025-03-19T06:50:13.328Z"
+        },
+        {
+          "$date": "2025-03-19T06:51:27.520Z"
+        }
+      ],
+      "createdAt": {
+        "$date": "2025-03-17T15:50:26.493Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-17T15:50:26.493Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-17T14:01:01.365Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-25T13:50:21.177Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67e18118311670d2eecbe110"
+  },
+  "postName": "Test Submission Post",
+  "postDescription": "This is test for start This is test for start This is test for start This is test for start This is test for start This is test for start This is test for start This is test for start",
+  "postImages": [
+    "2e40673644847a9ad0f4b4df10e4ee029af4c48d5a07459c904de24cd9aee96e",
+    "8b08963be5bb27b07854a5165def9ae53334522d89f48c2f9e41202cc2034daa"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18ad7c7f8482264c2ae9"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65c8765432abcd5678ef1234"
+    },
+    {
+      "$oid": "65b1234567abcd1234ef5678"
+    }
+  ],
+  "postStatus": "in-progress",
+  "startDate": "Mon Mar 24 2025 23:13:48 GMT+0700 (เวลาอินโดจีน)",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "candidate",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b1234567abcd1234ef5678"
+          },
+          "offeredBy": 1,
+          "price": 87000,
+          "createdAt": {
+            "$date": "2025-03-24T16:01:08.132Z"
+          },
+          "reason": "SubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmission"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 3,
+      "isSend": false,
+      "isApprove": false,
+      "submissions": [],
+      "createdAt": {
+        "$date": "2025-03-24T16:01:08.132Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-24T16:01:08.132Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-24T15:58:17.009Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-24T16:23:15.978Z"
+  },
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "67e182a543f8579a0fa84688"
+  },
+  "postName": "Test No Submission Post",
+  "postDescription": "This is test for start This is test for start This is test for start This is test for start This is test for start This is test for start This is test for start This is test for start",
+  "postImages": [
+    "2e40673644847a9ad0f4b4df10e4ee029af4c48d5a07459c904de24cd9aee96e",
+    "8b08963be5bb27b07854a5165def9ae53334522d89f48c2f9e41202cc2034daa"
+  ],
+  "postMediaType": {
+    "$oid": "67ae18ad7c7f8482264c2ae9"
+  },
+  "postProjectRoles": [
+    {
+      "$oid": "65c8765432abcd5678ef1234"
+    },
+    {
+      "$oid": "65b1234567abcd1234ef5678"
+    }
+  ],
+  "postStatus": "in-progress",
+  "startDate": "Mon Mar 24 2025 23:13:55 GMT+0700 (เวลาอินโดจีน)",
+  "endDate": "",
+  "userID": {
+    "$oid": "67cfe75ee61393154761459b"
+  },
+  "participants": [
+    {
+      "participantID": {
+        "$oid": "67cfebaa2ee482247147799b"
+      },
+      "status": "candidate",
+      "offer": [
+        {
+          "role": {
+            "$oid": "65b1234567abcd1234ef5678"
+          },
+          "offeredBy": 1,
+          "price": 87000,
+          "createdAt": {
+            "$date": "2025-03-24T16:01:08.132Z"
+          },
+          "reason": "SubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmissionSubmission"
+        }
+      ],
+      "ratingScore": 0,
+      "comment": "",
+      "reviewedAt": null,
+      "workQuota": 0,
+      "isSend": false,
+      "isApprove": false,
+      "submissions": [
+        {
+          "$date": "2025-03-25T12:13:31.381Z"
+        },
+        {
+          "$date": "2025-03-25T12:13:54.327Z"
+        },
+        {
+          "$date": "2025-03-25T12:14:16.198Z"
+        }
+      ],
+      "createdAt": {
+        "$date": "2025-03-24T16:01:08.132Z"
+      },
+      "updatedAt": {
+        "$date": "2025-03-24T16:01:08.132Z"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-03-24T15:58:17.009Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-25T12:14:16.198Z"
+  },
+  "__v": 1
 }
 ]
