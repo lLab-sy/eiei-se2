@@ -116,6 +116,13 @@ const PostDetail = () => {
       }
   },[dataResponse]);
 
+  useEffect(()=>{
+    if(dataReviews && dataReviews.receivedReviews){
+      dataReviews.receivedReviews = dataReviews.receivedReviews.filter((e) => e.ratingScore > 0);
+      console.log(dataReviews);
+    }
+  }, [dataReviews])
+
   if (!dataResponse || !ownerResponse) {
     fetchData();
     return (
@@ -290,34 +297,19 @@ const PostDetail = () => {
           </div>
 
           {/* Contact Button */}
-          <div className="mt-6 flex justify-center">
+          <div className="grid grid-cols-2 gap-4">
             <a
               href={`/create-offer/${id}`}
-              className="bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
+              className="bg-blue-600 text-white text-center py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
             >
               Send Offer
             </a>
-          </div>
-          
-          {/*Review Section*/}
-          <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Producer's Previously Received Reviews</h2>
-            {dataReviews != null && dataReviews.receivedReviews && dataReviews.receivedReviews.length > 0 ? (
-              dataReviews.receivedReviews.map((review, index) => (
-                review.ratingScore > 0 ?
-                <ReviewCard
-                        key={index}
-                        index={index}
-                        reviewerName={review.reviewerName}
-                        reviewerProfileImage={review.reviewerProfileImage}
-                        ratingScore={review.ratingScore}
-                        comment={review.comment}
-                      /> : <></>
-              ))
-            ) : (
-              <p className="text-gray-500">No reviews yet.</p>
-            )}
-
+            <a
+              href={`/producer/${ownerResponse._id}`}
+              className="bg-blue-600 text-white text-center py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
+            >
+              View Producer Profile
+            </a>
           </div>
           
         </CardContent>

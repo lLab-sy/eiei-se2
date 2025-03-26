@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { ProfessionalsData, Professional } from "../../../../interface";
 import SearchBar from "@/components/SearchBar";
-import ProfessionalCard from "@/components/ProfessionalCrad";
+import ProfessionalCard from "@/components/ProfessionalCard";
 import Pagination from "@/components/Pagination";
 import getProfessionals from "@/libs/getProfessionals";
 
@@ -12,6 +12,7 @@ const PAGE_SIZE = 12;
 const ProfessionalsPage = () => {
 
   // requestFilter
+  // 
   const [requestFilter, setRequestFilter] = useState("&minRating=0");
 
   // page
@@ -85,13 +86,13 @@ const ProfessionalsPage = () => {
             {professtionalsCurrentPage.map((professional, index) => (
               <ProfessionalCard
                 key={index}
-                title={professional?.firstName + " " + professional?.lastName}
-                description={professional?.description || ""}
+                title={professional.firstName ? (professional.firstName + " " + professional.lastName) : professional.username }
+                description={professional?.description ? (professional.description.length > 100 ? professional.description.slice(0, 100) : professional.description) : ""}
                 imageUrl={professional?.imageUrl || ""}
                 skill={professional?.skill}
                 ratings={Number(professional?.avgRating) || 0}
-                occupation={professional?.occupation}
-                experience={professional?.experience}
+                occupation={professional?.occupation || ""}
+                experience={professional?.experience || 0}
                 id={professional?._id}
               />
             ))}

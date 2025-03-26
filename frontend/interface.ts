@@ -1,4 +1,5 @@
 export interface PostData {
+    postMediaTypeOut: any;
     id:string
     postName: string;
     postDescription: string;
@@ -15,30 +16,65 @@ export interface PostData {
     participants: Participant[]
 }
 
+
 export interface Participant{
     comment:string,
     createdAt:Date,
-    offer:OfferData[],
-    participantID:string,
+    offer:OfferData,
+    participantID?:string,
+    // participants?:ParticipantDetail,
     ratingScore:string,
     reviewedAt?:Date,
     status: string,
-    updatedAt: Date;
+    updatedAt: Date
+    // --
+    workQuota?:number,
+    isSend?:boolean,
+    isApprove?:boolean,
+    submissions?:Date[]
+
+}
+
+export interface ParticipantForRight{
+    comment:string,
+    createdAt:Date,
+    offer:OfferDataForRight[],
+    participantID:ParticipantDetail,
+    ratingScore:string,
+    reviewedAt?:Date,
+    status: string,
+    updatedAt: Date
+    // --
+    workQuota?:number,
+    isSend?:boolean,
+    isApprove?:boolean,
+    submissions:Date[]
+
+}
+
+
+
+export interface ParticipantDetail{
+    _id:string,
+    firstname:string,
+    lastname:string,
+    middlename:string
+    username:string
+}
+
+export interface ApproveData{
+    userId:string,
+    isApprove:boolean
 }
 
 export interface PostImageDisplay{
     imageURL:string;
     imageKey:string;
 }
-export interface ReceivedReview{
-    reviewerName: string;
-    reviewerProfileImage: string;
-    ratingScore: number;
-    comment: string;
-}
 
-export interface ReceivedReviews{
-    receivedReviews: ReceivedReview[];
+export interface postMediaTypeOut{
+    id:string;
+    mediaName:string;
 }
 
 export interface ReceivedReview{
@@ -46,11 +82,13 @@ export interface ReceivedReview{
     reviewerProfileImage: string;
     ratingScore: number;
     comment: string;
+    reviewAt: string;
 }
 
 export interface ReceivedReviews{
     receivedReviews: ReceivedReview[];
 }
+
 export interface SearchPosts{
     data: PostData[];
     meta: MetaData;
@@ -169,7 +207,19 @@ export interface MediaType{
     mediaName: string;
 }
 export interface OfferData{
-    roleID:string;
+    role:string;
+    roleID?:string;
+    productionProfessionalID:string;
+    offeredBy: Number;
+    price: Number;
+    reason: string;
+    createdAt: Date;
+    postID: string;
+}
+
+export interface OfferDataForRight{
+    role:PostRolesResponse;
+    roleID:PostRolesResponse;
     productionProfessionalID:string;
     offeredBy: Number;
     price: Number;
@@ -204,3 +254,13 @@ export interface ReviewData{
     createdAt:Date;
 }
 
+export interface PostParticipant {
+    id: string;
+    label: string;
+}
+
+export interface ChangeParticipantStatus{
+    postID: string;
+    participantID: string;
+    statusToChange: string;
+}

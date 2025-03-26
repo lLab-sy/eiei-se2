@@ -37,7 +37,7 @@ export default function ReviewContent({data, rating} : {data : reviewInterface, 
           </div>
         </div>
         <span className=''>
-          {`${diffDays} day ago`}
+          {diffDays == 0 ? `Today` : `${diffDays} day ago`}
         </span>
       </div>
       <span className="text-wrap ">

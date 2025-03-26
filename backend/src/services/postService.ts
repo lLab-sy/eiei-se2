@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO } from '../dtos/postDTO';
-import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel } from '../models/postModel';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO, ChangeParticipantStatusDTO, SendApproveRequest } from '../dtos/postDTO';
+import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
 import { OfferHistory } from '../models/postModel';
@@ -40,8 +40,8 @@ class PostService {
                 postImageDisplay:postImageDisplay as ImageDisplayDTO[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 participant: post.participants.map(participant => new ParticipantDetailDTO({
-                  participantID: (participant.participantID as any)._id.toString(),
-                  participantName: (participant.participantID as any).username,
+                  participantID: (participant.participantID as any)?._id.toString(),
+                  participantName: (participant.participantID as any)?.username,
                   status: participant.status,
                   // offer: participant.offer.map(offer => ({
                   //   role: offer.role.toString(), 
@@ -136,6 +136,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                 postImages: postImages as string[],
                 postMediaType: post.postMediaType as string,
                 roleCount: post.roleCount as number,
+                participant: post.participans,
                 postProjectRoles: post.postProjectRoles as string[],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 startDate: post.startDate? post.startDate.toString():"",
@@ -166,6 +167,7 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: postImages as string[],
+                participant: post.participants,
                 postMediaType: post.postMediaType as string,
                 roleCount: post.roleCount as number,
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
@@ -247,24 +249,24 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       throw new Error('Error in service layer: ' + error);
     }
   }
-  async createOffer(offerInput:ParticipantDetailDTO,postID:string,productionProfessionalID:string){
+  async createOffer(offerInput:ParticipantDetailDTO,postID:string,productionProfessionalID:string,myRole:string){
     try{
 
         //first find that have this production professional send offer to this first before
         const offerEvidence= await postRepository.checkProductionProInPost(postID,productionProfessionalID)
-        var offerModel:OfferDTO={
+        const offerModel:OfferDTO={
             price: offerInput.price,
             role: offerInput.roleID,
-            offeredBy: offerInput.offeredBy,
+            offeredBy: myRole=='producer'?1:0,
             createdAt: new Date() ,
             reason: offerInput.reason
         }
-        var response;
+        let response;
         //1 = Add OfferHistory
         if(offerEvidence.length>0){
           response= await postRepository.addNewOffer(offerModel,postID,productionProfessionalID)
         }else{//Create New Object
-          var participantData= new ParticipantDetailDTO({
+          const participantData= new ParticipantDetailDTO({
             participantID: productionProfessionalID,
             status: 'in-progress',
             offer: [offerModel],
@@ -362,19 +364,20 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
       var res;
         res = await postRepository.getOffer(offerRequest);
 
-      const resDTO = res.data.map((offer) => {
-        return new OfferResponseDTO({
-          _id: offer._id as string,
-          postName: offer.postName,
-          userName: offer._id as string,
-          roleName: offer.roleName, // Role offered to the participant
-          currentWage: offer.currentWage, // The amount offered for the role
-          reason: offer.reason,
-          offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
-          status: offer.status,
-          createdAt: offer.createdAt
-        })         
-      });
+        const resDTO = res.data.map((offer) => {
+          return new OfferResponseDTO({
+            _id: offer._id as string,
+            postName: offer.postName,
+            userName: offer._id as string,
+            roleName: offer.roleName, // Role offered to the participant
+            currentWage: offer.currentWage, // The amount offered for the role
+            reason: offer.reason,
+            offeredBy: offer.offeredBy, // User ID should be better than 0/1 ?
+            status: offer.status,
+            createdAt: offer.createdAt,
+            participantID : offer.participantID as string,
+          })
+        });
       const response: PaginatedResponseDTO<OfferResponseDTO> = {
         data: resDTO,
         meta: {
@@ -462,7 +465,10 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
                 postName: post.postName as string,
                 postDescription: post.postDescription as string,
                 postImages: [postImage] as [string],
-                postMediaType: post.postMediaType.toString() as string,
+                postMediaTypeOut: {    
+                  id: (post.postMediaType as any)._id.toString() as string,
+                  mediaName: (post.postMediaType as any).mediaName as string
+                },
                 postProjectRoles: post.postProjectRoles.map(eachRole => eachRole.toString()) as [string],
                 postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
                 startDate: post.startDate ? post.startDate : "",  
@@ -484,6 +490,102 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     } catch (error) {
         console.error('Error in service layer:', error);
         throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  async getPostParticipants(postId: string) {
+    try {
+      const participants = await postRepository.getPostParticipants(postId);
+      return participants;
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+
+  async getPostsByProducer(getPostReq: GetPostByProducerRequestModel): Promise<PaginatedResponseDTO<PostDTO>> { //no need to change name
+    try {
+        const postsReq: GetPostByProducerRequestModel = getPostReq;
+        const res = await postRepository.getPostsByProducer(postsReq);
+
+        const resDTO = await Promise.all(res.data.map(async (post) => {
+            let postImage = post.postImages[0] 
+                ? await cloudService.getSignedUrlImageCloud(post.postImages[0] as string) 
+                : '';
+            // console.log('postImage',postImage)
+            return new PostDTO({
+                id: post._id?.toString(),
+                postName: post.postName as string,
+                postDescription: post.postDescription as string,
+                postImages: [postImage] as [string],
+                postProjectRoles: post.postProjectRoles.map(eachRole => eachRole.toString()) as [string],
+                postMediaTypeOut: {    
+                  id: (post.postMediaType as any)._id.toString() as string,
+                  mediaName: (post.postMediaType as any).mediaName as string
+                },
+                postStatus: post.postStatus as 'created' | 'in-progress' | 'success' | 'cancel',
+                startDate: post.startDate ? post.startDate : "",  
+                endDate: post.endDate ? post.endDate : ""
+            });
+        }));
+
+        const response: PaginatedResponseDTO<PostDTO> = {
+            data: resDTO,
+            meta: {
+                page: getPostReq.page,
+                limit: getPostReq.limit,
+                totalItems: res.totalItems,
+                totalPages: Math.ceil(res.totalItems / getPostReq.limit)
+            } as PaginationMetaDTO
+        };
+
+        return response;
+    } catch (error) {
+        console.error('Error in service layer:', error);
+        throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  public async sendSubmission(id: string, participantID: string): Promise<void> {
+    try {
+      await postRepository.sendSubmission(id, participantID);
+      return;
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+
+  public async sendApprove(sendApproveRequest: SendApproveRequest): Promise<void> {
+    try {
+      await postRepository.sendApprove(sendApproveRequest);
+      return;
+    } catch (error) {
+      throw new Error('Error in service layer: ' + error);
+    }
+  }
+  
+  async startProject(postId: string, userId: string): Promise<void> {
+    try {
+      await postRepository.startProject(postId, userId);
+      return;
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+
+  async getPostParticipant(postId: string, userId: string): Promise<ParticipantDetail[]> {
+    try {
+      const participants = await postRepository.getPostParticipant(postId, userId);
+      return participants
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+
+  async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
+    try{
+        await postRepository.changeParticipantStatus(dto);
+    }catch(error){
+      throw new Error('Error change participant status in service layer: ' + error);
     }
   }
 

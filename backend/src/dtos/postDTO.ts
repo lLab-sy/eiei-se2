@@ -1,6 +1,6 @@
-import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsEnum, IsArray, ArrayNotEmpty, IsNumber, IsObject, IsMongoId, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectId } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 import { PostRoleDTO } from './postRoleDTO';
 class PostProjectRoleDTO {
     @ApiProperty({ description: 'Role ID', type: String })
@@ -8,6 +8,14 @@ class PostProjectRoleDTO {
 
     @ApiProperty({ description: 'Role name', type: String })
     roleName!: string;
+}
+
+class PostMediaDTO {
+    @ApiProperty({ description: 'Role ID', type: String })
+    id!: string;
+
+    @ApiProperty({ description: 'Role name', type: String })
+    mediaName!: string;
 }
 
 export interface ImageDisplayDTO{
@@ -47,6 +55,44 @@ export interface OfferDetailDTO{
     reason: string;
 }
 
+export class ChangeParticipantStatusDTO {
+    @IsMongoId()
+    @IsNotEmpty()
+    actionBy!: string;
+
+    @IsEnum(['production professional', 'producer'])
+    @IsNotEmpty()
+    role!: 'production professional' | 'producer';
+
+    @IsMongoId()
+    @IsNotEmpty()
+    postID!: string;
+
+    @IsMongoId()
+    @IsNotEmpty()
+    participantID!: string;
+
+    @IsEnum(['candidate', 'reject'])
+    @IsNotEmpty()
+    statusToChange!: 'candidate' | 'reject';
+
+    constructor(partial: Partial<ChangeParticipantStatusDTO>) {
+        Object.assign(this, partial);
+    }
+}
+
+export class SendApproveRequest {
+    @IsNotEmpty()
+    @IsString()
+    postId!: string;
+
+    @IsString()
+    userId: string = '';
+
+    @IsBoolean()
+    isApprove: boolean = false;
+}
+
 export class ParticipantDetailDTO {  
     @ApiProperty({ description: 'Unique identifier of the participant', type: String })
     @IsString()
@@ -74,6 +120,22 @@ export class ParticipantDetailDTO {
     offeredBy!: number;
 
     offer!: OfferDTO[]; // Array of offers received by the participant
+
+
+    @IsNumber()
+    @IsNotEmpty()
+    workQuota!: number;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    isSend!: boolean;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    isApprove!: boolean;
+
+    @IsArray()
+    submissions!: Date[];
 
     @ApiProperty({ description: 'Participant rating score', type: Number })
     @IsNumber()
@@ -189,6 +251,11 @@ export class PostDTO {
     @IsNotEmpty()
     postMediaType!: string;
 
+    @ApiProperty({ description: 'The media type detail of the post', type: String })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypeOut!: PostMediaDTO;
+
     @ApiProperty({ description: 'The roles in the project associated with the post', type: [String] })
     @IsArray()
     @IsString({ each: true }) 
@@ -207,7 +274,7 @@ export class PostDTO {
     @ApiProperty({ description: 'The status of the post', enum: ['created', 'in-progress', 'success', 'cancel'] })
     @IsString()
     @IsEnum(['created', 'in-progress', 'success', 'cancel'], { message: 'Status must be one of: created, in-progress, success, cancel' })
-    postStatus!: 'created' | 'in-progress' | 'success' | 'cancel';
+    postStatus!: 'created' | 'waiting' | 'in-progress' | 'success' | 'cancel';
 
     @ApiProperty({ description: 'The start date of the post' })
     @IsString()  
@@ -333,6 +400,7 @@ export class OfferResponseDTO {
     offeredBy!: number; // User ID should be better than 0/1 ?
     status!: string;
     createdAt!: Date;
+    participantID?: string;
     constructor(
         init : {_id: string,
         postName: string,
@@ -342,6 +410,7 @@ export class OfferResponseDTO {
         userName:string,
         offeredBy: number,
         status: string,
+        participantID?: string,
         createdAt: Date}
       ) {
         this._id = init._id;
@@ -353,10 +422,47 @@ export class OfferResponseDTO {
         this.offeredBy = init.offeredBy;
         this.status = init.status;
         this.createdAt = init.createdAt;
+        this.participantID = init.participantID;
+
       }
 }
 
 export class GetPostByProfDTO {
+    @ApiProperty({ description: 'The id of user', type: String })
+    @IsString()
+    @IsNotEmpty()
+    userId!: string;
+
+    @ApiProperty({ description: 'The status of post', type: String })
+    @IsString()  
+    postStatus!: string[];
+
+    @ApiProperty({ description: 'The status of participant', type: String })
+    @IsString()  
+    participantStatus!:string
+
+    @ApiProperty({ description: 'The number of post per page' })
+    @IsNumber()  
+    limit!: number;
+
+    @ApiProperty({ description: 'The current page' })
+    @IsNumber() 
+    page!: number;
+
+    @ApiProperty({ description: 'The media type of the post', type: [String] })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypes!: string[];
+
+    @ApiProperty({ description: 'The name of the post or project detail', type: String })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100, { message: 'searchText cannot be more than 100 characters' })
+    searchText!: string;
+}
+
+
+export class GetPostByProducerDTO {
     @ApiProperty({ description: 'The id of user', type: String })
     @IsString()
     @IsNotEmpty()
@@ -373,4 +479,15 @@ export class GetPostByProfDTO {
     @ApiProperty({ description: 'The current page' })
     @IsNumber() 
     page!: number;
+
+    @ApiProperty({ description: 'The media type of the post', type: [String] })
+    @IsString()
+    @IsNotEmpty()
+    postMediaTypes!: string[];
+
+    @ApiProperty({ description: 'The name of the post or project detail', type: String })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100, { message: 'searchText cannot be more than 100 characters' })
+    searchText!: string;
 }

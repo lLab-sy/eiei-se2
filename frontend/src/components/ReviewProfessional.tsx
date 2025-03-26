@@ -27,7 +27,7 @@ interface ratingCounterInterface {
 
 
 
-interface reviewDataInterface {
+export interface reviewDataInterface {
   amount: number;
   rating: number;
   reviews: Array<reviewInterface>;
@@ -158,13 +158,12 @@ export default function ReviewProfessional({ id }: { id: string }) {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         className=" h-full overflow-y-auto scroll-p-0 flex flex-col"
       >
-        <title className="text-2xl bg-mainblue text-white h-[5%]">Your Review</title>
         <div className="flex px-3 py-2 my-1 bg-white rounded-lg border justify-around items-center">
           <div className=" w-[30%] items-center flex flex-col">
             {/* <Star size={90} color="#ffbb00" strokeWidth={3} /> */}
             <span className="text-5xl">{(avg) ? avg : 0}</span>
             <span className="text-lg">Out of 5</span>
-            <Rating value={avg} readOnly />
+            <Rating value={avg} precision={0.5} readOnly />
           </div>
           <div className="  w-[60%] flex flex-col">
             <span className="flex items-center">

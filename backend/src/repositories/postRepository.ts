@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel } from '../models/postModel';
-import { OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel, SendApproveRequestModel } from '../models/postModel';
+import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
-import mongoose, { PipelineStage } from 'mongoose';
+import mongoose, { FilterQuery, PipelineStage, ProjectionFields, UpdateQuery } from 'mongoose';
 import { Pipe } from 'stream';
 
 class PostRepository {
@@ -73,6 +73,7 @@ class PostRepository {
                         postName: 1,
                         postDescription: 1,
                         postImages: 1,
+                        participants: 1,
                         postMediaType: 1, // Show mediaName instead of postMediaType
                         postStatus: 1,
                         startDate: 1,
@@ -127,6 +128,7 @@ class PostRepository {
                     postImages: 1,
                     postMediaType: 1,
                     postName: 1,
+                    participants: 1,
                     postProjectRolesOut: {
                       $arrayElemAt: [
                         '$participants.offer.role',
@@ -164,6 +166,7 @@ class PostRepository {
                     postImages: 1,
                     postMediaType: 1,
                     postName: 1,
+                    participants: 1,
                     postProjectRolesOut: {
                       $arrayElemAt: [
                         '$postProjectRolesOut',
@@ -340,7 +343,7 @@ class PostRepository {
 
             matchStage.push({
               $match: {
-                postStatus: "created"
+                postStatus: { $in: ["created", "waiting"] }
               }
             })
             
@@ -403,6 +406,36 @@ class PostRepository {
         }
     }
 
+    public async startProject(postId: string, userId: string): Promise<void> {
+        try {
+            if (!postId) {
+                throw new Error("Id is required");
+            }
+
+            const result = await Post.findOneAndUpdate(
+                {
+                    _id: postId,
+                    "postStatus": "waiting", // have at least 1 cadidate
+                    "userID": userId 
+                },
+                { $set: { 
+                    "postStatus": 'in-progress',
+                    "startDate":new Date()
+                 }}, // Update the matching element
+                { new: true, runValidators: true }
+            );
+            
+            if (!result) {
+                throw new Error('Post not found or post status not match');
+            }
+
+            return;
+        }
+        catch(err){
+            throw new Error('Error in postRepository startProject : ' + err)
+		}
+	}
+
     public async addPostReview(postID: string, participantID: string, newRating: PaticipantRating) {
         try {
             if (!postID) {
@@ -414,7 +447,7 @@ class PostRepository {
                   "postStatus": "success", // post success
                   "participants.participantID": participantID, // Ensure has paticipant in post
                   "participants.status": "candidate", // cadidate only
-                  "participants.reviewedAt": { $exists: false }, // make sure that no review when add to this post
+                  // "participants.reviewedAt": null, // make sure that no review when add to this post
                 },
                 { $set: { 
                     "participants.$.ratingScore": newRating.ratingScore,
@@ -635,8 +668,9 @@ class PostRepository {
                     },
                     currentWage: '$participants.offer.price',
                     reason: '$participants.offer.reason',
-                    offeredBy: '$participants.offer.offerBy',
+                    offeredBy: '$participants.offer.offeredBy',
                     status: "$participants.status",
+                    participantID: '$participants.participantID',
                     createdAt: '$participants.offer.createdAt'
                   }
             }
@@ -651,7 +685,8 @@ class PostRepository {
                     reason: 1,
                     offeredBy: 1,
                     status:1,
-                    createdAt: 1
+                    createdAt: 1,
+                    participantID: 1,
                   }
             }
             pipeline.push(projectStage);
@@ -686,17 +721,24 @@ class PostRepository {
 
     public async getPostsByProf(getPostByProfReq: GetPostByProfRequestModel): Promise<GetPostByProfResponse>{
         try {
-            const { userId, postStatus, limit, page } = getPostByProfReq;
+            const { userId, postStatus, limit, page, postMediaTypes, searchText,participantStatus  } = getPostByProfReq;
             const objectId = new mongoose.Types.ObjectId(userId);
 
-            const postStatusMatchStage: PipelineStage.Match = {
-                $match: {
-                  ...(postStatus && { postStatus }),
-                },
-            };
+            // const postStatusMatchStage: PipelineStage.Match = {
+            //     $match: {
+            //       ...(postStatus && { postStatus }),
+            //     },
+            // };
             
-            const pipeline: PipelineStage[] = [postStatusMatchStage];
-
+            // const pipeline: PipelineStage[] = [postStatusMatchStage];
+            const pipeline: PipelineStage[] = [];
+            if (postStatus?.length) {
+                pipeline.push({
+                    $match: {
+                        postStatus: { $in: postStatus}
+                    }
+                })
+            }
             const matchStage1: PipelineStage.Match ={
                 $match: {
                       'participants.participantID': objectId
@@ -704,17 +746,80 @@ class PostRepository {
             }
             pipeline.push(matchStage1);
 
+            if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
+                pipeline.push({
+                    $match: {
+                        postMediaType: { $in: postMediaTypesID}
+                    }
+                })
+            }
+
+
+            if (searchText) {
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { postName: { $regex: searchText, $options: "i" } },
+                            { postDescription: { $regex: searchText, $options: "i" } }
+                        ]
+                    }
+                });
+            }
+
             const unwindStage: PipelineStage.Unwind = {
                 $unwind: { path: '$participants' }
             }
             pipeline.push(unwindStage)
             
-            const matchStage2: PipelineStage.Match ={
+            const matchStage3: PipelineStage.Match ={
                 $match: {
                     'participants.participantID': objectId
                   }
             }
-            pipeline.push(matchStage2);
+            pipeline.push(matchStage3);
+
+            
+            if(participantStatus){
+                const matchStage2: PipelineStage.Match={
+                    $match: {
+                        'participants.status': participantStatus
+                    }
+                }
+                pipeline.push(matchStage2);
+            }
+
+            const lookupStage1: PipelineStage.Lookup ={
+                $lookup: {
+                    from: "mediaTypes",
+                    localField: "postMediaType",
+                    foreignField: "_id",
+                    as: "postMediaTypeOut"
+                  }
+            }
+            pipeline.push(lookupStage1);
+
+            const projectStage1: PipelineStage.Project ={
+                $project: {
+                    postName:1,
+                    postDescription:1,
+                  postImages:1,
+                  postProjectRoles:1,
+                  postStatus:1,
+                  startDate:1,
+                  endDate:1,
+                  createdAt:1,
+                  updatedAt:1,
+                  postMediaType: {
+                    $arrayElemAt: ["$postMediaTypeOut", 0]
+                  }
+                }
+                
+            }
+            pipeline.push(projectStage1);
 
             const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
             const totalItemsResult = await Post.aggregate(totalItemstStage);
@@ -736,12 +841,328 @@ class PostRepository {
                 data: results,
                 totalItems: totalItems
             }
-            console.log("ANSWER",response)
+            console.log("ANSWER Prof",response)
             return response
         } catch (error) {
             throw new Error('Error fetching user posts from repository: ' + error);
         }
     }
+
+    async getPostParticipants(postId: string) {
+      try {
+        const objectId = new ObjectId(postId);
+        const post = await Post.findById(objectId)
+          .populate({
+            path: "participants.participantID",
+            // select: "username rating _id",
+          })
+          .populate({
+            path: "participants.offer.role",
+            select: "roleName",
+          });
+  
+        if (!post) {
+          throw new Error("Post not found");
+        }
+  
+        // กรองเฉพาะ participants ที่มีสถานะ "candidate"
+        const participants = post.participants.filter(
+          (p) => p.status === "candidate"
+        );
+        return participants.map((participant) => {
+          // หาบทบาทล่าสุดจาก offers (ถ้ามี)
+          const latestOffer =
+            participant.offer && participant.offer.length > 0
+              ? participant.offer[participant.offer.length - 1]
+              : null;
+  
+          const roleName =
+            latestOffer && latestOffer.role
+              ? (latestOffer.role as any).roleName
+              : "Unknown Role";
+  
+          const isReview = (participant.participantID as any).rating.some(
+            (eachRating: { postID: any }) => eachRating.postID == post.id
+          );
+  
+          return {
+            id: (participant.participantID as any)._id.toString(),
+            label: `${(participant.participantID as any).username} - ${roleName}`,
+            isReview: isReview,
+          };
+        });
+      } catch (error) {
+        throw new Error("Error fetching post participants: " + error);
+      }
+    }
+    public async getPostsByProducer(getPostByProducerReq: GetPostByProducerRequestModel): Promise<GetPostByProfResponse>{ //no need to change name
+        try {
+            const { userId, postStatus, limit, page, postMediaTypes, searchText  } = getPostByProducerReq;
+            const objectId = new mongoose.Types.ObjectId(userId);
+
+            const postStatusMatchStage: PipelineStage.Match = {
+                $match: {
+                  ...(postStatus && { postStatus }),
+                },
+            };
+            
+            const pipeline: PipelineStage[] = [postStatusMatchStage];
+
+            const matchStage1: PipelineStage.Match ={
+                $match: {
+                      'userID': objectId
+                    }
+            }
+            pipeline.push(matchStage1);
+
+            if (postMediaTypes?.length) {
+                const postMediaTypesID = postMediaTypes.map((eachType) => {
+                    return new ObjectId(eachType);
+                  
+                });
+                pipeline.push({
+                    $match: {
+                        postMediaType: { $in: postMediaTypesID}
+                    }
+                })
+            }
+
+
+            if (searchText) {
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { postName: { $regex: searchText, $options: "i" } },
+                            { postDescription: { $regex: searchText, $options: "i" } }
+                        ]
+                    }
+                });
+            }
+            
+
+            const lookupStage1: PipelineStage.Lookup ={
+                $lookup: {
+                    from: "mediaTypes",
+                    localField: "postMediaType",
+                    foreignField: "_id",
+                    as: "postMediaTypeOut"
+                  }
+            }
+            pipeline.push(lookupStage1);
+
+            const projectStage1: PipelineStage.Project ={
+                $project: {
+                    postName:1,
+                    postDescription:1,
+                  postImages:1,
+                  postProjectRoles:1,
+                  postStatus:1,
+                  startDate:1,
+                  endDate:1,
+                  createdAt:1,
+                  updatedAt:1,
+                  postMediaType: {
+                    $arrayElemAt: ["$postMediaTypeOut", 0]
+                  }
+                }
+                
+            }
+            pipeline.push(projectStage1);
+
+
+            const totalItemstStage: PipelineStage[] = [...pipeline, { $count: "totalCount" }];
+            const totalItemsResult = await Post.aggregate(totalItemstStage);
+            const totalItems = totalItemsResult.length > 0 ? totalItemsResult[0].totalCount : 0;
+
+            // Pagination
+            const pageNumber = Math.max(1, Number(page));
+            const pageSize = Math.max(1, Number(limit));
+            const skip = (pageNumber - 1) * pageSize;
+
+            //sort by date from new to old, push skip and limit
+            const sortStage: PipelineStage.Sort = {
+                $sort: { createdAt: -1 }
+            }
+            pipeline.push(sortStage, { $skip: skip }, { $limit: pageSize });
+
+            const results = await Post.aggregate(pipeline)
+            const response: GetPostByProfResponse = {
+                data: results,
+                totalItems: totalItems
+            }
+            // console.log("ANSWER",response)
+            return response
+        } catch (error) {
+            throw new Error('Error fetching user posts from repository: ' + error);
+        }
+    }
+    
+    public async getPostParticipant(id:string, participantID:string): Promise<ParticipantDetail[]> {
+        try {
+            // console.log("HELlo",postData)
+
+            const filter: FilterQuery<IPost> = {
+                _id: id
+            }
+
+            if (participantID != '') {
+                filter["participants.participantID"] = participantID
+            }
+
+            const project: ProjectionFields<IPost> = {};
+
+            switch (true) {
+                case participantID!='': project['participants.$'] = 1;break;
+                default: project['participants'] = {
+                    $filter: {
+                      input: "$participants",
+                      as: "p",
+                      cond: { $eq: ["$$p.status", "candidate"] },
+                    },
+                }
+            }
+
+            const post:IPost[]|null = await Post.find(
+                filter,
+                project
+            ).populate({path:"participants.offer.role"})
+            .populate({
+                path:"participants.participantID",
+                select:"username _id firstname middlename lastname"
+            });
+
+            if (!post) {
+                throw new Error('Post or participant not found')
+            }
+
+            return post[0].participants;
+        } catch (error) {
+            throw new Error('Error getPostParticipant in post repository: ' + error);
+        }
+    }
+
+    public async sendSubmission(id:string, participantID:string): Promise<void>{
+        try {
+            // console.log("HELlo",postData)
+            const post = await Post.findOneAndUpdate(
+                {
+                    _id: id,
+                    "postStatus": "in-progress", // post success
+                    "participants.participantID": participantID, // Ensure has paticipant in post
+                    "participants.status": "candidate", // cadidate only
+                    "participants.workQuota": { $gt: 0 }
+                  // "participants.reviewedAt": null, // make sure that no review when add to this post
+                },
+                { 
+                    $set: { 
+                        "participants.$.isSend": true,
+                    },
+                    $inc: { "participants.$.workQuota": -1 },
+                    $push: {
+                        "participants.$.submissions": new Date()
+                    }
+                }, // Update the matching element
+                { new: true, runValidators: true }
+            );
+
+            if (!post) {
+                throw new Error('Post not found or no more quota')
+            }
+
+            // const posts= await Post.findById(objectId);
+            return;
+        } catch (error) {
+            throw new Error('Error submission in post repository: ' + error);
+        }
+    }
+    
+    public async sendApprove(sendApproveReq: SendApproveRequestModel): Promise<void> {
+        try {
+            const filter: FilterQuery<IPost> = {
+                _id: sendApproveReq.postId,
+                postStatus: "in-progress",
+            };
+    
+            const update: UpdateQuery<IPost> = {};
+    
+            // ถ้ามี userId ที่กำหนด -> อัปเดตเฉพาะ participant ที่มี participantID ตรงกัน
+            if (sendApproveReq.userId !== '') {
+                filter["participants.participantID"] = sendApproveReq.userId;
+                update["$set"] = {
+                    "participants.$[elem].isApprove": sendApproveReq.isApprove
+                };
+    
+                if (!sendApproveReq.isApprove) {
+                    update["$set"]["participants.$[elem].isSend"] = false;
+                }
+            } else if (sendApproveReq.isApprove) {
+                // ถ้า userId เป็น "" และกำลัง approve -> เปลี่ยน postStatus เป็น "success"
+                update["$set"] = { 
+                    postStatus: "success",
+                    endDate: new Date(), 
+                };
+                update["$set"]["participants.$[].isApprove"] = true;
+            }
+    
+            const post = await Post.findOneAndUpdate(
+                filter,
+                update,
+                {
+                    new: true,
+                    runValidators: true,
+                    arrayFilters: sendApproveReq.userId !== '' ? [{ "elem.participantID": sendApproveReq.userId }] : undefined
+                }
+            );
+    
+            if (!post) {
+                throw new Error('Post not found');
+            }
+    
+            return;
+        } catch (error) {
+            throw new Error('Error submission in post repository: ' + error);
+        }
+    }
+    
+    public async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
+        try{
+            const post: IPost | null = await Post.findOne({ _id: dto.postID });
+            if (!post) {
+                throw new Error(`Post with ID ${dto.postID} not found`);
+            }
+
+            // Check producerId to matach with userID from post
+            if(dto.role === 'producer' && post.userID.toString() !== dto.actionBy){
+                throw new Error(`You do not have permission to access or modify this post(Post ID: ${dto.postID})`);
+            }
+
+            // Find the participant in the post's participants array
+            const participant = post.participants.find((p) => p.participantID.toString() === dto.participantID);
+            
+            switch(true) {
+                case !participant: throw new Error('Participant not found');break;
+                case participant && participant.status !== 'in-progress': throw new Error('Participant is not in progress');break;
+                case dto.statusToChange == 'candidate' && post.postStatus == 'created' : post.postStatus = 'waiting';break;
+            }
+
+            const latestOffer = participant.offer.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+            if (!latestOffer) {
+                throw new Error('No offers found for this participant');
+            }
+
+            if ((latestOffer.offeredBy === (dto.role === "producer"? 1:0)) && dto.statusToChange === "candidate") {
+                throw new Error("Cannot confirm offer which is created by yourself");
+            }
+
+            participant.status = dto.statusToChange;
+            await post.save();
+        }catch(error){
+            throw new Error('Error change participant status in repository: ' + error);
+        }
+    }
+    
+  
 }
 
 

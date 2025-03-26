@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { bool } from 'sharp';
 
 // Offer History Model
 export interface OfferHistory {
@@ -23,6 +24,12 @@ export interface ParticipantDetail {
     ratingScore: number;
     comment: string; 
     reviewedAt: Date|null; // Date of review for the participant
+
+    workQuota: number|3;
+    isSend: boolean|false;
+    isApprove: boolean|false;
+    submissions: Date[];
+
     createdAt: Date; // Date participant was first added (when first offer was made)
     updatedAt: Date; // Date when participant details were last updated
 }
@@ -34,7 +41,7 @@ export interface IPost extends Document {
     postImages: string[];
     postMediaType: mongoose.Schema.Types.ObjectId;
     postProjectRoles: mongoose.Schema.Types.ObjectId[]; 
-    postStatus: 'created' | 'in-progress' | 'success' | 'cancel';
+    postStatus: 'created' | 'waiting' | 'in-progress' | 'success' | 'cancel';
     startDate?: string;
     endDate?: string;
     postDetailID: mongoose.Schema.Types.ObjectId;
@@ -83,15 +90,34 @@ export const participantDetailSchema = new Schema<ParticipantDetail>({
         type: Number,
         min: 0,
         max: 5,
-        required: true,
+        required: false,
     },
     comment: {
         type: String,
-        required: true,
+        default: '',
+        //required: true,
     },
     reviewedAt: {
         type: Date,
     },
+
+    workQuota: {
+        type: Number,
+        default: 3,
+    },
+    isSend: {
+        type: Boolean,
+        default: false,
+    },
+    isApprove: {
+        type: Boolean,
+        default: false,
+    },
+    submissions: {
+        type: [Date],
+        default: [],
+    },
+
     createdAt: {
         type: Date,
         default: Date.now,
@@ -144,7 +170,7 @@ const postSchema = new Schema<IPost>({
     },
     postStatus: {
         type: String,
-        enum: ['created', 'in-progress', 'success', 'cancel'],
+        enum: ['created', 'waiting', 'in-progress', 'success', 'cancel'],
         required: true,
     },
     startDate: {
@@ -200,6 +226,7 @@ export interface GetOfferRequestModel {
 }
 
 export interface OfferHistoryForGetOfferResponse {
+    participantID: string;
     _id: string;
     userName:string;
     postName: string;
@@ -218,9 +245,27 @@ export interface GetOfferResponse {
 
 export interface GetPostByProfRequestModel {
     userId: string;
+    postStatus: string[];
+    limit: number;
+    page: number;
+    postMediaTypes: string[];
+    searchText: string;
+    participantStatus:string;
+}
+
+export interface GetPostByProducerRequestModel {
+    userId: string;
     postStatus: string;
     limit: number;
     page: number;
+    postMediaTypes: string[];
+    searchText: string;
+}
+
+export interface SendApproveRequestModel {
+    postId: string;
+    userId: string;
+    isApprove: boolean;
 }
 
 export interface GetPostByProfResponse {

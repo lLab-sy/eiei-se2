@@ -8,7 +8,7 @@ class MediaTypeRepository {
     public async getAllMediaTypes() {
         try {
              const mediaTypes= await MediaType.find();
-             console.log('Media Type from database:', mediaTypes);
+            //  console.log('Media Type from database:', mediaTypes);
              return mediaTypes
         } catch (error) {
             throw new Error('Error fetching mediaType from repository: ' + error);

@@ -215,6 +215,58 @@ const upload = multer({
  */
 router.get('/posts/search', postController.searchPost);
 
+/**
+ * @swagger
+ * /api/v1/posts/{id}/startProject:
+ *   put:
+ *     summary: Change post status to in-progress (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Complete start project
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.put('/posts/:id/startProject', AuthMiddleware.authenticate as RequestHandler, postController.startProject as RequestHandler);
+
+/**
+ * @swagger
+ * /api/v1/posts/getPostParticipant/{id}:
+ *   get:
+ *     summary: get ont participant in post (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully get post
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.get('/posts/getPostParticipant/:id', AuthMiddleware.authenticate as RequestHandler, postController.getPostParticipant as RequestHandler);
+// 
 
 /**
  * @swagger
@@ -251,6 +303,75 @@ router.get('/posts/search', postController.searchPost);
  */
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
 router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandler, postController.addPostReview as RequestHandler);
+
+
+/**
+ * @swagger
+ * /api/v1/posts/{id}/sendSubmission:
+ *   post:
+ *     summary: Send submission to post by user (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       201:
+ *         description: The created post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PostDTO'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.post('/posts/:id/sendSubmission', AuthMiddleware.authenticate as RequestHandler, postController.sendSubmission as RequestHandler);
+
+/**
+ * @swagger
+ * /api/v1/posts/{id}/sendApprove:
+ *   put:
+ *     summary: Send approve to post by producer (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: userId
+ *         required: false
+ *         description: The unique identifier of the candidate (if not assume all)
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: isApprove
+ *         required: false
+ *         description: approve = 1, reject = 0
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: Successfully approve post
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.put('/posts/:id/sendApprove', AuthMiddleware.authenticate as RequestHandler, postController.sendApprove as RequestHandler);
 
 
 /**
@@ -321,7 +442,74 @@ router.post('/posts/:id/addReview', AuthMiddleware.authenticate as RequestHandle
  *         description: Server error
  */
 router.get('/posts/user/prof', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByProf as RequestHandler);
-
+/**
+ * @swagger
+ * /api/v1/posts/user/producer:
+ *   get:
+ *     summary: Get posts by a specific user
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: postStatus
+ *         schema:
+ *           type: string
+ *         description: The status of post
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of posts per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The current page number
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: "#/components/schemas/PostDTO"
+ *                     meta:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                           example: 1
+ *                         limit:
+ *                           type: integer
+ *                           example: 10
+ *                         totalItems:
+ *                           type: integer
+ *                           example: 5
+ *                         totalPages:
+ *                           type: integer
+ *                           example: 1
+ *                 message:
+ *                   type: string
+ *                   example: Successfully get posts
+ *       404:
+ *         description: Posts not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/posts/user/producer', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByProducer as RequestHandler);
 /**
  * @swagger
  * /api/v1/posts:
@@ -644,5 +832,88 @@ router.delete('/posts/:id', AuthMiddleware.authenticate as RequestHandler, postC
  *         description: Internal server error
  */
 router.post('/create-offer', AuthMiddleware.authenticate as RequestHandler, postController.createOffer as RequestHandler);
+
+/**
+ * @swagger
+ * /api/v1/posts/{id}/participants:
+ *   get:
+ *     summary: Get all participants for a post
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of participants in the post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "67b1a81ded193cb7b3dd94bb"
+ *                   label:
+ *                     type: string
+ *                     example: "Johny Stafrod - Prop Master"
+ *       403:
+ *         description: Unauthorized, only the post owner can view participants
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.get(
+    "/posts/:id/participants",
+    AuthMiddleware.authenticate as RequestHandler,
+    postController.getPostParticipants as RequestHandler
+  );
+
+  
+/**
+ * @swagger
+ * /api/v1/posts/participant-status:
+ *   patch:
+ *     summary: change participant status from in-progress to candidate or reject in specific post
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: [] 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - postID
+ *               - participantID
+ *               - statusToChange
+ *             properties:
+ *               postID:
+ *                 type: string
+ *                 description: The ID of the post associated with the offer
+ *               participantID:
+ *                 type: string
+ *                 description: The ID of the participant which the producer want to change status  
+ *               statusToChange:
+ *                 type: string
+ *                 description: The status to change to (candidate or reject) 
+ *     responses:
+ *       200:
+ *         description: Confirm offer successfully
+ *       400:
+ *         description: Bad request, invalid input
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/posts/participant-status', AuthMiddleware.authenticate as RequestHandler, postController.changeParticipantStatus as RequestHandler);
 
 export default router;

@@ -22,23 +22,32 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "./ui/button";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { FaHistory } from "react-icons/fa";
 type menuItem = {
   icon: JSX.Element;
   label: string;
   href: string;
 }
 const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, handleSignOut: Function}) => {
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  const handleSignOutTrigger = async () => {
+    setOpen(false);
+    await handleSignOut();
+    // router.push('/')
+  }
   return (
     <div>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {/* <Link href='/'>Logout</Link> */}
           <Link
-                href={'/'}
+                href={'#'}
                 className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
                   "text-red-600 hover:text-red-700"
                 }`}
-                onClick={ async () => setIsMenuOpen(false)}
+                onClick={ async () => {setIsMenuOpen(false)}}
               >
                 <LogOut className="w-5 h-5"/>
                 <span>Logout</span>
@@ -57,7 +66,7 @@ const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, 
             <div className=' w-full text-white flex flex-row justify-between'>
                 <DialogClose asChild><Button className='bg-red-600'>No</Button></DialogClose>
                 <Button onClick={async () => {
-                  await handleSignOut()
+                  await handleSignOutTrigger()
                 }} className='bg-green-400'>Yes</Button>
             </div>
           </DialogFooter>  
@@ -75,11 +84,10 @@ const NavBar = (session: any) => {
   // const {data: session, status} = useSession()
   const dispatch = useDispatch<AppDispatch>()
   const user: any = useSelector<RootState>(state => state.user)
-  console.log('session', session)
   const handleSignOut = async () => {
-    dispatch(clearStorage(''))
-    await signOut()
     
+    await signOut();
+    dispatch(clearStorage(''));
   }
   
   
@@ -117,7 +125,6 @@ const NavBar = (session: any) => {
           Authorization: `Bearer ${fetchToken}`
         }
       })
-      console.log('res', res)
       const controller = new AbortController()
       if(!res){
         throw new Error('Failed to Fetch')
@@ -130,7 +137,6 @@ const NavBar = (session: any) => {
       await handleFetchProfileURL(returnUser.data._id)
 
       dispatch(setUser(returnUser.data))
-      console.log('setuser', user.user)
       return () => controller.abort()
     }
     handleFetch(token)
@@ -144,8 +150,13 @@ const NavBar = (session: any) => {
         label: "Profile", 
         href: "/user-profile" },
       {
-        icon: <FileText className="w-5 h-5" />,
-        label: role === "producer" ? "My Post" : "Work History",
+          icon: <FileText className="w-5 h-5" />,
+          label:  "My Post",
+          href: "/my-post",
+      },
+      {
+        icon: <FaHistory className="w-5 h-5" />,
+        label: role === "producer" ? "My Post History" : "Work History",
         href: "/post-history",
       },
       ...(role === "producer" ? 
@@ -194,7 +205,6 @@ const NavBar = (session: any) => {
         },
       });
       setHistoryDataArray(res?.data?.data?.data)
-      console.log('resHistory', res)
     } 
     // handleFetch(userId, "created")
   return (

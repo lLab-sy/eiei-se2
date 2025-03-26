@@ -117,7 +117,7 @@ const mockOfferHistory: OfferHistoryData[] = [
           var userResponse;
 
           if (userRole === "producer") {
-            response = await getPostUser(userID); // ดึงโพสต์ของ producer
+            response = await getPostUser(userID,true); // ดึงโพสต์ของ producer
             userResponse = await getUser(pid);
             // responseOffer= await getOfferHistory(token,pid); 
           } else if (userRole === "production professional") {

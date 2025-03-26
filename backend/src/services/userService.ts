@@ -154,7 +154,8 @@ class UserService {
                                     reviewerName: review.reviewerName as string,
                                     reviewerProfileImage: reviewerProfileImageTmp,
                                     ratingScore: review.ratingScore,
-                                    comment: review.comment as string
+                                    comment: review.comment as string,
+                                    reviewAt: review.reviewAt as string
                                 })
                             })
                         )

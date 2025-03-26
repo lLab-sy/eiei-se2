@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import {User, IUser } from '../models/userModel';
 import Post from '../models/postModel';
 import { error } from 'console';
+import cloudService from '../services/cloudService';
 
 //change to similar to test using input as I user
 
@@ -40,9 +41,11 @@ class UserRepository {
     async getUserByID(userID: string){
         try{
             const user = await User.findById(userID);
+            
             if(!user){
                 throw new Error("User not found.")
             }
+            console.log('userGetById', user)
             return user;
         } catch(err){
             throw new Error('Error logging in user in repository: ' + err);
@@ -287,6 +290,7 @@ class UserRepository {
                         "participants.ratingScore": 1,
                         "participants.comment": 1,
                         "participants.status": 1,
+                        "participants.reviewedAt": 1,
                         _id: 0
                       }
                     },
@@ -296,10 +300,11 @@ class UserRepository {
                       }
                     },
                     {
-                      $match:
-                        {
-                          "participants.status": "candidate"
+                      $match: {
+                        "participants.ratingScore": {
+                          $gt: 0
                         }
+                      }
                     },
                     {
                       $lookup: {
@@ -329,7 +334,8 @@ class UserRepository {
                         ratingScore: "$participants.ratingScore",
                         comment: "$participants.comment",
                         username: "$rating.username",
-                        profileImage: "$rating.profileImage"
+                        profileImage: "$rating.profileImage",
+                        reviewAt: "$participants.reviewedAt"
                       }
                     },
                     {
@@ -340,7 +346,8 @@ class UserRepository {
                             ratingScore: "$ratingScore",
                             comment: "$comment",
                             reviewerName: "$username",
-                            reviewerProfileImage: "$profileImage"
+                            reviewerProfileImage: "$profileImage",
+                            reviewAt: "$reviewAt"
                           }
                         }
                       }
