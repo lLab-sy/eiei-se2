@@ -178,7 +178,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
           </SelectTrigger>
           <SelectContent data-test-id="select-postStatus-2">
             <SelectGroup>
-              <SelectItem value={"created"} data-test-id="select-create-option">
+              {userRole === "producer" && <SelectItem value={"created"} data-test-id="select-create-option">
                     Created
                 </SelectItem>}
                 <SelectItem value={"waiting"}>
