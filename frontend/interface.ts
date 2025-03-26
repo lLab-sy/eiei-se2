@@ -16,15 +16,55 @@ export interface PostData {
     participants: Participant[]
 }
 
+
 export interface Participant{
     comment:string,
     createdAt:Date,
-    offer:OfferData[],
-    participantID:string,
+    offer:OfferData,
+    participantID?:string,
+    // participants?:ParticipantDetail,
     ratingScore:string,
     reviewedAt?:Date,
     status: string,
-    updatedAt: Date;
+    updatedAt: Date
+    // --
+    workQuota?:number,
+    isSend?:boolean,
+    isApprove?:boolean,
+    submissions?:Date[]
+
+}
+
+export interface ParticipantForRight{
+    comment:string,
+    createdAt:Date,
+    offer:OfferDataForRight[],
+    participantID:ParticipantDetail,
+    ratingScore:string,
+    reviewedAt?:Date,
+    status: string,
+    updatedAt: Date
+    // --
+    workQuota?:number,
+    isSend?:boolean,
+    isApprove?:boolean,
+    submissions:Date[]
+
+}
+
+
+
+export interface ParticipantDetail{
+    _id:string,
+    firstname:string,
+    lastname:string,
+    middlename:string
+    username:string
+}
+
+export interface ApproveData{
+    userId:string,
+    isApprove:boolean
 }
 
 export interface PostImageDisplay{
@@ -168,7 +208,18 @@ export interface MediaType{
 }
 export interface OfferData{
     role:string;
-    roleID:string;
+    roleID?:string;
+    productionProfessionalID:string;
+    offeredBy: Number;
+    price: Number;
+    reason: string;
+    createdAt: Date;
+    postID: string;
+}
+
+export interface OfferDataForRight{
+    role:PostRolesResponse;
+    roleID:PostRolesResponse;
     productionProfessionalID:string;
     offeredBy: Number;
     price: Number;

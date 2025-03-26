@@ -18,6 +18,7 @@ export default function MyPostContentDetail(){
         const [isOpen, setIsOpen] = useState(false);
         const [post,setPost] = useState<PostData|null>(null)
         const [error, setError] = useState<string | null>(null);
+        const [refreshKey, setRefreshKey] = useState(0);
         useEffect(() => {
               const fetchData = async () => {
                 try {
@@ -27,7 +28,7 @@ export default function MyPostContentDetail(){
                   } else if (userRole === "production professional") {
                     response = await getPostById(mid,session?.user.token??"")
                   }
-                  console.log("respons",response)
+                  // console.log("respons",response)
                   if (response) {
                     setPost(response);
                   }
@@ -36,7 +37,12 @@ export default function MyPostContentDetail(){
                 }
             }
                 fetchData();
-            }, [userID, userRole]);
+            }, [userID, userRole,refreshKey]);
+
+    const refreshPost = () => {
+      setRefreshKey((prevKey) => prevKey + 1);
+    };
+    
     return(
         <>
          <div className="grid grid-cols-1 lg:grid-cols-2 my-5 h-full flex-auto">
@@ -46,15 +52,15 @@ export default function MyPostContentDetail(){
             <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
             { userRole == "production professional" ? 
                 <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
-                    <TaskSubmissionContent
+                    {post?<TaskSubmissionContent
                     isOpen={isOpen}
                     setIsOpen={setIsOpen}
-                    username = {username}
-                    />
+                    postStatus={post.postStatus}
+                    />:<LinearProgress/>}
                 </div>
                 :
                 <div className="col-span-1 w-[80%] lg:w-[95%] m-auto h-[650px] my-5 flex">
-                    <ProfessionalWorkingContent pid={mid}/>
+                    {post?<ProfessionalWorkingContent postStatus={post.postStatus} refreshPost={refreshPost}/>:<LinearProgress/>}
                 </div>
                 }
             </div>

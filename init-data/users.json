@@ -124,4 +124,39 @@
     "$date": "2025-03-12T13:49:04.373Z"
   },
   "__v": 0
-}]
+},
+{
+  "_id": {
+    "$oid": "67e24feb35bbc2cf1cebdab8"
+  },
+  "username": "testpf24p1",
+  "password": "$2b$10$dUiVBYejKMamHfQewlEX8u5cRURMObp84X20Qi.Dkk9SwLpKemwY.",
+  "role": "production professional",
+  "createdAt": {
+    "$date": "2025-03-25T06:40:43.584Z"
+  },
+  "skill": [],
+  "rating": [],
+  "updatedAt": {
+    "$date": "2025-03-25T06:40:43.584Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67e2500735bbc2cf1cebdabc"
+  },
+  "username": "testpf24p2",
+  "password": "$2b$10$DM6OIDL8/Ho8Z1KtCblFl.tB0JE/vVCGHkdxlx/R7Ld8lExULVFnO",
+  "role": "production professional",
+  "createdAt": {
+    "$date": "2025-03-25T06:41:11.360Z"
+  },
+  "skill": [],
+  "rating": [],
+  "updatedAt": {
+    "$date": "2025-03-25T06:41:11.360Z"
+  },
+  "__v": 0
+}
+]

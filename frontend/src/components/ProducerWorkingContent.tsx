@@ -99,19 +99,29 @@ export default function ProducerWorkingContent({
         setSelectedProfessional(profID);
 
         let professionalOffers: IOfferData[] = [];
+        let filtterRoleOffers: IOfferData[] = [];
         participants.forEach((p) => {
             if(p.participantID === profID){ // same person
                 for(let i = 0; i < p.offer.length; ++i){
                     const o : OfferData = p.offer[i];
-                    if (o.role === selectedRole) { // same offer
-                        const status = p.status;
-                        professionalOffers.push({ data: o, status: (i != p.offer.length - 1 || status === "reject" ? "Rejected" : (status === "candidate" ? "Completed" : "Pending")) });
-                    }
+                    professionalOffers.push({ data: o, status: p.status });
                 }
             }
         });
 
-        setOffers(professionalOffers);
+        professionalOffers.sort((a, b) => {
+            return new Date(b.data.createdAt).getTime() - new Date(a.data.createdAt).getTime();
+        });
+
+        // recompute status
+        for(let i = 0; i < professionalOffers.length; ++i){
+            const status = professionalOffers[i].status;
+            if (professionalOffers[i].data.role === selectedRole) { // same offer
+                filtterRoleOffers.push({data: professionalOffers[i].data, status: (i != 0 || status === "reject" ? "Rejected" : (status === "candidate" ? "Completed" : "Pending"))})
+            }
+        }
+
+        setOffers(filtterRoleOffers);
     }
 
     function handleStatusChange(participantID: string, status: string): void {
@@ -122,7 +132,9 @@ export default function ProducerWorkingContent({
     }
 
     return participants.length === 0 ? (
-        <div>No Offer.</div>
+        <main className="bg-slate-480 rounded-lg h-full shadow-xl m-auto w-[100%] flex items-center justify-center">
+            <h1 className="text-center text-4xl font-bold my-5 p-0">No Offer</h1>
+        </main>
     ) : (
         <main className="bg-slate-480 rounded-lg h-full shadow-xl m-auto w-[100%]">
             <h1 className="text-start text-xl font-bold my-5 ml-8 p-0">Offer History</h1>
@@ -186,8 +198,10 @@ export default function ProducerWorkingContent({
                         postName: index.toString(),
                         description: offer.data.reason,
                         productionName: professionalMap.get(selectedProfessional)?.username || "",
+                        productionID: professionalMap.get(selectedProfessional)?._id || "",
                         reviews: professionalMap.get(selectedProfessional)?.avgRating || 0,
-                        professionalImg: professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png"
+                        professionalImg: professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png",
+                        offeredBy: Number(offer.data.offeredBy)
                     }}
                     onStatusChange={handleStatusChange}                 
                             />

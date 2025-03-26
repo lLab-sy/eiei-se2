@@ -13,12 +13,15 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
+import { useSession } from "next-auth/react";
 // 
 interface SearchPostBarProps {
   onSearch: (filter: string) => void;
 }
 
 const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
+  const { data: session } = useSession();
+  const userRole=session?.user.role
   const [openType, setOpenType] = useState("");
   const [text, setText] = useState("");
 
@@ -26,7 +29,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
 
   const [selectedMedia, setSelectedMedia] = useState<MediaType[]>([]);
   const [selectedRole, setSelectedRole] = useState<RoleType[]>([]);
-  const [selectPostStatus,setSelectPostStatus]=useState<string>("created")
+  const [selectPostStatus,setSelectPostStatus]=useState<string>(userRole==="producer"?"created":"waiting")
 
   const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
 //   const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
@@ -99,12 +102,14 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
 
     if(text != "") result += "&searchText="+text;
 
+    let searchMedias:string[]=[]
     if(selectedMedia.length != 0){
       selectedMedia.forEach(select => {
-        result += "&postMediaTypes=" + select.id;
+         searchMedias.push(select.id)
       });
     }
 
+    result += "&postMediaTypes=" + searchMedias.join(",");
     result+="&postStatus="+selectPostStatus
     // if(selectedRole.length != 0){
     //   selectedRole.forEach(select => {
@@ -148,6 +153,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
         />
         <button
           onClick={handleSearch}
+          data-test-id="search-button"
           className="bg-blue-500 text-white rounded-full px-4 py-2 ml-2 hover:bg-blue-600 transition-colors"
         >
           Search
@@ -155,6 +161,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
       </div>
       <div className="relative flex items-center gap-4 px-4 w-full mt-4"> 
         <button
+          data-test-id="select-mediaType"
           className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm w-[40%]"
           onClick={() => toggleModal("Media")}
         >
@@ -164,13 +171,17 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
         <Select
           onValueChange={handleSelectPostStatus}
           value={selectPostStatus}
+          data-test-id="select-postStatus"
         >
           <SelectTrigger className="shadow-lg w-[40%]">
             <SelectValue placeholder="Choose your Post" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent data-test-id="select-postStatus-2">
             <SelectGroup>
-                <SelectItem value={"created"}>
+              {userRole === "producer" && <SelectItem value={"created"} data-test-id="select-create-option">
+                    Created
+                </SelectItem>}
+                <SelectItem value={"waiting"}>
                     Waiting
                 </SelectItem>
                 <SelectItem value={"in-progress"}>

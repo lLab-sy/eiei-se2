@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 // import * as testService from '../services/testService';
 import postService from '../services/postService';
 import { sendResponse } from '../utils/responseHelper';
-import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO, ChangeParticipantStatusDTO, GetPostByProducerDTO } from '../dtos/postDTO';
+import { PostSearchRequestDTO, PaticipantRatingDTO, OfferRequestDTO, GetPostByProfDTO, ChangeParticipantStatusDTO, GetPostByProducerDTO, SendApproveRequest } from '../dtos/postDTO';
 import { AuthRequest } from '../dtos/middlewareDTO';
 import postDetailService from '../services/postDetailService';
 import cloudService from '../services/cloudService';
@@ -14,6 +14,10 @@ class PostController {
     try {
       //Handler Query
       const reqQuery= {...req.query}
+      if(req.query.postStatus && req.query.postStatus!=""){
+        let datas:string=req.query.postStatus as string
+        req.query.postStatus=datas.split(',')
+      }
       const removeFields=['select','sort']
       removeFields.forEach(param=> delete reqQuery[param])
       let queryStr=JSON.stringify(req.query);
@@ -187,7 +191,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     const producerId= req.user.userId as string
     const limit = req.query.limit ? Number(req.query.limit): 10;
     const page = req.query.page ? Number(req.query.page): 1;
-    const status = ['created', 'in-progress', 'success', 'cancel'];
+    const status = ['created', 'in-progress', 'success', 'cancel','waiting'];
     console.log(limit,page,producerId)
     if ((limit < 1 || page < 1 || userId=="") && role ==="production professional" ) {
       sendResponse(res, 'error', '', 'bad request', 400);
@@ -291,6 +295,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
 
   async getPostsByProf(req: AuthRequest, res: Response): Promise<void> {
     try {
+      // 
       const role=req.user.role
       if(role!="production professional"){
         sendResponse(res, 'error', "", `unauthorized`, 400);
@@ -299,38 +304,67 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       const userId = req.user.userId? req.user.userId as string: false;
       const limit = req.query.limit ? Number(req.query.limit): 10;
       const page = req.query.page ? Number(req.query.page): 1;
-      const status = ['created', 'in-progress', 'success', 'cancel'];
-      const postMediaTypes = req.query.postMediaTypes as string[];
-
+      const status = ['created', 'in-progress', 'success', 'cancel','waiting'];
+      const postMediaTypesString = req.query.postMediaTypes as string ;
       if (limit < 1 || page < 1 || !userId ) {
         sendResponse(res, 'error', '', 'bad request', 400);
         return
       }
       
-      let postStatus;
+      let postStatus:string[]=[];
       if (!req.query.postStatus){
-        postStatus = '';
+          postStatus = [];
       }else{
-        if(!status.includes(req.query.postStatus as string)){
+          let postStatusString=req.query.postStatus as string
+          postStatus = postStatusString.split(",") as string []
+          if(postStatus.length>5){
+             sendResponse(res, 'error', '', 'bad request', 400)
+             return;
+          }
+          status.map((eachStatus)=>{
+            if(!status.includes(eachStatus as string)){
+              sendResponse(res, 'error', '', 'bad request', 400)
+              return;
+            }
+          })
+          
+      }
+      console.log("postStatusssssssssssssssssssssssssssss",postStatus)
+
+      let postMediaTypes:string[]=[];
+      if(postMediaTypesString && postMediaTypesString!=""){
+        postMediaTypes=postMediaTypesString.split(",")
+      }
+
+      const participantAllStatus = ['in-progress', 'reject', 'candidate'];
+      let participantStatus;
+      if (!req.query.participantStatus){
+        participantStatus = '';
+      }else{
+        if(!participantAllStatus.includes(req.query.participantStatus as string)){
           sendResponse(res, 'error', '', 'bad request', 400)
           return;
         }else{
-          postStatus = req.query.postStatus as string
+          participantStatus = req.query.participantStatus as string
         }
           
       }
-
       const getPostByProfDTO: GetPostByProfDTO = {
         page: page,
         limit: limit,
         userId: userId,
-        postStatus: postStatus as string,
+        postStatus: postStatus as string[],
+        participantStatus: participantStatus as string,
         postMediaTypes: Array.isArray(postMediaTypes)?postMediaTypes: postMediaTypes? [postMediaTypes]: postMediaTypes,
         searchText: req.query.searchText? req.query.searchText as string: '',
       }
 
       const posts = await postService.getPostsByProf(getPostByProfDTO);
-      // console.log(offers.meta.totalPages)
+      // console.log(posts.meta.totalPages,posts.meta.totalPages,page)
+      if(posts.data.length==0){
+          posts.meta.totalPages=1;
+      }
+
       if (!posts.meta.totalPages){
         sendResponse(res, 'error', '', 'You have no relate posts.', 400);
         return
@@ -352,15 +386,20 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
   async getPostsByProducer(req: AuthRequest, res: Response): Promise<void> {
     try {
       const role=req.user.role;
-      const postMediaTypes = req.query.postMediaTypes as string[];
+      const postMediaTypesString = req.query.postMediaTypes as string;
       const userId = req.user.userId? req.user.userId as string: false;
       const limit = req.query.limit ? Number(req.query.limit): 10;
       const page = req.query.page ? Number(req.query.page): 1;
-      const status = ['created', 'in-progress', 'success', 'cancel'];
+      const status = ['created', 'in-progress', 'success', 'cancel','waiting'];
 
 
       if(role!="producer"){
         sendResponse(res, 'error', '', 'unauthorize', 401);
+      }
+
+      let postMediaTypes:string[]=[];
+      if(postMediaTypesString && postMediaTypesString!=""){
+        postMediaTypes=postMediaTypesString.split(",")
       }
 
       if (limit < 1 || page < 1 || !userId ) {
@@ -391,6 +430,9 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       }
       console
       const posts = await postService.getPostsByProducer(getPostByProducerDTO);
+      if(posts.data.length==0){
+        posts.meta.totalPages=1;
+      }
       switch (true) {
         case !posts.meta.totalPages:
           sendResponse(res, "error", "", "You have no related posts.", 400);
@@ -451,16 +493,22 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
 
   async sendApprove(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const postID  = req.params.id
-      const userID  = req.query.userId ? req.query.userId as string: ''
-
+      const postId  = req.params.id
+      const userId  = req.query.userId ? req.query.userId as string: ''
+      const isApprove = req.query.isApprove=='false' ? false : true
+      const reqDTO: SendApproveRequest = {
+        postId: postId,
+        userId: userId,
+        isApprove: isApprove
+      }
+      
       if (req.user.role!="producer") {
         sendResponse(res, 'error', '', 'unauthorize', 401);
         return;
       }
 
 
-      await postService.sendApprove(postID, userID)
+      await postService.sendApprove(reqDTO)
 
       sendResponse(res, 'success', {'status': 'success'}, 'Successfully approve post');
     } catch (err) {
@@ -481,7 +529,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
         sendResponse(res.status(401), 'error', 'Unauthorize');
         return;
       } 
-
+      
       await postService.startProject(postId, userId);
       sendResponse(
         res,
@@ -494,7 +542,31 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     }
   }
 
+  async getPostParticipant(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const postId = req.params.id;
+      let userId = req.user.userId;
+      
+      if (!postId) {
+        sendResponse(res, "error", "", "Post ID is required", 400);
+        return;
+      }
 
+      if(req.user.role=="producer"){
+        userId=''
+      } 
+
+      const post = await postService.getPostParticipant(postId, userId);
+      sendResponse(
+        res,
+        "success",
+        post,
+        "Successfully change post status to in-progress"
+      );
+    } catch (err) {
+      sendResponse(res, "error", err, "Failed to change post status to in-progress");
+    }
+  }
   async changeParticipantStatus(req: AuthRequest, res: Response): Promise<void> {
     try{
       const roles = ["production professional", "producer"] as const;

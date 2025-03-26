@@ -1,13 +1,21 @@
 {
     "default": {
+        "dryRun": false,
         "requireModule": [
             "ts-node/register"
         ],
         "require": [
-            "features/step-definitions/**/*.ts"
+            "features/step-definitions/**/*.ts",
+            "features/utils/**/*.ts"
         ],
         "format": [
-            "progress"
-        ]
+        "progress-bar",
+        ["json", "reports/cucumber-report.json"],
+        ["html", "reports/html-formatter.html"]
+      ],
+        "paths": ["features/**/*.feature"],
+        "formatOptions": {
+          "snippetInterface": "async-await"
+        }
     }
 }

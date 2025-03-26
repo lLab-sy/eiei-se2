@@ -1,5 +1,5 @@
 import postRepository from '../repositories/postRepository';
-import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO, ChangeParticipantStatusDTO } from '../dtos/postDTO';
+import { ImageDisplayDTO, ParticipantDetailDTO, PostDTO, PostSearchRequestDTO, PostWithRoleCountDTO, OfferDTO, OfferResponseDTO, OfferRequestDTO, PaticipantRatingDTO, ProducerDisplayDTO, OfferProducerResponseDTO, ChangeParticipantStatusDTO, SendApproveRequest } from '../dtos/postDTO';
 import Post, { IPost, GetOfferRequestModel, GetPostByProfRequestModel, ParticipantDetail, participantDetailSchema, PostSearchRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
 import { PaginatedResponseDTO, PaginationMetaDTO } from '../dtos/utilsDTO';
 import cloudService from './cloudService';
@@ -554,9 +554,9 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
-  public async sendApprove(id: string, participantID: string): Promise<void> {
+  public async sendApprove(sendApproveRequest: SendApproveRequest): Promise<void> {
     try {
-      await postRepository.sendApprove(id, participantID);
+      await postRepository.sendApprove(sendApproveRequest);
       return;
     } catch (error) {
       throw new Error('Error in service layer: ' + error);
@@ -567,6 +567,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     try {
       await postRepository.startProject(postId, userId);
       return;
+    } catch (error) {
+      throw new Error("Error in service layer: " + error);
+    }
+  }
+
+  async getPostParticipant(postId: string, userId: string): Promise<ParticipantDetail[]> {
+    try {
+      const participants = await postRepository.getPostParticipant(postId, userId);
+      return participants
     } catch (error) {
       throw new Error("Error in service layer: " + error);
     }

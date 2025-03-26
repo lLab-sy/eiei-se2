@@ -241,6 +241,32 @@ router.get('/posts/search', postController.searchPost);
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
 router.put('/posts/:id/startProject', AuthMiddleware.authenticate as RequestHandler, postController.startProject as RequestHandler);
 
+/**
+ * @swagger
+ * /api/v1/posts/getPostParticipant/{id}:
+ *   get:
+ *     summary: get ont participant in post (need authen)
+ *     tags: [Post]
+ *     security:
+ *      - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the post
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully get post
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+// router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
+router.get('/posts/getPostParticipant/:id', AuthMiddleware.authenticate as RequestHandler, postController.getPostParticipant as RequestHandler);
+// 
 
 /**
  * @swagger
@@ -330,6 +356,12 @@ router.post('/posts/:id/sendSubmission', AuthMiddleware.authenticate as RequestH
  *         description: The unique identifier of the candidate (if not assume all)
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: isApprove
+ *         required: false
+ *         description: approve = 1, reject = 0
+ *         schema:
+ *           type: boolean
  *     responses:
  *       200:
  *         description: Successfully approve post

@@ -1,5 +1,5 @@
 "use client"
-
+import { useRouter } from "next/navigation";
 import { Airplay } from "lucide-react";
 import { Switch } from "./ui/switch";
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -16,7 +16,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "./ui/button";
-export default function ProfessionalWorkingCard({postStatus}:{postStatus?:string}){ 
+import { ApproveData, Participant, ParticipantForRight } from "../../interface";
+import putApproveWork from "@/libs/putApproveWork";
+import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+
+export default function ProfessionalWorkingCard({postStatus,participantDetail,setRefreshKey}:{postStatus?:string,participantDetail:ParticipantForRight,setRefreshKey:Function}){ 
 //   const offerDate = new Date(data.createdAt);
 //   const displayDate = offerDate.toLocaleString("en-US", {
 //     year: "numeric",
@@ -25,73 +32,86 @@ export default function ProfessionalWorkingCard({postStatus}:{postStatus?:string
 //     hour: "2-digit",
 //     minute: "2-digit",
 //   });
+  const { mid }: { mid: string } = useParams();
+  const { data: session } = useSession();
+  const token =session?.user.token;
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "candidate":
-        return "Employed";
-      case "reject":
-        return "Banned";
-      case "in-progress":
-        return "Waiting";
-      default:
-        return status;
+
+  async function sendApprove (approve:boolean,participantID:string) {
+    const approveData:ApproveData = {
+      isApprove:approve,
+      userId:participantID
+    };
+    const postCreateResponse = await putApproveWork(mid,approveData,token??"")
+    if (!postCreateResponse || postCreateResponse != "success") {
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "Please try again.",
+      })
+      return
     }
-  };
+      setRefreshKey()
+      toast({
+      variant: "default",
+      title: "Successful approve work",
+      description: `Balance is go to ${participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}.`,
+    })
 
+  }
 
   return (
     <div className="w-full grid grid-cols-10 bg-slate-100 m-auto text-sm my-2 p-5 font-medium text-center whitespace-normal break-words h-[30px] items-center content-center">
         <div className="col-span-2">
-            <p className="">Pro1</p>
+            <p className="">{participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}</p>
         </div>
         <div className="col-span-2">
-            <p className="">Actor</p>
+            <p className="">{participantDetail.offer[participantDetail.offer.length - 1].role.roleName}</p>
         </div>
         <div className="col-span-2">
-            <p className="text-sm">In-Progress</p>
+            <p className="text-sm">{participantDetail.isApprove?"Approved" : (participantDetail.isSend?"Sent":"In-Progress")}</p>
         </div>
         <div className="col-span-2 space-x-1">
         {/* แล้วต่อไปต้องมี isSend ด้วย */}
-        {postStatus === "in-progress" && (
+        {postStatus === "in-progress" && participantDetail.isSend && !participantDetail.isApprove && (
         <>
         <AlertDialog>
-          <AlertDialogTrigger><CheckBoxIcon className="  bg-maingreen hover:brightness-110 cursor-pointer hover:bg-mainblue-dark" /></AlertDialogTrigger>
+          <AlertDialogTrigger><CheckBoxIcon data-test-id={`Approve-${participantDetail.participantID._id}`} className="bg-maingreen hover:brightness-110 cursor-pointer hover:bg-mainblue-dark" /></AlertDialogTrigger>
           <AlertDialogContent>
               <AlertDialogHeader>
-              <AlertDialogTitle>Are You Sure to Confirm This Task (1/5)</AlertDialogTitle>
+              <AlertDialogTitle>Are You Sure to Confirm This Task</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="flex flex-col gap-2">
                     <p className="text-black">This submission will mark this task as complete according to the agreement. </p>
-                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">Upon confirmation, $15,000 will be transferred to the production professional account.</div>
+                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">{`Upon confirmation, ${participantDetail.offer[participantDetail.offer.length - 1].price} Baht will be transferred to the ${participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username} account.`}</div>
                 </div>
               </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction className="bg-maingreen" asChild> 
-                    <Button
+                    <Button onClick={(e:any)=>{sendApprove(true,participantDetail.participantID._id)}}
                       >Confirm</Button>
                   </AlertDialogAction>
               </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
         <AlertDialog>
-          <AlertDialogTrigger><DisabledByDefaultIcon className="bg-mainred hover:brightness-110 cursor-pointer hover:bg-mainblue-dark"/></AlertDialogTrigger>
+          <AlertDialogTrigger><DisabledByDefaultIcon data-test-id={`Reject-${participantDetail.participantID._id}`} className="bg-mainred hover:brightness-110 cursor-pointer hover:bg-mainblue-dark"/></AlertDialogTrigger>
           <AlertDialogContent>
               <AlertDialogHeader>
-              <AlertDialogTitle>Are You Sure to Request to fix Task (1/5)</AlertDialogTitle>
+              <AlertDialogTitle>Are You Sure to Request to fix Task</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="flex flex-col gap-2">
-                    <p className="text-black">Requesting a resubmission from professionalName. professionalName will need to make corrections and resubmit the work.</p>
-                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">Important: If revisions reach 5/5, the payment will be voided for all parties..</div>
+                    <p className="text-black">Requesting a resubmission from {participantDetail.participantID.firstname?participantDetail.participantID.firstname:participantDetail.participantID.username}. {participantDetail.participantID.username}  will need to make corrections and resubmit the work.</p>
+                    <div className="bg-mainyellow-light p-5 rounded-lg text-mainred font-bold">Important: If revisions reach 0, the {participantDetail.participantID.username} will no longer to send and payment will be voided for all parties.</div>
                 </div>
               </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction className="bg-green-700" asChild> 
-                    <Button
+                    <Button onClick={(e:any)=>{sendApprove(false,participantDetail.participantID._id)}}
                       >Confirm</Button>
                   </AlertDialogAction>
               </AlertDialogFooter>
@@ -101,7 +121,7 @@ export default function ProfessionalWorkingCard({postStatus}:{postStatus?:string
         )}
         </div>
         <div className="col-span-2">
-            <p className=""> 0/5</p>
+            <p className=""> {participantDetail.workQuota}/3</p>
         </div>
     </div>
   );

@@ -158,7 +158,6 @@ export default function ReviewProfessional({ id }: { id: string }) {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         className=" h-full overflow-y-auto scroll-p-0 flex flex-col"
       >
-        <title className="text-2xl bg-mainblue text-white h-[5%]">Your Review</title>
         <div className="flex px-3 py-2 my-1 bg-white rounded-lg border justify-around items-center">
           <div className=" w-[30%] items-center flex flex-col">
             {/* <Star size={90} color="#ffbb00" strokeWidth={3} /> */}

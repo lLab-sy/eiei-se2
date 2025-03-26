@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
-import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel } from '../models/postModel';
+import Post, { IPost, ParticipantDetail, PostSearchRequestModel, PostSearchResponse, PaticipantRating, GetOfferRequestModel, GetOfferResponse, GetPostByProfResponse, GetPostByProfRequestModel, GetPostByProducerRequestModel, SendApproveRequestModel } from '../models/postModel';
 import { ChangeParticipantStatusDTO, OfferDTO, ParticipantDetailDTO, PostDTO } from '../dtos/postDTO';
 import PostDetail from '../models/postDetail';
-import mongoose, { FilterQuery, PipelineStage, UpdateQuery } from 'mongoose';
+import mongoose, { FilterQuery, PipelineStage, ProjectionFields, UpdateQuery } from 'mongoose';
 import { Pipe } from 'stream';
 
 class PostRepository {
@@ -343,7 +343,7 @@ class PostRepository {
 
             matchStage.push({
               $match: {
-                postStatus: "created"
+                postStatus: { $in: ["created", "waiting"] }
               }
             })
             
@@ -419,7 +419,8 @@ class PostRepository {
                     "userID": userId 
                 },
                 { $set: { 
-                    "postStatus": 'in-progress'
+                    "postStatus": 'in-progress',
+                    "startDate":new Date()
                  }}, // Update the matching element
                 { new: true, runValidators: true }
             );
@@ -720,17 +721,24 @@ class PostRepository {
 
     public async getPostsByProf(getPostByProfReq: GetPostByProfRequestModel): Promise<GetPostByProfResponse>{
         try {
-            const { userId, postStatus, limit, page, postMediaTypes, searchText  } = getPostByProfReq;
+            const { userId, postStatus, limit, page, postMediaTypes, searchText,participantStatus  } = getPostByProfReq;
             const objectId = new mongoose.Types.ObjectId(userId);
 
-            const postStatusMatchStage: PipelineStage.Match = {
-                $match: {
-                  ...(postStatus && { postStatus }),
-                },
-            };
+            // const postStatusMatchStage: PipelineStage.Match = {
+            //     $match: {
+            //       ...(postStatus && { postStatus }),
+            //     },
+            // };
             
-            const pipeline: PipelineStage[] = [postStatusMatchStage];
-
+            // const pipeline: PipelineStage[] = [postStatusMatchStage];
+            const pipeline: PipelineStage[] = [];
+            if (postStatus?.length) {
+                pipeline.push({
+                    $match: {
+                        postStatus: { $in: postStatus}
+                    }
+                })
+            }
             const matchStage1: PipelineStage.Match ={
                 $match: {
                       'participants.participantID': objectId
@@ -767,12 +775,22 @@ class PostRepository {
             }
             pipeline.push(unwindStage)
             
-            const matchStage2: PipelineStage.Match ={
+            const matchStage3: PipelineStage.Match ={
                 $match: {
                     'participants.participantID': objectId
                   }
             }
-            pipeline.push(matchStage2);
+            pipeline.push(matchStage3);
+
+            
+            if(participantStatus){
+                const matchStage2: PipelineStage.Match={
+                    $match: {
+                        'participants.status': participantStatus
+                    }
+                }
+                pipeline.push(matchStage2);
+            }
 
             const lookupStage1: PipelineStage.Lookup ={
                 $lookup: {
@@ -978,6 +996,50 @@ class PostRepository {
             throw new Error('Error fetching user posts from repository: ' + error);
         }
     }
+    
+    public async getPostParticipant(id:string, participantID:string): Promise<ParticipantDetail[]> {
+        try {
+            // console.log("HELlo",postData)
+
+            const filter: FilterQuery<IPost> = {
+                _id: id
+            }
+
+            if (participantID != '') {
+                filter["participants.participantID"] = participantID
+            }
+
+            const project: ProjectionFields<IPost> = {};
+
+            switch (true) {
+                case participantID!='': project['participants.$'] = 1;break;
+                default: project['participants'] = {
+                    $filter: {
+                      input: "$participants",
+                      as: "p",
+                      cond: { $eq: ["$$p.status", "candidate"] },
+                    },
+                }
+            }
+
+            const post:IPost[]|null = await Post.find(
+                filter,
+                project
+            ).populate({path:"participants.offer.role"})
+            .populate({
+                path:"participants.participantID",
+                select:"username _id firstname middlename lastname"
+            });
+
+            if (!post) {
+                throw new Error('Post or participant not found')
+            }
+
+            return post[0].participants;
+        } catch (error) {
+            throw new Error('Error getPostParticipant in post repository: ' + error);
+        }
+    }
 
     public async sendSubmission(id:string, participantID:string): Promise<void>{
         try {
@@ -1014,46 +1076,54 @@ class PostRepository {
         }
     }
     
-    public async sendApprove(id:string, participantID:string): Promise<void>{
+    public async sendApprove(sendApproveReq: SendApproveRequestModel): Promise<void> {
         try {
-            // console.log("HELlo",postData)
-
             const filter: FilterQuery<IPost> = {
-                _id: id,
-                "postStatus": "in-progress", // post success
-                "participants.status": "candidate",
-            }
-
-            if (participantID != '') {
-                filter["participants.participantID"] = participantID
-            }
-            const update: UpdateQuery<IPost> = {
-                $set: { 
-                    "participants.$.isApprove": true,
+                _id: sendApproveReq.postId,
+                postStatus: "in-progress",
+            };
+    
+            const update: UpdateQuery<IPost> = {};
+    
+            // ถ้ามี userId ที่กำหนด -> อัปเดตเฉพาะ participant ที่มี participantID ตรงกัน
+            if (sendApproveReq.userId !== '') {
+                filter["participants.participantID"] = sendApproveReq.userId;
+                update["$set"] = {
+                    "participants.$[elem].isApprove": sendApproveReq.isApprove
+                };
+    
+                if (!sendApproveReq.isApprove) {
+                    update["$set"]["participants.$[elem].isSend"] = false;
                 }
+            } else if (sendApproveReq.isApprove) {
+                // ถ้า userId เป็น "" และกำลัง approve -> เปลี่ยน postStatus เป็น "success"
+                update["$set"] = { 
+                    postStatus: "success",
+                    endDate: new Date(), 
+                };
+                update["$set"]["participants.$[].isApprove"] = true;
             }
-
-            if (participantID == '') {
-                update['postStatus'] = 'success'
-            }
-
+    
             const post = await Post.findOneAndUpdate(
                 filter,
                 update,
-                { new: true, runValidators: true }
+                {
+                    new: true,
+                    runValidators: true,
+                    arrayFilters: sendApproveReq.userId !== '' ? [{ "elem.participantID": sendApproveReq.userId }] : undefined
+                }
             );
-
+    
             if (!post) {
-                throw new Error('Post not found')
+                throw new Error('Post not found');
             }
-
-            // const posts= await Post.findById(objectId);
+    
             return;
         } catch (error) {
             throw new Error('Error submission in post repository: ' + error);
         }
     }
-
+    
     public async changeParticipantStatus(dto: ChangeParticipantStatusDTO): Promise<void>{
         try{
             const post: IPost | null = await Post.findOne({ _id: dto.postID });
