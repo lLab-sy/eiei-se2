@@ -97,7 +97,7 @@ export default function CreatePostPage() {
   }
 
   useEffect(()=>{
-      console.log(session)
+      // console.log(session)
       const fetchData=async()=>{
           const response= await getPostRoles()
           const tmp= response.data.data

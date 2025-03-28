@@ -10,7 +10,7 @@ export default function ReviewProducerContent({data, rating} : {data : ReceivedR
   const date1: Date = new Date(data.reviewAt);
   const diffTime: number = date2.getTime() - date1.getTime();
   const diffDays: number = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  console.log("Reviewdata", data)
+  // console.log("Reviewdata", data)
   return (
     <div className="flex flex-col p-3 my-2 w-[97%] bg-slate-50 rounded-lg">
       <div className="flex justify-between">

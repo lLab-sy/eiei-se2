@@ -59,8 +59,8 @@ export default function ReviewProducer({ id }: { id: string }) {
     fetchReviews(id);
   }, []);
 
-  console.log("reviewData", reviewData);
-  console.log('allReview', allReviews)
+  // console.log("reviewData", reviewData);
+  // console.log('allReview', allReviews)
   const groupOnClick = (rating: number) => {
     setRatingState(rating);
     if(rating === 0){

@@ -1,7 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const initialState = {
-    user: {},
+const initialState : {
+    user : {
+        role : string,
+    },
+    profileImageURL : string
+} = {
+    user : { role : ""},
     profileImageURL : "/",
 }
 
@@ -16,7 +21,7 @@ export const userSlice = createSlice({
             state.profileImageURL = action.payload
         },
         clearStorage: (state, action) => {
-            state.user = {}
+            state.user = { role : "" }
             state.profileImageURL = "/"
         }
     }
