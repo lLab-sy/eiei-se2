@@ -1,20 +1,14 @@
 "use client";
-import PostToOffer from "@/components/PostToOffer";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MediaType, PostData, RoleType } from "../../../../interface";
-import { Button } from "@/components/ui/button";
-
+import { Suspense, lazy } from "react";
 // นำเข้า mock data (ปรับตามที่จัดเก็บไฟล์ mockData ของคุณ)
-import { mockPosts } from "@/mock/mockData";
 import getPostUser from "@/libs/getPostsUser";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import getPostRoles from "@/libs/getPostRoles";
 import getMediaTypes from "@/libs/getMediaTypes";
-import PostCard from "@/components/PostCard";
 
 export default function OfferPage() {
   const { data: session, status } = useSession();
@@ -22,7 +16,7 @@ export default function OfferPage() {
   const [error, setError] = useState<string | null>(null);
   const userRole = session?.user.role;
   const userID = session?.user.id;
-
+  const PostCard = lazy(() => import("@/components/PostCard"))
   if (!userID || !userRole) {
     return <>Unautorize</>;
   }
@@ -70,17 +64,13 @@ export default function OfferPage() {
     fetchData();
   }, [userID, userRole]); // ใช้ pid และ token ใน dependency array
 
-  const userData: any = useSelector<RootState>((state) => state.user.user);
-  const router = useRouter();
-  const handleChangePage = (postID: string) => {
-    router.push(`/my-offering/${postID}`);
-  };
   const [mediaTypes, setMediaTypes] = useState<MediaType[]>([]);
   const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
   const getMediaNameById = (id: string): string => {
     const mediaType = mediaTypes.find((media) => media.id === id);
     return mediaType ? mediaType.mediaName : "Unknown";
   };
+
   useEffect(() => {
     const fetchData = async () => {
       var medias, roles;
@@ -113,34 +103,35 @@ export default function OfferPage() {
     });
     return result;
   };
+
+
   return (
     <main className=" min-h-screen mb-5 flex flex-col gap-3 relative">
       <div className="mt-20 gap-5 flex flex-col">
-        <span className="text-5xl font-bold flex justify-center">
+        <span className="w-full text-5xl font-bold flex justify-center">
           My Offering
         </span>
         <span className="text-4xl font-bold flex justify-start ml-7">Post</span>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-12 max-w-full">
           {postArray && postArray?.length > 0
             ? postArray.map((post, index) => (
-                <div
-                  key={index}
-                  className="cursor-pointer"
-                  onClick={() => handleChangePage(post?.id!)}
-                >
-                  <PostCard
-                    title={post.postName}
-                    description={post.postDescription}
-                    imageUrl={
-                      post.postImages && post.postImages.length !== 0
-                        ? post.postImages[0]
-                        : ""
-                    }
-                    role={getRoleById(post.postProjectRoles || [])}
-                    mediaType={getMediaNameById(post.postMediaType)}
-                    id={post.id??""}
-                  />
-                </div>
+                  <Suspense key={index} fallback={<div className='flex justify-center items-center'>
+                    Loading posts...
+                    </div>}>
+                    <PostCard
+                      title={post.postName}
+                      description={post.postDescription}
+                      imageUrl={
+                        post.postImages && post.postImages.length !== 0
+                          ? post.postImages[0]
+                          : ""
+                      }
+                      role={getRoleById(post.postProjectRoles || [])}
+                      mediaType={getMediaNameById(post.postMediaType)}
+                      id={post.id}
+                      link={`http://localhost:3000/my-offering/${post.id}`}
+                    />
+                  </Suspense>
               ))
             : ""}
         </div>

@@ -16,8 +16,12 @@ class CloudService {
       if(!imageKey){ // check null undefined or empty strings
         imageKey = this.getKeyName()
       }
-
-      await s3Client.uploadFile(buffer, imageKey, mimetype);
+      let bufferUpload = buffer
+      if(mimetype.startsWith('image/')){
+        bufferUpload = await sharp(buffer).webp().toBuffer()
+        mimetype = 'image/webp'
+      }
+      await s3Client.uploadFile(bufferUpload, imageKey, mimetype);
       const url = await s3Client.createSignedURL(imageKey)
       return {
         imageKey, //เก็บ แค่อันนี้พอ

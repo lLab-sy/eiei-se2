@@ -35,7 +35,7 @@ const ReviewProfessionalList = ({
     }
   }, [productionList, form]);
 
-  console.log("***************")
+  // console.log("***************")
 
   // ฟังก์ชันหา label จาก value
   const getSelectedLabel = () => {
