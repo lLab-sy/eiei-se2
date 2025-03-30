@@ -244,7 +244,12 @@ const NavBar = (session: any) => {
             </span>
           </div>
         </Link>
-
+        {/* user role */}
+        <div className="absolute left-[40%] w-[20%] text-center">
+          <span className="text-pretty">
+            {role? `You are a ${role}!`:""}
+          </span>
+        </div>
         {/* Right Section */}
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
