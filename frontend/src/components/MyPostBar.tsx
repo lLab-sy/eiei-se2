@@ -162,7 +162,7 @@ const MyPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
       <div className="relative flex items-center gap-4 px-4 w-full mt-4"> 
         <button
           data-test-id="select-mediaType"
-          className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm w-[40%]"
+          className="px-4 py-2 bg-mainblue-lightest hover:bg-mainblue text-white rounded-md text-sm w-[40%]"
           onClick={() => toggleModal("Media")}
         >
           Select Media Type

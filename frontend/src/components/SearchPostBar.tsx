@@ -81,11 +81,14 @@ const SearchPostBar: React.FC<SearchPostBarProps> = ({onSearch}) => {
 
     if(text != "") result += "&searchText="+text;
 
+    let searchMedias:string[]=[]
     if(selectedMedia.length != 0){
       selectedMedia.forEach(select => {
-        result += "&postMediaTypes=" + select.id;
+         searchMedias.push(select.id)
       });
     }
+
+    result += "&postMediaTypes=" + searchMedias.join(",");
 
     if(selectedRole.length != 0){
       selectedRole.forEach(select => {

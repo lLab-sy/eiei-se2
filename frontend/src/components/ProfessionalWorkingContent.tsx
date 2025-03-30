@@ -253,7 +253,7 @@ export default function ProfessionalWorkingContent({postStatus, refreshPost}:{po
 
             {postStatus === "created" && userRole=="producer" && (
                 <Link href={`/edit-post/${mid}`}>
-                    <Button className="absolute bg-maingreen-light text-white p-3 rounded-md hover:bg-sky-700 shadow-lg right-5 bottom-5" data-test-id="edit-mypost-button">
+                    <Button className="absolute bg-maingreen text-white p-3 rounded-md hover:bg-maingreen-light shadow-lg right-5 bottom-5" data-test-id="edit-mypost-button">
                             Edit Post
                     </Button>
                </Link>
@@ -262,7 +262,7 @@ export default function ProfessionalWorkingContent({postStatus, refreshPost}:{po
 
             {postStatus === "waiting" && (
                 <AlertDialog>
-                    <AlertDialogTrigger className="absolute bg-maingreen-light text-white p-3 rounded-md hover:bg-sky-700 shadow-lg right-5 bottom-5">
+                    <AlertDialogTrigger className="absolute bg-maingreen text-white p-3 rounded-md hover:bg-maingreen-light shadow-lg right-5 bottom-5">
                         Start Project
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -290,7 +290,7 @@ export default function ProfessionalWorkingContent({postStatus, refreshPost}:{po
 
             {postStatus === "in-progress" && (
                 <AlertDialog>
-                    <AlertDialogTrigger className="absolute bg-maingreen-light text-white p-3 rounded-md hover:bg-sky-700 shadow-lg right-5 bottom-5">
+                    <AlertDialogTrigger className="absolute bg-maingreen text-white p-3 rounded-md hover:bg-maingreen-light right-5 bottom-5">
                         Mark as Complete
                     </AlertDialogTrigger>
                     <AlertDialogContent>

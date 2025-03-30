@@ -22,7 +22,7 @@ export default function MyPostDetail({post}:{post:PostData}) {
       <div className="p-5 grid grid-cols-2  bg-white w-full rounded-lg">
         
         <div className="col-span-1 h-[20%]">
-            <p className="text-md w-full m-auto font-bold col-span-1 h-[20%]">Post {post.postName}</p>
+            <p className="text-md w-full m-auto font-bold col-span-1 h-[20%]">{post.postName}</p>
         </div>
 
         <p data-test-id="post-status"
