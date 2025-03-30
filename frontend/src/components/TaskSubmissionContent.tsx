@@ -126,9 +126,12 @@ export default function TaskSubmissionContent({isOpen,
                 </div>
             </div>
             <div className="flex absolute justify-end bottom-2 right-5">
-            {!participantsRight?.isSend && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>=0 ? <Button onClick={()=>setIsOpen(true)}>
+            {!participantsRight?.isSend && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>=0 ? <Button  onClick={()=>setIsOpen(true)}>
                     Submit new task
-                </Button> : ''}
+                </Button> : 
+            participantsRight?.isSend && !participantsRight.isApprove && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>=0 ?<Button  onClick={()=>setIsOpen(true)} disabled={true}> Submit new task</Button>
+                :""
+                }
             </div>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent className="sm:max-w-lg">
