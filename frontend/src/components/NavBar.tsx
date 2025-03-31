@@ -167,11 +167,11 @@ const NavBar = (session: any) => {
         label: "My Post",
         href: "/my-post",
       },
-      {
-        icon: <FaHistory className="w-5 h-5" />,
-        label: role === "producer" ? "My Post History" : "Work History",
-        href: "/post-history",
-      },
+      // {
+      //   icon: <FaHistory className="w-5 h-5" />,
+      //   label: role === "producer" ? "My Post History" : "Work History",
+      //   href: "/post-history",
+      // },
       ...(role === "producer"
         ? [
             {
@@ -199,11 +199,6 @@ const NavBar = (session: any) => {
         icon: <Gift className="w-5 h-5" />,
         label: "My Offering",
         href: "/my-offering",
-      },
-      {
-        icon: <Settings className="w-5 h-5" />,
-        label: "Setting",
-        href: "/setting",
       },
     ];
     setMenuItems(sessionMenuItems);
