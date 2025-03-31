@@ -97,6 +97,7 @@ export default function ReviewProfessional({ id }: { id: string }) {
       const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/reviews/${id}`;
 
       const reviewResponse = await axios.get(apiUrl);
+      console.log('review Res', reviewResponse)
       // const reviewData = await reviewResponse.data
       // console.log("ReviewResponse", reviewResponse);
       const newReviewData = reviewResponse?.data?.data

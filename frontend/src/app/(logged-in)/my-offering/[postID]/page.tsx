@@ -24,11 +24,6 @@ import { mockOfferHistory, mockPostDetail } from "@/mock/mockData";
 
 // นำเข้า components ที่แยกออกมา
 import HistoryProductionContent from "@/components/HistoryProductionContent";
-import RoleDropdown from "@/components/RoleDropdown";
-import ProfessionalSelector from "@/components/ProfessionalSelector";
-import OfferHistory from "@/components/OfferHistory";
-import ComparisonView from "@/components/ComparisonView";
-import PostDetail from "@/components/PostDetail";
 import getPostById from "@/libs/getPostById";
 import getPrudcerOffers from "@/libs/getProducerOffers";
 import axios from "axios";
@@ -42,7 +37,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Checkbox, CircularProgress, Rating } from "@mui/material";
+import { Checkbox, CircularProgress, Rating, setRef } from "@mui/material";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,12 +100,16 @@ const ConfirmOffer = ({
   token,
   setOfferArray,
   setOfferStatus,
+  setRefreshKey,
+  refreshKey
 }: {
   setOfferStatus: Function;
   setOfferArray: Function;
   token: string | undefined;
   postID: string;
   offer: historyStateInterface;
+  setRefreshKey : Function,
+  refreshKey : boolean
 }) => {
   const { toast } = useToast();
   token = token ?? "";
@@ -183,6 +182,7 @@ const ConfirmOffer = ({
     const offerArray: Array<historyStateInterface> =
       updateOfferRes?.data?.data?.data;
     if (res?.data?.status !== "success") {
+      
       toast({
         title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
         description: `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
@@ -194,6 +194,7 @@ const ConfirmOffer = ({
     if (offerArray.length > 0) {
       setOfferStatus(offerArray[0]?.status ?? "");
     }
+    setRefreshKey(!refreshKey)
     setOpen(false);
     setTextState("");
     setCheckboxState(false);
@@ -745,7 +746,7 @@ export default function OfferPostContent() {
   >(null);
   const [selectedOfferProducer, setSelectedOfferProducer] =
     useState<OfferHistoryResponseData | null>(null);
-
+  const [refreshKey, setRefreshKey] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -775,7 +776,7 @@ export default function OfferPostContent() {
       }
     };
     fetchData();
-  }, [userID, userRole]);
+  }, [userID, userRole, refreshKey]);
   //*********************************** */
 
   //API Connection
@@ -1055,6 +1056,8 @@ export default function OfferPostContent() {
                           status: index == 0 ? offer.status : "reject",
                         }}
                         key={index}
+                        setRefreshKey={setRefreshKey}
+                        refreshKey={refreshKey}
                       />
                     ))}
                   </div>
