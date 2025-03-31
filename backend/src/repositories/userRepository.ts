@@ -214,7 +214,8 @@ class UserRepository {
                           {
                             $project: {
                               _id: 1,
-                              userID: 1
+                              userID: 1,
+                              postName: 1
                             }
                           }
                         ]
@@ -242,12 +243,26 @@ class UserRepository {
                       }
                     },
                     {
+                      $unwind:
+                        /**
+                         * path: Path to the array field.
+                         * includeArrayIndex: Optional name for index.
+                         * preserveNullAndEmptyArrays: Optional
+                         *   toggle to unwind null and empty values.
+                         */
+                        {
+                          path: "$rating.post"
+                        }
+                    },
+                    {
                       $group: {
                         _id: "$_id",
                         reviews: {
                           $addToSet: {
                             reviewerName:
                               "$rating.producer.username",
+                            reviewerPostName:
+                              "$rating.post.postName",
                             reviewerProfileImage:
                               "$rating.producer.profileImage",
                             ratingScore: "$rating.ratingScore",
