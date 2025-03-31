@@ -88,7 +88,7 @@ const ProducerProfile = () => {
             </p>
           </div>
         
-          <h3 className="text-xl font-bold text-main-gery text-center">Producer's Previously Received Reviews</h3>
+          <h3 className="text-xl font-bold text-maingrey text-center">Producer's Previously Received Reviews</h3>
           <ReviewProducer id={id}/>
 
         </CardContent>
