@@ -99,331 +99,331 @@ interface userReturn {
   role : string;
 }
 
-const ConfirmOffer = ({
-  offer,
-  postID,
-  token,
-  setOfferArray,
-  setOfferStatus,
-}: {
-  setOfferStatus: Function;
-  setOfferArray: Function;
-  token: string | undefined;
-  postID: string;
-  offer: historyStateInterface;
-}) => {
-  const { toast } = useToast();
-  token = token ?? "";
-  const offerDate = new Date(offer.createdAt);
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
-  const { data: session } = useSession();
+// const ConfirmOffer = ({
+//   offer,
+//   postID,
+//   token,
+//   setOfferArray,
+//   setOfferStatus,
+// }: {
+//   setOfferStatus: Function;
+//   setOfferArray: Function;
+//   token: string | undefined;
+//   postID: string;
+//   offer: historyStateInterface;
+// }) => {
+//   const { toast } = useToast();
+//   token = token ?? "";
+//   const offerDate = new Date(offer.createdAt);
+//   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
+//   const { data: session } = useSession();
 
-  const userId = session?.user?.id ?? "";
-  const handleStatusChange = async (status: StatusChangeType) => {
-    const body = {
-      postID: postID,
-      participantID: offer.participantID,
-      statusToChange: status,
-    };
+//   const userId = session?.user?.id ?? "";
+//   const handleStatusChange = async (status: StatusChangeType) => {
+//     const body = {
+//       postID: postID,
+//       participantID: offer.participantID,
+//       statusToChange: status,
+//     };
 
-    const res = await axios.patch(apiUrl, body, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        Accept: "*/*",
-      },
-    });
-    return res;
-  };
-  const handleFetch = async (userId: string) => {
-    const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
-    const res = await axios.get(apiUrl, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token ?? ""}`,
-      },
-    });
-    return res;
-  };
+//     const res = await axios.patch(apiUrl, body, {
+//       withCredentials: true,
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json",
+//         Accept: "*/*",
+//       },
+//     });
+//     return res;
+//   };
+//   const handleFetch = async (userId: string) => {
+//     const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
+//     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+//     const res = await axios.get(apiUrl, {
+//       withCredentials: true,
+//       headers: {
+//         Authorization: `Bearer ${token ?? ""}`,
+//       },
+//     });
+//     return res;
+//   };
 
-  const displayDate = offerDate.toLocaleString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const [open, setOpen] = useState(false);
-  const [isChanged, setIsChanged] = useState(0);
-  const [canCanfirm, setCanConfirm] = useState(false);
-  const handleRejectOffer = () => {
-    setIsChanged(1);
-    setTextState("");
-    setCanConfirm(false);
-    setCheckboxState(false);
-    // setTimeout(() => {}, 1000)
-    // setIsChanged(false)
-  };
-  const handleConfirmOffer = () => {
-    if (isChanged == 0) {
-      setIsChanged(2);
-    }
-  };
-  const [loading, setLoading] = useState(false);
-  const handleClickConfirmOffer = async (isConfirm: boolean) => {
-    // setTextState("")
-    // alert(1)
-    setLoading(true);
-    const res = await handleStatusChange(
-      isConfirm ? StatusChangeType.Candidate : StatusChangeType.Reject,
-    );
-    const updateOfferRes = await handleFetch(userId);
-    const offerArray: Array<historyStateInterface> =
-      updateOfferRes?.data?.data?.data;
-    if (res?.data?.status !== "success") {
-      toast({
-        title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
-        description: `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
-        variant: "destructive",
-      });
-      return;
-    }
-    setOfferArray(offerArray);
-    if (offerArray.length > 0) {
-      setOfferStatus(offerArray[0]?.status ?? "");
-    }
-    setOpen(false);
-    setTextState("");
-    setCheckboxState(false);
-    setLoading(false);
-    toast({
-      title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
-      description: `${isConfirm ? "Confirm" : "Reject"} this offer successfully`,
-    });
-  };
-  const [textState, setTextState] = useState("");
-  // console.log('textState', textState)
-  const [profileImageState, setProfileImageState] = useState("");
-  const [reviewState, setReviewState] = useState(0);
-  const [ratingCount, setRatingCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [name, setName] = useState("");
-  const handleTriggerDialog = async () => {
-    const user = await axios.get(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`,
-    );
-    setTextState("");
-    setCanConfirm(false);
-    setIsChanged(0);
-    setCheckboxState(false);
-    const data: userReturn = user.data.data;
-    console.log('data', data)
-    setProfileImageState(data?.profileImage ?? "");
-    setName(data?.username);
-    const count = data.rating.length;
-    let sumRating = 0;
-    for (const object of data.rating) {
-      sumRating += object.ratingScore;
-    }
-    setRatingCount(count);
-    setReviewState(
-      sumRating == 0 || count == 0 ? 0 : Math.round(sumRating / count),
-    );
-  };
-  const router = useRouter();
-  const handleCounterOffer = (postID: string) => {
-    if (isChanged == 3) {
-      setOpen(false);
-      router.push(`/create-offer/${postID}`);
-    } else setIsChanged(3);
-  };
+//   const displayDate = offerDate.toLocaleString("en-US", {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   });
+//   const [open, setOpen] = useState(false);
+//   const [isChanged, setIsChanged] = useState(0);
+//   const [canCanfirm, setCanConfirm] = useState(false);
+//   const handleRejectOffer = () => {
+//     setIsChanged(1);
+//     setTextState("");
+//     setCanConfirm(false);
+//     setCheckboxState(false);
+//     // setTimeout(() => {}, 1000)
+//     // setIsChanged(false)
+//   };
+//   const handleConfirmOffer = () => {
+//     if (isChanged == 0) {
+//       setIsChanged(2);
+//     }
+//   };
+//   const [loading, setLoading] = useState(false);
+//   const handleClickConfirmOffer = async (isConfirm: boolean) => {
+//     // setTextState("")
+//     // alert(1)
+//     setLoading(true);
+//     const res = await handleStatusChange(
+//       isConfirm ? StatusChangeType.Candidate : StatusChangeType.Reject,
+//     );
+//     const updateOfferRes = await handleFetch(userId);
+//     const offerArray: Array<historyStateInterface> =
+//       updateOfferRes?.data?.data?.data;
+//     if (res?.data?.status !== "success") {
+//       toast({
+//         title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
+//         description: `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
+//         variant: "destructive",
+//       });
+//       return;
+//     }
+//     setOfferArray(offerArray);
+//     if (offerArray.length > 0) {
+//       setOfferStatus(offerArray[0]?.status ?? "");
+//     }
+//     setOpen(false);
+//     setTextState("");
+//     setCheckboxState(false);
+//     setLoading(false);
+//     toast({
+//       title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
+//       description: `${isConfirm ? "Confirm" : "Reject"} this offer successfully`,
+//     });
+//   };
+//   const [textState, setTextState] = useState("");
+//   // console.log('textState', textState)
+//   const [profileImageState, setProfileImageState] = useState("");
+//   const [reviewState, setReviewState] = useState(0);
+//   const [ratingCount, setRatingCount] = useState(0);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [name, setName] = useState("");
+//   const handleTriggerDialog = async () => {
+//     const user = await axios.get(
+//       `${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`,
+//     );
+//     setTextState("");
+//     setCanConfirm(false);
+//     setIsChanged(0);
+//     setCheckboxState(false);
+//     const data: userReturn = user.data.data;
+//     console.log('data', data)
+//     setProfileImageState(data?.profileImage ?? "");
+//     setName(data?.username);
+//     const count = data.rating.length;
+//     let sumRating = 0;
+//     for (const object of data.rating) {
+//       sumRating += object.ratingScore;
+//     }
+//     setRatingCount(count);
+//     setReviewState(
+//       sumRating == 0 || count == 0 ? 0 : Math.round(sumRating / count),
+//     );
+//   };
+//   const router = useRouter();
+//   const handleCounterOffer = (postID: string) => {
+//     if (isChanged == 3) {
+//       setOpen(false);
+//       router.push(`/create-offer/${postID}`);
+//     } else setIsChanged(3);
+//   };
 
-  const [checkboxState, setCheckboxState] = useState(false);
-  const offerRole =
-    offer.offeredBy == 1 ? "producer" : "production professional";
-  const canOffer =
-    (offer.offeredBy == 1 ? "producer" : "production professional") !==
-    session?.user.role;
+//   const [checkboxState, setCheckboxState] = useState(false);
+//   const offerRole =
+//     offer.offeredBy == 1 ? "producer" : "production professional";
+//   const canOffer =
+//     (offer.offeredBy == 1 ? "producer" : "production professional") !==
+//     session?.user.role;
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <div
-          onClick={handleTriggerDialog}
-          className="mt-4 pb-1 w-[90%] relative"
-        >
-          <HistoryProductionContent data={offer} />
-        </div>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isChanged == 1 ? "Reject Offer" : "Confirm Offer"}:{" "}
-            {offer.postName}
-          </DialogTitle>
-          <DialogDescription>Role: {offer.roleName}</DialogDescription>
-        </DialogHeader>
-        {isChanged > 0 ? (
-          <div className="gap-3 flex flex-col">
-            <span>
-              {isChanged == 1
-                ? "If you reject this offer, you won’t be able to make another offer on this post in the future. "
-                : ""}
-            </span>
-            <span
-              className={`${isChanged == 1 ? "text-mainred" : isChanged == 3 ? "text-black" : "text-black"}`}
-            >
-              {" "}
-              {isChanged == 1
-                ? "Please type 'Reject Offer' to decline."
-                : isChanged == 3
-                  ? "You are about to be redirected to the Create Offer page. Are you sure?"
-                  : "Are you sure to accept this offer."}
-            </span>
-            {isChanged == 1 ? (
-              <Input
-                value={textState}
-                onChange={(e) => {
-                  setTextState(e.target.value);
-                  // console.log("e", e.target.value)
-                  if (
-                    e.target.value ==
-                    (isChanged == 1 ? "Reject Offer" : "Confirm Offer")
-                  ) {
-                    setCanConfirm(true);
-                  } else {
-                    setCanConfirm(false);
-                  }
-                }}
-              />
-            ) : isChanged == 3 ? (
-              <div></div>
-            ) : (
-              <div>
-                <Checkbox
-                  value={checkboxState}
-                  onChange={(e) => setCheckboxState(e.target.checked)}
-                />
-                <Label>Confirmed</Label>
-              </div>
-            )}
-          </div>
-        ) : (
-          ""
-        )}
-        <div className={`${isChanged > 0 ? "hidden" : ""}`}>
-          <div className={`flex flex-row gap-3`}>
-            <Avatar className="border flex justify-center items-center">
-              {/* {
-                isLoading && profileImageState &&
-                <CircularProgress size={20}/>
+//   return (
+//     <Dialog open={open} onOpenChange={setOpen}>
+//       <DialogTrigger asChild>
+//         <div
+//           onClick={handleTriggerDialog}
+//           className="mt-4 pb-1 w-[90%] relative"
+//         >
+//           <HistoryProductionContent data={offer} />
+//         </div>
+//       </DialogTrigger>
+//       <DialogContent>
+//         <DialogHeader>
+//           <DialogTitle>
+//             {isChanged == 1 ? "Reject Offer" : "Confirm Offer"}:{" "}
+//             {offer.postName}
+//           </DialogTitle>
+//           <DialogDescription>Role: {offer.roleName}</DialogDescription>
+//         </DialogHeader>
+//         {isChanged > 0 ? (
+//           <div className="gap-3 flex flex-col">
+//             <span>
+//               {isChanged == 1
+//                 ? "If you reject this offer, you won’t be able to make another offer on this post in the future. "
+//                 : ""}
+//             </span>
+//             <span
+//               className={`${isChanged == 1 ? "text-mainred" : isChanged == 3 ? "text-black" : "text-black"}`}
+//             >
+//               {" "}
+//               {isChanged == 1
+//                 ? "Please type 'Reject Offer' to decline."
+//                 : isChanged == 3
+//                   ? "You are about to be redirected to the Create Offer page. Are you sure?"
+//                   : "Are you sure to accept this offer."}
+//             </span>
+//             {isChanged == 1 ? (
+//               <Input
+//                 value={textState}
+//                 onChange={(e) => {
+//                   setTextState(e.target.value);
+//                   // console.log("e", e.target.value)
+//                   if (
+//                     e.target.value ==
+//                     (isChanged == 1 ? "Reject Offer" : "Confirm Offer")
+//                   ) {
+//                     setCanConfirm(true);
+//                   } else {
+//                     setCanConfirm(false);
+//                   }
+//                 }}
+//               />
+//             ) : isChanged == 3 ? (
+//               <div></div>
+//             ) : (
+//               <div>
+//                 <Checkbox
+//                   value={checkboxState}
+//                   onChange={(e) => setCheckboxState(e.target.checked)}
+//                 />
+//                 <Label>Confirmed</Label>
+//               </div>
+//             )}
+//           </div>
+//         ) : (
+//           ""
+//         )}
+//         <div className={`${isChanged > 0 ? "hidden" : ""}`}>
+//           <div className={`flex flex-row gap-3`}>
+//             <Avatar className="border flex justify-center items-center">
+//               {/* {
+//                 isLoading && profileImageState &&
+//                 <CircularProgress size={20}/>
 
-              }
-              {
-                (profileImageState) ? 
-                <AvatarImage onLoad={() => setIsLoading(false)} onError={() => setIsLoading(false)} src={profileImageState ?? "/"}/>
-                      :
-                <User />
-              } */}
-              <User />
-            </Avatar>
-            <div className="flex flex-col">
-              <span>{`From: ${name} `}</span>
-              <div className="flex">
-                <Rating value={reviewState} readOnly />
-                <span>{ratingCount} (review)</span>
-              </div>
-            </div>
-          </div>
-          <Separator className="bg-black my-2" />
-          <div>
-            <span className="text-xl font-bold">Offer Detail</span>
-            <div className="flex justify-between">
-              <span>Offered Price:</span>
-              <span>{`${offer.currentWage} THB`}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Start Date:</span>
-              <span>{displayDate}</span>
-            </div>
-            <div className="flex flex-col">
-              <span>Description</span>
-              <div className="w-[100%] flex justify-center items-center bg-slate-50 h-[300px] rounded-xl">
-                <span className="w-[80%] h-[80%]">{offer.reason}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <div className="w-full flex justify-center">
-            {offer.status === "in-progress" ? (
-              <div className="flex justify-around w-full">
-                <Button
-                  onClick={
-                    isChanged > 0
-                      ? () => {
-                          setIsChanged(0);
-                          setCanConfirm(false);
-                          setTextState("");
-                          setCheckboxState(false);
-                        }
-                      : handleRejectOffer
-                  }
-                  className="w-[25%] rounded-lg bg-mainred hover:bg-mainred-light"
-                >
-                  {isChanged > 0 ? "No" : "Reject Offer"}
-                </Button>
-                <Button
-                  onClick={() => {
-                    handleCounterOffer(postID);
-                  }}
-                  className={`${isChanged == 3 ? "hidden" : ""}`}
-                >
-                  Counter Offer
-                </Button>
-                <Button
-                  onClick={
-                    isChanged > 0
-                      ? () => {
-                          isChanged == 2
-                            ? handleClickConfirmOffer(true)
-                            : isChanged == 3
-                              ? handleCounterOffer(postID)
-                              : handleClickConfirmOffer(false);
-                        }
-                      : handleConfirmOffer
-                  }
-                  className="w-[30%] rounded-lg bg-maingreen text-white hover:bg-maingreen-light"
-                  disabled={
-                    ((canCanfirm || checkboxState || isChanged == 3) &&
-                      isChanged > 0) ||
-                    (isChanged == 0 && canOffer)
-                      ? false
-                      : true
-                  }
-                >
-                  {isChanged ? "Yes" : "Confirm Offer"}
-                </Button>
-              </div>
-            ) : (
-              <span className="text-lg">
-                You have successfully{" "}
-                <span
-                  className={`${offer.status === "reject" ? "text-mainred-light" : "text-maingreen-light"}`}
-                >
-                  {offer.status === "reject" ? "rejected" : "confirmed"}
-                </span>{" "}
-                this offer.
-              </span>
-            )}
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
+//               }
+//               {
+//                 (profileImageState) ? 
+//                 <AvatarImage onLoad={() => setIsLoading(false)} onError={() => setIsLoading(false)} src={profileImageState ?? "/"}/>
+//                       :
+//                 <User />
+//               } */}
+//               <User />
+//             </Avatar>
+//             <div className="flex flex-col">
+//               <span>{`From: ${name} `}</span>
+//               <div className="flex">
+//                 <Rating value={reviewState} readOnly />
+//                 <span>{ratingCount} (review)</span>
+//               </div>
+//             </div>
+//           </div>
+//           <Separator className="bg-black my-2" />
+//           <div>
+//             <span className="text-xl font-bold">Offer Detail</span>
+//             <div className="flex justify-between">
+//               <span>Offered Price:</span>
+//               <span>{`${offer.currentWage} THB`}</span>
+//             </div>
+//             <div className="flex justify-between">
+//               <span>Start Date:</span>
+//               <span>{displayDate}</span>
+//             </div>
+//             <div className="flex flex-col">
+//               <span>Description</span>
+//               <div className="w-[100%] flex justify-center items-center bg-slate-50 h-[300px] rounded-xl">
+//                 <span className="w-[80%] h-[80%] text-wrap">{offer.reason}</span>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//         <DialogFooter>
+//           <div className="w-full flex justify-center">
+//             {offer.status === "in-progress" ? (
+//               <div className="flex justify-around w-full">
+//                 <Button
+//                   onClick={
+//                     isChanged > 0
+//                       ? () => {
+//                           setIsChanged(0);
+//                           setCanConfirm(false);
+//                           setTextState("");
+//                           setCheckboxState(false);
+//                         }
+//                       : handleRejectOffer
+//                   }
+//                   className="w-[25%] rounded-lg bg-mainred hover:bg-mainred-light"
+//                 >
+//                   {isChanged > 0 ? "No" : "Reject Offer"}
+//                 </Button>
+//                 <Button
+//                   onClick={() => {
+//                     handleCounterOffer(postID);
+//                   }}
+//                   className={`${isChanged == 3 ? "hidden" : ""}`}
+//                 >
+//                   Counter Offer
+//                 </Button>
+//                 <Button
+//                   onClick={
+//                     isChanged > 0
+//                       ? () => {
+//                           isChanged == 2
+//                             ? handleClickConfirmOffer(true)
+//                             : isChanged == 3
+//                               ? handleCounterOffer(postID)
+//                               : handleClickConfirmOffer(false);
+//                         }
+//                       : handleConfirmOffer
+//                   }
+//                   className="w-[30%] rounded-lg bg-maingreen text-white hover:bg-maingreen-light"
+//                   disabled={
+//                     ((canCanfirm || checkboxState || isChanged == 3) &&
+//                       isChanged > 0) ||
+//                     (isChanged == 0 && canOffer)
+//                       ? false
+//                       : true
+//                   }
+//                 >
+//                   {isChanged ? "Yes" : "Confirm Offer"}
+//                 </Button>
+//               </div>
+//             ) : (
+//               <span className="text-lg">
+//                 You have successfully{" "}
+//                 <span
+//                   className={`${offer.status === "reject" ? "text-mainred-light" : "text-maingreen-light"}`}
+//                 >
+//                   {offer.status === "reject" ? "rejected" : "confirmed"}
+//                 </span>{" "}
+//                 this offer.
+//               </span>
+//             )}
+//           </div>
+//         </DialogFooter>
+//       </DialogContent>
+//     </Dialog>
+//   );
+// };
 
 //         <p
 //             className={`text-sm w-full m-auto text-end font-semibold ${

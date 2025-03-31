@@ -126,6 +126,7 @@ export interface PostDataHistory {
     postDescription: string;
     postImages: string[];
     postImagesKey?: string[];
+    participant?: ParticipantForRight;
     postMediaType: string;
     postProjectRolesOut?: PostRolesResponse[]
     postProjectRolesOutProfessional?: PostRolesResponse
@@ -257,6 +258,7 @@ export interface ReviewData{
 export interface PostParticipant {
     id: string;
     label: string;
+    isReview: boolean;
 }
 
 export interface ChangeParticipantStatus{

@@ -2,12 +2,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { PostData,SearchPosts } from "../../interface";
 import Pagination from "@/components/Pagination";
-import Footer from "@/components/Footer";
 import MyPostCard from "@/components/MyPostCard";
 import { useSession } from "next-auth/react";
-import SearchPostBar from "@/components/SearchPostBar";
 import MyPostBar from "@/components/MyPostBar";
-import getPosts from "@/libs/getPosts";
 import getMyProducerPosts from "@/libs/getMyProducerPosts";
 import Link from "next/link";
 import getMyProductionProfessionalPosts from "@/libs/getMyProfessionalPost";

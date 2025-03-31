@@ -1,10 +1,15 @@
-import { Calendar, Film, User } from "lucide-react";
+import { Calendar, Film } from "lucide-react";
 import Image from "next/image";
 import ReviewSubmissionForm from "./ReviewSubmissionForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { PostData } from "../../interface";
+import { Participant, PostData, ReviewData } from "../../interface";
+import { useSession } from "next-auth/react";
+import getPostParticipants from "@/libs/getPostParticipants";
+import putReviewProfessional from "@/libs/putReviewProfessional";
+import postReviewPost from "@/libs/postReviewPost";
+import getPostById from "@/libs/getPostById";
 
 
 const formSchema = z.object({
@@ -25,9 +30,13 @@ const formSchema = z.object({
       .or(z.literal("unneeded")),
   });
 
-export default function MyPostCard({role,isReview,postDetail}:{role:string,isReview?:boolean,postDetail:PostData}){
+export default function MyPostCard({role,postDetail}:{role:string,postDetail:PostData}){
+    const {data : session} = useSession();
+    const token = session?.user.token??"";
     const { toast } = useToast();
     const [isOpen, setIsOpen] = useState(false);
+    const [isReviewed, setIsReviewed] = useState(true);
+    const userId = session?.user.id??"";
 
     const displayDate = postDetail.endDate
     ? new Date(postDetail.endDate).toLocaleString("en-US", {
@@ -44,7 +53,7 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
     const diffTime: number = date2.getTime() - date1.getTime();
     const diffDays: number = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-     async function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         if (values.comment.length < 10) {
           toast({
             variant: "destructive",
@@ -53,7 +62,7 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
           });
           return;
         }
-    
+  
         if (values.rating < 1 || values.rating > 5) {
           toast({
             variant: "destructive",
@@ -62,14 +71,87 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
           });
           return;
         }
+      const reviewData: ReviewData = {
+            createdAt: new Date(),
+            postID: postDetail.id,
+            ratingScore: values.rating,
+            comment: values.comment,
+          };
+      
+          try {
+            let response;
+      
+            if (role === "producer") {
+              const professionalId = values.production;
+              response = await putReviewProfessional(
+                reviewData,
+                token,
+                professionalId,
+              );
+            } else {
+              response = await postReviewPost(reviewData, token, postDetail.id);
+            }
+      
+            if (!response) {
+              toast({
+                variant: "destructive",
+                title: "Failed to submit review",
+                description: "Failed to submit review. Please try again.",
+              });
+              return;
+            }
+      
+            if (response.data?.status === "error") {
+              toast({
+                variant: "destructive",
+                title: "Review Submission Failed",
+                description: response.data?.message || "Failed to submit review",
+              });
+              return;
+            }
+      
+            toast({
+              variant: "default",
+              title: "Successful review submission",
+              description: "Your review has been submitted!",
+            });
+            setIsReviewed(true);
+            setIsOpen(false);
+          } catch (error) {
+            console.error("Error submitting review:", error);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "An unexpected error occurred. Please try again.",
+            });
+          }
      }
-     const imageURL =
-      postDetail.postImages && postDetail.postImages.length > 0
-        ? postDetail.postImages[0]
-        : "image/logo.png";
+    const imageURL = postDetail.postImages && postDetail.postImages.length > 0 ? 
+    postDetail.postImages[0] : "image/logo.png";
+    
+    useEffect(() => {
+      const test = async () => {
+        if (postDetail.postStatus === "success") {
+          if (role === "producer"){
+            const response = await getPostParticipants(postDetail.id??"", token)
+            const validParticipants = response.data
+                .filter((item) => !item.isReview)
+            console.log(validParticipants.length)
+            setIsReviewed(validParticipants.length <= 0)
+          } else if (role === "production professional") {
+            const response = await getPostById(postDetail.id??"", token)
+            const selfParticipant = response.participants.filter((item: Participant)=> item.participantID === userId)[0]
+            setIsReviewed(selfParticipant.reviewedAt !== null)
+          }
+        }
+      }
+      test()
+    }, [isReviewed]);
+
+    
     return(
-        <div className=" bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.01] h-[144px] w-[400px] p-2">
-            <div className="grid grid-cols-7 gap-2 w-[100%] h-full">
+        <div className=" bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.01] min-h-[144px] max-h-[200px] w-[400px] p-2">
+            <div className="grid grid-cols-8 gap-3 w-[100%] h-full">
                 <div className="col-span-4 rounded-lg overflow-hidden w-[100%] relative">
                     <Image
                         src={imageURL}
@@ -78,71 +160,59 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
                         className="object-cover w-full h-full p-0.5"
                     />
                 </div>
-                <div className="col-span-3 content-center justify-center">
-                    <h3 className="text-lg font-semibold text-mainblue">
-                        {postDetail.postName}
-                    </h3>
-                    {role === "producer" ? (
-                        <>
-                        <div className=" text-gray-600 text-sm flex">
-                            <Film className="w-4 h-4 mr-2 text-mainblue-light " />
-                            <p className="flex">Type: {postDetail.postMediaTypeOut.mediaName}</p>
-                        </div>
-                        <div className="  text-gray-600 text-sm flex">
-                            <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
-                            <p>
-                            {postDetail.postStatus === "in-progress"
-                          ? "During Develop"
+                <div className="col-span-4 content-center justify-center">
+                  <h3 className="text-lg font-semibold text-mainblue">
+                      {postDetail.postName}
+                  </h3>
+                  <>
+                    <div className="flex items-center text-gray-600 text-sm mb-1">
+                      <Film className="w-4 h-4 mr-2 text-mainblue-light " />
+                      <p className="flex">Type: {postDetail.postMediaTypeOut.mediaName}</p>
+                    </div>
+                    <div className="flex items-center text-gray-600 text-sm">
+                      <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
+                      <p>
+                        {postDetail.postStatus === "in-progress"
+                          ? "During Development"
                           : postDetail.postStatus === "created"
-                          ? "Wait"
+                          ? "New Post"
                           : postDetail.postStatus === "waiting"
-                          ? "Wait"
-                          : postDetail.postStatus==="success"
-                          ? `EndDate:  ${diffDays == 0 ? `Today` : `${diffDays} day ago`}`
-                          : `-`}
-                            </p>
-                        </div>
-                        </>
-                    ) : (
-                        <>
-
-                        <div className="flex items-center text-gray-600 text-sm mb-1">
-                            <Film className="w-4 h-4 mr-2 text-mainblue-light" />
-                            <p className="flex">Type: {postDetail.postMediaTypeOut.mediaName}</p>
-                        </div>
-                        <div className="flex items-center text-gray-600 text-sm">
-                            <Calendar className="w-4 h-4 mr-2 text-mainblue-light" />
-                            <p>
-                            {postDetail.postStatus === "in-progress"
-                          ? "During Develop"
-                          : postDetail.postStatus === "created"
-                          ? "Wait"
-                          : postDetail.postStatus === "waiting"
-                          ? "Wait"
-                          : postDetail.postStatus==="success"
-                          ? `EndDate: ${displayDate}`
-                          : `-`}
-                            </p>
-                        </div>
-                        </>
-                        )}
+                          ? "Waiting"
+                          : postDetail.postStatus === "success"
+                          ? `End Date:  ${diffDays == 0 ? `Today` : `${diffDays} days ago`}`
+                          : `-`
+                        }
+                      </p>
+                    </div>
+                  </>
                 </div>
-                {isReview&&  (<div className="col-span-7 content-center justify-center">        
-                <button
-                    className="w-full px-3 py-2 text-sm bg-mainblue text-white rounded-md
-                    hover:bg-mainblue-light transition-colors"
-                    onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsOpen(true);
-                    }}
-                >
-                {role === "producer" ? "Review Professional" : "Review Project"}
-                </button>
+                {!isReviewed && postDetail.postStatus === "success" && (
+                <div className="col-span-8 content-center justify-center">
+                    <div className="pt-4 border-t">        
+                      <button
+                          className="w-full px-3 py-2 text-sm bg-mainblue text-white rounded-md
+                          hover:bg-mainblue-light transition-colors"
+                          onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsOpen(true);
+                          }}
+                      >
+                        {role === "producer" ? "Review Professional" : "Review Project"}
+                      </button>
+                    </div>
+                    <ReviewSubmissionForm
+                            role={role}
+                            isOpen={isOpen}
+                            setIsOpen={setIsOpen}
+                            onSubmit={onSubmit}
+                            toast={toast}
+                            postId={postDetail.id}
+                          />
                 </div>
+                
                 )}
-          
-         </div>
-    </div>
+            </div>
+        </div>
     )
 }
