@@ -126,6 +126,7 @@ export interface PostDataHistory {
     postDescription: string;
     postImages: string[];
     postImagesKey?: string[];
+    participant?: ParticipantForRight;
     postMediaType: string;
     postProjectRolesOut?: PostRolesResponse[]
     postProjectRolesOutProfessional?: PostRolesResponse

@@ -99,153 +99,153 @@ interface userReturn {
   role : string;
 }
 
-const ConfirmOffer = ({
-  offer,
-  postID,
-  token,
-  setOfferArray,
-  setOfferStatus,
-}: {
-  setOfferStatus: Function;
-  setOfferArray: Function;
-  token: string | undefined;
-  postID: string;
-  offer: historyStateInterface;
-}) => {
-  const { toast } = useToast();
-  token = token ?? "";
-  const offerDate = new Date(offer.createdAt);
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
-  const { data: session } = useSession();
+// const ConfirmOffer = ({
+//   offer,
+//   postID,
+//   token,
+//   setOfferArray,
+//   setOfferStatus,
+// }: {
+//   setOfferStatus: Function;
+//   setOfferArray: Function;
+//   token: string | undefined;
+//   postID: string;
+//   offer: historyStateInterface;
+// }) => {
+//   const { toast } = useToast();
+//   token = token ?? "";
+//   const offerDate = new Date(offer.createdAt);
+//   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
+//   const { data: session } = useSession();
 
-  const userId = session?.user?.id ?? "";
-  const handleStatusChange = async (status: StatusChangeType) => {
-    const body = {
-      postID: postID,
-      participantID: offer.participantID,
-      statusToChange: status,
-    };
+//   const userId = session?.user?.id ?? "";
+//   const handleStatusChange = async (status: StatusChangeType) => {
+//     const body = {
+//       postID: postID,
+//       participantID: offer.participantID,
+//       statusToChange: status,
+//     };
 
-    const res = await axios.patch(apiUrl, body, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        Accept: "*/*",
-      },
-    });
-    return res;
-  };
-  const handleFetch = async (userId: string) => {
-    const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
-    const res = await axios.get(apiUrl, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token ?? ""}`,
-      },
-    });
-    return res;
-  };
+//     const res = await axios.patch(apiUrl, body, {
+//       withCredentials: true,
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json",
+//         Accept: "*/*",
+//       },
+//     });
+//     return res;
+//   };
+//   const handleFetch = async (userId: string) => {
+//     const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
+//     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+//     const res = await axios.get(apiUrl, {
+//       withCredentials: true,
+//       headers: {
+//         Authorization: `Bearer ${token ?? ""}`,
+//       },
+//     });
+//     return res;
+//   };
 
-  const displayDate = offerDate.toLocaleString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const [open, setOpen] = useState(false);
-  const [isChanged, setIsChanged] = useState(0);
-  const [canCanfirm, setCanConfirm] = useState(false);
-  const handleRejectOffer = () => {
-    setIsChanged(1);
-    setTextState("");
-    setCanConfirm(false);
-    setCheckboxState(false);
-    // setTimeout(() => {}, 1000)
-    // setIsChanged(false)
-  };
-  const handleConfirmOffer = () => {
-    if (isChanged == 0) {
-      setIsChanged(2);
-    }
-  };
-  const [loading, setLoading] = useState(false);
-  const handleClickConfirmOffer = async (isConfirm: boolean) => {
-    // setTextState("")
-    // alert(1)
-    setLoading(true);
-    const res = await handleStatusChange(
-      isConfirm ? StatusChangeType.Candidate : StatusChangeType.Reject,
-    );
-    const updateOfferRes = await handleFetch(userId);
-    const offerArray: Array<historyStateInterface> =
-      updateOfferRes?.data?.data?.data;
-    if (res?.data?.status !== "success") {
-      toast({
-        title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
-        description: `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
-        variant: "destructive",
-      });
-      return;
-    }
-    setOfferArray(offerArray);
-    if (offerArray.length > 0) {
-      setOfferStatus(offerArray[0]?.status ?? "");
-    }
-    setOpen(false);
-    setTextState("");
-    setCheckboxState(false);
-    setLoading(false);
-    toast({
-      title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
-      description: `${isConfirm ? "Confirm" : "Reject"} this offer successfully`,
-    });
-  };
-  const [textState, setTextState] = useState("");
-  // console.log('textState', textState)
-  const [profileImageState, setProfileImageState] = useState("");
-  const [reviewState, setReviewState] = useState(0);
-  const [ratingCount, setRatingCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [name, setName] = useState("");
-  const handleTriggerDialog = async () => {
-    const user = await axios.get(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`,
-    );
-    setTextState("");
-    setCanConfirm(false);
-    setIsChanged(0);
-    setCheckboxState(false);
-    const data: userReturn = user.data.data;
-    console.log('data', data)
-    setProfileImageState(data?.profileImage ?? "");
-    setName(data?.username);
-    const count = data.rating.length;
-    let sumRating = 0;
-    for (const object of data.rating) {
-      sumRating += object.ratingScore;
-    }
-    setRatingCount(count);
-    setReviewState(
-      sumRating == 0 || count == 0 ? 0 : Math.round(sumRating / count),
-    );
-  };
-  const router = useRouter();
-  const handleCounterOffer = (postID: string) => {
-    if (isChanged == 3) {
-      setOpen(false);
-      router.push(`/create-offer/${postID}`);
-    } else setIsChanged(3);
-  };
+//   const displayDate = offerDate.toLocaleString("en-US", {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   });
+//   const [open, setOpen] = useState(false);
+//   const [isChanged, setIsChanged] = useState(0);
+//   const [canCanfirm, setCanConfirm] = useState(false);
+//   const handleRejectOffer = () => {
+//     setIsChanged(1);
+//     setTextState("");
+//     setCanConfirm(false);
+//     setCheckboxState(false);
+//     // setTimeout(() => {}, 1000)
+//     // setIsChanged(false)
+//   };
+//   const handleConfirmOffer = () => {
+//     if (isChanged == 0) {
+//       setIsChanged(2);
+//     }
+//   };
+//   const [loading, setLoading] = useState(false);
+//   const handleClickConfirmOffer = async (isConfirm: boolean) => {
+//     // setTextState("")
+//     // alert(1)
+//     setLoading(true);
+//     const res = await handleStatusChange(
+//       isConfirm ? StatusChangeType.Candidate : StatusChangeType.Reject,
+//     );
+//     const updateOfferRes = await handleFetch(userId);
+//     const offerArray: Array<historyStateInterface> =
+//       updateOfferRes?.data?.data?.data;
+//     if (res?.data?.status !== "success") {
+//       toast({
+//         title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
+//         description: `Unable to ${isConfirm ? "confirm" : "reject"} this offer`,
+//         variant: "destructive",
+//       });
+//       return;
+//     }
+//     setOfferArray(offerArray);
+//     if (offerArray.length > 0) {
+//       setOfferStatus(offerArray[0]?.status ?? "");
+//     }
+//     setOpen(false);
+//     setTextState("");
+//     setCheckboxState(false);
+//     setLoading(false);
+//     toast({
+//       title: `${isConfirm ? "Confirm" : "Reject"} Offer`,
+//       description: `${isConfirm ? "Confirm" : "Reject"} this offer successfully`,
+//     });
+//   };
+//   const [textState, setTextState] = useState("");
+//   // console.log('textState', textState)
+//   const [profileImageState, setProfileImageState] = useState("");
+//   const [reviewState, setReviewState] = useState(0);
+//   const [ratingCount, setRatingCount] = useState(0);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [name, setName] = useState("");
+//   const handleTriggerDialog = async () => {
+//     const user = await axios.get(
+//       `${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`,
+//     );
+//     setTextState("");
+//     setCanConfirm(false);
+//     setIsChanged(0);
+//     setCheckboxState(false);
+//     const data: userReturn = user.data.data;
+//     console.log('data', data)
+//     setProfileImageState(data?.profileImage ?? "");
+//     setName(data?.username);
+//     const count = data.rating.length;
+//     let sumRating = 0;
+//     for (const object of data.rating) {
+//       sumRating += object.ratingScore;
+//     }
+//     setRatingCount(count);
+//     setReviewState(
+//       sumRating == 0 || count == 0 ? 0 : Math.round(sumRating / count),
+//     );
+//   };
+//   const router = useRouter();
+//   const handleCounterOffer = (postID: string) => {
+//     if (isChanged == 3) {
+//       setOpen(false);
+//       router.push(`/create-offer/${postID}`);
+//     } else setIsChanged(3);
+//   };
 
-  const [checkboxState, setCheckboxState] = useState(false);
-  const offerRole =
-    offer.offeredBy == 1 ? "producer" : "production professional";
-  const canOffer =
-    (offer.offeredBy == 1 ? "producer" : "production professional") !==
-    session?.user.role;
+//   const [checkboxState, setCheckboxState] = useState(false);
+//   const offerRole =
+//     offer.offeredBy == 1 ? "producer" : "production professional";
+//   const canOffer =
+//     (offer.offeredBy == 1 ? "producer" : "production professional") !==
+//     session?.user.role;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

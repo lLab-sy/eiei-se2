@@ -130,23 +130,36 @@ export default function ProducerWorkingCard({
     {/* marking */}
     <Dialog open={open} onOpenChange={setOpen}> 
         <DialogContent className="max-w-lg p-0 rounded-lg border shadow-lg overflow-hidden" >
-          
-          <div className="bg-blue-700 text-white p-4">
-            <h2 className="text-lg font-bold">{offer.postName}</h2>
-            <p className="text-sm">Role: {offer.role}</p>
-          </div>
-          <div className="p-4">
-            <div className="flex items-center space-x-2">
-            <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden">
-              <img 
-                src={offer.professionalImg || "/default-avatar.png"} 
-                alt="Production" 
-                className="w-full h-full object-cover" 
-              />
+          <div className="max-w-lg">
+            <div className="bg-blue-700 text-white p-4 max-w-lg">
+              <h2 className="text-lg font-bold">Offer {offer.postName}</h2>
+              <p className="text-sm">Role: {offer.role}</p>
             </div>
-              <div>
-                <p className="font-semibold">From: {fromWho}</p>
-                <p className="flex items-center gap-2 font-medium"><Star className="h-6 w-6 text-mainyellow fill-current" />{offer.reviews}</p>
+            <div className="p-4">
+              <div className="flex items-center space-x-2">
+              <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden">
+                <img 
+                  src={offer.professionalImg || "/default-avatar.png"} 
+                  alt="Production" 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+                <div>
+                  <p className="font-semibold">From: {fromWho}</p>
+                  <p className="flex items-center gap-2 font-medium"><Star className="h-6 w-6 text-mainyellow fill-current" />{offer.reviews}</p>
+                </div>
+              </div>
+              <hr className="my-3" />
+              <p className="mt-2"><strong>Offered Price:</strong> <span className="font-bold">{offer.amount} THB</span></p>
+              <p><strong>Start Date:</strong> {offer.startDate.toString()}</p>
+              <p><strong>Status:</strong> <span className={`font-semibold ${
+                  offer.status === "Rejected" ? "text-mainred-light" : 
+                  offer.status === "Pending" ? "text-mainyellow" : 
+                  offer.status === "Completed" ? "text-green-500" : "text-gray-500"
+              }`}>{offer.status}</span></p>
+              <p className="mt-2"><strong>Description</strong></p>
+              <div className="mt-1 p-3 bg-gray-100 border rounded-md text-sm overflow-auto break-words">
+                {offer.description}
               </div>
             </div>
             <hr className="my-3" />
@@ -167,22 +180,6 @@ export default function ProducerWorkingCard({
               {offer.description}
             </div>
           </div>
-          <div className="flex justify-between p-4">
-            {offerStatus === "Pending" && 
-              <Button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleReject}>
-                Reject Offer
-              </Button>}
-            {offerStatus === "Pending" && 
-              <Button className="bg-mainblue-light text-white px-4 py-2 rounded" onClick={handleCounter}>
-                Counter Offer
-              </Button>}
-            {offerStatus === "Pending" && 
-              <Button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleConfirm}
-              disabled={fromWho === "Producer"}>
-                Confirm Offer
-              </Button>}
-          </div>
-
           <DialogHeader>
             <DialogTitle>
               <VisuallyHidden>Confirm Offer</VisuallyHidden>
