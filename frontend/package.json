@@ -36,6 +36,7 @@
     "cmdk": "^1.0.4",
     "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.5.2",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.474.0",
     "next": "^15.2.4",
     "next-auth": "^5.0.0-beta.25",
@@ -50,6 +51,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

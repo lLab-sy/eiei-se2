@@ -1,3 +1,4 @@
+'use state'
 import ProfessionalWorkingCard from "./ProfessionalWorkingCard";
 import {
     AlertDialog,
@@ -22,6 +23,7 @@ import getPostParticipantCandidate from "@/libs/getPostParticipantCandidate";
 import putApproveWork from "@/libs/putApproveWork";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
+import Cookies from 'js-cookie'
 // const StartProjectButton = ({ post, setPost, userRole }: { userRole: string, post: PostData, setPost:Function }) => {
 //     const { data: session } = useSession();
 //     const token = session?.user.token;
@@ -116,7 +118,7 @@ export default function ProfessionalWorkingContent({postStatus, refreshPost}:{po
         const userRole=session?.user.role
         const userID=session?.user.id
         const username = session?.user.username ?? "";
-        const token =session?.user.token;
+        const token = Cookies.get('token')
         const [isOpen, setIsOpen] = useState(false);
         const [participantsRight, setParticipantsRight] = useState<ParticipantForRight[] | null>(null);
         const [refreshKey, setRefreshKey] = useState(0);

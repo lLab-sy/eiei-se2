@@ -54,7 +54,7 @@ const optionSchema = z.object({
   value: z.string(),
   disable: z.boolean().optional(),
 });
-
+import Cookies from 'js-cookie'
 const formSchema = z.object({
   postname: z
     .string()
@@ -83,7 +83,7 @@ export default function CreatePostPage() {
   if(!session){
     return <>Loading</>
   }
-  const token=session.user?.token
+  const token= Cookies.get('token')
   const role= session?.user.role
 
   if(role!="producer"){

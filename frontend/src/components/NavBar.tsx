@@ -39,6 +39,7 @@ import { useRouter } from "next/navigation";
 import { FaHistory } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import Cookies from 'js-cookie'
 type menuItem = {
   icon: JSX.Element;
   label: string;
@@ -102,7 +103,7 @@ const DialogLogout = ({
   );
 };
 const NavBar = (session: any) => {
-  const token = session?.session?.user?.token ?? "";
+  const token = Cookies.get('token') ?? ""
   const role = session?.session?.user?.role ?? "";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<menuItem[]>([]);

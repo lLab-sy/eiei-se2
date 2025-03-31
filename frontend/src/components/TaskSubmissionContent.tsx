@@ -17,7 +17,7 @@ import { useSession } from "next-auth/react";
 import { CircularProgress, LinearProgress } from "@mui/material";
 import postSendWork from "@/libs/postSendWork";
 import { toast } from "@/hooks/use-toast";
-
+import Cookies from 'js-cookie'
 export default function TaskSubmissionContent({isOpen,
     setIsOpen,postStatus
     }:{isOpen: boolean;
@@ -30,7 +30,7 @@ export default function TaskSubmissionContent({isOpen,
         const userRole=session?.user.role
         const userID=session?.user.id
         const username = session?.user.username ?? "";
-        const token =session?.user.token;
+        const token =Cookies.get('token')
         const [participantsRight, setParticipantsRight] = useState<ParticipantForRight | null>(null);
         const [refreshKey, setRefreshKey] = useState(0);
         const [error, setError] = useState<string | null>(null);

@@ -1,6 +1,7 @@
 import axios from "axios"
 import NextAuth from "next-auth"
-import Credentials from 'next-auth/providers/credentials' 
+import Credentials from 'next-auth/providers/credentials'
+import { cookies } from "next/headers"
 export const loginUser = async (data: {username:string, password:string}) => {
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`
     const dataPost = {
@@ -41,7 +42,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 if (!user || user?.status === 'error') {
                     throw new Error("Invalid username or password");
                 }
-        
+                const token = user.data.token
+                const cookieStore = await cookies()
+                cookieStore.set('token', token, {maxAge : 6*60*60})
                 return {
                     // id from mongo
                     id: user.data.user.id,
@@ -57,6 +60,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
 
   ],
+  session : {
+    strategy : 'jwt',
+    maxAge : 6 * 60 * 60
+  },
   callbacks:{
     jwt({token, user} : {token : any, user : any}){
         if(user){

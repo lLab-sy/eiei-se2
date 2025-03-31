@@ -22,7 +22,7 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
-
+import Cookies from 'js-cookie'
 export default function ProfessionalWorkingCard({postStatus,participantDetail,setRefreshKey}:{postStatus?:string,participantDetail:ParticipantForRight,setRefreshKey:Function}){ 
 //   const offerDate = new Date(data.createdAt);
 //   const displayDate = offerDate.toLocaleString("en-US", {
@@ -34,7 +34,7 @@ export default function ProfessionalWorkingCard({postStatus,participantDetail,se
 //   });
   const { mid }: { mid: string } = useParams();
   const { data: session } = useSession();
-  const token =session?.user.token;
+  const token = Cookies.get('token')
 
 
   async function sendApprove (approve:boolean,participantID:string) {

@@ -19,6 +19,7 @@ import ReviewProfessionalList from "./ReviewProfessionalList";
 import getPostParticipants from "@/libs/getPostParticipants";
 import { PostParticipant } from "../../interface";
 import { useSession } from "next-auth/react";
+import Cookies from 'js-cookie'
 
 const formSchema = z.object({
   comment: z
@@ -71,7 +72,7 @@ const ReviewSubmissionForm = ({
   const [loading, setLoading] = useState(false);
   const [isAllReview, setAllReview] = useState(true);
   const { data: session } = useSession();
-  const token = session?.user?.token;
+  const token = Cookies.get('token')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
