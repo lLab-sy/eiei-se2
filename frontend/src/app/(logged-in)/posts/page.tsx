@@ -142,7 +142,7 @@ const ProfessionalsPage = () => {
               imageUrl={(post.postImages && post.postImages.length != 0)  ? post.postImages[0] : ''} 
               role={getRoleById(post.postProjectRoles || [])} 
               mediaType={getMediaNameById(post.postMediaType)}
-              id={post.id}          
+              id={post.id??""}          
               />
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { PostData } from "../../interface";
-
+// No longer use
 interface postContent {
   postName: string;
   postMediaType: string;
@@ -38,7 +38,7 @@ export default function PostToOffer({
   });
 
   // ข้อมูลจำลองสำหรับ Producer
-  const applicantsCount = (post?.participants).length; // จำนวนผู้สมัครทั้งหมด (สำหรับตัวอย่าง)
+  const applicantsCount = 5 // จำนวนผู้สมัครทั้งหมด (สำหรับตัวอย่าง)
   const offersCount = 3; // จำนวนข้อเสนอ (สำหรับตัวอย่าง)
 
   return (

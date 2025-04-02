@@ -102,7 +102,7 @@ export default function OfferInformation({postSelectData,productionProfessionalI
             offeredBy: userRole==="Producer"?1:0,
             createdAt: new Date(),
             reason: values.description,
-            postID: postSelectData.id
+            postID: postSelectData.id,
           };
        
       

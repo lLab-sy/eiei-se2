@@ -138,7 +138,7 @@ export default function OfferPage() {
                     }
                     role={getRoleById(post.postProjectRoles || [])}
                     mediaType={getMediaNameById(post.postMediaType)}
-                    id={post.id}
+                    id={post.id??""}
                   />
                 </div>
               ))

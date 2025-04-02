@@ -42,24 +42,38 @@ export default function PostSelect({
   // console.log("IAMGE",postSelectData?.postImageDisplay)
   return (
     <div className="flex flex-col w-4/5 lg:w-3/5 m-auto space-y-4">
-      <Carousel className="w-full">
-        <CarouselContent>
-          {postSelectData?.postImageDisplay.map((image, index) => (
-            <CarouselItem key={index}>
-              <Card className="relative w-full aspect-video">
-                <Image
-                  src={image.imageURL}
-                  alt={`Project Image ${index + 1}`}
-                  fill
-                  className="object-cover rounded-lg"
-                />
-              </Card>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="left-2" />
-        <CarouselNext className="right-2" />
-      </Carousel>
+    <Carousel className="w-full">
+    <CarouselContent>
+      {postSelectData?.postImageDisplay && postSelectData?.postImageDisplay?.length > 0 ? (
+        postSelectData.postImageDisplay.map((image, index) => (
+          <CarouselItem key={index}>
+            <Card className="relative w-full aspect-video">
+              <Image
+                src={image.imageURL}
+                alt={`Project Image ${index + 1}`}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </Card>
+          </CarouselItem>
+        ))
+      ) : (
+        <CarouselItem>
+          <Card className="relative w-full aspect-video">
+            <Image
+              src="image/logo.png"
+              alt="original-logo"
+              fill
+              className="object-cover rounded-lg"
+            />
+          </Card>
+        </CarouselItem>
+      )}
+    </CarouselContent>
+    <CarouselPrevious className="left-2" />
+    <CarouselNext className="right-2" />
+  </Carousel>
+
 
       {userRole === "producer" ? (
         <Select
@@ -71,8 +85,9 @@ export default function PostSelect({
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
+              {/* Actually must have post id */}
               {postData.map((eachPost: PostData) => (
-                <SelectItem key={eachPost.id} value={eachPost.id}>
+                <SelectItem key={eachPost.id} value={eachPost.id??""}> 
                   {eachPost.postName}
                 </SelectItem>
               ))}

@@ -1,5 +1,5 @@
 "use client";
-
+//No longer use
 import MyPostDetail from "@/components/MyPostDetail";
 import ProductionWorkingContent from "@/components/ProducerWorkingContent";
 import { useParams } from "next/navigation";
@@ -10,7 +10,7 @@ const MyOfferingProducer = () => {
 
     return(
         <div className="">
-                <ProductionWorkingContent/>
+                {/* <ProductionWorkingContent/> */}
         </div>
     );
 }

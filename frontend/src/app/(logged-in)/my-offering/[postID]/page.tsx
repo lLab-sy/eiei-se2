@@ -665,7 +665,7 @@ export default function OfferPostContent() {
           profOffersByRole[roleName] = [];
         }
 
-        profOffersByRole[roleName].push(offer);
+        // profOffersByRole[roleName].push(offer);
       });
 
       // หาข้อเสนอล่าสุดของแต่ละบทบาท
@@ -727,9 +727,9 @@ export default function OfferPostContent() {
       });
 
       // อัพเดทข้อมูลว่าข้อเสนอไหนเป็นข้อเสนอล่าสุด
-      offers.forEach((offer) => {
-        offer.isLatestOffer = latestOfferIds.includes(offer._id);
-      });
+      // offers.forEach((offer) => {
+      //   offer.isLatestOffer = latestOfferIds.includes(offer._id);
+      // });
     });
 
     // แปลงเป็น array สำหรับการแสดงผล
@@ -754,7 +754,7 @@ export default function OfferPostContent() {
         if (userRole === "producer") {
           response2 = await getPostById(postID, token ?? "");
           setPostState(response2);
-          response = await getPrudcerOffers(token ?? "", postID); // ดึงโพสต์ของ producer
+          response = await getPrudcerOffers(token ?? ""); // ดึงโพสต์ของ producer
           setProducerOffers(response);
           // console.log("PRODUCER BY",response)
         } else if (userRole === "production professional") {
@@ -837,11 +837,11 @@ export default function OfferPostContent() {
       if (professionals.length > 0) {
         setSelectedProfessionalId(professionals[0].id);
         // ดึงข้อเสนอของ professional คนแรก
-        setOfferArray(
-          mockProfessionalOffers[
-            professionals[0].id as keyof typeof mockProfessionalOffers
-          ] || [],
-        );
+        // setOfferArray(
+        //   mockProfessionalOffers[
+        //     professionals[0].id as keyof typeof mockProfessionalOffers
+        //   ] || [],
+        // );
       }
     } else if (role === "production professional") {
       // ถ้าเป็น professional ให้ใช้ข้อเสนอของ professional คนนั้น
@@ -861,11 +861,11 @@ export default function OfferPostContent() {
     setSelectedProfessionalId(professionalId);
 
     // ดึงข้อเสนอของ professional ที่เลือก
-    setOfferArray(
-      mockProfessionalOffers[
-        professionalId as keyof typeof mockProfessionalOffers
-      ] || [],
-    );
+    // setOfferArray(
+    //   mockProfessionalOffers[
+    //     professionalId as keyof typeof mockProfessionalOffers
+    //   ] || [],
+    // );
   };
   const [offerStatus, setOfferStatus] = useState("");
   useEffect(() => {
@@ -896,17 +896,17 @@ export default function OfferPostContent() {
 
     // รีเซ็ต professional ที่เลือกเมื่อเปลี่ยน role
     const profsInRole = getProfessionalsByRole(role);
-    if (profsInRole.length > 0) {
-      setSelectedProfessionalId(profsInRole[0].id);
-      setOfferArray(
-        mockProfessionalOffers[
-          profsInRole[0].id as keyof typeof mockProfessionalOffers
-        ] || [],
-      );
-    } else {
-      setSelectedProfessionalId(null);
-      setOfferArray([]);
-    }
+    // if (profsInRole.length > 0) {
+    //   setSelectedProfessionalId(profsInRole[0].id);
+    //   setOfferArray(
+    //     mockProfessionalOffers[
+    //       profsInRole[0].id as keyof typeof mockProfessionalOffers
+    //     ] || [],
+    //   );
+    // } else {
+    //   setSelectedProfessionalId(null);
+    //   setOfferArray([]);
+    // }
   };
 
   // ดึงเฉพาะ professional ตามบทบาทที่เลือก
@@ -992,9 +992,9 @@ export default function OfferPostContent() {
   };
 
   // ตรวจสอบว่าข้อเสนอนี้เป็นข้อเสนอล่าสุดหรือไม่
-  const isLatestOffer = (offer: historyStateInterface) => {
-    return offer.isLatestOffer === true;
-  };
+  // const isLatestOffer = (offer: historyStateInterface) => {
+  //   return offer.isLatestOffer === true;
+  // };
 
   // if (!producerOffers) {
   //   return (
@@ -1004,18 +1004,18 @@ export default function OfferPostContent() {
   //   );
   // }
 
-  const handleSelectProducerChange = (selectID: string) => {
-    const tmpselectedOfferProducer = producerOffers.find(
-      (eachPerson) => eachPerson._id === selectID,
-    );
-    if (
-      tmpselectedOfferProducer &&
-      tmpselectedOfferProducer._id !== selectedOfferProducer?._id
-    ) {
-      // console.log("ChangPerson", tmpselectedOfferProducer);
-      setSelectedOfferProducer(tmpselectedOfferProducer);
-    }
-  };
+  // const handleSelectProducerChange = (selectID: string) => {
+  //   const tmpselectedOfferProducer = producerOffers.find(
+  //     (eachPerson) => eachPerson._id === selectID,
+  //   );
+  //   if (
+  //     tmpselectedOfferProducer &&
+  //     tmpselectedOfferProducer._id !== selectedOfferProducer?._id
+  //   ) {
+  //     // console.log("ChangPerson", tmpselectedOfferProducer);
+  //     setSelectedOfferProducer(tmpselectedOfferProducer);
+  //   }
+  // };
 
   return (
     <main className="flex flex-col min-h-screen gap-3 mb-5 relative">

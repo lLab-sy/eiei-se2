@@ -103,11 +103,11 @@ export default function PostHistoryCard({
         const professionalId = values.production;
         response = await putReviewProfessional(
           reviewData,
-          token,
+          token??'',
           professionalId,
         );
       } else {
-        response = await postReviewPost(reviewData, token, post.id);
+        response = await postReviewPost(reviewData, token??"", post.id);
       }
 
       if (!response) {

@@ -73,7 +73,7 @@ export default function MyPostCard({role,isReview,postDetail}:{role:string,isRev
                 <div className="col-span-4 rounded-lg overflow-hidden w-[100%] relative">
                     <Image
                         src={imageURL}
-                        alt={postDetail.id}
+                        alt={postDetail.id??"postImage"}
                         fill
                         className="object-cover w-full h-full p-0.5"
                     />

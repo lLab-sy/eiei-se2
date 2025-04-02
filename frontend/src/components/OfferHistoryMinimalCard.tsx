@@ -13,9 +13,9 @@ export default function OfferHistoryMinimalCard({productionProfessionalName,offe
             <div className="ml-3">
                 <h1 className="font-bold">Name: {productionProfessionalName}</h1>
                 <p className="font-bold">Role: {offerHisData.roleName}</p>
-                <p className="font-bold">Send By: {offerHisData.offerBy?"production":"producer"}</p>
+                <p className="font-bold">Send By: {offerHisData.offeredBy?"production":"producer"}</p>
                 <p className="font-bold">Offer Time: {displayDate}</p>
-                <p className="font-bold">Price {(offerHisData.price).toString()}</p>
+                <p className="font-bold">Price {(offerHisData.price??10).toString()}</p>
             </div>
 
         </div>

@@ -90,11 +90,7 @@ const formSchema = z.object({
     .min(1, { message: "Please choose at least one role." }),
 });
 
-export default function EditPostPage({
-  initialPostId,
-}: {
-  initialPostId: string;
-}) {
+export default function EditPostPage() {
   const { data: session } = useSession();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
