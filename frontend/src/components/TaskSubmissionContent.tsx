@@ -129,7 +129,7 @@ export default function TaskSubmissionContent({isOpen,
             {!participantsRight?.isSend && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>=0 ? <Button  onClick={()=>setIsOpen(true)}>
                     Submit new task
                 </Button> : 
-            participantsRight?.isSend && !participantsRight.isApprove && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>=0 ?<Button  onClick={()=>setIsOpen(true)} disabled={true}> Submit new task</Button>
+            participantsRight?.isSend && !participantsRight.isApprove && postStatus=="in-progress" && participantsRight?.workQuota && participantsRight?.workQuota>=0 ?<Button  onClick={()=>setIsOpen(true)} disabled={true}> Already Submitted</Button>
                 :""
                 }
             </div>
