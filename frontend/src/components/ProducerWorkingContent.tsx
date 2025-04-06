@@ -13,10 +13,12 @@ interface IOfferData {
 
 export default function ProducerWorkingContent({
     postID,
+    postName,
     participants,
     mapRole,
 }: {
     postID: string;
+    postName:string;
     participants: Participant[];
     mapRole: PostRolesResponse[];
 }) {
@@ -199,7 +201,7 @@ export default function ProducerWorkingContent({
                         amount: offer.data.price.toString(),
                         role: mapRoles.get(offer.data.role??"") || "",
                         startDate: offer.data.createdAt,
-                        postName: index.toString(),
+                        postName: postName,
                         description: offer.data.reason,
                         productionName: professionalMap.get(selectedProfessional)?.username || "",
                         productionID: professionalMap.get(selectedProfessional)?._id || "",

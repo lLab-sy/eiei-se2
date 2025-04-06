@@ -107,7 +107,7 @@ export default function ProducerWorkingCard({
         onClick={() => setOpen(true)}
       >
         <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Offer {offer.id}</h3>
+        {/* <h3 className="text-lg font-medium">Offer {offer.id}</h3> */}
         <span className={`font-semibold ${
                offerStatus === "Rejected" ? "text-mainred-light" : 
                offerStatus === "Pending" ? "text-mainyellow" : 
@@ -116,17 +116,23 @@ export default function ProducerWorkingCard({
         </div>
         <div className="flex items-center text-sm text-gray-500 mt-1 space-x-2">
           <Calendar size={14} />
-          <span>{offer.date.toString()}</span>
+          <span>{new Date(offer.date).toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",})}</span>
         </div>
         <div className="mt-2 text-right text-lg font-semibold">{offer.amount} THB</div>
     </Card>
 
     {/* Popup Modal */}
-    <Dialog open={open} onOpenChange={setOpen}>
+    {/* marking */}
+    <Dialog open={open} onOpenChange={setOpen}> 
         <DialogContent className="max-w-lg p-0 rounded-lg border shadow-lg overflow-hidden" >
           
           <div className="bg-blue-700 text-white p-4">
-            <h2 className="text-lg font-bold">Offer {offer.postName}</h2>
+            <h2 className="text-lg font-bold">{offer.postName}</h2>
             <p className="text-sm">Role: {offer.role}</p>
           </div>
           <div className="p-4">
@@ -145,7 +151,12 @@ export default function ProducerWorkingCard({
             </div>
             <hr className="my-3" />
             <p className="mt-2"><strong>Offered Price:</strong> <span className="font-bold">{offer.amount} THB</span></p>
-            <p><strong>Start Date:</strong> {offer.startDate.toString()}</p>
+            <p><strong>Start Date:</strong> {new Date(offer.startDate).toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",})}</p>
             <p><strong>Status:</strong> <span className={`font-semibold ${
                 offer.status === "Rejected" ? "text-mainred-light" : 
                 offer.status === "Pending" ? "text-mainyellow" : 

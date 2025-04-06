@@ -14,6 +14,7 @@ import OfferHistoryMinimal from "@/components/OfferHistoryMinimal";
 import { OfferHistoryMinimal2 } from "@/components/OfferHistoryMinimal2";
 import getOfferHistory from "@/libs/getOffersHistory";
 import getUser from "@/libs/getUser";
+import {useRouter } from "next/navigation";
 
 // const mockOfferHistory: OfferHistoryData[] = [
 //     {
@@ -107,6 +108,11 @@ import getUser from "@/libs/getUser";
           </Card>
         </div>
       );
+    }
+
+    const router= useRouter()
+    if(pid==userID || userData?.role=="producer"){
+        router.push('/')
     }
   
     useEffect(() => {
