@@ -257,106 +257,52 @@ const ConfirmOffer = ({
           <HistoryProductionContent data={offer} />
         </div>
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isChanged == 1 ? "Reject Offer" : "Confirm Offer"}:{" "}
-            {offer.postName}
-          </DialogTitle>
-          <DialogDescription>Role: {offer.roleName}</DialogDescription>
-        </DialogHeader>
-        {isChanged > 0 ? (
-          <div className="gap-3 flex flex-col">
-            <span>
-              {isChanged == 1
-                ? "If you reject this offer, you won’t be able to make another offer on this post in the future. "
-                : ""}
-            </span>
-            <span
-              className={`${isChanged == 1 ? "text-mainred" : isChanged == 3 ? "text-black" : "text-black"}`}
-            >
-              {" "}
-              {isChanged == 1
-                ? "Please type 'Reject Offer' to decline."
-                : isChanged == 3
-                  ? "You are about to be redirected to the Create Offer page. Are you sure?"
-                  : "Are you sure to accept this offer."}
-            </span>
-            {isChanged == 1 ? (
-              <Input
-                value={textState}
-                onChange={(e) => {
-                  setTextState(e.target.value);
-                  // console.log("e", e.target.value)
-                  if (
-                    e.target.value ==
-                    (isChanged == 1 ? "Reject Offer" : "Confirm Offer")
-                  ) {
-                    setCanConfirm(true);
-                  } else {
-                    setCanConfirm(false);
-                  }
-                }}
-              />
-            ) : isChanged == 3 ? (
-              <div></div>
-            ) : (
-              <div>
-                <Checkbox
-                  value={checkboxState}
-                  onChange={(e) => setCheckboxState(e.target.checked)}
-                />
-                <Label>Confirmed</Label>
-              </div>
-            )}
-          </div>
-        ) : (
-          ""
-        )}
-        <div className={`${isChanged > 0 ? "hidden" : ""}`}>
-          <div className={`flex flex-row gap-3`}>
-            <Avatar className="border flex justify-center items-center">
-              {/* {
-                isLoading && profileImageState &&
-                <CircularProgress size={20}/>
+      <DialogContent className="max-w-lg w-[90vw] max-h-[90vh] overflow-hidden p-0 rounded-lg border shadow-lg">
+  {/* Header */}
+  <DialogHeader className="bg-blue-700 text-white p-4">
+    <DialogTitle>{offer.postName}</DialogTitle>
+    <DialogDescription className="text-white">Role: {offer.roleName}</DialogDescription>
+  </DialogHeader>
 
-              }
-              {
-                (profileImageState) ? 
-                <AvatarImage onLoad={() => setIsLoading(false)} onError={() => setIsLoading(false)} src={profileImageState ?? "/"}/>
-                      :
-                <User />
-              } */}
-              <User />
-            </Avatar>
-            <div className="flex flex-col">
-              <span>{`From: ${name} `}</span>
-              <div className="flex">
-                <Rating value={reviewState} readOnly />
-                <span>{ratingCount} (review)</span>
-              </div>
-            </div>
-          </div>
-          <Separator className="bg-black my-2" />
-          <div>
-            <span className="text-xl font-bold">Offer Detail</span>
-            <div className="flex justify-between">
-              <span>Offered Price:</span>
-              <span>{`${offer.currentWage} THB`}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Start Date:</span>
-              <span>{displayDate}</span>
-            </div>
-            <div className="flex flex-col">
-              <span>Description</span>
-              <div className="w-[100%] flex justify-center items-center bg-slate-50 h-[300px] rounded-xl">
-                <span className="w-[80%] h-[80%]">{offer.reason}</span>
-              </div>
-            </div>
+  <div className="overflow-y-auto max-h-[calc(90vh-160px)] px-4 pb-4">
+    <div>
+      <div className="flex flex-row gap-3">
+        <Avatar className="border flex justify-center items-center">
+          <User />
+        </Avatar>
+        <div className="flex flex-col">
+          <span>{`From: ${name} `}</span>
+          <div className="flex">
+            <Rating value={reviewState} readOnly />
+            <span>{ratingCount} (review)</span>
           </div>
         </div>
-        <DialogFooter>
+      </div>
+
+      <Separator className="bg-black my-2" />
+
+      <div>
+        <span className="text-xl font-bold">Offer Detail</span>
+        <div className="flex justify-between">
+          <span>Offered Price:</span>
+          <span>{`${offer.currentWage} THB`}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Start Date:</span>
+          <span>{displayDate}</span>
+        </div>
+        <div className="flex flex-col">
+          <span>Description</span>
+          <div className="w-full h-60 overflow-y-auto p-4 bg-slate-50 rounded-xl whitespace-pre-wrap break-words">
+            {offer.reason}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Footer */}
+  <DialogFooter className="m-4">
           <div className="w-full flex justify-center">
             {offer.status === "in-progress" ? (
               <div className="flex justify-around w-full">
@@ -420,7 +366,8 @@ const ConfirmOffer = ({
             )}
           </div>
         </DialogFooter>
-      </DialogContent>
+</DialogContent>
+
     </Dialog>
   );
 };
@@ -1031,6 +978,7 @@ export default function OfferPostContent() {
             {postState && userRole === "producer" && (
               <ProducerWorkingContent
                 postID={postID}
+                postName={postState.postName}
                 participants={postState?.participants || []}
                 mapRole={postState?.postProjectRolesOut || []}
               />
