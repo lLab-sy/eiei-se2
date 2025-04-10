@@ -6,6 +6,8 @@ import authRoutes from './routes/authRoutes';
 import postRoleRoutes from "./routes/postRoleRoutes"
 import postDetailRoutes from "./routes/postDetailRoutes"
 import mediaTypeRoutes from "./routes/mediaTypeRoutes"
+import paymentRoutes from "./routes/paymentRoutes"
+import transferRoutes from "./routes/transferRoutes"
 import morgan from 'morgan';
 import helmet from "helmet";
 import cors from "cors";
@@ -63,6 +65,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/v1',postRoutes,postRoleRoutes,postDetailRoutes,mediaTypeRoutes);
 app.use('/api/users', userRoutes)
 app.use('/api/cloud', cloudRouter)
+app.use('/api/payment', paymentRoutes)
+app.use('/api/transfer', transferRoutes)
 
 // Server
 app.listen(port, () => {
