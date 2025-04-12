@@ -101,6 +101,8 @@ router.get('/cards/:userId');
  *             properties:
  *               userId:
  *                 type: string
+ *               cardId:
+ *                 type: string
  *               amount:
  *                 type: number
  *               currency:
