@@ -3,22 +3,17 @@ const router = express.Router();
 
 /**
  * @openapi
- * /payment/transactions/{userId}:
+ * /payment/transactions:
  *   get:
  *     summary: Get all transactions of the user
  *     tags:
  *       - Payment
- *     parameters:
- *       - name: userId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
  *     responses:
  *       200:
  *         description: List of transactions
  */
-router.get('/payment/transactions/:userId');
+router.get('/payment/transactions');
+// userId from token
 
 /**
  * @openapi
@@ -58,7 +53,7 @@ router.post('/payment/create-customer');
  *             properties:
  *               userId:
  *                 type: string
- *               token:
+ *               cardId:
  *                 type: string
  *     responses:
  *       200:
@@ -68,22 +63,17 @@ router.post('/payment/add-card');
 
 /**
  * @openapi
- * /payment/cards/{userId}:
+ * /payment/cards:
  *   get:
  *     summary: Get all cards for a user
  *     tags:
  *       - Payment
- *     parameters:
- *       - name: userId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
  *     responses:
  *       200:
  *         description: List of cards
  */
-router.get('/cards/:userId');
+router.get('/cards');
+// userId from token
 
 /**
  * @openapi
@@ -103,15 +93,13 @@ router.get('/cards/:userId');
  *                 type: string
  *               cardId:
  *                 type: string
- *               amount:
- *                 type: number
- *               currency:
+ *               postId:
  *                 type: string
- *                 example: thb
  *     responses:
  *       200:
  *         description: Charge successful
  */
 router.post('/payment/charge-customer');
+// we can get amount from postId
 
 export default router;

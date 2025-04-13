@@ -40,11 +40,7 @@ router.post('/transfer/create-customer');
  *             properties:
  *               userId:
  *                 type: string
- *               name:
- *                 type: string
- *               bank:
- *                 type: string
- *               accountNumber:
+ *               bookbankId:
  *                 type: string
  *     responses:
  *       200:
@@ -68,13 +64,15 @@ router.post('/transfer/add-bank-account');
  *             properties:
  *               userId:
  *                 type: string
- *               amount:
- *                 type: number
+ *               postId:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Transfer successful
  */
 router.post('/transfer/transfer');
+// we can get userId from token (auth middleware), but in this still okay
+// we can get amount from postId 
 
 /**
  * @openapi
@@ -97,21 +95,16 @@ router.get('/transfer/bank-accounts/:userId');
 
 /**
  * @openapi
- * /transfer/transactions/{userId}:
+ * /transfer/transactions:
  *   get:
  *     summary: Get all transactions of the user
  *     tags:
  *       - Transfer
- *     parameters:
- *       - name: userId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
  *     responses:
  *       200:
  *         description: List of transactions
  */
-router.get('/transfer/transactions/:userId');
+router.get('/transfer/transactions');
+// userId from token
 
 export default router;
