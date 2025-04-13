@@ -3,7 +3,7 @@ const router = express.Router();
 
 /**
  * @openapi
- * /payment/transactions:
+ * /api/payment/transactions:
  *   get:
  *     summary: Get all transactions of the user
  *     tags:
@@ -12,12 +12,12 @@ const router = express.Router();
  *       200:
  *         description: List of transactions
  */
-router.get('/payment/transactions');
+router.get('/transactions');
 // userId from token
 
 /**
  * @openapi
- * /payment/create-customer:
+ * /api/payment/create-customer:
  *   post:
  *     summary: Create Omise customer for a user
  *     tags:
@@ -35,11 +35,11 @@ router.get('/payment/transactions');
  *       200:
  *         description: Customer created
  */
-router.post('/payment/create-customer');
+router.post('/create-customer');
 
 /**
  * @openapi
- * /payment/add-card:
+ * /api/payment/add-card:
  *   post:
  *     summary: Add a card to an Omise customer
  *     tags:
@@ -59,11 +59,11 @@ router.post('/payment/create-customer');
  *       200:
  *         description: Card added
  */
-router.post('/payment/add-card');
+router.post('/add-card');
 
 /**
  * @openapi
- * /payment/cards:
+ * /api/payment/cards:
  *   get:
  *     summary: Get all cards for a user
  *     tags:
@@ -77,7 +77,7 @@ router.get('/cards');
 
 /**
  * @openapi
- * /payment/charge-customer:
+ * /api/payment/charge-customer:
  *   post:
  *     summary: Charge a saved card of the customer
  *     tags:
@@ -99,7 +99,7 @@ router.get('/cards');
  *       200:
  *         description: Charge successful
  */
-router.post('/payment/charge-customer');
+router.post('/charge-customer');
 // we can get amount from postId
 
 export default router;

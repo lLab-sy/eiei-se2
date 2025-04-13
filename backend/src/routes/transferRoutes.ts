@@ -4,7 +4,7 @@ const router = express.Router();
 
 /**
  * @openapi
- * /transfer/create-customer:
+ * /api/transfer/create-customer:
  *   post:
  *     summary: Create Omise customer for a user
  *     tags:
@@ -22,11 +22,11 @@ const router = express.Router();
  *       200:
  *         description: Customer created
  */
-router.post('/transfer/create-customer');
+router.post('/create-customer');
 
 /**
  * @openapi
- * /transfer/add-bank-account:
+ * /api/transfer/add-bank-account:
  *   post:
  *     summary: Add a bank account to the user
  *     tags:
@@ -46,11 +46,11 @@ router.post('/transfer/create-customer');
  *       200:
  *         description: Bank account added
  */
-router.post('/transfer/add-bank-account');
+router.post('/add-bank-account');
 
 /**
  * @openapi
- * /transfer/transfer:
+ * /api/transfer/transfer:
  *   post:
  *     summary: Transfer money to user's bank account
  *     tags:
@@ -70,13 +70,13 @@ router.post('/transfer/add-bank-account');
  *       200:
  *         description: Transfer successful
  */
-router.post('/transfer/transfer');
+router.post('/transfer');
 // we can get userId from token (auth middleware), but in this still okay
 // we can get amount from postId 
 
 /**
  * @openapi
- * /transfer/bank-accounts/{userId}:
+ * /api/transfer/bank-accounts/{userId}:
  *   get:
  *     summary: Get user's saved bank accounts
  *     tags:
@@ -91,11 +91,11 @@ router.post('/transfer/transfer');
  *       200:
  *         description: List of bank accounts
  */
-router.get('/transfer/bank-accounts/:userId');
+router.get('/bank-accounts/:userId');
 
 /**
  * @openapi
- * /transfer/transactions:
+ * /api/transfer/transactions:
  *   get:
  *     summary: Get all transactions of the user
  *     tags:
@@ -104,7 +104,7 @@ router.get('/transfer/bank-accounts/:userId');
  *       200:
  *         description: List of transactions
  */
-router.get('/transfer/transactions');
+router.get('/transactions');
 // userId from token
 
 export default router;
