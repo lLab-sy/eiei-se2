@@ -1,32 +1,94 @@
+// src/components/MovieList.tsx
 "use client";
 
-import { FC } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { PostData, SearchPosts } from "../../interface";
+import getPosts from "@/libs/getPosts";
 
-interface Movie {
-  title: string;
-  image: string;
-  id: string;
-}
+const MovieList: React.FC = () => {
+  // กำหนดให้แสดงเพียง 8 รายการในหน้าแรก
+  const PAGE_SIZE = 8;
 
-const movies: Movie[] = [
-  { title: "Fast Feel Love", image: "/api/placeholder/300/200", id: "1" },
-  { title: "Haunted Universities", image: "/api/placeholder/300/200", id: "2" },
-  { title: "Friend Zone", image: "/api/placeholder/300/200", id: "3" },
-  { title: "Shadow & Bone", image: "/api/placeholder/300/200", id: "4" },
-  { title: "Gladiator", image: "/api/placeholder/300/200", id: "5" },
-  { title: "JURASSIC PARK", image: "/api/placeholder/300/200", id: "6" },
-  { title: "Titanic", image: "/api/placeholder/300/200", id: "7" },
-];
+  // state สำหรับเก็บข้อมูล posts
+  const [posts, setPosts] = useState<PostData[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-const MovieList: FC = () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // เรียกใช้ API เพื่อดึงข้อมูล Posts
+        const requestPage = `limit=${PAGE_SIZE}&page=1`;
+
+        console.log("Getting Posts...");
+        const response = await getPosts(requestPage);
+
+        if (response && response.data) {
+          setPosts(response.data);
+        } else {
+          setError("ไม่พบข้อมูลโพสต์");
+        }
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+        setError("ไม่สามารถดึงข้อมูลโพสต์ได้");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="container mx-auto py-4 sm:py-6 md:py-8 px-4">
+        <div className="flex justify-between items-center mb-4 sm:mb-6 text-gray-600">
+          <h2 className="text-xl sm:text-2xl font-bold">Job Posts</h2>
+          <Link
+            href="/posts"
+            className="text-blue-600 hover:text-blue-800 text-sm sm:text-base"
+          >
+            See more ...
+          </Link>
+        </div>
+
+        <div className="flex justify-center items-center h-40">
+          <div className="text-gray-500">กำลังโหลดข้อมูล...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !posts || posts.length === 0) {
+    return (
+      <section className="container mx-auto py-4 sm:py-6 md:py-8 px-4">
+        <div className="flex justify-between items-center mb-4 sm:mb-6 text-gray-600">
+          <h2 className="text-xl sm:text-2xl font-bold">Job Posts</h2>
+          <Link
+            href="/posts"
+            className="text-blue-600 hover:text-blue-800 text-sm sm:text-base"
+          >
+            See more ...
+          </Link>
+        </div>
+
+        <div className="flex justify-center items-center h-40">
+          <div className="text-gray-500">{error || "ไม่พบข้อมูลโพสต์"}</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="container mx-auto py-4 sm:py-6 md:py-8 px-4">
       <div className="flex justify-between items-center mb-4 sm:mb-6 text-gray-600">
-        <h2 className="text-xl sm:text-2xl font-bold">Movie</h2>
+        <h2 className="text-xl sm:text-2xl font-bold">Job Posts</h2>
         <Link
-          href="/movies"
+          href="/posts"
           className="text-blue-600 hover:text-blue-800 text-sm sm:text-base"
         >
           See more ...
@@ -34,19 +96,28 @@ const MovieList: FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {movies.map((movie) => (
-          <Link href={`/movie/${movie.id}`} key={movie.id} className="group">
+        {posts.map((post, index) => (
+          <Link href={`/posts/${post.id}`} key={index} className="group">
             <div className="relative aspect-video rounded-lg overflow-hidden">
               <Image
-                src={movie.image}
-                alt={movie.title}
+                src={
+                  post.postImages && post.postImages.length > 0
+                    ? post.postImages[0]
+                    : "/api/placeholder/400/225"
+                }
+                alt={post.postName}
                 fill
                 className="object-cover transform group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity flex items-center justify-center">
-                <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity text-center px-2">
-                  {movie.title}
-                </span>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity text-white text-center px-4">
+                  <h3 className="font-bold text-lg mb-1">{post.postName}</h3>
+                  <p className="text-sm">
+                    {post.postDescription.length > 60
+                      ? post.postDescription.substring(0, 60) + "..."
+                      : post.postDescription}
+                  </p>
+                </div>
               </div>
             </div>
           </Link>
