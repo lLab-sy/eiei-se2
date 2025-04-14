@@ -132,31 +132,31 @@ const Footer: FC = () => {
               </a>
             </div>
             <div className="pt-4">
-              <h4 className="text-sm font-semibold mb-2">Download Our App</h4>
+              {/* <h4 className="text-sm font-semibold mb-2">Download Our App</h4> */}
               <div className="flex gap-2">
                 <Link
                   href="#"
                   className="opacity-80 hover:opacity-100 transition-opacity"
                 >
-                  <Image
+                  {/* <Image
                     src="/api/placeholder/120/40"
                     alt="Download on App Store"
                     width={120}
                     height={40}
                     className="rounded"
-                  />
+                  /> */}
                 </Link>
                 <Link
                   href="#"
                   className="opacity-80 hover:opacity-100 transition-opacity"
                 >
-                  <Image
+                  {/* <Image
                     src="/api/placeholder/120/40"
                     alt="Get it on Google Play"
                     width={120}
                     height={40}
                     className="rounded"
-                  />
+                  /> */}
                 </Link>
               </div>
             </div>
