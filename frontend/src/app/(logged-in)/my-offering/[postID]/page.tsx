@@ -257,106 +257,52 @@ const ConfirmOffer = ({
           <HistoryProductionContent data={offer} />
         </div>
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isChanged == 1 ? "Reject Offer" : "Confirm Offer"}:{" "}
-            {offer.postName}
-          </DialogTitle>
-          <DialogDescription>Role: {offer.roleName}</DialogDescription>
-        </DialogHeader>
-        {isChanged > 0 ? (
-          <div className="gap-3 flex flex-col">
-            <span>
-              {isChanged == 1
-                ? "If you reject this offer, you won’t be able to make another offer on this post in the future. "
-                : ""}
-            </span>
-            <span
-              className={`${isChanged == 1 ? "text-mainred" : isChanged == 3 ? "text-black" : "text-black"}`}
-            >
-              {" "}
-              {isChanged == 1
-                ? "Please type 'Reject Offer' to decline."
-                : isChanged == 3
-                  ? "You are about to be redirected to the Create Offer page. Are you sure?"
-                  : "Are you sure to accept this offer."}
-            </span>
-            {isChanged == 1 ? (
-              <Input
-                value={textState}
-                onChange={(e) => {
-                  setTextState(e.target.value);
-                  // console.log("e", e.target.value)
-                  if (
-                    e.target.value ==
-                    (isChanged == 1 ? "Reject Offer" : "Confirm Offer")
-                  ) {
-                    setCanConfirm(true);
-                  } else {
-                    setCanConfirm(false);
-                  }
-                }}
-              />
-            ) : isChanged == 3 ? (
-              <div></div>
-            ) : (
-              <div>
-                <Checkbox
-                  value={checkboxState}
-                  onChange={(e) => setCheckboxState(e.target.checked)}
-                />
-                <Label>Confirmed</Label>
-              </div>
-            )}
-          </div>
-        ) : (
-          ""
-        )}
-        <div className={`${isChanged > 0 ? "hidden" : ""}`}>
-          <div className={`flex flex-row gap-3`}>
-            <Avatar className="border flex justify-center items-center">
-              {/* {
-                isLoading && profileImageState &&
-                <CircularProgress size={20}/>
+      <DialogContent className="max-w-lg w-[90vw] max-h-[90vh] overflow-hidden p-0 rounded-lg border shadow-lg">
+  {/* Header */}
+  <DialogHeader className="bg-blue-700 text-white p-4">
+    <DialogTitle>{offer.postName}</DialogTitle>
+    <DialogDescription className="text-white">Role: {offer.roleName}</DialogDescription>
+  </DialogHeader>
 
-              }
-              {
-                (profileImageState) ? 
-                <AvatarImage onLoad={() => setIsLoading(false)} onError={() => setIsLoading(false)} src={profileImageState ?? "/"}/>
-                      :
-                <User />
-              } */}
-              <User />
-            </Avatar>
-            <div className="flex flex-col">
-              <span>{`From: ${name} `}</span>
-              <div className="flex">
-                <Rating value={reviewState} readOnly />
-                <span>{ratingCount} (review)</span>
-              </div>
-            </div>
-          </div>
-          <Separator className="bg-black my-2" />
-          <div>
-            <span className="text-xl font-bold">Offer Detail</span>
-            <div className="flex justify-between">
-              <span>Offered Price:</span>
-              <span>{`${offer.currentWage} THB`}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Start Date:</span>
-              <span>{displayDate}</span>
-            </div>
-            <div className="flex flex-col">
-              <span>Description</span>
-              <div className="w-[100%] flex justify-center items-center bg-slate-50 h-[300px] rounded-xl">
-                <span className="w-[80%] h-[80%]">{offer.reason}</span>
-              </div>
-            </div>
+  <div className="overflow-y-auto max-h-[calc(90vh-160px)] px-4 pb-4">
+    <div>
+      <div className="flex flex-row gap-3">
+        <Avatar className="border flex justify-center items-center">
+          <User />
+        </Avatar>
+        <div className="flex flex-col">
+          <span>{`From: ${name} `}</span>
+          <div className="flex">
+            <Rating value={reviewState} readOnly />
+            <span>{ratingCount} (review)</span>
           </div>
         </div>
-        <DialogFooter>
+      </div>
+
+      <Separator className="bg-black my-2" />
+
+      <div>
+        <span className="text-xl font-bold">Offer Detail</span>
+        <div className="flex justify-between">
+          <span>Offered Price:</span>
+          <span>{`${offer.currentWage} THB`}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Start Date:</span>
+          <span>{displayDate}</span>
+        </div>
+        <div className="flex flex-col">
+          <span>Description</span>
+          <div className="w-full h-60 overflow-y-auto p-4 bg-slate-50 rounded-xl whitespace-pre-wrap break-words">
+            {offer.reason}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Footer */}
+  <DialogFooter className="m-4">
           <div className="w-full flex justify-center">
             {offer.status === "in-progress" ? (
               <div className="flex justify-around w-full">
@@ -420,7 +366,8 @@ const ConfirmOffer = ({
             )}
           </div>
         </DialogFooter>
-      </DialogContent>
+</DialogContent>
+
     </Dialog>
   );
 };
@@ -665,7 +612,7 @@ export default function OfferPostContent() {
           profOffersByRole[roleName] = [];
         }
 
-        profOffersByRole[roleName].push(offer);
+        // profOffersByRole[roleName].push(offer);
       });
 
       // หาข้อเสนอล่าสุดของแต่ละบทบาท
@@ -727,9 +674,9 @@ export default function OfferPostContent() {
       });
 
       // อัพเดทข้อมูลว่าข้อเสนอไหนเป็นข้อเสนอล่าสุด
-      offers.forEach((offer) => {
-        offer.isLatestOffer = latestOfferIds.includes(offer._id);
-      });
+      // offers.forEach((offer) => {
+      //   offer.isLatestOffer = latestOfferIds.includes(offer._id);
+      // });
     });
 
     // แปลงเป็น array สำหรับการแสดงผล
@@ -754,7 +701,7 @@ export default function OfferPostContent() {
         if (userRole === "producer") {
           response2 = await getPostById(postID, token ?? "");
           setPostState(response2);
-          response = await getPrudcerOffers(token ?? "", postID); // ดึงโพสต์ของ producer
+          response = await getPrudcerOffers(token ?? ""); // ดึงโพสต์ของ producer
           setProducerOffers(response);
           // console.log("PRODUCER BY",response)
         } else if (userRole === "production professional") {
@@ -837,11 +784,11 @@ export default function OfferPostContent() {
       if (professionals.length > 0) {
         setSelectedProfessionalId(professionals[0].id);
         // ดึงข้อเสนอของ professional คนแรก
-        setOfferArray(
-          mockProfessionalOffers[
-            professionals[0].id as keyof typeof mockProfessionalOffers
-          ] || [],
-        );
+        // setOfferArray(
+        //   mockProfessionalOffers[
+        //     professionals[0].id as keyof typeof mockProfessionalOffers
+        //   ] || [],
+        // );
       }
     } else if (role === "production professional") {
       // ถ้าเป็น professional ให้ใช้ข้อเสนอของ professional คนนั้น
@@ -861,11 +808,11 @@ export default function OfferPostContent() {
     setSelectedProfessionalId(professionalId);
 
     // ดึงข้อเสนอของ professional ที่เลือก
-    setOfferArray(
-      mockProfessionalOffers[
-        professionalId as keyof typeof mockProfessionalOffers
-      ] || [],
-    );
+    // setOfferArray(
+    //   mockProfessionalOffers[
+    //     professionalId as keyof typeof mockProfessionalOffers
+    //   ] || [],
+    // );
   };
   const [offerStatus, setOfferStatus] = useState("");
   useEffect(() => {
@@ -896,17 +843,17 @@ export default function OfferPostContent() {
 
     // รีเซ็ต professional ที่เลือกเมื่อเปลี่ยน role
     const profsInRole = getProfessionalsByRole(role);
-    if (profsInRole.length > 0) {
-      setSelectedProfessionalId(profsInRole[0].id);
-      setOfferArray(
-        mockProfessionalOffers[
-          profsInRole[0].id as keyof typeof mockProfessionalOffers
-        ] || [],
-      );
-    } else {
-      setSelectedProfessionalId(null);
-      setOfferArray([]);
-    }
+    // if (profsInRole.length > 0) {
+    //   setSelectedProfessionalId(profsInRole[0].id);
+    //   setOfferArray(
+    //     mockProfessionalOffers[
+    //       profsInRole[0].id as keyof typeof mockProfessionalOffers
+    //     ] || [],
+    //   );
+    // } else {
+    //   setSelectedProfessionalId(null);
+    //   setOfferArray([]);
+    // }
   };
 
   // ดึงเฉพาะ professional ตามบทบาทที่เลือก
@@ -992,9 +939,9 @@ export default function OfferPostContent() {
   };
 
   // ตรวจสอบว่าข้อเสนอนี้เป็นข้อเสนอล่าสุดหรือไม่
-  const isLatestOffer = (offer: historyStateInterface) => {
-    return offer.isLatestOffer === true;
-  };
+  // const isLatestOffer = (offer: historyStateInterface) => {
+  //   return offer.isLatestOffer === true;
+  // };
 
   // if (!producerOffers) {
   //   return (
@@ -1004,18 +951,18 @@ export default function OfferPostContent() {
   //   );
   // }
 
-  const handleSelectProducerChange = (selectID: string) => {
-    const tmpselectedOfferProducer = producerOffers.find(
-      (eachPerson) => eachPerson._id === selectID,
-    );
-    if (
-      tmpselectedOfferProducer &&
-      tmpselectedOfferProducer._id !== selectedOfferProducer?._id
-    ) {
-      // console.log("ChangPerson", tmpselectedOfferProducer);
-      setSelectedOfferProducer(tmpselectedOfferProducer);
-    }
-  };
+  // const handleSelectProducerChange = (selectID: string) => {
+  //   const tmpselectedOfferProducer = producerOffers.find(
+  //     (eachPerson) => eachPerson._id === selectID,
+  //   );
+  //   if (
+  //     tmpselectedOfferProducer &&
+  //     tmpselectedOfferProducer._id !== selectedOfferProducer?._id
+  //   ) {
+  //     // console.log("ChangPerson", tmpselectedOfferProducer);
+  //     setSelectedOfferProducer(tmpselectedOfferProducer);
+  //   }
+  // };
 
   return (
     <main className="flex flex-col min-h-screen gap-3 mb-5 relative">
@@ -1031,6 +978,7 @@ export default function OfferPostContent() {
             {postState && userRole === "producer" && (
               <ProducerWorkingContent
                 postID={postID}
+                postName={postState.postName}
                 participants={postState?.participants || []}
                 mapRole={postState?.postProjectRolesOut || []}
               />

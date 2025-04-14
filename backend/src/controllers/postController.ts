@@ -247,16 +247,20 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
   async searchPost(req: Request, res: Response): Promise<void> {
     try {
       // make sure postMediaTypes and roleRequirements are string[] or undefined
-      const postMediaTypes = req.query.postMediaTypes as string[]
+      let postMediaTypesString = req.query.postMediaTypes as string
       const roleRequirements = req.query.roleRequirements as string[]
       const limit = req.query.limit ? Number(req.query.limit): 10
       const page = req.query.page ? Number(req.query.page): 1
-      
+      // 
       if (limit < 1 || page < 1) {
         sendResponse(res, 'error', '', 'bad request', 400);
         return
       }
-
+      
+      let postMediaTypes:string[]=[];
+      if(postMediaTypesString && postMediaTypesString!=""){
+        postMediaTypes=postMediaTypesString.split(",")
+      }
       const postSearchReqDTO: PostSearchRequestDTO = {
         page: page,
         limit: limit,
@@ -391,7 +395,7 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
       const limit = req.query.limit ? Number(req.query.limit): 10;
       const page = req.query.page ? Number(req.query.page): 1;
       const status = ['created', 'in-progress', 'success', 'cancel','waiting'];
-
+// 
 
       if(role!="producer"){
         sendResponse(res, 'error', '', 'unauthorize', 401);
