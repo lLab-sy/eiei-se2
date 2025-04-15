@@ -1,15 +1,28 @@
 "use client";
 
-import { Menu, X, User, FileText, Gift, Settings, LogOut, LogIn, SearchCheck } from "lucide-react";
-import { JSX, useEffect, useState } from "react";
+import {
+  Menu,
+  X,
+  User,
+  FileText,
+  Gift,
+  Settings,
+  LogOut,
+  LogIn,
+  SearchCheck,
+} from "lucide-react";
+import { JSX, lazy, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { clearStorage, setProfileImageURL, setUser } from "@/redux/user/user.slice";
+import {
+  clearStorage,
+  setProfileImageURL,
+  setUser,
+} from "@/redux/user/user.slice";
 import axios from "axios";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import HistoryProduction, { historyStateInterface } from "./HistoryProduction";
+
 import {
   Dialog,
   DialogClose,
@@ -19,39 +32,46 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import { Button } from "./ui/button";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FaHistory } from "react-icons/fa";
+import dynamic from "next/dynamic";
+import Head from "next/head";
 type menuItem = {
   icon: JSX.Element;
   label: string;
   href: string;
-}
-const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, handleSignOut: Function}) => {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
+};
+const DialogLogout = ({
+  setIsMenuOpen,
+  handleSignOut,
+}: {
+  setIsMenuOpen: Function;
+  handleSignOut: Function;
+}) => {
+  const [open, setOpen] = useState(false);
   const handleSignOutTrigger = async () => {
     setOpen(false);
     await handleSignOut();
-    // router.push('/')
-  }
+  };
+
   return (
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {/* <Link href='/'>Logout</Link> */}
           <Link
-                href={'#'}
-                className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                  "text-red-600 hover:text-red-700"
-                }`}
-                onClick={ async () => {setIsMenuOpen(false)}}
-              >
-                <LogOut className="w-5 h-5"/>
-                <span>Logout</span>
-            </Link>
+            href={"#"}
+            className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${"text-red-600 hover:text-red-700"}`}
+            onClick={async () => {
+              setIsMenuOpen(false);
+            }}
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </Link>
           {/* <Button variant="outline">Edit Profile</Button> */}
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] flex flex-col">
@@ -60,166 +80,157 @@ const DialogLogout = ({setIsMenuOpen, handleSignOut}:{setIsMenuOpen : Function, 
           </DialogHeader>
           <div className="gap-4 py-4">
             <span>Are you sure?</span>
-            
           </div>
           <DialogFooter>
-            <div className=' w-full text-white flex flex-row justify-between'>
-                <DialogClose asChild><Button className='bg-red-600'>No</Button></DialogClose>
-                <Button onClick={async () => {
-                  await handleSignOutTrigger()
-                }} className='bg-green-400'>Yes</Button>
+            <div className=" w-full text-white flex flex-row justify-between">
+              <DialogClose asChild>
+                <Button className="bg-red-600">No</Button>
+              </DialogClose>
+              <Button
+                onClick={async () => {
+                  await handleSignOutTrigger();
+                }}
+                className="bg-green-400"
+              >
+                Yes
+              </Button>
             </div>
-          </DialogFooter>  
+          </DialogFooter>
         </DialogContent>
-        
       </Dialog>
     </div>
-  )
-}
+  );
+};
 const NavBar = (session: any) => {
-  const token = session?.session?.user?.token ?? '';
-  const role = session?.session?.user?.role ?? '';
+  const token = session?.session?.user?.token ?? "";
+  const role = session?.session?.user?.role ?? "";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [menuItems, setMenuItems] = useState<menuItem[]>([])
+  const [menuItems, setMenuItems] = useState<menuItem[]>([]);
   // const {data: session, status} = useSession()
-  const dispatch = useDispatch<AppDispatch>()
-  const user: any = useSelector<RootState>(state => state.user)
+  const dispatch = useDispatch<AppDispatch>();
+  const user: any = useSelector<RootState>((state) => state.user);
   const handleSignOut = async () => {
-    
     await signOut();
-    dispatch(clearStorage(''));
-  }
-  
-  
-  // const handleLogout = async () => {
-  //   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`
-  //   await axios.post(apiUrl, {
-  //     withCredentials: true,
-  //     headers: {
-  //       Authorization: `Bearer ${token}`
-  //     }
-  //   })
-  //   await signOut()
-  // }
-  // console.log('session',session.session)
+    dispatch(clearStorage(""));
+  };
+
+  const [profileImageUrl, setProfileImageUrl] = useState("");
   useEffect(() => {
-    if(!session.session || token === ''){
+    if (!session.session || token === "") {
       return;
     }
-    // set token and set user from fetch data
-    const handleFetchProfileURL = async (id : string) => {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/signed-profile/${id}`
-      const res= await axios.get(apiUrl)
-      const imageUrl = res?.data?.data ?? ""
 
-      dispatch(setProfileImageURL(imageUrl))
-      return imageUrl
-    }
-    const handleFetch = async (fetchToken : string) => {
-      // if(role === 'producer') return;
-
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`
+    const handleFetchProfileURL = async (id: string) => {
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/signed-profile/${id}`;
+      const res = await axios.get(apiUrl);
+      const imageUrl = res?.data?.data ?? "";
+      setProfileImageUrl(imageUrl);
+      dispatch(setProfileImageURL(imageUrl));
+      return imageUrl;
+    };
+    const handleFetch = async (fetchToken: string) => {
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`;
       const res = await axios.get(apiUrl, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${fetchToken}`
-        }
-      })
-      const controller = new AbortController()
-      if(!res){
-        throw new Error('Failed to Fetch')
+          Authorization: `Bearer ${fetchToken}`,
+          
+        },
+      });
+      const controller = new AbortController();
+      if (!res) {
+        throw new Error("Failed to Fetch");
       }
-      if(!res.data){
-        throw new Error('Failed Data')
+      if (!res.data) {
+        throw new Error("Failed Data");
       }
-      const returnUser = await res.data
+      const returnUser = await res.data;
       // console.log('returnUser', returnUser)
-      await handleFetchProfileURL(returnUser.data._id)
+      await handleFetchProfileURL(returnUser.data._id);
 
-      dispatch(setUser(returnUser.data))
-      return () => controller.abort()
-    }
-    handleFetch(token)
-  }, [session.session, token])
+      dispatch(setUser(returnUser.data));
+      return () => controller.abort();
+    };
+    handleFetch(token);
+  }, [session.session, token]);
 
-  useEffect(()=>{
-    if(!session.session || token === '') return;
+  useEffect(() => {
+    if (!session.session || token === "") return;
     const sessionMenuItems: menuItem[] = [
-      { 
-        icon: <User className="w-5 h-5" />, 
-        label: "Profile", 
-        href: "/user-profile" },
       {
-          icon: <FileText className="w-5 h-5" />,
-          label:  "My Post",
-          href: "/my-post",
+        icon: <User className="w-5 h-5" />,
+        label: "Profile",
+        href: "/user-profile",
       },
       {
-        icon: <FaHistory className="w-5 h-5" />,
-        label: role === "producer" ? "My Post History" : "Work History",
-        href: "/post-history",
+        icon: <FileText className="w-5 h-5" />,
+        label: "My Post",
+        href: "/my-post",
       },
-      ...(role === "producer" ? 
-      [{
-        icon: <Gift className="w-5 h-5" />,
-        label: "Create Post",
-        href: "/create-post",
-      },
-      {
-        icon: <SearchCheck className="w-5 h-5" />,
-        label: "Search for Professionals",
-        href: "/professionals", 
-      }] : 
-      []),
-      ...(role === "production professional" ? 
-      [{
-          icon: <SearchCheck className="w-5 h-5" />,
-          label: "Search for Posts",
-          href: "/posts", 
-      }] : 
-      []),
+      // {
+      //   icon: <FaHistory className="w-5 h-5" />,
+      //   label: role === "producer" ? "My Post History" : "Work History",
+      //   href: "/post-history",
+      // },
+      ...(role === "producer"
+        ? [
+            {
+              icon: <Gift className="w-5 h-5" />,
+              label: "Create Post",
+              href: "/create-post",
+            },
+            {
+              icon: <SearchCheck className="w-5 h-5" />,
+              label: "Search for Professionals",
+              href: "/professionals",
+            },
+          ]
+        : []),
+      ...(role === "production professional"
+        ? [
+            {
+              icon: <SearchCheck className="w-5 h-5" />,
+              label: "Search for Posts",
+              href: "/posts",
+            },
+          ]
+        : []),
       {
         icon: <Gift className="w-5 h-5" />,
         label: "My Offering",
         href: "/my-offering",
       },
-      {
-        icon: <Settings className="w-5 h-5" />,
-        label: "Setting",
-        href: "/setting",
-      },
-    ]
-    setMenuItems(sessionMenuItems)},[session.session,token]);
-    
-    const userId = user?.user?._id ?? ""
-    // console.log('userIdToFind', user)
-    const [historyDataArray, setHistoryDataArray] = useState<Array<historyStateInterface>>([])
-    const handleFetch = async () => {
-      const postStatus = 'created'
-      const query = `?userId=${userId}&postStatus=${postStatus}&limit=10&page=1`
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
-      const res = await axios.get(apiUrl, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${session?.session?.user?.token}`,
-        },
-      });
-      setHistoryDataArray(res?.data?.data?.data)
-    } 
-    // handleFetch(userId, "created")
+    ];
+    setMenuItems(sessionMenuItems);
+  }, [session.session, token]);
+
+  const PictureLogo = () => {
+    return (
+      <Image
+          src="/image/logo-preview.webp"
+          alt="BualoiDev Logo"
+          fill
+          sizes="50"
+          className="object-contain"
+          loading="eager"
+        />
+    );
+  };
+  const PictureLogoDynamic = useMemo(() => dynamic(() => Promise.resolve(PictureLogo), {ssr: false}), [])
+  const AvatarProfileImage = useMemo(
+    () => dynamic(() => import("./AvatarProfileImage"), { ssr: false }),
+    [],
+  );
   return (
     <header className="bg-[#2B428C] text-white fixed m-auto w-[100%] z-50">
+      <Head>
+        {profileImageUrl && <link rel="preload" href={profileImageUrl} />}
+      </Head>
       <div className="flex justify-between items-center h-16 bg-[#2B428C] text-white">
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-2 pl-2">
           <div className="relative w-10 h-10">
-            <Image
-              src="/image/logo-preview.png"
-              alt="BualoiDev Logo"
-              fill
-              className="object-contain"
-              priority
-            />
+            <PictureLogoDynamic />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-bold">BualoiDev</span>
@@ -228,7 +239,12 @@ const NavBar = (session: any) => {
             </span>
           </div>
         </Link>
-        
+        {/* user role */}
+        <div className="absolute left-[40%] w-[20%] text-center">
+          <span className="text-pretty">
+            {role? `You are a ${role}!`:""}
+          </span>
+        </div>
         {/* Right Section */}
         <div className="flex items-center gap-4 pr-2">
           {/* Username with Avatar */}
@@ -240,21 +256,18 @@ const NavBar = (session: any) => {
             {/* <div className={`${session?.session ? "" : "hidden"}`}>
              <HistoryProduction handleFetch={handleFetch} historyDataArray={historyDataArray}/>
             </div> */}
-            <span className="text-sm">{session?.session?.user?.username ?? ""}</span>
-            {
-              (session?.session) ?
+            <span className="text-sm">
+              {session?.session?.user?.username ?? ""}
+            </span>
+            {session?.session ? (
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              {/* <User className="w-5 h-5 text-gray-600"/> */}
+                {/* <User className="w-5 h-5 text-gray-600"/> */}
 
-              <Avatar>
-                <AvatarImage src={(!token) ? "" : user?.profileImageURL??""}/>
-              </Avatar>
-
-              
-            </div>
-            :""
-            }
-            
+                <AvatarProfileImage token={token} user={user} />
+              </div>
+            ) : (
+              ""
+            )}
           </div>
 
           {/* Menu Button */}
@@ -298,21 +311,27 @@ const NavBar = (session: any) => {
               <span>{item.label}</span>
             </Link>
           ))}
-          {
-            session?.session ? 
-            <DialogLogout handleSignOut={handleSignOut} setIsMenuOpen={setIsMenuOpen}/>
-            :
+          {session?.session ? (
+            <DialogLogout
+              handleSignOut={handleSignOut}
+              setIsMenuOpen={setIsMenuOpen}
+            />
+          ) : (
             <Link
-                href={(session.session) ? '/' : "/login"}
-                className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                  session.session ? "text-red-600 hover:text-red-700" : ""
-                }`}
-                onClick={ async () => setIsMenuOpen(false)}
-              >
-                {session ? (<LogOut className="w-5 h-5"/>) : (<LogIn className="w-5 h-5"/>)}
-                <span>{(session.session) ? "Logout" : "Login"}</span>
+              href={session.session ? "/" : "/login"}
+              className={`flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                session.session ? "text-red-600 hover:text-red-700" : ""
+              }`}
+              onClick={async () => setIsMenuOpen(false)}
+            >
+              {session ? (
+                <LogOut className="w-5 h-5" />
+              ) : (
+                <LogIn className="w-5 h-5" />
+              )}
+              <span>{session.session ? "Logout" : "Login"}</span>
             </Link>
-          }
+          )}
         </div>
       </div>
 

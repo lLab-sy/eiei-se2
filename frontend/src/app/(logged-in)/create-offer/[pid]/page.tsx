@@ -110,7 +110,7 @@ import {useRouter } from "next/navigation";
       );
     }
 
-    const router= useRouter()
+    const router= useRouter();
     if(pid==userID || userData?.role=="producer"){
         router.push('/')
     }
@@ -128,11 +128,16 @@ import {useRouter } from "next/navigation";
             // responseOffer= await getOfferHistory(token,pid); 
           } else if (userRole === "production professional") {
             response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+            console.log(response)
+            if (!response) {
+              console.log("Invalid access")
+              router.push('/')
+            }
             userResponse = await getUser(userID);
             // responseOffer= await getOfferHistory(token,userID); 
           }
           setUserData(userResponse)
-          console.log("respons",response)
+          // console.log("respons",response)
           if (response) {
             const posts =
               userRole === "producer" ? response : [response];

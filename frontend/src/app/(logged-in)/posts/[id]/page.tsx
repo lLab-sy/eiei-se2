@@ -239,7 +239,7 @@ const PostDetail = () => {
               </span>
             </div>
           </div>
-          <p className="text-main-gery break-words whitespace-normal">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
+          <p className="text-maingrey break-words whitespace-normal">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
 
           {/* Project Detail Section */}
           <div className="place-content-center grid grid-cols-1 gap-3">
