@@ -128,7 +128,7 @@ export default function OfferPage() {
                       }
                       role={getRoleById(post.postProjectRoles || [])}
                       mediaType={getMediaNameById(post.postMediaType)}
-                      id={post.id}
+                      id={post.id!}
                       link={`http://localhost:3000/my-offering/${post.id}`}
                     />
                   </Suspense>

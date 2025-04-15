@@ -119,24 +119,24 @@ export interface UserData{
     imageUrl?: string;
 }
 
-export interface PostDataHistory {
-    id:string,
-    postName: string;
-    producerName: ProducerResponse;
-    postDescription: string;
-    postImages: string[];
-    postImagesKey?: string[];
-    participant?: ParticipantForRight;
-    postMediaType: string;
-    postProjectRolesOut?: PostRolesResponse[]
-    postProjectRolesOutProfessional?: PostRolesResponse
-    startDate: string; 
-    endDate: string;   
-    postProjectRoles: string[]; 
-    postStatus: string;
-    roleCount:number;
-    participant: Participant
-}
+// export interface PostDataHistory {
+//     id:string,
+//     postName: string;
+//     producerName: ProducerResponse;
+//     postDescription: string;
+//     postImages: string[];
+//     postImagesKey?: string[];
+//     participant?: ParticipantForRight;
+//     postMediaType: string;
+//     postProjectRolesOut?: PostRolesResponse[]
+//     postProjectRolesOutProfessional?: PostRolesResponse
+//     startDate: string; 
+//     endDate: string;   
+//     postProjectRoles: string[]; 
+//     postStatus: string;
+//     roleCount:number;
+//     participant: Participant
+// }
 
 export interface Rating{
     ratingScore: number;

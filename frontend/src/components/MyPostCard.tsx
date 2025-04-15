@@ -73,7 +73,7 @@ export default function MyPostCard({role,postDetail}:{role:string,postDetail:Pos
         }
       const reviewData: ReviewData = {
             createdAt: new Date(),
-            postID: postDetail.id,
+            postID: postDetail.id!,
             ratingScore: values.rating,
             comment: values.comment,
           };
@@ -89,7 +89,7 @@ export default function MyPostCard({role,postDetail}:{role:string,postDetail:Pos
                 professionalId,
               );
             } else {
-              response = await postReviewPost(reviewData, token, postDetail.id);
+              response = await postReviewPost(reviewData, token, postDetail.id!);
             }
       
             if (!response) {
@@ -207,7 +207,7 @@ export default function MyPostCard({role,postDetail}:{role:string,postDetail:Pos
                             setIsOpen={setIsOpen}
                             onSubmit={onSubmit}
                             toast={toast}
-                            postId={postDetail.id}
+                            postId={postDetail.id!}
                           />
                 </div>
                 

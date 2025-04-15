@@ -42,7 +42,7 @@ export default async function getPostById(
     });
 
     if (!response.data || response.data.status !== "success") {
-      throw new Error("Failed to fetch post by ID");
+      return null
     }
 
     console.log("Hello Fetched Post Data:", response.data.data);
