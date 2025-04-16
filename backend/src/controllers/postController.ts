@@ -607,6 +607,17 @@ async getOffers(req: AuthRequest, res: Response, next: NextFunction): Promise<vo
     }
   }
 
+  async getSumCandidateOffer(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user.userId;
+      const postId = req.params.id;
+      const sumCandidateOffer = await postService.getSumCandidateOffer(userId, postId);
+      sendResponse(res, 'success', sumCandidateOffer, 'Successfully get sum candidate offer');
+    } catch (err) {
+      sendResponse(res, 'error', err, 'Failed to get sum candidate offer');
+    }
+  };
+
 }
 
 
