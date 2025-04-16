@@ -44,3 +44,44 @@ const transactionSchema = new Schema<ITransaction>({
 
 const Transaction = mongoose.model<ITransaction>('transaction', transactionSchema);
 export default Transaction;
+
+export interface OmiseCard {
+    id: string;
+    brand: string;
+    name: string;
+    last_digits: string;
+    expiration_month: number;
+    expiration_year: number;
+    created: string;
+  }
+
+export interface addCardRequestModel {
+    userId: string;
+    cardToken: string;
+}
+
+export interface addCardResponseModel {
+    // status: string;
+    id: string;
+    brand: string;
+    name: string;
+    last_digits: string;
+    expiration_month: number;
+    expiration_year: number;
+    created: string;
+}
+
+export interface chargeCustomerRequestModel {
+    userId:string;
+    amount: number;
+    cardId:string;
+}
+
+export interface chargeCustomerResponseModel {
+    userId: string,
+    amount: number,
+    currency: string,
+    status: string,
+    transactionId: string,
+    transactionType: 'charge',
+}
