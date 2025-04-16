@@ -5,6 +5,22 @@ import { AuthRequest } from '../dtos/middlewareDTO';
 import { addCardRequestModel, chargeCustomerRequestModel } from "../models/transactionModel";
 
 class paymentController{
+    async createCustomer(req: AuthRequest, res: Response): Promise<void> {
+        try {
+            const userId = req.user.userId;
+    
+            const result = await paymentService.createCustomer(userId);
+            if(result.created){
+                sendResponse(res, 'success', result, "Successfully create omise account")
+            }else{
+                sendResponse(res, 'success', result, "Already have omise account")
+            }
+            
+        } catch (err) {
+            console.log(err)
+            sendResponse(res, 'error', 'Failed to create omise account')
+        }
+    }
     async addCard(req: AuthRequest, res: Response): Promise<void> {
         try{
             const userId = req.user.userId;
@@ -28,14 +44,15 @@ class paymentController{
             const userId = req.user.userId;
             const cardId = req.body.cardId;
             const amount = req.body.amount;
-            if (!cardId || !amount ) {
-                sendResponse(res, "error", "", "Card Id and amount is required", 400);
+            const postId = req.body.postId;
+            if (!cardId || !amount || !postId) {
+                sendResponse(res, "error", "", "CardId, postId and amount is required", 400);
                 return;
             }
-            const chargeRequest: chargeCustomerRequestModel = {userId, amount, cardId};
+            const chargeRequest: chargeCustomerRequestModel = {userId, postId, amount, cardId};
                 
             const chargeResponse = await paymentService.chargeCustomer(chargeRequest)
-            sendResponse(res, 'success', chargeResponse, "Successfully charge")
+            sendResponse(res, 'success', chargeResponse, "Successfully charge customer")
             }catch(err){
                 console.log(err)
                 sendResponse(res, 'error', 'Failed to charge user')
