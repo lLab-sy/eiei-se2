@@ -2,6 +2,7 @@ import mongoose, {Document, Schema} from 'mongoose';
 
 export interface ITransaction extends Document {
     userId: mongoose.Schema.Types.ObjectId,
+    postId: mongoose.Schema.Types.ObjectId,
     amount: number,
     currency: string,
     status: string,
@@ -13,6 +14,11 @@ const transactionSchema = new Schema<ITransaction>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
+        required: true
+    },
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'postType',
         required: true
     },
     amount: {
@@ -73,12 +79,14 @@ export interface addCardResponseModel {
 
 export interface chargeCustomerRequestModel {
     userId:string;
+    postId:string;
     amount: number;
     cardId:string;
 }
 
 export interface chargeCustomerResponseModel {
     userId: string,
+    postId: string,
     amount: number,
     currency: string,
     status: string,
