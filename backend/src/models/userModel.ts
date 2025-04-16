@@ -14,6 +14,8 @@ export interface IUser extends Document {
   gender?: "Male" | "Female" | "Non-Binary" | "Other";
   bankAccount?: IBankAccount;
   profileImage?: string;
+  omiseCustomerId?: string;
+  cardIds?: string[];
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
@@ -119,6 +121,10 @@ export const userSchema = new Schema<IUser>({
   profileImage: {
     type: String,
   },
+  omiseCustomerId: {
+    type: String,
+  },
+  cardIds: [String],
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {
