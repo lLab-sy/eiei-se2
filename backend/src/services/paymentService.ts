@@ -46,11 +46,9 @@ class paymentService {
             const updateCustomer = await omise.customers.update(customerId, {
                 card: data.cardToken,
             });
-
-            const newCard = updateCustomer.cards.data.find(
-                (card) => card.id === updateCustomer.default_card
-            );
-
+            
+            const newCard = updateCustomer.cards.data[updateCustomer.cards.data.length - 1];
+            
             if (!newCard) throw new Error('Card not found');
 
             if (producer.role === 'producer') {
@@ -60,7 +58,7 @@ class paymentService {
                 }
                 await producer.save();
             }
-
+            
             const response: addCardResponseModel = {
                 id: newCard.id,
                 brand: newCard.brand,

@@ -59,6 +59,7 @@ declare module 'omise' {
     email: string;
     description?: string;
     cards: {
+      length: number;
       object: 'list';
       data: OmiseCard[];
     };
