@@ -5,7 +5,7 @@ import { expect } from '@playwright/test';
 
 let customWorld: ICustomWorld = world;
 
-Given('the producer has a target production professional and {string}', async function (action:string) {
+Given('the producer has a target production professional for offer and {string}', async function (action:string) {
   const page = customWorld.page;
   if (page){
     await page.waitForLoadState("domcontentloaded");
@@ -62,6 +62,70 @@ Given('the producer does not fill out the price', async function () {
   }
 });
 
+Given('the producer fill out the price as {int}', async function (int) {
+  // Given('the producer fill out the price as {float}', async function (float) {
+    // Write code here that turns the phrase above into concrete actions
+    const page = customWorld.page;
+    if (page){
+      await page.getByRole('textbox', { name: 'description' }).fill('This should be how the description for any offer');
+      await page.getByPlaceholder('200').fill('0');
+      const roleBox = page.getByRole('combobox').nth(1);
+      await roleBox.click();
+      const roleOptions = page.getByRole('option');
+      const count = await roleOptions.count();
+      await roleOptions.nth(Math.floor(Math.random() * count)).click();
+    }
+  });
+
+Given('the producer fill description at most {int} characters', async function (int) {
+  // Given('the producer fill description at most {float} characters', async function (float) {
+    // Write code here that turns the phrase above into concrete actions
+    const page = customWorld.page;
+    if (page){
+      await page.getByRole('textbox', { name: 'description' }).fill('Hello');
+      await page.getByPlaceholder('200').fill('500');
+      const roleBox = page.getByRole('combobox').nth(1);
+      await roleBox.click();
+      const roleOptions = page.getByRole('option');
+      const count = await roleOptions.count();
+      await roleOptions.nth(Math.floor(Math.random() * count)).click();
+    }
+  });
+
+  Given('the producer fill description more than {int} characters', async function (int) {
+    const page = customWorld.page;
+    if (page) {
+      let text1 = "1";
+      let result = "";
+      for (let i = 0; i <= int; i++) {
+        result += text1; // Fix: use += instead of concat()
+      }
+      await page.getByRole('textbox', { name: 'description' }).fill(result);
+      await page.getByPlaceholder('200').fill('500');
+  
+      const roleBox = page.getByRole('combobox').nth(1);
+      await roleBox.click();
+      const roleOptions = page.getByRole('option');
+      const count = await roleOptions.count();
+      await roleOptions.nth(Math.floor(Math.random() * count)).click();
+    }
+  });
+
+Given('the producer does not select role', async function () {
+        // Write code here that turns the phrase above into concrete actions
+        const page = customWorld.page;
+        if (page){
+          await page.getByRole('textbox', { name: 'description' }).fill('This should be how the description for any offer');
+          await page.getByPlaceholder('200').fill('500');
+        }
+      });
+ 
+
+// Given('the producer does not select post', async function () {
+//   // Write code here that turns the phrase above into concrete actions
+//   return 'pending';
+// });
+
 // Then('ensure the system sends an offer to production professional', async function () {
 //   const page = customWorld.page;
 //   if (page){
@@ -77,9 +141,9 @@ Then('ensure the system shows the offer in producer post\'s offer list', async f
   return 'pending';
 });
 
-Then('ensure the system sends a message failed to create an offer with a production professional', async function () {
-  const page = customWorld.page;
-  if (page){
-    await expect(page.getByText("Price more than 0.")).toBeVisible();
-  }
-});
+// Then('ensure the system sends a message failed to create an offer with a production professional', async function () {
+//   const page = customWorld.page;
+//   if (page){
+//     await expect(page.getByText("Price more than 0.")).toBeVisible();
+//   }
+// });

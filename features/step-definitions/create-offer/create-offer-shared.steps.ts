@@ -19,3 +19,11 @@ Then('ensure the system displays status message {string}', (string: string) => {
     expect(successMessage).toBeVisible();
   }
 })
+
+
+Then('ensure the system sends a message failed that {string}.', async function (string) {
+  const page = customWorld.page;
+  if (page){
+    await expect(page.getByText(string)).toBeVisible();
+  }
+});
