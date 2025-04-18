@@ -3,6 +3,7 @@ import userRepository from '../repositories/userRepository';
 import Transaction, { addCardRequestModel, chargeCustomerRequestModel, addCardResponseModel, chargeCustomerResponseModel, OmiseCard, ITransaction } from '../models/transactionModel';
 import { IUser, IProducer } from '../models/userModel';
 import transactionRepository from '../repositories/transactionRepository';
+import producerRepository from '../repositories/producerRepository';
 
 class paymentService {
     async createCustomer(userId: string): Promise<{ created: boolean; customerId: string }> {
@@ -32,12 +33,11 @@ class paymentService {
     }
 
     async addCardToCustomer(data: addCardRequestModel): Promise<addCardResponseModel | null> {
-        const user: IUser | null = await userRepository.getUserByID(data.userId);
-        if (!user) throw new Error('User not found');
-        if (user.role !== 'producer') throw new Error('Only producers can add cards');
-        if (!user.email) throw new Error('Email not found');
+        const producer: IProducer | null = await producerRepository.getProducerById(data.userId);
+        if (!producer) throw new Error('User not found');
+        if (!producer.email) throw new Error('Email not found');
 
-        const customerId = user.omiseCustomerId;
+        const customerId = producer.omiseCustomerId;
         if (!customerId) {
             throw new Error('Customer ID not found. Please create a customer first.');
         }
@@ -53,8 +53,7 @@ class paymentService {
 
             if (!newCard) throw new Error('Card not found');
 
-            if (user.role === 'producer') {
-                const producer = user as IProducer;
+            if (producer.role === 'producer') {
                 if (!producer.cardIds) producer.cardIds = [];
                 if (!producer.cardIds.includes(newCard.id)) {
                     producer.cardIds.push(newCard.id);

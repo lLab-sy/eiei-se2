@@ -24,6 +24,10 @@ class ProducerRepository {
             throw new Error(`Failed to update producer: ${(err as Error).message}`);
         }
     }
+
+    public async getProducerById(id: string): Promise<IProducer|null> {
+        return await Producer.findById(id);
+    }
 }
 
 export default new ProducerRepository();
