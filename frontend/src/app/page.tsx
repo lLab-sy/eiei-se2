@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Users, Search, Briefcase } from "lucide-react";
 import Banner from "@/components/Banner";
+import Script from "next/script";
 
 export default function Home() {
   return (
@@ -79,6 +80,14 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {/* <Script
+        src="https://cdn.omise.co/omise.js"
+        onLoad={() => {
+          (window as any).Omise?.setPublicKey(
+            process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY!
+          );
+        }}
+      /> */}
     </div>
   );
 }
