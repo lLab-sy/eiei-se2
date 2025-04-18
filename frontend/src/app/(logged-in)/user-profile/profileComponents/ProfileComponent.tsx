@@ -11,6 +11,9 @@ import { setProfileImageURL, setUser } from "@/redux/user/user.slice";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import ProfileEdit from "./ProfileEdit";
+import UserInfo from "./UserInfo";
+import ReviewProfile from "./ReviewProfile";
 
 const formSchema = z.object({
   firstName: z.string().optional(),
@@ -28,9 +31,8 @@ const formSchema = z.object({
   payment_type: z.enum(["creditDebit", "qrCode"], {
     required_error: "Select Your Payment Type",
   }),
-  card_name: z.string().optional(),
-  card_number: z.string().optional(),
-  company: z.string().optional(),
+//   card_name: z.string().optional(),
+//   card_number: z.string().optional(),
   description: z.string().optional(),
   occupation: z.string().optional(),
   skill: z.array(z.any()).optional(),
@@ -60,8 +62,8 @@ export default function ProfileComponent() {
       bankName: userData?.bankAccount?.bankName ?? "",
       accountHolderName: userData?.bankAccount?.accountHolderName ?? "",
       accountNumber: userData?.bankAccount?.accountNumber ?? "",
-      card_name: userData?.nameOnCard ?? "",
-      card_number: userData?.cardNumber ?? "",
+    //   card_name: userData?.nameOnCard ?? "",
+    //   card_number: userData?.cardNumber ?? "",
       firstName: userData?.firstName ?? "",
       middleName: userData?.middleName ?? "",
       lastName: userData?.lastName ?? "",
@@ -69,7 +71,6 @@ export default function ProfileComponent() {
       occupation: userData?.occupation ?? "",
       skill: userData?.skill ?? [],
       experience: userData?.experience ?? 0,
-      company: userData?.company ?? "",
       gender: userData?.gender,
       description: userData?.description ?? "",
     },
@@ -83,8 +84,8 @@ export default function ProfileComponent() {
         bankName: userData.bankAccount?.bankName ?? "",
         accountHolderName: userData.bankAccount?.accountHolderName ?? "",
         accountNumber: userData.bankAccount?.accountNumber ?? "",
-        card_name: userData.nameOnCard ?? "",
-        card_number: userData.cardNumber ?? "",
+        // card_name: userData.nameOnCard ?? "",
+        // card_number: userData.cardNumber ?? "",
         firstName: userData.firstName ?? "",
         middleName: userData.middleName ?? "",
         lastName: userData.lastName ?? "",
@@ -92,7 +93,6 @@ export default function ProfileComponent() {
         occupation: userData.occupation ?? "",
         skill: userData.skill ?? [],
         experience: userData.experience ?? 0,
-        company: userData.company ?? "",
         gender: userData.gender,
         description: userData?.description ?? "",
       });
@@ -130,10 +130,9 @@ export default function ProfileComponent() {
 
     const producerData = {
       ...sendUserData,
-      company: data.company,
       paymentType: data.payment_type,
-      nameOnCard: data.card_name,
-      cardNumber: data.card_number,
+    //   nameOnCard: data.card_name,
+    //   cardNumber: data.card_number,
     };
 
     const productionData = {
@@ -231,43 +230,10 @@ export default function ProfileComponent() {
 
   const [mobilePageState, setMobilePageState] = useState(0);
   const router = useRouter();
-  const UserInfo = useMemo(() => dynamic(() => import("./UserInfo"), { ssr: false }), [userData, img, mobilePageState])
-  const ProfileEdit = useMemo(() => dynamic(() => import("./ProfileEdit"), { ssr: false }), [])
-  const ReviewProfile = useMemo(() => dynamic(() => import("./ReviewProfile"), { ssr: false }), [])
-  const All = () => {
-    return (
-      <div className={` flex lg:justify-around lg:w-[80%] lg:h-[800px]`}>
-        <UserInfo
-          mobilePageState={mobilePageState}
-          userData={userData}
-          img={img}
-          setMobilePageState={setMobilePageState}
-          role={role}
-          onImageChange={onImageChange}
-        />
-
-        <ProfileEdit
-          mobilePageState={mobilePageState}
-          setClick={setClick}
-          setMobilePageState={setMobilePageState}
-          role={role}
-          form={form}
-          handleSubmit={handleSubmit}
-          click={click}
-          isEdit={isEdit}
-          setIsEdit={setIsEdit}
-          paymentState={paymentState}
-          setPaymentState={setPaymentState}
-        />
-        <ReviewProfile
-          role={role}
-          userData={userData}
-          mobilePageState={mobilePageState}
-          setMobilePageState={setMobilePageState}
-        />
-      </div>
-    )
-  }
+//   const UserInfo = useMemo(() => dynamic(() => import("./UserInfo"), { ssr: false }), [img, mobilePageState])
+//   const ProfileEdit = useMemo(() => dynamic(() => import("./ProfileEdit"), { ssr: false }), [])
+//   const ReviewProfile = useMemo(() => dynamic(() => import("./ReviewProfile"), { ssr: false }), [])
+ 
 
   return (
     <main className="h-[100vh] lg:min-h-screen flex bg-mainblue-light relative lg:items-center lg:justify-center">
@@ -287,6 +253,7 @@ export default function ProfileComponent() {
         />
 
         <ProfileEdit
+          userData={userData}
           mobilePageState={mobilePageState}
           setClick={setClick}
           setMobilePageState={setMobilePageState}

@@ -11,7 +11,7 @@ export default function AvatarProfile({ img }: { img: { image: string } }) {
   }), [img]);
   return (
     <Avatar className="order-1 lg:order-2 w-[240px] h-[240px] lg:w-[150px] lg:h-[150px] flex justify-center items-center">
-      <AvatarImageDynamic
+      <AvatarImage
         fetchPriority="high"
         src={img.image}
         loading="eager"
