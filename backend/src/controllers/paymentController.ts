@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { sendResponse } from "../utils/responseHelper";
 import paymentService from "../services/paymentService";
 import { AuthRequest } from '../dtos/middlewareDTO';
