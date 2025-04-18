@@ -142,7 +142,9 @@ export const producerSchema = new Schema<IProducer>({
     type: String,
     trim: true,
   },
-  cardIds: [String],
+  cardIds: {
+    type: [String],
+  }
   // paymentType: {
   //   type: String,
   //   enum: ["qrCode", "creditDebit"],
