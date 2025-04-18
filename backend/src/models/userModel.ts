@@ -14,6 +14,7 @@ export interface IUser extends Document {
   gender?: "Male" | "Female" | "Non-Binary" | "Other";
   bankAccount?: IBankAccount;
   profileImage?: string;
+  omiseCustomerId?: string;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
@@ -29,9 +30,10 @@ export interface IBankAccount extends Document {
 // Producer-specific fields
 export interface IProducer extends IUser {
   company?: string;
-  paymentType?: "qrCode" | "creditDebit";
-  nameOnCard?: string; //for Credit/Debit
-  cardNumber?: string; //for Credit/Debit
+  cardIds?: string[];
+  // paymentType?: "qrCode" | "creditDebit";
+  // nameOnCard?: string; //for Credit/Debit
+  // cardNumber?: string; //for Credit/Debit
 }
 
 // review
@@ -119,6 +121,9 @@ export const userSchema = new Schema<IUser>({
   profileImage: {
     type: String,
   },
+  omiseCustomerId: {
+    type: String,
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {
@@ -137,16 +142,19 @@ export const producerSchema = new Schema<IProducer>({
     type: String,
     trim: true,
   },
-  paymentType: {
-    type: String,
-    enum: ["qrCode", "creditDebit"],
-  },
-  nameOnCard: {
-    type: String,
-  },
-  cardNumber: {
-    type: String,
-  },
+  cardIds: {
+    type: [String],
+  }
+  // paymentType: {
+  //   type: String,
+  //   enum: ["qrCode", "creditDebit"],
+  // },
+  // nameOnCard: {
+  //   type: String,
+  // },
+  // cardNumber: {
+  //   type: String,
+  // },
 });
 
 export const Producer = User.discriminator<IProducer>("producer", producerSchema); // <-- Discriminator

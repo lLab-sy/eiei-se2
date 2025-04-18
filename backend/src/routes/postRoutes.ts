@@ -266,6 +266,68 @@ router.put('/posts/:id/startProject', AuthMiddleware.authenticate as RequestHand
  */
 // router.get('/posts/user', AuthMiddleware.authenticate as RequestHandler, postController.getPostsByUser as RequestHandler);
 router.get('/posts/getPostParticipant/:id', AuthMiddleware.authenticate as RequestHandler, postController.getPostParticipant as RequestHandler);
+
+/**
+ * @swagger
+ * /api/v1/posts/{id}/sumCandidateOffer:
+ *   get:
+ *     summary: Get the sum of latest offers made to candidates for a post
+ *     description: Calculates and returns the total of the latest offers made to participants with candidate status for the specified post.
+ *     tags: [Post]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the post
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the sum of candidate offers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Successfully get sum candidate offer
+ *                 data:
+ *                   type: number
+ *                   example: 1500
+ *       400:
+ *         description: Failed to get sum candidate offer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Failed to get sum candidate offer
+ *       401:
+ *         description: Unauthorized access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ */
+router.get('/posts/:id/sumCandidateOffer', AuthMiddleware.authenticate as RequestHandler, postController.getSumCandidateOffer as RequestHandler);
 // 
 
 /**

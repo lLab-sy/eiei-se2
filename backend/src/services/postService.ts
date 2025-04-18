@@ -589,6 +589,15 @@ async getPostsbyUser(id:string,role:string): Promise<PostWithRoleCountDTO[]|null
     }
   }
 
+  async getSumCandidateOffer(userId:string, postId:string): Promise<number>{
+    try{
+        const sumCandidateOffer =  await postRepository.sumLatestCandidateOffers(userId, postId);
+        return sumCandidateOffer;
+    }catch(error){
+      throw new Error('Error get sum candidate offer in service layer: ' + error);
+    }
+  }
+
 }
 
 // Export an instance of the service
