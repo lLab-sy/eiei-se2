@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { BookBankInterface } from "./ProfileEdit";
+import postCustomerTransfer from "@/libs/postCustomerTransfer";
+import { useSession } from "next-auth/react";
 
 export default function ProfessionalBillingInfo({
     bankInfo,
@@ -15,6 +17,9 @@ export default function ProfessionalBillingInfo({
     const [bankName, setBankName] = useState(bankInfo?.bankName || "");
     const [accountHolder, setAccountHolder] = useState(bankInfo?.accountHolder || "");
     const [accountNumber, setAccountNumber] = useState(bankInfo?.accountNumber || "");
+
+    const { data: session } = useSession();
+    const token = session?.user.token;
 
     const checkValid = () => {
         if (!bankName) {
@@ -35,7 +40,7 @@ export default function ProfessionalBillingInfo({
         return true;
     }
 
-    const handleEdit = () => {  
+    const handleEdit = async () => {  
         // Handle form submission logic here
         toast({
             variant: "default",
@@ -49,22 +54,32 @@ export default function ProfessionalBillingInfo({
             accountNumber: accountNumber,
         });
         setIsEditing(!isEditing);
+
+        const response = await postCustomerTransfer({
+            fullName: accountHolder,
+            bankAccount: {
+                name: bankName,
+                number: accountNumber,
+                brand: bankName,
+            }
+            }, token || "");
+        console.log("Response from postCustomerTransfer:", response);
     };
 
     const bankOptions = [
-        { value: "bank1", label: "Krungsri" },
-        { value: "bank2", label: "Kasikorn" },
-        { value: "bank3", label: "Siam Commercial" },
-        { value: "bank4", label: "Bangkok Bank" },
-        { value: "bank5", label: "TMBThanachart" },
-        { value: "bank6", label: "Krung Thai" },
-        { value: "bank7", label: "Government Savings Bank (Aomsin)" },
-        { value: "bank8", label: "UOB" },
-        { value: "bank9", label: "CIMB Thai" },
-        { value: "bank10", label: "Kiatnakin Phatra" },
-        { value: "bank11", label: "TISCO" },
-        { value: "bank12", label: "Thanachart Bank" },
-        { value: "bank13", label: "Bank of Ayudhya" },
+        //{ value: "bank1", label: "Krungsri" },
+        { value: "kbank", label: "Kasikorn" },
+        { value: "scb", label: "Siam Commercial" },
+        { value: "bbl", label: "Bangkok Bank" },
+        // { value: "bank5", label: "TMBThanachart" },
+        // { value: "bank6", label: "Krung Thai" },
+        // { value: "bank7", label: "Government Savings Bank (Aomsin)" },
+        // { value: "bank8", label: "UOB" },
+        // { value: "bank9", label: "CIMB Thai" },
+        // { value: "bank10", label: "Kiatnakin Phatra" },
+        // { value: "bank11", label: "TISCO" },
+        // { value: "bank12", label: "Thanachart Bank" },
+        // { value: "bank13", label: "Bank of Ayudhya" },
     ];
 
     return (

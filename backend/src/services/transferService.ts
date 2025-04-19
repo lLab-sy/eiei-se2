@@ -60,11 +60,9 @@ class transferService {
         if (!user.email) throw new Error('Email is required');
 
         if (user.omiseCustomerId) {
-            return {
-                created: false,
-                recipientId: user.omiseCustomerId
-            };
+            return this.addBankAccount(data);
         }
+        
 
         try {
             const recipient = await omise.recipients.create({
@@ -92,7 +90,7 @@ class transferService {
         }
     }
 
-    async addBankAccount(data: CreateRecipientInput): Promise<void> {
+    async addBankAccount(data: CreateRecipientInput): Promise<{ created: boolean; recipientId: string }> {
         const user = await userRepository.getUserByID(data.userId);
         if (!user?.omiseCustomerId) {
             throw new Error('Recipient not found');
@@ -109,6 +107,10 @@ class transferService {
                     last_digits: data.bankAccount.number.slice(-4),
                 },
             });
+            return {
+                created: true,
+                recipientId: updatedRecipient.id,
+            };
 
         } catch (err) {
             console.error("Error updating Omise recipient:", err);

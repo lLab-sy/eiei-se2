@@ -10,7 +10,7 @@ class transferController {
             const userId = req.user.userId;
 
             const { fullName, bankAccount } = req.body;
-
+            console.log("Bank Account:", req.body);
             if (!fullName || !bankAccount?.name || !bankAccount?.number || !bankAccount?.brand) {
                 sendResponse(res, 'error', null, 'Missing required bank account information');
                 return;

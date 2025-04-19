@@ -25,6 +25,9 @@ export default function UserInfo({
   setMobilePageState: Function;
   role: string;
 }) {
+  if (!userData) {
+    return <div>Loading...</div>;
+  }
   const AvatarProfile = useMemo(
     () => dynamic(() => import("./AvatarProfile"), { ssr: false }),
     [img],
@@ -38,7 +41,7 @@ export default function UserInfo({
   };
   const ProfileNameDynamic = useMemo(
     () => dynamic(() => Promise.resolve(ProfileName)),
-    [userData.firstName, userData.middleName, userData.lastName],
+    [userData.firstName , userData.middleName , userData.lastName ],
   );
   // const ProfileNameDynamic = dynamic(() => Promise.resolve(ProfileName))
   return (
