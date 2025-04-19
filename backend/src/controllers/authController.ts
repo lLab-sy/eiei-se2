@@ -41,11 +41,12 @@ class AuthController{
                 return;
             }
             sendResponse(res, 'success', user, 'Register successful.');
-        } catch (err) {
-            // console.error("Error in registerUser:", err);       
-            const errorMessage = (err as Error).message || "Internal server error.";
-    
-            sendResponse(res, 'error', err, errorMessage);
+        } catch (error: any) {
+            if (error.message === 'Internal server error') {
+              sendResponse(res, 'error', null, 'Internal server error', 500);
+              return
+            }
+            sendResponse(res, 'error', null, error.message);
         }
     };
 
@@ -66,10 +67,12 @@ class AuthController{
                 sameSite: 'strict', // protect CSRF attacks
             });
             sendResponse(res, 'success', result, 'Login successful');
-        } catch (err) {
-            const errorMessage = (err as Error).message || "Internal server error.";
-            
-            sendResponse(res, 'error', null, errorMessage);
+        } catch (error: any) {
+            if (error.message === 'Internal server error') {
+              sendResponse(res, 'error', null, 'Internal server error', 500);
+              return
+            }
+            sendResponse(res, 'error', null, error.message);
         }
     };
 
@@ -77,11 +80,13 @@ class AuthController{
         try{
             const user = await authService.getMe(req.user.userId, req.user.role);
             sendResponse(res, 'success', user, 'Get User successful.');
-        }catch(err){
-            const errorMessage = (err as Error).message || "Internal server error.";
-            
-            sendResponse(res, 'error', null, errorMessage);
-        };
+        } catch (error: any) {
+            if (error.message === 'Internal server error') {
+              sendResponse(res, 'error', null, 'Internal server error', 500);
+              return
+            }
+            sendResponse(res, 'error', null, error.message);
+        }
     }
 
     async logoutUser(req: Request, res: Response): Promise<void>{
