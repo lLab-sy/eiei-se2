@@ -80,7 +80,7 @@ export interface IProductionProfessional extends IUser {
   skill?: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
   experience?: number; // Years of experience
   rating?: Array<Rating>;
-  bankAccount?: IBankAccount;
+  //bankAccount?: IBankAccount;
 }
 
 // export const BankAccountSchema = new Schema<IBankAccount>({
@@ -225,10 +225,10 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
       default: Date.now, // Automatically sets the current timestamp when the review is created
     },
   }],
-  bankAccount: {
-    type: bankAccountSchema,
-    required: false,
-  },
+  // bankAccount: {
+  //   type: bankAccountSchema,
+  //   required: false,
+  // },
 });
 
 // for full-text search

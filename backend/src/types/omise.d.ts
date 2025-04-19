@@ -37,7 +37,7 @@ declare module 'omise' {
     amount: number;
     currency: string;
     recipient: string;
-    status: string; // e.g., 'paid', 'failed'
+    paid: boolean; // e.g., 'paid', 'failed'
     created: string;
   }
 
@@ -49,6 +49,7 @@ declare module 'omise' {
       brand: string;
       number: string;
       name: string;
+      last_digits: string;
     } | string; // หรือ token ก็ได้
   }
 
