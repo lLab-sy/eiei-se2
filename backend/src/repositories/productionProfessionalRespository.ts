@@ -138,6 +138,10 @@ class ProductionProfessionalRespository {
         }
     }
 
+    async getById(id: string): Promise<IProductionProfessional | null> {
+        return await ProductionProfessional.findById(id);
+    }
+
 }
 
-export default new ProductionProfessionalRespository()
+export default new ProductionProfessionalRespository();

@@ -159,6 +159,7 @@ export interface Professional{
     avgRating: number;
     description?: string;
     imageUrl?: string;
+    profileImage: string;
 }
 
 export interface MetaData{

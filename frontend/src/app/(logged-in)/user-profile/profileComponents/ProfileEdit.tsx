@@ -30,12 +30,13 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import styles from "../animation.module.css";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, use, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { z } from "zod";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import ProfessionalBillingInfo from "./ProfessionalBillingInfo";
+import ProfessionalTransaction from "./ProfessionalTransaction";
 import {
   Command,
   CommandEmpty,
@@ -44,6 +45,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { get } from "http";
+import getProfessionalTransactions from "@/libs/getProfessionalTransactions";
+import { set } from "react-hook-form";
+import postProfessionalTransfer from "@/libs/postProfesstionalTransfer";
+import getBankAccount from "@/libs/getBankAccount";
+import postCustomerTransfer from "@/libs/postCustomerTransfer";
 const CardSchema = z.object({
   nameOnCard: z.string().min(1, "Name on card is required"),
   cardNumber: z
@@ -71,11 +78,27 @@ export interface CardInterface {
   expiration_year: string;
   last_digits: string;
 }
-export interface BookBankInterface {
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
+export interface BankAccountResponse {
+  brand: string,
+  name: string,
+  bankLastDigits: string,
+  number: string,
+  recipientId: string
 }
+export interface TransactionResponse {
+  _id: string,
+  postName: string,
+  endDate: string,
+  offer: [
+      {
+          price: number,
+          createdAt: string
+      }
+  ]
+  isTransferable: boolean
+}
+
+
 function formatCardNumber(value: string) {
   // Remove non-digits
   const digitsOnly = value.replace(/\D/g, "");
@@ -86,7 +109,7 @@ function formatCardNumber(value: string) {
   return formatted;
 }
 
-interface TransactionInterface {
+export interface TransactionInterface {
   amount: number;
   currency: string;
   userId: string;
@@ -117,7 +140,16 @@ const FourthPageEdit = ({
   setRoleSearch: Function;
   token: string;
 }) => {
+
   const [transactions, setTransactions] = useState<TransactionInterface[]>([]);
+  const [bankAccount, setBankAccount] = useState<BankAccountResponse | null>(null);
+  const [professionalTransactions, setProfessionalTransactions] = useState<TransactionResponse[]>([]);
+
+  const handleRequestTransfer = async (postID: string, amount: number) => {
+    const res = await postProfessionalTransfer(postID, amount, token);
+    console.log("transfer status", res);
+  }
+
   useEffect(() => {
     const handleFetchTransactions = async () => {
       const res = await axios.get(
@@ -133,74 +165,98 @@ const FourthPageEdit = ({
       console.log("res transactions", res);
       setTransactions(res.data?.data ?? []);
     };
+
+    const handleProfesstionalTransaction = async () => {
+      const res = await getProfessionalTransactions(token);
+      setProfessionalTransactions(res ?? []);
+    }
     handleFetchTransactions();
+    if(role === "production professional"){
+      handleProfesstionalTransaction();
+    }
+    
   }, []);
+
+  if(role === "producer"){
   return (
-    <div
-      className={`${click == 3 ? "" : "hidden"} w-full flex  flex-col justify-start h-full`}
-    >
-      <div className="mt-2 h-full w-full flex flex-col justify-between ">
-        <div className="h-[10%] text-xl font-bold">Transaction History</div>
-        <div className="w-full h-[90%]">
-          <Command className="flex flex-col items-center w-full h-[100%]">
-            <div className="flex h-[15%] w-[100%] gap-4 pt-2">
-              <CommandInput
-                className="h-[50px] w-full"
-                placeholder="Search Project Name"
-              />
-              <CommandEmpty>No results found.</CommandEmpty>
-            </div>
-            <CommandList className="h-full w-full">
-              <div className="h-[85%] w-[100%] flex flex-col">
-                <div className="w-full bg-mainblue-lightest  text-white h-[50px] rounded-xl flex justify-around items-center">
-                  <div className="w-[30%] flex justify-center">
-                    <span className="w-full">Date</span>
-                  </div>
-                  <div className="w-[30%] flex justify-center">
-                    <span>Project</span>
-                  </div>
-                  <div className="w-[30%] flex justify-center">
-                    <span>Amount (THB)</span>
-                  </div>
-                </div>
-                <div
-                  className="h-[60%] overflow-y-scroll"
-                  style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
-                >
-                  <CommandGroup>
-                    {transactions.map((transaction, index) => {
-                      const isoDate = transaction.createdAt;
-                      const date = new Date(isoDate);
-                      const formattedDate = date
-                        .toLocaleDateString("en-GB")
-                        .replace(/\//g, "-");
-                      return (
-                        <CommandItem
-                          key={index}
-                          className="w-full h-[60px] rounded-xl flex justify-around items-center"
-                          value={transaction.postId.postName}
-                        >
-                          <div className="w-[33%] flex justify-center">
-                            <span className="w-full">{formattedDate}</span>
-                          </div>
-                          <div className="w-[33%] flex justify-center">
-                            <span>{transaction.postId.postName}</span>
-                          </div>
-                          <div className="w-[33%] flex justify-center">
-                            <span>{transaction.amount}</span>
-                          </div>
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                </div>
+      <div
+        className={`${click == 3 ? "" : "hidden"} w-full flex  flex-col justify-start h-full`}
+      >
+        <div className="mt-2 h-full w-full flex flex-col justify-between ">
+          <div className="h-[10%] text-xl font-bold">Transaction History</div>
+          <div className="w-full h-[90%]">
+            <Command className="flex flex-col items-center w-full h-[100%]">
+              <div className="flex h-[15%] w-[100%] gap-4 pt-2">
+                <CommandInput
+                  className="h-[50px] w-full"
+                  placeholder="Search Project Name"
+                />
+                <CommandEmpty>No results found.</CommandEmpty>
               </div>
-            </CommandList>
-          </Command>
+              <CommandList className="h-full w-full">
+                <div className="h-[85%] w-[100%] flex flex-col">
+                  <div className="w-full bg-mainblue-lightest  text-white h-[50px] rounded-xl flex justify-around items-center">
+                    <div className="w-[30%] flex justify-center">
+                      <span className="w-full">Date</span>
+                    </div>
+                    <div className="w-[30%] flex justify-center">
+                      <span>Project</span>
+                    </div>
+                    <div className="w-[30%] flex justify-center">
+                      <span>Amount (THB)</span>
+                    </div>
+                  </div>
+                  <div
+                    className="h-[60%] overflow-y-scroll"
+                    style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
+                  >
+                    <CommandGroup>
+                      {transactions && transactions.map((transaction, index) => {
+                        const isoDate = transaction.createdAt;
+                        const date = new Date(isoDate);
+                        const formattedDate = date
+                          .toLocaleDateString("en-GB")
+                          .replace(/\//g, "-");
+                        return (
+                          <CommandItem
+                            key={index}
+                            className="w-full h-[60px] rounded-xl flex justify-around items-center"
+                            value={transaction.postId.postName}
+                          >
+                            <div className="w-[33%] flex justify-center">
+                              <span className="w-full">{formattedDate}</span>
+                            </div>
+                            <div className="w-[33%] flex justify-center">
+                              <span>{transaction.postId.postName}</span>
+                            </div>
+                            <div className="w-[33%] flex justify-center">
+                              <span>{transaction.amount}</span>
+                            </div>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </div>
+                </div>
+              </CommandList>
+            </Command>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }else{
+    return (
+      <div
+        className={`${click == 3 ? "" : "hidden"} w-full flex  flex-col justify-start h-full`}
+      >
+        <ProfessionalTransaction
+          transactionsData={professionalTransactions || []}
+          handleRequestTransfer={handleRequestTransfer}>
+        </ProfessionalTransaction>
+      </div>
+    );
+  }
+  
 };
 const AddNewCardDialog = ({
   email,
@@ -482,10 +538,37 @@ export default function ProfileEdit({
   const { data: session } = useSession();
   const [refreshKey, setRefreshKey] = useState(false);
 
-  const [bookbank, setBookBank] = useState<BookBankInterface | null>(null);
-  const handleSubmitBookBank = (bankInfo: BookBankInterface) => {
-    setBookBank(bankInfo);
-    console.log("Form submitted:", bankInfo);
+  // For Production Professional
+  const userID = session?.user.id ?? "";
+  const token = session?.user.token ?? "";
+  const [bankAccount, setBankAccount] = useState<BankAccountResponse | null>(null);
+  const handleFetchBankAccount = async () => {
+    const res = await getBankAccount(userID, token);
+    setBankAccount(res ?? null);
+  }
+  useEffect(() => {
+    handleFetchBankAccount();
+  }, [userID, token, refreshKey]);
+
+  const handleSubmitBookBank = (value: string, name: string, number: string) => {
+    setBankAccount({
+      brand: value,
+      name: name,
+      number: number,
+      bankLastDigits: number.slice(-4),
+      recipientId: bankAccount?.recipientId ?? "",
+    });
+    console.log("Form submitted:", value, name, number);
+
+    const res = postCustomerTransfer({
+      fullName: name,
+      bankAccount: {
+        name: name,
+        number: number,
+        brand: value,
+      },
+    }, token);
+    console.log("Response from postCustomerTransfer:", res);
   };
 
   useEffect(() => {
@@ -865,7 +948,7 @@ export default function ProfileEdit({
             </div>
           ) : (
             <ProfessionalBillingInfo
-              bankInfo={bookbank || null}
+              bankInfo={bankAccount || null}
               handleSubmit={handleSubmitBookBank}
             ></ProfessionalBillingInfo>
           )}
@@ -931,7 +1014,28 @@ export default function ProfileEdit({
             </FormItem>
           )}
         />
+
+        <div
+          className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
+        >
+          <Button
+            className={`${isEdit ? "" : "hidden"}  w-[40%] lg:w-[30%] text-white bg-green-400 hover:bg-green-500`}
+            type="submit"
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
+            Update Info
+          </Button>
+          <Button
+            variant={`${isEdit ? "destructive" : "default"}`}
+            type="reset"
+            onClick={() => setIsEdit(!isEdit)}
+            className={`${isEdit ? "w-[40%] lg:w-[30%]" : "w-full"} lg:w-[30%]`}
+          >
+            {isEdit ? "Cancel" : "Edit"}
+          </Button>
+        </div>
       </div>
+      
     );
   };
   const [projectName, setProjectName] = useState("");

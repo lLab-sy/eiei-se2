@@ -61,14 +61,14 @@ const ProfessionalDetail = () => {
     email: dataResponse.email || "N/A",
     phoneNumber: dataResponse.phoneNumber || "N/A",
     gender: dataResponse.gender || "N/A",
-    profileImage: dataResponse.imageUrl,
+    profileImage: dataResponse.profileImage || 'image/logo-preview.webp',
     description: dataResponse.description || "",
     occupation: dataResponse.occupation || "",
     skill: dataResponse.skill || [],
     experience: dataResponse.experience || 0.0,
     rating: dataResponse.rating || 0.0,
     avgRating: dataResponse.avgRating || 0.0,
-    username: dataResponse.username
+    username: dataResponse.username,
   };
 
   return (
@@ -81,37 +81,42 @@ const ProfessionalDetail = () => {
 
         <CardContent className="space-y-6">
           {/* Image Carousel */}
-          <div className="w-full flex justify-center">
-            <Carousel className="rounded-lg shadow-md bg-gray-50 p-2">
-              <CarouselContent>
-                {ProfessionalInfo.profileImage ? (
-                    <CarouselItem key={JSON.stringify(ProfessionalInfo.profileImage)} className="flex justify-center">
-                      <Image
-                        src={JSON.stringify(ProfessionalInfo.profileImage)}
-                        alt="Project Image"
-                        width={300}
-                        height={300}
-                        className="rounded-lg object-cover shadow-sm"
-                        priority
-                      />
-                    </CarouselItem>
-                ) : (
-                  <CarouselItem className="flex justify-center">
-                    <Image
-                      src="/image/logo.png"
-                      alt="Default Project Image"
-                      width={300}
-                      height={300}
-                      className="rounded-lg object-cover shadow-sm"
-                      priority
-                    />
-                  </CarouselItem>
-                )}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          </div>
+                    <div className="w-full flex justify-center">
+                       <Carousel className="w-full">
+                              <CarouselContent>
+                              {(ProfessionalInfo.profileImage && ProfessionalInfo.profileImage.length != 0) ? (
+
+                              <CarouselItem key={ProfessionalInfo.profileImage} className="flex justify-center">
+                                <Card className="relative w-full aspect-video">
+                                  <Image
+                                    src={ProfessionalInfo.profileImage}//imgSrc}
+                                    alt="Project Image"
+                                    // width={300}
+                                    // height={300}
+                                    fill
+                                    className="rounded-lg object-cover shadow-sm"
+                                    priority
+                                  />
+                                </Card>
+                              </CarouselItem>
+                            
+                          ) : (
+                            <CarouselItem className="flex justify-center">
+                              <Image
+                                src="/image/logo.png"
+                                alt="Default Project Image"
+                                width={300}
+                                height={300}
+                                className="rounded-lg object-cover shadow-sm"
+                                priority
+                              />
+                            </CarouselItem>
+                          )}
+                              </CarouselContent>
+                              <CarouselPrevious className="left-2" />
+                              <CarouselNext className="right-2" />
+                            </Carousel>
+                    </div>
 
           {/* Professional Info */}
           <div className="w-full text-center space-y-3">

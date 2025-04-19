@@ -1,20 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { BookBankInterface } from "./ProfileEdit";
+import { useEffect, useState } from "react";
+import postCustomerTransfer from "@/libs/postCustomerTransfer";
+import { useSession } from "next-auth/react";
+import { BankAccountResponse } from "./ProfileEdit";
+import { set } from "react-hook-form";
 
 export default function ProfessionalBillingInfo({
     bankInfo,
     handleSubmit,
   }: {
-    bankInfo: BookBankInterface | null;
-    handleSubmit: (bankInfo : BookBankInterface) => void;
+    bankInfo: BankAccountResponse | null;
+    handleSubmit: (value: string, name: string, number: string) => void;
   }){
 
     const [isEditing, setIsEditing] = useState(false);
-    const [bankName, setBankName] = useState(bankInfo?.bankName || "");
-    const [accountHolder, setAccountHolder] = useState(bankInfo?.accountHolder || "");
-    const [accountNumber, setAccountNumber] = useState(bankInfo?.accountNumber || "");
+    const [bankName, setBankName] = useState(bankInfo?.brand || "");
+    const [accountHolder, setAccountHolder] = useState(bankInfo?.name || "");
+    const [accountNumber, setAccountNumber] = useState(bankInfo?.number || "");
+    const [lastDigits, setLastDigits] = useState(bankInfo?.bankLastDigits || "");
+
+    useEffect(() => {
+        if (bankInfo) {
+            setBankName(bankOptions.find((option) => option.label === bankInfo.brand)?.brand || "");
+            setAccountHolder(bankInfo.name || "");
+            setAccountNumber(bankInfo.number || "");
+            setLastDigits(bankInfo.bankLastDigits || "");
+        }
+    }
+    , [bankInfo]);
+
+    const { data: session } = useSession();
+    const token = session?.user.token;
 
     const checkValid = () => {
         if (!bankName) {
@@ -27,7 +44,7 @@ export default function ProfessionalBillingInfo({
             return false;
         }
   
-        if (!accountNumber.trim() || !/^\d{10}$/.test(accountNumber)) {
+        if (accountNumber && !accountNumber.trim() || !/^\d{10}$/.test(accountNumber)) {
            // alert("Please enter a valid 10-digit account number.");
             return false;
         }
@@ -35,7 +52,7 @@ export default function ProfessionalBillingInfo({
         return true;
     }
 
-    const handleEdit = () => {  
+    const handleEdit = async () => {  
         // Handle form submission logic here
         toast({
             variant: "default",
@@ -43,29 +60,36 @@ export default function ProfessionalBillingInfo({
             description: "Your bank details have been updated.",
         });
 
-         handleSubmit({
-            bankName: bankName,
-            accountHolder: accountHolder,
-            accountNumber: accountNumber,
-        });
+        handleSubmit(bankName, accountHolder, accountNumber);
         setIsEditing(!isEditing);
+
+        const response = await postCustomerTransfer({
+            fullName: accountHolder,
+            bankAccount: {
+                name: accountHolder,
+                number: accountNumber,
+                brand: bankName,
+            }
+            }, token || "");
+        console.log("Response from postCustomerTransfer:", response);
     };
 
     const bankOptions = [
-        { value: "bank1", label: "Krungsri" },
-        { value: "bank2", label: "Kasikorn" },
-        { value: "bank3", label: "Siam Commercial" },
-        { value: "bank4", label: "Bangkok Bank" },
-        { value: "bank5", label: "TMBThanachart" },
-        { value: "bank6", label: "Krung Thai" },
-        { value: "bank7", label: "Government Savings Bank (Aomsin)" },
-        { value: "bank8", label: "UOB" },
-        { value: "bank9", label: "CIMB Thai" },
-        { value: "bank10", label: "Kiatnakin Phatra" },
-        { value: "bank11", label: "TISCO" },
-        { value: "bank12", label: "Thanachart Bank" },
-        { value: "bank13", label: "Bank of Ayudhya" },
+        { brand: "kbank", label: "Kasikorn Bank" }, // Matches Omise's "kbank"
+        { brand: "scb", label: "Siam Commercial Bank" }, // Matches Omise's "scb"
+        { brand: "bbl", label: "Bangkok Bank" }, // Matches Omise's "bbl"
+        { brand: "ktb", label: "Krung Thai Bank" }, // Matches Omise's "ktb"
+        { brand: "bay", label: "Bank of Ayudhya (Krungsri)" }, // Matches Omise's "bay"
+        { brand: "gsb", label: "Government Savings Bank (Aomsin)" }, // Matches Omise's "gsb"
+        { brand: "tmb", label: "TMBThanachart Bank" }, // Matches Omise's "tmb"
+        { brand: "uob", label: "United Overseas Bank (UOB)" }, // Matches Omise's "uob"
+        { brand: "kkp", label: "Kiatnakin Phatra Bank" }, // Matches Omise's "kkp"
+        { brand: "tisco", label: "TISCO Bank" }, // Matches Omise's "tisco"
     ];
+
+    function handleSubmitBankName(value: string): void {
+        setBankName(bankOptions.find((option) => option.label === value)?.brand || "");
+    }
 
     return (
         <div>
@@ -73,17 +97,18 @@ export default function ProfessionalBillingInfo({
 
             <label className="block text-sm font-medium mb-1">Bank Name</label>
             <select
-                value={bankName}
-                onChange={(e) => setBankName(e.target.value)}
+                value={bankName ? bankOptions.find((option) => option.brand === bankName)?.label || "" : ""}
+                onChange={(e) => handleSubmitBankName(e.target.value)}
                 className="w-full mb-4 px-3 py-2 border rounded-md"
                 disabled={!isEditing}
             >
-                {!bankName ? <option value="">Choose Bank</option> : <option value={bankName}>{bankOptions.find(option => option.value === bankName)?.label}</option>}
+                <option value="" disabled={!bankName}>
+                    {bankName ? bankOptions.find((option) => option.brand === bankName)?.label || "Choose Bank" : "Choose Bank"}
+                </option>
                 {bankOptions.map((option) => (
-                    (option.value !== bankName) ?
-                    <option key={option.value} value={option.value}>
+                    <option key={option.brand} value={option.label}>
                         {option.label}
-                    </option> : null
+                    </option>
                 ))}
             </select>
 
@@ -104,11 +129,11 @@ export default function ProfessionalBillingInfo({
                 type="text"
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value)}
-                placeholder={isEditing ? "1234567890" : accountNumber}
+                placeholder={isEditing ? ("******" + lastDigits) : accountNumber ? accountNumber : "******" + lastDigits}
                 className="w-full mb-2 px-3 py-2 border rounded-md"
                 disabled={!isEditing}
             />
-            {!/^\d{10}$/.test(accountNumber) && accountNumber.length != 0 && isEditing && (
+            {accountNumber && !/^\d{10}$/.test(accountNumber) && accountNumber.length != 0 && isEditing && (
                 <p className="text-red-500 text-sm">Please enter a valid 10-digit account number.</p>
             )}
 

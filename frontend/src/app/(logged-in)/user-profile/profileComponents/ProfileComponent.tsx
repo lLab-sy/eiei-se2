@@ -234,7 +234,6 @@ export default function ProfileComponent() {
 //   const ProfileEdit = useMemo(() => dynamic(() => import("./ProfileEdit"), { ssr: false }), [])
 //   const ReviewProfile = useMemo(() => dynamic(() => import("./ReviewProfile"), { ssr: false }), [])
  
-
   return (
     <main className="h-[100vh] lg:min-h-screen flex bg-mainblue-light relative lg:items-center lg:justify-center">
       <ArrowLeft

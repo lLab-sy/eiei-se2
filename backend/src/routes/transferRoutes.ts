@@ -1,5 +1,7 @@
 import express from 'express';
-
+import AuthMiddleware from '../middlewares/authMiddleware'
+import { RequestHandler } from '@nestjs/common/interfaces';
+import transferController from '../controllers/transferController'
 const router = express.Router();
 
 /**
@@ -22,7 +24,7 @@ const router = express.Router();
  *       200:
  *         description: Customer created
  */
-router.post('/create-customer');
+router.post('/create-customer', AuthMiddleware.authenticate as RequestHandler, transferController.createCustomer as RequestHandler);
 
 /**
  * @openapi
@@ -46,7 +48,7 @@ router.post('/create-customer');
  *       200:
  *         description: Bank account added
  */
-router.post('/add-bank-account');
+router.post('/add-bank-account', AuthMiddleware.authenticate as RequestHandler, transferController.addBankAccount as RequestHandler);
 
 /**
  * @openapi
@@ -70,7 +72,7 @@ router.post('/add-bank-account');
  *       200:
  *         description: Transfer successful
  */
-router.post('/transfer');
+router.post('/transfer', AuthMiddleware.authenticate as RequestHandler, transferController.transfer as RequestHandler);
 // we can get userId from token (auth middleware), but in this still okay
 // we can get amount from postId 
 
@@ -91,7 +93,7 @@ router.post('/transfer');
  *       200:
  *         description: List of bank accounts
  */
-router.get('/bank-accounts/:userId');
+router.get('/bank-accounts/:userId', AuthMiddleware.authenticate as RequestHandler, transferController.getBankAccount as RequestHandler);
 
 /**
  * @openapi
@@ -104,7 +106,7 @@ router.get('/bank-accounts/:userId');
  *       200:
  *         description: List of transactions
  */
-router.get('/transactions');
+router.get('/transactions', AuthMiddleware.authenticate as RequestHandler, transferController.getTransactions as RequestHandler);
 // userId from token
 
 export default router;
