@@ -79,7 +79,8 @@ class transferController {
 
     async transfer(req: AuthRequest, res: Response): Promise<void> {
         try {
-            const { postId } = req.body;
+
+            const { postId, amount } = req.body;
             const userId = req.user.userId;
 
             if (!postId || !userId) {
@@ -87,7 +88,7 @@ class transferController {
                 return;
             }
 
-            const result = await transferService.transferToBank({ userId, postId });
+            const result = await transferService.transferToBank({ userId, postId, amount });
 
             sendResponse(res, 'success', result, 'Transfer successful');
         } catch (err) {

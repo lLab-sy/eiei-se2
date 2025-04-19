@@ -150,19 +150,6 @@ export default function ProducerWorkingCard({
                 </div>
               </div>
               <hr className="my-3" />
-              <p className="mt-2"><strong>Offered Price:</strong> <span className="font-bold">{offer.amount} THB</span></p>
-              <p><strong>Start Date:</strong> {offer.startDate.toString()}</p>
-              <p><strong>Status:</strong> <span className={`font-semibold ${
-                  offer.status === "Rejected" ? "text-mainred-light" : 
-                  offer.status === "Pending" ? "text-mainyellow" : 
-                  offer.status === "Completed" ? "text-green-500" : "text-gray-500"
-              }`}>{offer.status}</span></p>
-              <p className="mt-2"><strong>Description</strong></p>
-              <div className="mt-1 p-3 bg-gray-100 border rounded-md text-sm overflow-auto break-words">
-                {offer.description}
-              </div>
-            </div>
-            <hr className="my-3" />
             <p className="mt-2"><strong>Offered Price:</strong> <span className="font-bold">{offer.amount} THB</span></p>
             <p><strong>Start Date:</strong> {new Date(offer.startDate).toLocaleString("en-US", {
                 year: "numeric",
@@ -179,6 +166,22 @@ export default function ProducerWorkingCard({
             <div className="mt-1 p-3 bg-gray-100 border rounded-md text-sm">
               {offer.description}
             </div>
+            </div>
+          </div>
+          <div className="flex justify-between p-4">
+            {offerStatus === "Pending" && 
+              <Button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleReject}>
+                Reject Offer
+              </Button>}
+            {offerStatus === "Pending" && 
+              <Button className="bg-mainblue-light text-white px-4 py-2 rounded" onClick={handleCounter}>
+                Counter Offer
+              </Button>}
+            {offerStatus === "Pending" && 
+              <Button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleConfirm}
+              disabled={fromWho === "Producer"}>
+                Confirm Offer
+              </Button>}
           </div>
           <DialogHeader>
             <DialogTitle>

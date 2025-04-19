@@ -79,7 +79,7 @@ class paymentController{
             sendResponse(res, 'success', transactions, "Successfully get transactions")
             }catch(err){
                 console.log(err)
-                sendResponse(res, 'error', 'Failed to get transactions')
+                sendResponse(res, 'error', null,'Failed to get transactions')
         }
     }
 }

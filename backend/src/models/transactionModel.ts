@@ -10,6 +10,18 @@ export interface ITransaction extends Document {
     transactionType: 'charge' | 'transfer',
     createdAt: Date,
 }
+
+export interface ITransactionResponse {
+    _id: mongoose.Schema.Types.ObjectId,
+    postName: string,
+    offer: [
+        {
+            price: number,
+            createdAt: Date
+        }
+    ]
+    isTransferable: boolean,
+}
 const transactionSchema = new Schema<ITransaction>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,38 +1,52 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Transaction } from "./ProfileEdit";
+import { useEffect, useState } from "react";
+import { TransactionResponse } from "./ProfileEdit";
+import { mock } from "node:test";
+import { off } from "process";
   
 export default function ProfessionalTransaction({
     transactionsData,
     handleRequestTransfer,
   }: {
-    transactionsData: Transaction[],
-    handleRequestTransfer: (transaction: Transaction) => void;
+    transactionsData: TransactionResponse[],
+    handleRequestTransfer: (postID: string, amount: number) => void;
 }) {
-    const [transactions, setTransactions] = useState(transactionsData);
-    const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+    
+    const [transactions, setTransactions] = useState<TransactionResponse[]>(transactionsData || []);
+    const [selectedTx, setSelectedTx] = useState<TransactionResponse | null>(null);
+
+    useEffect(() => {
+      setTransactions(transactionsData);
+    }
+    , [transactionsData]);
   
     const handleConfirm = () => {
       if (selectedTx) {
         const updated = transactions.map(tx =>
-          tx === selectedTx ? { ...tx, transferred: true } : tx
+          tx === selectedTx ? { ...tx, isTransferable: false } : tx
         );
-        handleRequestTransfer(selectedTx); // Call the transfer function
+        handleRequestTransfer(selectedTx._id, getAmount(selectedTx)); // Call the transfer function
         setTransactions(updated);
         setSelectedTx(null); // Close modal
         toast({
           variant: "default",
           title: "Success",
-          description: `A request for the payment of ฿${selectedTx.amount.toFixed(2)} for the project "${selectedTx.project}" has been submitted.`,
+          description: `A request for the payment of ฿${getAmount(selectedTx)} for the project "${selectedTx.postName}" has been submitted.`,
         });
       }
     };
-  
+
+    const getAmount = (tx: TransactionResponse) => {
+      //sort offer by createdAt date and get the first one
+      const sortedOffer = tx.offer.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return sortedOffer[0].price;
+    };
+
     const handleCancel = () => {
       setSelectedTx(null); // Close modal
     };
-  
+
     return (
       <div>
         <h1 className="text-l font-bold mb-4 mt-2">Transaction History</h1>
@@ -51,19 +65,19 @@ export default function ProfessionalTransaction({
               <tbody className="bg-white text-gray-800">
                 {transactions.map((tx, idx) => (
                   <tr key={idx} className="border-t">
-                    <td className="px-4 py-2">{tx.date}</td>
-                    <td className="px-4 py-2">{tx.project}</td>
-                    <td className="px-4 py-2">{tx.amount}</td>
+                    <td className="px-4 py-2">{tx.endDate}</td>
+                    <td className="px-4 py-2">{tx.postName}</td>
+                    <td className="px-4 py-2">{getAmount(tx)}</td>
                     <td className="px-4 py-2">
                       <Button
                         onClick={() => setSelectedTx(tx)}
                         type="reset"
                         className={`px-4 py-1 rounded-md font-medium ${
-                          !tx.transferred
+                          tx.isTransferable
                             ? "bg-green-500 text-white"
                             : "bg-gray-300 text-gray-600 cursor-not-allowed"
                         }`}
-                        disabled={tx.transferred}
+                        disabled={!tx.isTransferable}
                       >
                         Transfer
                       </Button>
@@ -81,9 +95,9 @@ export default function ProfessionalTransaction({
             <div className="bg-white rounded-md shadow-lg p-6 max-w-md w-full">
               <h2 className="text-xl font-bold mb-4">Transfer Confirmation</h2>
               <p className="mb-2">
-                The payment of <strong>฿{selectedTx.amount.toFixed(2)}</strong> for project
+                The payment of <strong>฿{getAmount(selectedTx)}</strong> for project
                 <br />
-                <strong>"{selectedTx.project}"</strong> will be transferred to your registered bank account.
+                <strong>"{selectedTx.postName}"</strong> will be transferred to your registered bank account.
               </p>
               <div className="bg-yellow-100 text-yellow-800 p-3 rounded mb-4 text-sm">
                 Please confirm this transaction. The transfer process typically takes 1-2 business days.
@@ -108,3 +122,4 @@ export default function ProfessionalTransaction({
       </div>
     );
 }
+

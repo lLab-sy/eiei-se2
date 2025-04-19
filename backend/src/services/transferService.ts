@@ -1,7 +1,7 @@
 import omise from '../config/omise';
 import userRepository from '../repositories/userRepository';
 import transactionRepository from '../repositories/transactionRepository';
-import { addBankAccountRequestModel, transferRequestModel, ITransaction, addBankAccountResponseModel, transferResponseModel } from '../models/transactionModel';
+import { addBankAccountRequestModel, transferRequestModel, ITransaction, addBankAccountResponseModel, transferResponseModel, ITransactionResponse } from '../models/transactionModel';
 import { IProductionProfessional, IUser } from '../models/userModel';
 import Transaction from '../models/transactionModel';
 import productionProfessionalRepository from '../repositories/productionProfessionalRespository';
@@ -20,6 +20,7 @@ import postRepository from '../repositories/postRepository';
 interface TransferRequestModel {
     userId: string;
     postId: string;
+    amount: number;
 }
 
 
@@ -38,6 +39,7 @@ export interface IOmiseBankAccount {
     bankLastDigits: string;
     brand: string;
     name?: string;
+    number: string;
 }
 
 interface CreateRecipientInput {
@@ -129,7 +131,7 @@ class transferService {
         const post = await postRepository.getPost(data.postId);
         if (!post) throw new Error('Post not found');
         //const amount = 1500; // สมมติชั่วคราว
-        const amount = await postRepository.getOneCandidatePrice(data.postId, data.userId);
+        const amount = data.amount; // ใช้ amount ที่ส่งมาจาก client
         if (!amount) throw new Error('Amount not found');
         const currency = 'thb';
 
@@ -139,9 +141,10 @@ class transferService {
             recipient: user.omiseCustomerId,
         });
 
-        if (!transfer.paid) {
-            throw new Error(`Transfer failed: ${transfer.paid}`);
-        }
+        // console.log("Transfer response:", transfer);
+        // if (!transfer.paid) {
+        //     throw new Error(`Transfer failed: ${transfer.paid}`);
+        // }
 
         // ✅ บันทึก transaction
         const transaction = new Transaction({
@@ -178,16 +181,17 @@ class transferService {
             brand: recipient.bank_account.brand,
             name: recipient.bank_account.name,
             bankLastDigits: recipient.bank_account.last_digits,
+            number: recipient.bank_account.number,
             recipientId: recipient.id,
         };
     }
 
-    async getTransactions(userId: string): Promise<ITransaction[]> {
+    async getTransactions(userId: string): Promise<ITransactionResponse[]> {
         try {
             const user = await userRepository.getUserByID(userId);
             if (!user || !user.omiseCustomerId) throw new Error('Invalid user');
 
-            return await transactionRepository.getTransactions(userId);
+            return await transactionRepository.getProfessionalTransactions(userId);
         } catch (err) {
             console.error("Error in transferService.getTransactions:", err);
             throw new Error("Failed to retrieve transactions: " + (err as Error).message);
