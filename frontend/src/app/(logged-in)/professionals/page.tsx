@@ -28,7 +28,6 @@ const ProfessionalsPage = () => {
     const fetchData=async()=>{
         
         var response;
-        console.log(requestPage + requestFilter);
         try{
           console.log("Getting Professionals...")
           response= await getProfessionals(requestPage + requestFilter)
@@ -88,7 +87,7 @@ const ProfessionalsPage = () => {
                 key={index}
                 title={professional.firstName ? (professional.firstName + " " + professional.lastName) : professional.username }
                 description={professional?.description ? (professional.description.length > 100 ? professional.description.slice(0, 100) : professional.description) : ""}
-                imageUrl={professional?.imageUrl || ""}
+                imageUrl={professional?.profileImage || ""}
                 skill={professional?.skill}
                 ratings={Number(professional?.avgRating) || 0}
                 occupation={professional?.occupation || ""}

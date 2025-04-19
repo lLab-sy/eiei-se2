@@ -34,7 +34,7 @@ const PostCard: React.FC<IPostCardProp> = ({
         <source
           srcSet={
             imageUrl === ""
-              ? "image/logo.webp"
+              ? "image/logo-preview.webp"
               : imageUrl.replace(/\.(jpg|png)$/, ".webp")
           }
           type="image/webp"
