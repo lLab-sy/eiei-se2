@@ -36,6 +36,7 @@ import { z } from "zod";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import ProfessionalBillingInfo from "./ProfessionalBillingInfo";
+import ProfessionalTransaction from "./ProfessionalTransaction";
 import {
   Command,
   CommandEmpty,
@@ -76,6 +77,12 @@ export interface BookBankInterface {
   accountHolder: string;
   accountNumber: string;
 }
+export interface Transaction{
+  date: string;
+  project: string;
+  amount: number;
+  transferred: boolean;
+};
 function formatCardNumber(value: string) {
   // Remove non-digits
   const digitsOnly = value.replace(/\D/g, "");
@@ -482,11 +489,43 @@ export default function ProfileEdit({
   const { data: session } = useSession();
   const [refreshKey, setRefreshKey] = useState(false);
 
+  // For Production Professional
   const [bookbank, setBookBank] = useState<BookBankInterface | null>(null);
   const handleSubmitBookBank = (bankInfo: BookBankInterface) => {
     setBookBank(bankInfo);
     console.log("Form submitted:", bankInfo);
   };
+
+  const transactionsData: Transaction[] = [
+      { date: "20-03-2025", project: "Project 4", amount: 100, transferred: false },
+      { date: "20-03-2025", project: "Project 3", amount: 50, transferred: true },
+      { date: "20-03-2025", project: "Project 2", amount: 30, transferred: true },
+      { date: "01-02-2025", project: "Project 1", amount: 20, transferred: true },
+      { date: "20-03-2025", project: "Project 4", amount: 100, transferred: false },
+      { date: "20-03-2025", project: "Project 3", amount: 50, transferred: true },
+      { date: "20-03-2025", project: "Project 2", amount: 30, transferred: true },
+      { date: "01-02-2025", project: "Project 1", amount: 20, transferred: true },
+      { date: "20-03-2025", project: "Project 4", amount: 100, transferred: false },
+      { date: "20-03-2025", project: "Project 3", amount: 50, transferred: true },
+      { date: "20-03-2025", project: "Project 2", amount: 30, transferred: true },
+      { date: "01-02-2025", project: "Project 1", amount: 20, transferred: true },
+      { date: "20-03-2025", project: "Project 4", amount: 100, transferred: false },
+      { date: "20-03-2025", project: "Project 3", amount: 50, transferred: true },
+      { date: "20-03-2025", project: "Project 2", amount: 30, transferred: true },
+      { date: "01-02-2025", project: "Project 1", amount: 20, transferred: true },
+      { date: "20-03-2025", project: "Project 4", amount: 100, transferred: false },
+      { date: "20-03-2025", project: "Project 3", amount: 50, transferred: true },
+      { date: "20-03-2025", project: "Project 2", amount: 30, transferred: true },
+      { date: "01-02-2025", project: "Project 1", amount: 20, transferred: true },
+  ];
+  const [transactions, setTransactions] = useState(transactionsData);
+  const handleRequestTransfer = (transaction: Transaction) => {
+    const updated = transactions.map(tx =>
+      tx === transaction ? { ...tx, transferred: true } : tx
+    );
+    setTransactions(updated);
+  };
+
 
   useEffect(() => {
     const handleFetchCards = async () => {
@@ -931,7 +970,28 @@ export default function ProfileEdit({
             </FormItem>
           )}
         />
+
+        <div
+          className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
+        >
+          <Button
+            className={`${isEdit ? "" : "hidden"}  w-[40%] lg:w-[30%] text-white bg-green-400 hover:bg-green-500`}
+            type="submit"
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
+            Update Info
+          </Button>
+          <Button
+            variant={`${isEdit ? "destructive" : "default"}`}
+            type="reset"
+            onClick={() => setIsEdit(!isEdit)}
+            className={`${isEdit ? "w-[40%] lg:w-[30%]" : "w-full"} lg:w-[30%]`}
+          >
+            {isEdit ? "Cancel" : "Edit"}
+          </Button>
+        </div>
       </div>
+      
     );
   };
   const [projectName, setProjectName] = useState("");
