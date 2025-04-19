@@ -36,11 +36,19 @@ import { z } from "zod";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import ProfessionalBillingInfo from "./ProfessionalBillingInfo";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 const CardSchema = z.object({
   nameOnCard: z.string().min(1, "Name on card is required"),
   cardNumber: z
     .string()
-    .refine((val) => /^\d{16}$/.test(val.replace(/\s/g, '')), {
+    .refine((val) => /^\d{16}$/.test(val.replace(/\s/g, "")), {
       message: "Card number must be 16 digits",
     }),
   exp_cvv: z.object({
@@ -63,20 +71,137 @@ export interface CardInterface {
   expiration_year: string;
   last_digits: string;
 }
-export interface BookBankInterface{
+export interface BookBankInterface {
   bankName: string;
   accountHolder: string;
   accountNumber: string;
 }
 function formatCardNumber(value: string) {
   // Remove non-digits
-  const digitsOnly = value.replace(/\D/g, '');
+  const digitsOnly = value.replace(/\D/g, "");
 
   // Group into 4-digit blocks
-  const formatted = digitsOnly.match(/.{1,4}/g)?.join(' ') ?? '';
+  const formatted = digitsOnly.match(/.{1,4}/g)?.join(" ") ?? "";
 
   return formatted;
 }
+
+interface TransactionInterface {
+  amount: number;
+  currency: string;
+  userId: string;
+  createdAt: string;
+  postId: {
+    postName: string;
+  };
+}
+
+const FourthPageEdit = ({
+  click,
+  role,
+  projectName,
+  setProjectName,
+  professionalName,
+  setProfessionalName,
+  roleSearch,
+  setRoleSearch,
+  token,
+}: {
+  click: number;
+  role: string;
+  projectName: string;
+  setProjectName: Function;
+  professionalName: string;
+  setProfessionalName: Function;
+  roleSearch: string;
+  setRoleSearch: Function;
+  token: string;
+}) => {
+  const [transactions, setTransactions] = useState<TransactionInterface[]>([]);
+  useEffect(() => {
+    const handleFetchTransactions = async () => {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/payment/transactions`,
+
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token ?? ""}`,
+          },
+        },
+      );
+      console.log("res transactions", res);
+      setTransactions(res.data?.data ?? []);
+    };
+    handleFetchTransactions();
+  }, []);
+  return (
+    <div
+      className={`${click == 3 ? "" : "hidden"} w-full flex  flex-col justify-start h-full`}
+    >
+      <div className="mt-2 h-full w-full flex flex-col justify-between ">
+        <div className="h-[10%] text-xl font-bold">Transaction History</div>
+        <div className="w-full h-[90%]">
+          <Command className="flex flex-col items-center w-full h-[100%]">
+            <div className="flex h-[15%] w-[100%] gap-4 pt-2">
+              <CommandInput
+                className="h-[50px] w-full"
+                placeholder="Search Project Name"
+              />
+              <CommandEmpty>No results found.</CommandEmpty>
+            </div>
+            <CommandList className="h-full w-full">
+              <div className="h-[85%] w-[100%] flex flex-col">
+                <div className="w-full bg-mainblue-lightest  text-white h-[50px] rounded-xl flex justify-around items-center">
+                  <div className="w-[30%] flex justify-center">
+                    <span className="w-full">Date</span>
+                  </div>
+                  <div className="w-[30%] flex justify-center">
+                    <span>Project</span>
+                  </div>
+                  <div className="w-[30%] flex justify-center">
+                    <span>Amount (THB)</span>
+                  </div>
+                </div>
+                <div
+                  className="h-[60%] overflow-y-scroll"
+                  style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
+                >
+                  <CommandGroup>
+                    {transactions.map((transaction, index) => {
+                      const isoDate = transaction.createdAt;
+                      const date = new Date(isoDate);
+                      const formattedDate = date
+                        .toLocaleDateString("en-GB")
+                        .replace(/\//g, "-");
+                      return (
+                        <CommandItem
+                          key={index}
+                          className="w-full h-[60px] rounded-xl flex justify-around items-center"
+                          value={transaction.postId.postName}
+                        >
+                          <div className="w-[33%] flex justify-center">
+                            <span className="w-full">{formattedDate}</span>
+                          </div>
+                          <div className="w-[33%] flex justify-center">
+                            <span>{transaction.postId.postName}</span>
+                          </div>
+                          <div className="w-[33%] flex justify-center">
+                            <span>{transaction.amount}</span>
+                          </div>
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                </div>
+              </div>
+            </CommandList>
+          </Command>
+        </div>
+      </div>
+    </div>
+  );
+};
 const AddNewCardDialog = ({
   email,
   refreshKey,
@@ -128,18 +253,20 @@ const AddNewCardDialog = ({
         cvv,
       },
     };
-    
+
     // Format the card number
-    const newCardNumber = cardNumber.replace(/\s/g, '');  // Remove spaces
-    
-    const data = CardSchema.safeParse({ ...rawData, cardNumber: newCardNumber });
+    const newCardNumber = cardNumber.replace(/\s/g, ""); // Remove spaces
+
+    const data = CardSchema.safeParse({
+      ...rawData,
+      cardNumber: newCardNumber,
+    });
     if (!data.success) {
       alert(
         "The information you entered doesn't look right. Please double-check your card details.",
       );
       console.log(data.error);
     } else {
-      
       const handleCreateUsersCard = async (email: string) => {
         Omise.createToken(
           "card",
@@ -257,17 +384,17 @@ const AddNewCardDialog = ({
           </div>
 
           <div className="space-y-1">
-      <FormLabel>Card Number</FormLabel>
-      <Input
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
-        maxLength={19}
-        placeholder="1234 5678 9012 3456"
-        value={cardNumber}
-        onChange={handleCardNumberChange}
-      />
-    </div>
+            <FormLabel>Card Number</FormLabel>
+            <Input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={19}
+              placeholder="1234 5678 9012 3456"
+              value={cardNumber}
+              onChange={handleCardNumberChange}
+            />
+          </div>
 
           <div className="flex justify-between items-end">
             <div className="w-[32%] flex flex-col">
@@ -356,9 +483,9 @@ export default function ProfileEdit({
   const [refreshKey, setRefreshKey] = useState(false);
 
   const [bookbank, setBookBank] = useState<BookBankInterface | null>(null);
-  const handleSubmitBookBank = (bankInfo : BookBankInterface) => {
-      setBookBank(bankInfo);
-      console.log("Form submitted:", bankInfo);
+  const handleSubmitBookBank = (bankInfo: BookBankInterface) => {
+    setBookBank(bankInfo);
+    console.log("Form submitted:", bankInfo);
   };
 
   useEffect(() => {
@@ -408,7 +535,7 @@ export default function ProfileEdit({
   const FirstPageEdit = () => {
     return (
       <div
-        className={`${click == 0 ? "" : "hidden"} h-full flex flex-row space-y-0 w-[100%] flex-wrap items-start  justify-between `}
+        className={`${click == 0 ? "" : "hidden"} h-[50%] flex flex-row space-y-0 w-[100%] flex-wrap items-start  justify-between `}
       >
         <FormField
           name="firstName"
@@ -635,26 +762,29 @@ export default function ProfileEdit({
         </svg>
       ),
     };
-    if(role === "producer"){
+    if (role === "producer") {
       return (
         <div
-          className={`${click == 1 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
+          className={`${click == 1 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-[50%]`}
         >
           {!userData.email ? (
             <div className="mt-2 h-[90%] flex flex-col justify-between">
-              <div className="h-[50%] text-xl font-bold ">Your payment card</div>
+              <div className="h-[50%] text-xl font-bold ">
+                Your payment card
+              </div>
               <div className="h-[50%] w-[68%] self-center flex flex-col">
                 <span>
                   {`
                 You haven't added an email yet. Add a card now for
                 seamless transactions.`}
                 </span>
-                
               </div>
             </div>
           ) : cards.length === 0 ? (
             <div className="mt-2 h-[90%] flex flex-col justify-between">
-              <div className="h-[50%] text-xl font-bold ">Your payment card</div>
+              <div className="h-[50%] text-xl font-bold ">
+                Your payment card
+              </div>
               <div className="h-[50%] w-[68%] self-center flex flex-col">
                 <span>
                   {`
@@ -674,7 +804,9 @@ export default function ProfileEdit({
             </div>
           ) : (
             <div className="mt-2 h-[100%] flex flex-col justify-between">
-              <div className="h-[20%] text-xl font-bold ">Your payment card</div>
+              <div className="h-[20%] text-xl font-bold ">
+                Your payment card
+              </div>
               <div
                 className="w-full h-full flex flex-col gap-4 overflow-y-scroll"
                 style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
@@ -713,33 +845,33 @@ export default function ProfileEdit({
           )}
         </div>
       );
-    }else{
+    } else {
       return (
         <div
           className={`${click == 1 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
         >
           {!userData.email ? (
             <div className="mt-2 h-[90%] flex flex-col justify-between">
-              <div className="h-[50%] text-xl font-bold ">Your payment card</div>
+              <div className="h-[50%] text-xl font-bold ">
+                Your payment card
+              </div>
               <div className="h-[50%] w-[68%] self-center flex flex-col">
                 <span>
                   {`
                 You haven't added an email yet. Add a card now for
                 seamless transactions.`}
                 </span>
-                
               </div>
             </div>
-          ) :  (
-            <ProfessionalBillingInfo 
+          ) : (
+            <ProfessionalBillingInfo
               bankInfo={bookbank || null}
               handleSubmit={handleSubmitBookBank}
-              ></ProfessionalBillingInfo>
-          ) }
+            ></ProfessionalBillingInfo>
+          )}
         </div>
       );
     }
-    
   };
   const ThirdPageEdit = () => {
     return (
@@ -802,17 +934,10 @@ export default function ProfileEdit({
       </div>
     );
   };
-  const FourthPageEdit = () => {
-    if(role === "producer"){
-      return (<></>);
-    }else{
-      <div
-        className={`${click == 3 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
-      >
+  const [projectName, setProjectName] = useState("");
+  const [professionalName, setProfessionalName] = useState("");
+  const [roleSearch, setRoleSearch] = useState("");
 
-      </div>
-    }
-  };
   const FirstPageEditDynamic = useMemo(
     () =>
       dynamic(() => Promise.resolve(FirstPageEdit), {
@@ -834,22 +959,22 @@ export default function ProfileEdit({
       }),
     [click === 2, isEdit],
   );
-  const FourthPageEditDynamic = useMemo(
-    () =>
-      dynamic(() => Promise.resolve(FourthPageEdit), {
-        ssr: false,
-      }),
-    [click === 3, isEdit],
-  );
+  // const FourthPageEditDynamic = useMemo(
+  //   () =>
+  //     dynamic(() => Promise.resolve(FourthPageEdit), {
+  //       ssr: false,
+  //     }),
+  //   [click === 3, isEdit, professionalName],
+  // );
 
   return (
     <Card
-      className={`${mobilePageState == 1 ? "" : "hidden"} w-[100vw] h-[100vh] lg:h-[700px] relative lg:w-[500px] lg:flex lg:flex-col`}
+      className={`${mobilePageState == 1 ? "" : "hidden"} w-[100vw] h-[100vh] lg:h-[700px] relative lg:w-[600px] lg:flex lg:flex-col`}
     >
       <Suspense fallback={<div>Loading...</div>}>
         <CardHeaderInCardDynamic />
       </Suspense>
-      <CardContent className="h-[65%] w-full lg:w-[500px] flex flex-col relative lg:h-full">
+      <CardContent className="h-[65%] w-full lg:w-[600px] flex flex-col relative lg:h-full">
         <div className="flex flex-row w-[60%] justify-between">
           <Link
             href={"#"}
@@ -883,22 +1008,33 @@ export default function ProfileEdit({
               Skill
             </Link>
           )}
-          
-
         </div>
         <Separator className="my-3" />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="h-[50%] ">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="h-full w-full "
+          >
             <fieldset
               disabled={form.formState.isSubmitting}
-              className="h-[100%] flex items-start"
+              className="h-[100%] flex items-start w-full"
             >
               <Suspense fallback={<div>Loading...</div>}>
                 <FirstPageEditDynamic />
               </Suspense>
               <SecondPageEditDynamic />
               <ThirdPageEditDynamic />
-              <FourthPageEditDynamic />
+              <FourthPageEdit
+                click={click}
+                role={role}
+                projectName={projectName}
+                setProjectName={setProjectName}
+                professionalName={professionalName}
+                setProfessionalName={setProfessionalName}
+                roleSearch={roleSearch}
+                setRoleSearch={setRoleSearch}
+                token={session?.user.token ?? ""}
+              />
               {/* <div
                 className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
               >
