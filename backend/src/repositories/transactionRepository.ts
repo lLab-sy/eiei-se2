@@ -11,7 +11,7 @@ class TransactionRepository {
             throw new Error("User not found.")
         }
 
-        const transaction = await Transaction.find({userId}).sort({createdAt:-1})
+        const transaction = await Transaction.find({userId}).sort({createdAt:-1}).populate('userId').populate('postId')
         return transaction
     }
 }
