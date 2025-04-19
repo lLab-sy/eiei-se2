@@ -10,6 +10,61 @@ declare module 'omise' {
     customers: CustomersAPI;
     tokens: TokensAPI;
     charges: ChargesAPI;
+    recipients: RecipientsAPI;
+    transfers: TransfersAPI;
+  }
+
+  interface RecipientsAPI {
+    create(data: RecipientCreate): Promise<OmiseRecipient>;
+    retrieve(id: string): Promise<OmiseRecipient>;
+    update(id: string, data: Partial<RecipientCreate>): Promise<OmiseRecipient>;
+    list(): Promise<{ data: OmiseRecipient[] }>;
+  }
+
+  interface TransfersAPI {
+    create(data: TransferCreate): Promise<OmiseTransfer>;
+    retrieve(id: string): Promise<OmiseTransfer>;
+    list(): Promise<{ data: OmiseTransfer[] }>;
+  }
+
+  interface TransferCreate {
+    amount: number;
+    recipient: string;
+  }
+
+  interface OmiseTransfer {
+    id: string;
+    amount: number;
+    currency: string;
+    recipient: string;
+    status: string; // e.g., 'paid', 'failed'
+    created: string;
+  }
+
+  interface RecipientCreate {
+    name: string;
+    email: string;
+    type: 'individual' | 'corporation';
+    bank_account: {
+      brand: string;
+      number: string;
+      name: string;
+    } | string; // หรือ token ก็ได้
+  }
+
+  interface OmiseRecipient {
+    id: string;
+    name: string;
+    email: string;
+    verified: boolean;
+    bank_account: {
+      brand: string;
+      number: string;
+      last_digits: string;
+      name: string;
+    };
+    active: boolean;
+    created: string;
   }
 
   interface CustomersAPI {

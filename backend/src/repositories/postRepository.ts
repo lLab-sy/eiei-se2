@@ -1252,6 +1252,70 @@ class PostRepository {
           throw new Error('Error calculating total latest offers for candidates');
         }
       }
+
+      public async getOneCandidatePrice(postId: string, professionalId: string): Promise<number> {
+        try {
+          const post = await Post.findById(postId);
+          if (!post) {
+            throw new Error("This post does not exist");
+          }
+      
+          const pipeline: PipelineStage[] = [
+            {
+              $match: { _id: new ObjectId(postId) }
+            },
+            {
+              $unwind: '$participants'
+            },
+            {
+              $match: {
+                'participants.userID': new ObjectId(professionalId),
+                'participants.status': 'candidate'
+              }
+            },
+            {
+              $addFields: {
+                sortedOffers: {
+                  $cond: [
+                    { $gt: [{ $size: '$participants.offer' }, 0] },
+                    {
+                      $sortArray: {
+                        input: '$participants.offer',
+                        sortBy: { createdAt: -1 }
+                      }
+                    },
+                    []
+                  ]
+                }
+              }
+            },
+            {
+              $addFields: {
+                latestOffer: { $arrayElemAt: ['$sortedOffers', 0] }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                price: {
+                  $cond: [
+                    { $gt: [{ $size: '$sortedOffers' }, 0] },
+                    '$latestOffer.price',
+                    0
+                  ]
+                }
+              }
+            }
+          ];
+      
+          const result = await Post.aggregate(pipeline);
+          return result.length > 0 ? result[0].price : 0;
+        } catch (error) {
+          console.error('Error retrieving candidate price:', error);
+          throw new Error('Error retrieving candidate price');
+        }
+      }
+      
       
 }
 

@@ -93,3 +93,33 @@ export interface chargeCustomerResponseModel {
     transactionId: string,
     transactionType: 'charge',
 }
+
+export interface addBankAccountRequestModel {
+    userId: string;
+    bankAccountToken: string; // token ที่ได้จาก Omise
+  }  
+
+export interface addBankAccountResponseModel {
+    userId: string;
+    bookbankId: string;
+    bankName: string;   // ชื่อธนาคารที่ได้รับจาก Omise
+    bankBranch: string; // สาขาของธนาคาร
+    created: string;
+}
+
+export interface transferRequestModel {
+    userId: string;
+    postId: string;
+    amount: number;  // จำนวนเงินที่จะโอน
+    transferType: 'bank' | 'cash'; // อาจจะใช้ตัวเลือกนี้ได้ในกรณีที่มีหลายประเภทการโอน
+}
+
+export interface transferResponseModel {
+    userId: string;
+    postId: string;
+    amount: number;
+    status: string;  // สถานะการโอน
+    transactionId: string;
+    transactionType: 'transfer';
+    createdAt: Date;
+}
