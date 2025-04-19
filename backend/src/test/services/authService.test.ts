@@ -1,89 +1,118 @@
-// import authService from '../../services/authService';
-// import userRepository from '../../repositories/userRepository';
-// import bcrypt from 'bcrypt';
-// import jwt from 'jsonwebtoken';
-// import { RegisterDTO } from '../../dtos/authDTO';
+import authService from '../../services/authService';
+import userRepository from '../../repositories/userRepository';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-// // Mock userRepository methods
-// jest.mock('../../repositories/userRepository', () => ({
-//   findUserByUsername: jest.fn(),
-//   createUser: jest.fn(),
-//   loginUser: jest.fn(),
-//   getUserByID: jest.fn(),
-// }));
+// Mock external dependencies
+jest.mock('../../repositories/userRepository');
+jest.mock('bcrypt');
+jest.mock('jsonwebtoken');
 
-// describe('AuthService', () => {
-  
-//   // Test for registerUser
-//   it('should register a user successfully', async () => {
-//     const mockData:RegisterDTO = {
-//       username: 'testuser',
-//       password: 'testpassword',
-//       role: 'producer',  // ระบุ role ให้ตรงกับที่ใช้ในแอป
-//     };
+describe('AuthService', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//     const mockUser = {
-//       username: 'testuser',
-//       password: 'hashedpassword',
-//       role: 'producer',
-//     };
+  describe('registerUser', () => {
+    it('should register a new user successfully', async () => {
+      (userRepository.findUserByUsername as jest.Mock).mockResolvedValue(null);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
+      (userRepository.createUser as jest.Mock).mockResolvedValue({ username: 'testuser', role: 'producer' });
 
-//     // Mock findUserByUsername to return null (no existing user)
-//     (userRepository.findUserByUsername as jest.Mock).mockResolvedValue(null);  // No existing user
-//     (userRepository.createUser as jest.Mock).mockResolvedValue(mockUser);  // Mock the created user
+      const result = await authService.registerUser({
+        username: 'testuser',
+        password: 'password123',
+        role: 'producer',
+      });
 
-//     const result = await authService.registerUser(mockData);
+      expect(result).toEqual({ username: 'testuser', role: 'producer' });
+      expect(userRepository.findUserByUsername).toHaveBeenCalledWith('testuser');
+      expect(userRepository.createUser).toHaveBeenCalled();
+    });
 
-//     expect(result).toEqual({
-//       username: 'testuser',
-//       role: 'user',
-//     });
-//   });
+    it('should throw error if username exists', async () => {
+      (userRepository.findUserByUsername as jest.Mock).mockResolvedValue({ username: 'testuser' });
 
-//   // Test for loginUser
-//   it('should login a user successfully', async () => {
-//     const mockData = {
-//       username: 'testuser',
-//       password: 'testpassword',
-//     };
+      await expect(authService.registerUser({
+        username: 'testuser',
+        password: 'password123',
+        role: 'producer',
+      })).rejects.toThrow('Error in service layer');
+    });
+  });
 
-//     const mockUser = {
-//       _id: '12345',
-//       username: 'testuser',
-//       password: 'hashedpassword',
-//       role: 'user',
-//     };
+  describe('loginUser', () => {
+    it('should login user and return token', async () => {
+      (userRepository.loginUser as jest.Mock).mockResolvedValue({
+        _id: { toString: () => 'userId123' },
+        username: 'testuser',
+        password: 'hashedPassword',
+        role: 'producer',
+      });
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (jwt.sign as jest.Mock).mockReturnValue('jwt_token');
 
-//     // Mocking the repository and bcrypt.compare
-//     (userRepository.loginUser as jest.Mock).mockResolvedValue(mockUser);
-//     (bcrypt.compare as jest.Mock).mockResolvedValue(true); // Simulate password match
+      const result = await authService.loginUser({
+        username: 'testuser',
+        password: 'password123',
+      });
 
-//     const result = await authService.loginUser(mockData);
+      expect(result.token).toBe('jwt_token');
+      expect(result.user.username).toBe('testuser');
+      expect(result.user.role).toBe('producer');
+    });
 
-//     expect(result).toHaveProperty('token');
-//     expect(result.user.username).toBe('testuser');
-//   });
+    it('should throw error if user not found', async () => {
+      (userRepository.loginUser as jest.Mock).mockResolvedValue(null);
 
-//   // Test for getMe
-//   it('should return user data for valid user', async () => {
-//     const mockUser = {
-//       _id: '12345',
-//       username: 'testuser',
-//       role: 'user',
-//     };
+      await expect(authService.loginUser({
+        username: 'wronguser',
+        password: 'password123',
+      })).rejects.toThrow('Error in service layer');
+    });
 
-//     (userRepository.getUserByID as jest.Mock).mockResolvedValue(mockUser);
+    it('should throw error if password incorrect', async () => {
+      (userRepository.loginUser as jest.Mock).mockResolvedValue({
+        _id: { toString: () => 'userId123' },
+        username: 'testuser',
+        password: 'hashedPassword',
+        role: 'producer',
+      });
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-//     const result = await authService.getMe('12345', 'user');
+      await expect(authService.loginUser({
+        username: 'testuser',
+        password: 'wrongpassword',
+      })).rejects.toThrow('Error in service layer');
+    });
+  });
 
-//     expect(result).toEqual(mockUser);
-//   });
+  describe('getMe', () => {
+    it('should return producer user', async () => {
+      (userRepository.getUserByID as jest.Mock).mockResolvedValue({ username: 'testuser', role: 'producer', password: 'pass' });
 
-//   // Test for getMe with invalid user ID
-//   it('should throw an error when user not found', async () => {
-//     (userRepository.getUserByID as jest.Mock).mockResolvedValue(null);
+      const result = await authService.getMe('userId123', 'producer');
+      expect(result).toEqual({ username: 'testuser', role: 'producer', password: 'pass' });
+    });
 
-//     await expect(authService.getMe('invalidID', 'user')).rejects.toThrow('Invalid userID.');
-//   });
+    it('should return production professional user', async () => {
+      (userRepository.getUserByID as jest.Mock).mockResolvedValue({ username: 'testuser', role: 'production professional', password: 'pass' });
 
-// });
+      const result = await authService.getMe('userId123', 'production professional');
+      expect(result).toEqual({ username: 'testuser', role: 'production professional', password: 'pass' });
+    });
+
+    it('should return admin user', async () => {
+      (userRepository.getUserByID as jest.Mock).mockResolvedValue({ username: 'admin', role: 'admin', password: 'pass' });
+
+      const result = await authService.getMe('userId123', 'admin');
+      expect(result).toEqual({ username: 'admin', role: 'admin', password: 'pass' });
+    });
+
+    it('should throw error if userID invalid', async () => {
+      (userRepository.getUserByID as jest.Mock).mockResolvedValue(null);
+
+      await expect(authService.getMe('wrongUserId', 'producer')).rejects.toThrow('Error in service layer');
+    });
+  });
+});
