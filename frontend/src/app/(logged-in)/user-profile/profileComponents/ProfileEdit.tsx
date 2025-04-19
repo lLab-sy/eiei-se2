@@ -865,6 +865,13 @@ export default function ProfileEdit({
           >
             Billing Information
           </Link>
+          <Link
+            href={"#"}
+            onClick={() => setClick(3)}
+            className={`${styles.divLines} relative ml-[12%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[100px] after:h-[4px] after:absolute after:left-[-5%] after:top-[145%] ${click == 3 ? "after:scale-x-100" : "after:scale-x-0"}`}
+          >
+            Transactions
+          </Link>
           {role === "producer" ? (
             <div className="ml-[24%]"></div>
           ) : (
@@ -876,13 +883,7 @@ export default function ProfileEdit({
               Skill
             </Link>
           )}
-          <Link
-            href={"#"}
-            onClick={() => setClick(3)}
-            className={`${styles.divLines} relative ml-[12%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[100px] after:h-[4px] after:absolute after:left-[-5%] after:top-[145%] ${click == 3 ? "after:scale-x-100" : "after:scale-x-0"}`}
-          >
-            Transactions
-          </Link>
+          
 
         </div>
         <Separator className="my-3" />
