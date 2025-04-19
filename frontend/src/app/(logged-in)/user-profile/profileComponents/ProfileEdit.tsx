@@ -35,6 +35,7 @@ import dynamic from "next/dynamic";
 import { z } from "zod";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import ProfessionalBillingInfo from "./ProfessionalBillingInfo";
 const CardSchema = z.object({
   nameOnCard: z.string().min(1, "Name on card is required"),
   cardNumber: z
@@ -61,6 +62,11 @@ export interface CardInterface {
   expiration_month: string;
   expiration_year: string;
   last_digits: string;
+}
+export interface BookBankInterface{
+  bankName: string;
+  accountHolder: string;
+  accountNumber: string;
 }
 function formatCardNumber(value: string) {
   // Remove non-digits
@@ -193,6 +199,7 @@ const AddNewCardDialog = ({
     }
     return;
   };
+
   const [openCard, setOpenCard] = useState(false);
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCardNumber(e.target.value);
@@ -347,6 +354,13 @@ export default function ProfileEdit({
   const [cards, setCards] = useState<CardInterface[]>([]);
   const { data: session } = useSession();
   const [refreshKey, setRefreshKey] = useState(false);
+
+  const [bookbank, setBookBank] = useState<BookBankInterface | null>(null);
+  const handleSubmitBookBank = (bankInfo : BookBankInterface) => {
+      setBookBank(bankInfo);
+      console.log("Form submitted:", bankInfo);
+  };
+
   useEffect(() => {
     const handleFetchCards = async () => {
       //payment/cards
@@ -621,32 +635,72 @@ export default function ProfileEdit({
         </svg>
       ),
     };
-    return (
-      <div
-        className={`${click == 1 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
-      >
-        {!userData.email ? (
-          <div className="mt-2 h-[90%] flex flex-col justify-between">
-            <div className="h-[50%] text-xl font-bold ">Your payment card</div>
-            <div className="h-[50%] w-[68%] self-center flex flex-col">
-              <span>
-                {`
-              You haven't added an email yet. Add a card now for
-              seamless transactions.`}
-              </span>
-              
-            </div>
-          </div>
-        ) : cards.length === 0 ? (
-          <div className="mt-2 h-[90%] flex flex-col justify-between">
-            <div className="h-[50%] text-xl font-bold ">Your payment card</div>
-            <div className="h-[50%] w-[68%] self-center flex flex-col">
-              <span>
-                {`
-                You haven't added a payment card yet. Add a card now for
+    if(role === "producer"){
+      return (
+        <div
+          className={`${click == 1 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
+        >
+          {!userData.email ? (
+            <div className="mt-2 h-[90%] flex flex-col justify-between">
+              <div className="h-[50%] text-xl font-bold ">Your payment card</div>
+              <div className="h-[50%] w-[68%] self-center flex flex-col">
+                <span>
+                  {`
+                You haven't added an email yet. Add a card now for
                 seamless transactions.`}
-              </span>
-              <div className="">
+                </span>
+                
+              </div>
+            </div>
+          ) : cards.length === 0 ? (
+            <div className="mt-2 h-[90%] flex flex-col justify-between">
+              <div className="h-[50%] text-xl font-bold ">Your payment card</div>
+              <div className="h-[50%] w-[68%] self-center flex flex-col">
+                <span>
+                  {`
+                  You haven't added a payment card yet. Add a card now for
+                  seamless transactions.`}
+                </span>
+                <div className="">
+                  <AddNewCardDialog
+                    refreshKey={refreshKey}
+                    setRefreshKey={setRefreshKey}
+                    id={session?.user.id ?? ""}
+                    userToken={session?.user.token ?? ""}
+                    email={userData?.email}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-2 h-[100%] flex flex-col justify-between">
+              <div className="h-[20%] text-xl font-bold ">Your payment card</div>
+              <div
+                className="w-full h-full flex flex-col gap-4 overflow-y-scroll"
+                style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
+              >
+                {cards.length > 0 &&
+                  cards.map((card, index) => (
+                    <div
+                      key={index}
+                      className="w-full h-[80px] border rounded-xl flex"
+                    >
+                      <div className="w-[20%]  flex items-center justify-center">
+                        {cardMapper[card?.brand]}
+                      </div>
+
+                      <div className="w-[80%] flex flex-col justify-center ml-2">
+                        <span>
+                          {card?.brand} **** {card.last_digits}
+                        </span>
+                        <span>{`Expired ${card.expiration_month}/${card.expiration_year}`}</span>
+                      </div>
+
+                      <div className="w-[70%]"></div>
+                    </div>
+                  ))}
+              </div>
+              <div className="self-end w-[130px] h-[40px]">
                 <AddNewCardDialog
                   refreshKey={refreshKey}
                   setRefreshKey={setRefreshKey}
@@ -656,48 +710,36 @@ export default function ProfileEdit({
                 />
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="mt-2 h-[100%] flex flex-col justify-between">
-            <div className="h-[20%] text-xl font-bold ">Your payment card</div>
-            <div
-              className="w-full h-full flex flex-col gap-4 overflow-y-scroll"
-              style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
-            >
-              {cards.length > 0 &&
-                cards.map((card, index) => (
-                  <div
-                    key={index}
-                    className="w-full h-[80px] border rounded-xl flex"
-                  >
-                    <div className="w-[20%]  flex items-center justify-center">
-                      {cardMapper[card?.brand]}
-                    </div>
-
-                    <div className="w-[80%] flex flex-col justify-center ml-2">
-                      <span>
-                        {card?.brand} **** {card.last_digits}
-                      </span>
-                      <span>{`Expired ${card.expiration_month}/${card.expiration_year}`}</span>
-                    </div>
-
-                    <div className="w-[70%]"></div>
-                  </div>
-                ))}
+          )}
+        </div>
+      );
+    }else{
+      return (
+        <div
+          className={`${click == 1 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
+        >
+          {!userData.email ? (
+            <div className="mt-2 h-[90%] flex flex-col justify-between">
+              <div className="h-[50%] text-xl font-bold ">Your payment card</div>
+              <div className="h-[50%] w-[68%] self-center flex flex-col">
+                <span>
+                  {`
+                You haven't added an email yet. Add a card now for
+                seamless transactions.`}
+                </span>
+                
+              </div>
             </div>
-            <div className="self-end w-[130px] h-[40px]">
-              <AddNewCardDialog
-                refreshKey={refreshKey}
-                setRefreshKey={setRefreshKey}
-                id={session?.user.id ?? ""}
-                userToken={session?.user.token ?? ""}
-                email={userData?.email}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    );
+          ) :  (
+            <ProfessionalBillingInfo 
+              bankInfo={bookbank || null}
+              handleSubmit={handleSubmitBookBank}
+              ></ProfessionalBillingInfo>
+          ) }
+        </div>
+      );
+    }
+    
   };
   const ThirdPageEdit = () => {
     return (
@@ -760,6 +802,17 @@ export default function ProfileEdit({
       </div>
     );
   };
+  const FourthPageEdit = () => {
+    if(role === "producer"){
+      return (<></>);
+    }else{
+      <div
+        className={`${click == 3 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
+      >
+
+      </div>
+    }
+  };
   const FirstPageEditDynamic = useMemo(
     () =>
       dynamic(() => Promise.resolve(FirstPageEdit), {
@@ -781,6 +834,13 @@ export default function ProfileEdit({
       }),
     [click === 2, isEdit],
   );
+  const FourthPageEditDynamic = useMemo(
+    () =>
+      dynamic(() => Promise.resolve(FourthPageEdit), {
+        ssr: false,
+      }),
+    [click === 3, isEdit],
+  );
 
   return (
     <Card
@@ -801,9 +861,16 @@ export default function ProfileEdit({
           <Link
             href={"#"}
             onClick={() => setClick(1)}
-            className={`${styles.divLines} ml-[24%] relative text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[147px] after:h-[4px] after:absolute after:left-[-5%] after:top-[145%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
+            className={`${styles.divLines} ml-[12%] relative text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[147px] after:h-[4px] after:absolute after:left-[-5%] after:top-[145%] ${click == 1 ? "after:scale-x-100" : "after:scale-x-0"}`}
           >
             Billing Information
+          </Link>
+          <Link
+            href={"#"}
+            onClick={() => setClick(3)}
+            className={`${styles.divLines} relative ml-[12%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[100px] after:h-[4px] after:absolute after:left-[-5%] after:top-[145%] ${click == 3 ? "after:scale-x-100" : "after:scale-x-0"}`}
+          >
+            Transactions
           </Link>
           {role === "producer" ? (
             <div className="ml-[24%]"></div>
@@ -811,11 +878,13 @@ export default function ProfileEdit({
             <Link
               href={"#"}
               onClick={() => setClick(2)}
-              className={`${styles.divLines} relative ml-[24%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[55px] after:h-[4px] after:absolute after:left-[-30%] after:top-[145%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
+              className={`${styles.divLines} relative ml-[12%] text-nowrap hover:after:scale-x-100 cursor-pointer after:bg-blue-200 after:content-[''] after:w-[55px] after:h-[4px] after:absolute after:left-[-30%] after:top-[145%] ${click == 2 ? "after:scale-x-100" : "after:scale-x-0"}`}
             >
               Skill
             </Link>
           )}
+          
+
         </div>
         <Separator className="my-3" />
         <Form {...form}>
@@ -829,6 +898,7 @@ export default function ProfileEdit({
               </Suspense>
               <SecondPageEditDynamic />
               <ThirdPageEditDynamic />
+              <FourthPageEditDynamic />
               {/* <div
                 className={`absolute bottom-0 w-[90%] pb-10 flex flex-row ${isEdit ? "justify-between" : "justify-end"}`}
               >
