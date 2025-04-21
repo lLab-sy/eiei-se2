@@ -40,7 +40,18 @@ class UserController {
                 return;
             }
             const user = await userService.getUserById(username)
-            sendResponse(res, 'success', user, "Successfully get User")
+            if(user?.profileImage){
+                const signedUrl = await cloudService.getSignedUrlImageCloud(user.profileImage);
+                const updatedUserWithSignedURL = {
+                    user,
+                    url: signedUrl
+                }
+                sendResponse(res, 'success', updatedUserWithSignedURL, "Successfully get User")
+            }else{
+                sendResponse(res, 'success', user, "Successfully get User")
+            }
+            
+            
         }catch(err){
             console.log(err)
             sendResponse(res, 'error', 'Failed to get User')
@@ -74,7 +85,7 @@ class UserController {
                     return;
                 }
                 const user = await userService.getUserById(id)
-                console.log('userProfileImage', user?.profileImage)
+                console.log('userProfileImage', user)
                 const imageKey = (user?.profileImage && user?.profileImage !== '') ? user?.profileImage : cloudService.getKeyName()
                 const {url} = await cloudService.getUrlWithImageNameAndUploadToCloud(buffer!, mimetype!, imageKey)
                 const userDataWithImageKey = {
