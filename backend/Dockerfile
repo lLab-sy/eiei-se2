@@ -1,10 +1,14 @@
-FROM node:23-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
+# Install dependencies to build bcrypt
+RUN apk add --no-cache python3 make g++ 
+
 COPY package*.json ./
 
-RUN yarn install
+# Force bcrypt rebuild inside container
+RUN yarn install --force
 
 COPY . .
 
