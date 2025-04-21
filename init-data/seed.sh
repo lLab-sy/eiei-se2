@@ -3,6 +3,9 @@
 sleep 1
 
 echo "Seeding MongoDB..."
+echo "User: $MONGO_USER"
+echo "Password: $MONGO_PASSWORD"
+echo "Host: $MONGO_HOST"
 
 mongoimport --authenticationDatabase admin \
   --username "$MONGO_USER" \
