@@ -10,7 +10,7 @@ export interface SentTransferData{
 }
 
 export default async function postCustomerTransfer(data: SentTransferData, token: string) {
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/transfer/create-customer`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/transfer/create-customer`;
     console.log("data", data);
     const response = await axios.post(apiUrl, data, {
         withCredentials: true,

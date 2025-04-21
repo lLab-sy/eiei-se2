@@ -1,7 +1,7 @@
 import axios from "axios"
 import { SearchPosts } from "../../interface"
 export default async function getMyProducerPosts(request:string,token:string): Promise<SearchPosts>{
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/user/producer?${request}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/user/producer?${request}`
     console.log("apiURL",apiUrl)
     const response= await axios.get(apiUrl, {
         withCredentials: true,

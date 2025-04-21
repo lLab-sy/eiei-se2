@@ -153,7 +153,7 @@ const FourthPageEdit = ({
   useEffect(() => {
     const handleFetchTransactions = async () => {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/payment/transactions`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/payment/transactions`,
 
         {
           withCredentials: true,
@@ -345,7 +345,7 @@ const AddNewCardDialog = ({
             //   email: email,
             // });
             const res = await axios.post(
-              `${process.env.NEXT_PUBLIC_BASE_URL}/payment/add-card`,
+              `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/payment/add-card`,
               {
                 userId: id,
                 cardToken: token,
@@ -394,7 +394,7 @@ const AddNewCardDialog = ({
         <button
           onClick={async () => {
             const response = await axios.post(
-              `${process.env.NEXT_PUBLIC_BASE_URL}/payment/create-customer`,
+              `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/payment/create-customer`,
               {
                 email,
               },
@@ -575,7 +575,7 @@ export default function ProfileEdit({
     const handleFetchCards = async () => {
       //payment/cards
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/payment/cards`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/payment/cards`,
         {
           withCredentials: true,
           headers: {

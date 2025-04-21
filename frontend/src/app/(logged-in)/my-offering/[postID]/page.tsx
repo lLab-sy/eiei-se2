@@ -115,7 +115,7 @@ const ConfirmOffer = ({
   const { toast } = useToast();
   token = token ?? "";
   const offerDate = new Date(offer.createdAt);
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/participant-status`;
   const { data: session } = useSession();
 
   const userId = session?.user?.id ?? "";
@@ -138,7 +138,7 @@ const ConfirmOffer = ({
   };
   const handleFetch = async (userId: string) => {
     const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/getOffers${query}`;
     const res = await axios.get(apiUrl, {
       withCredentials: true,
       headers: {
@@ -212,7 +212,7 @@ const ConfirmOffer = ({
   const [name, setName] = useState("");
   const handleTriggerDialog = async () => {
     const user = await axios.get(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/users/${offer.participantID}`,
+      `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/${offer.participantID}`,
     );
     setTextState("");
     setCanConfirm(false);
@@ -759,7 +759,7 @@ export default function OfferPostContent() {
           // console.log("PRODUCER BY",response)
         } else if (userRole === "production professional") {
           const handleFetch = async (postID: string) => {
-            const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postID}`;
+            const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postID}`;
             const res = await axios.get(apiUrl);
             setPostState(res?.data?.data ?? {});
             // console.log("postImageDisplay", res?.data?.data?.postImageDisplay?.[0])
@@ -871,7 +871,7 @@ export default function OfferPostContent() {
   useEffect(() => {
     const handleFetch = async (userId: string) => {
       const query = `?postId=${postID}&userId=${userId}&limit=10&page=1`;
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers${query}`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/getOffers${query}`;
       const res = await axios.get(apiUrl, {
         withCredentials: true,
         headers: {

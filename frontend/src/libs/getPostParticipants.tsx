@@ -6,7 +6,7 @@ export default async function getPostParticipants(
   token?: string,
 ) {
   try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}/participants`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postId}/participants`;
     console.log('login libbbbbbbbbbbb')
     if (!token) {
       throw new Error("No authentication token found.");

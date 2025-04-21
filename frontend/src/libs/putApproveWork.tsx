@@ -3,7 +3,7 @@ import { ApproveData, ChangeParticipantStatus } from "../../interface"
 
 export default async function putApproveWork(postID:string,data:ApproveData,token:string){
     // console.log("FORMDATA",data)
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postID}/sendApprove?userId=${data.userId}&isApprove=${data.isApprove}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postID}/sendApprove?userId=${data.userId}&isApprove=${data.isApprove}`
     console.log("token",token)
     console.log(data)
     const response = await axios.put(

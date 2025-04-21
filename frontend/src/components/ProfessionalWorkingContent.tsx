@@ -36,7 +36,7 @@ import { CircleCheck } from "lucide-react";
 //     const token = session?.user.token;
 //     console.log("postDataDialog", post);
 //     const handleStartProject = async (token: string) => {
-//       const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${post.id}/startProject`;
+//       const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${post.id}/startProject`;
 //       setIsLoading(true);
 //       await axios.put(
 //         apiUrl,
@@ -226,7 +226,7 @@ export default function ProfessionalWorkingContent({
   const [price, setPrice] = useState(0);
   const handleClickFirstConfirm = async (email: string) => {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/payment/create-customer`,
+      `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/payment/create-customer`,
       {
         email,
       },
@@ -261,7 +261,7 @@ export default function ProfessionalWorkingContent({
   const [noFinishCandidate, setNoFinishCandidate] = useState<string[]>([]);
   const handleFetchPrice = async (postId: string) => {
     //v1/posts/1/sumCandidateOffer
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}/sumCandidateOffer`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postId}/sumCandidateOffer`;
     const res = await axios.get(apiUrl, {
       withCredentials: true,
       headers: { Authorization: `Bearer ${token}` },
@@ -270,7 +270,7 @@ export default function ProfessionalWorkingContent({
     setPrice(res.data.data);
   };
   const handleStartProject = async (token: string) => {
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${mid}/startProject`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${mid}/startProject`;
     setIsLoading(true);
     const res = await axios.put(
       apiUrl,
@@ -389,7 +389,7 @@ export default function ProfessionalWorkingContent({
     if (returnData.status) {
       setDialogState(1);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/payment/cards`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/payment/cards`,
         {
           withCredentials: true,
           headers: {
@@ -410,7 +410,7 @@ export default function ProfessionalWorkingContent({
   const handleChargeCustomer = async (cardId: string, amount: number) => {
     setIsLoading(true);
     const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/payment/charge-customer`,
+      `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/payment/charge-customer`,
       {
         cardId,
         amount,

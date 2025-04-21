@@ -26,7 +26,7 @@ export default function OfferPage() {
   // useEffect(() => {
   //   const handleFetch = async (postStatus: string) => {
   //     const query = `?postStatus=${postStatus}&limit=10&page=1`;
-  //     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/user/prof${query}`;
+  //     const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/user/prof${query}`;
   //     const res = await axios.get(apiUrl, {
   //       withCredentials: true,
   //       headers: {
@@ -47,7 +47,7 @@ export default function OfferPage() {
         } else if (userRole === "production professional") {
           const postStatus = "created,waiting,in-progress,success";
           const query = `?postStatus=${postStatus}&limit=10&page=1`;
-          const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/user/prof${query}`;
+          const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/user/prof${query}`;
           const res = await axios.get(apiUrl, {
             withCredentials: true,
             headers: {

@@ -7,7 +7,7 @@ export default async function editPostById(
   token: string
 ) {
   // 
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postId}`;
   console.log(apiUrl)
   try {
     const response = await axios.put(apiUrl, data, {

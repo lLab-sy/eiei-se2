@@ -2,7 +2,7 @@ import axios from "axios"
 
 export default async function postSendWork(postId:string,token:string){
     // console.log("FORMDATA",data)
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}/sendSubmission`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postId}/sendSubmission`
     const response= await axios.post(
     apiUrl, 
     {},

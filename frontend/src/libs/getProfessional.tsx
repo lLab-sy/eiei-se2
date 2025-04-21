@@ -1,6 +1,6 @@
 import axios from "axios"
 export default async function getPostUser(userID:string){
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts?userID=${userID}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts?userID=${userID}`
     //console.log(apiUrl)
     const response= await axios.get(apiUrl)
     if(!response){

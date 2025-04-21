@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default async function getPrudcerOffers(token:string){
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/getOffers`
     try{
         const response = await axios.get(apiUrl, {
             withCredentials: true,

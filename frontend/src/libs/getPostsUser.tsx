@@ -4,7 +4,7 @@ export default async function getPostUser(userID:string,status?:boolean){ //Prod
     if(status){
         offerDo="&postStatus=created,waiting"
     }
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts?userID=${userID}`+offerDo
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts?userID=${userID}`+offerDo
     console.log(apiUrl)
     try{
         const response= await axios.get(apiUrl)

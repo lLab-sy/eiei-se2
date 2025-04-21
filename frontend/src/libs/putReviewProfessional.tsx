@@ -7,7 +7,7 @@ export default async function putReviewProfessional(
   // pId: string,
   professionalId: string,
 ) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/${professionalId}/addReview`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/${professionalId}/addReview`;
 
   const response = await axios.put(apiUrl, data, {
     withCredentials: true,
