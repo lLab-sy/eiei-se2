@@ -68,15 +68,15 @@ jobs:
             sudo docker run -d --name mongodb-eiei \
               -p 7007:27017 \
               --network my-network \
-              -e MONGO_INITDB_ROOT_USERNAME=$root \
-              -e MONGO_INITDB_ROOT_PASSWORD=$rootpassword \
+              -e MONGO_INITDB_ROOT_USERNAME=root \
+              -e MONGO_INITDB_ROOT_PASSWORD=rootpassword \
               -e MONGO_INITDB_DATABASE=eiei \
               mongo:8.0
             
             sudo docker run -d --name mongo-seed \
               --network my-network \
-              -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
-              -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
+              -e MONGO_INITDB_ROOT_USERNAME=root \
+              -e MONGO_INITDB_ROOT_PASSWORD=rootpassword \
               -e MONGO_HOST=mongodb-eiei \
               $MONGO_SEED_IMAGE:latest
             
