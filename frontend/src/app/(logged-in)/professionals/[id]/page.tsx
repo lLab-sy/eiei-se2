@@ -56,7 +56,7 @@ const ProfessionalDetail = () => {
       })
       dataResponse.avgRating = dataResponse.rating.length ? Math.ceil((sum / dataResponse.rating.length) * 10) / 10 : 0.0;
   }
-
+  console.log("DATA RESPONSE",dataResponse)
   const ProfessionalInfo = {
     id: dataResponse._id,
     firstName: dataResponse.firstName || "N/A",
@@ -73,7 +73,7 @@ const ProfessionalDetail = () => {
     avgRating: dataResponse.avgRating || 0.0,
     username: dataResponse.username,
   };
-
+  console.log(ProfessionalInfo)
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
       <Card className="w-full max-w-3xl shadow-lg rounded-2xl bg-white p-8">
