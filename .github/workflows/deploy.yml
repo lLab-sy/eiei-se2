@@ -66,10 +66,10 @@ jobs:
             sudo docker network create my-network || true
 
             sudo docker run -d --name mongodb-eiei \
-              -p $MONGO_PORT:27017 \
+              -p 7007:27017 \
               --network my-network \
-              -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
-              -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
+              -e MONGO_INITDB_ROOT_USERNAME=$root \
+              -e MONGO_INITDB_ROOT_PASSWORD=$rootpassword \
               -e MONGO_INITDB_DATABASE=eiei \
               mongo:8.0
             
