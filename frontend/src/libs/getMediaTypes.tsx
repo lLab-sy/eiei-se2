@@ -2,7 +2,7 @@ import axios from "axios"
 
 export default async function getMediaTypes(){
 
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/mediaTypes`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/mediaTypes`
     const response= await axios.get(apiUrl)
 
 

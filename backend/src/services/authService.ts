@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import userRepository from "../repositories/userRepository";
 import { RegisterDTO, ReturnRegisterDTO, LoginDTO, ReturnLoginDTO, ProducerReturnGetMeDTO, ProctionProfessionalReturnGetMeDTO, AdMinReturnGetMeDTO } from "../dtos/authDTO";

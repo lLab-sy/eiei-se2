@@ -2,7 +2,7 @@ import axios from "axios"
 
 export default async function getHistoryPosts(token:string){
 
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/user`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/user`
     const response= await axios.get(apiUrl, {
       withCredentials: true,
       headers: {

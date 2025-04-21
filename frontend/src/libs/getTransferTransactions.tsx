@@ -1,6 +1,6 @@
 import axios from "axios"
 export default async function getProfessionals(){
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/transfer/transactions`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/transfer/transactions`;
     console.log(apiUrl)
     const response= await axios.get(apiUrl)
     if(!response){

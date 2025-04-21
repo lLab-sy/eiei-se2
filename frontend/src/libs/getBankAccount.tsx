@@ -3,7 +3,7 @@ import axios from "axios"
 
 export default async function getBankAccount(userID : string, token: string) : Promise<BankAccountResponse> {
 
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/transfer/bank-accounts/${userID}`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/transfer/bank-accounts/${userID}`;
     const response= await axios.get(apiUrl,{
         withCredentials: true,
         headers: {

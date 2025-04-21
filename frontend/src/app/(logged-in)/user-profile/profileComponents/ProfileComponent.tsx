@@ -157,7 +157,7 @@ export default function ProfileComponent() {
 
     const id = user.user._id;
     const token = user.token;
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/update-user/${id}`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/update-user/${id}`;
 
     const returnUser = await axios.put(
       apiUrl,

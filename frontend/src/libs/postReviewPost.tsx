@@ -6,7 +6,7 @@ export default async function postReviewPost(
   token: string,
   postId: string,
 ) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}/addReview`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postId}/addReview`;
 
   const response = await axios.post(apiUrl, data, {
     withCredentials: true,

@@ -121,7 +121,7 @@ const NavBar = (session: any) => {
     }
 
     const handleFetchProfileURL = async (id: string) => {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/signed-profile/${id}`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/signed-profile/${id}`;
       const res = await axios.get(apiUrl);
       const imageUrl = res?.data?.data ?? "";
       setProfileImageUrl(imageUrl);
@@ -129,7 +129,7 @@ const NavBar = (session: any) => {
       return imageUrl;
     };
     const handleFetch = async (fetchToken: string) => {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/auth/me`;
       const res = await axios.get(apiUrl, {
         withCredentials: true,
         headers: {

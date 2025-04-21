@@ -3,7 +3,7 @@ import { ChangeParticipantStatus } from "../../interface"
 
 export default async function patchChangeParticipantStatus(data:ChangeParticipantStatus,token:string){
     // console.log("FORMDATA",data)
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/participant-status`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/participant-status`
     const response= await axios.patch(
     apiUrl, 
     data, {

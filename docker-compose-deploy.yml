@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  mongodb-eiei:
+    image: mongo:8.0
+    container_name: mongodb-eiei
+    restart: always
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: eiei
+    networks:
+      - my-network
+
+  mongo-seed:
+    build: ./init-data
+    depends_on:
+      - mongodb-eiei
+    restart: on-failure
+    environment:
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_HOST: mongodb-eiei
+    networks:
+      - my-network
+
+  frontend:
+    image: llab/eiei-frontend:latest
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    build: ./frontend
+    networks:
+      - my-network
+  
+  backend:
+    image: llab/eiei-backend:latest
+    container_name: backend
+    ports:
+      - "1000:1000"
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+
+
+# docker build -t your-dockerhub-username/mongo-seed:latest ./init-data
+# docker buildx build --platform linux/amd64 -t llab/eiei-db-seed:latest ./init-data
+# docker push llab/eiei-db-seed:latest
+# docker pull llab/eiei-db-seed:latest
+
+# docker run -d --name mongo-seed \
+#               --network my-network \
+#               -e MONGO_USER=root \
+#               -e MONGO_PASSWORD=rootpassword \
+#               -e MONGO_HOST=mongodb-eiei \
+#               llab/eiei-db-seed:latest
+
+# docker buildx build --platform linux/amd64 -t llab/eiei-frontend:latest ./frontend
+# docker buildx build --platform linux/amd64 -t llab/eiei-backend:latest ./backend
+
+# docker push llab/eiei-frontend:latest
+# docker push llab/eiei-backend:latest
+
+# docker pull llab/eiei-frontend:latest
+# docker pull llab/eiei-backend:latest
+
+# docker run -d -p 3000:3000 --name frontend --network my-network llab/eiei-frontend:latest
+# docker run -d -p 1000:1000 --name backend --network my-network llab/eiei-backend:latest

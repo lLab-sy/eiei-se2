@@ -31,7 +31,7 @@ export default async function getPostById(
   token: string
 ){
   // console.log(postId,token)
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/${postId}`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/${postId}`;
 
   try {
     const response = await axios.get(apiUrl, {

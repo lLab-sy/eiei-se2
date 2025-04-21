@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default async function getOfferHistory(token:string,userId:string){
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getOffers?userId=${userId}`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/getOffers?userId=${userId}`
     try{
         console.log(userId)
         const response = await axios.get(apiUrl, {

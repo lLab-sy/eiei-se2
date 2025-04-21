@@ -3,7 +3,7 @@ import axios from "axios"
 
 export default async function getProfessionalTransactions(token: string) : Promise<TransactionResponse[]> {
 
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/transfer/transactions`
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/transfer/transactions`
     const response= await axios.get(apiUrl,{
         withCredentials: true,
         headers: {
