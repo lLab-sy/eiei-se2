@@ -933,7 +933,7 @@ export default function ProfileEdit({
         <div
           className={`${click == 1 ? "" : "hidden"} w-[100%] flex flex-col justify-start h-full`}
         >
-          {!userData.email ? (
+          {userData && !userData.email ? (
             <div className="mt-2 h-[90%] flex flex-col justify-between">
               <div className="h-[50%] text-xl font-bold ">
                 Your payment card
