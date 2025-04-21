@@ -1,6 +1,6 @@
 export interface PostData {
-    postMediaTypeOut: any;
-    id:string
+    postMediaTypeOut?: any;
+    id?:string
     postName: string;
     postDescription: string;
     postImages?: string[];
@@ -12,15 +12,15 @@ export interface PostData {
     startDate?: string; 
     endDate?: string;  
     userID: string;
-    postImageDisplay:PostImageDisplay[]
-    participants: Participant[]
+    postImageDisplay?:PostImageDisplay[]
+    participants?: Participant[]
 }
 
 
 export interface Participant{
     comment:string,
     createdAt:Date,
-    offer:OfferData,
+    offer:OfferData[],
     participantID?:string,
     // participants?:ParticipantDetail,
     ratingScore:string,
@@ -119,22 +119,24 @@ export interface UserData{
     imageUrl?: string;
 }
 
-export interface PostDataHistory {
-    id:string,
-    postName: string;
-    producerName: ProducerResponse;
-    postDescription: string;
-    postImages: string[];
-    postImagesKey?: string[];
-    postMediaType: string;
-    postProjectRolesOut?: PostRolesResponse[]
-    postProjectRolesOutProfessional?: PostRolesResponse
-    startDate: string; 
-    endDate: string;   
-    postProjectRoles: string[]; 
-    postStatus: string;
-    roleCount:number;
-}
+// export interface PostDataHistory {
+//     id:string,
+//     postName: string;
+//     producerName: ProducerResponse;
+//     postDescription: string;
+//     postImages: string[];
+//     postImagesKey?: string[];
+//     participant?: ParticipantForRight;
+//     postMediaType: string;
+//     postProjectRolesOut?: PostRolesResponse[]
+//     postProjectRolesOutProfessional?: PostRolesResponse
+//     startDate: string; 
+//     endDate: string;   
+//     postProjectRoles: string[]; 
+//     postStatus: string;
+//     roleCount:number;
+//     participant: Participant
+// }
 
 export interface Rating{
     ratingScore: number;
@@ -157,6 +159,7 @@ export interface Professional{
     avgRating: number;
     description?: string;
     imageUrl?: string;
+    profileImage: string;
 }
 
 export interface MetaData{
@@ -207,7 +210,7 @@ export interface MediaType{
     mediaName: string;
 }
 export interface OfferData{
-    role:string;
+    role?:string;
     roleID?:string;
     productionProfessionalID:string;
     offeredBy: Number;
@@ -257,6 +260,8 @@ export interface ReviewData{
 export interface PostParticipant {
     id: string;
     label: string;
+    isReview: boolean;
+    value:string;
 }
 
 export interface ChangeParticipantStatus{

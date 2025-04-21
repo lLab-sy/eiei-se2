@@ -22,7 +22,7 @@ export default function MyPostDetail({post}:{post:PostData}) {
       <div className="p-5 grid grid-cols-2  bg-white w-full rounded-lg">
         
         <div className="col-span-1 h-[20%]">
-            <p className="text-md w-full m-auto font-bold col-span-1 h-[20%]">Post {post.postName}</p>
+            <p className="text-md w-full m-auto font-bold col-span-1 h-[20%]">{post.postName}</p>
         </div>
 
         <p data-test-id="post-status"
@@ -36,7 +36,7 @@ export default function MyPostDetail({post}:{post:PostData}) {
             Status: {post.postStatus}
         </p>
 
-        <Carousel className="col-span-2 w-full h-[40%] flex-auto">
+       { post?.postImageDisplay && <Carousel className="col-span-2 w-full h-[40%] flex-auto">
                 <CarouselContent>
                     {post?.postImageDisplay.map((image, index) => (
                     <CarouselItem key={index}>
@@ -53,7 +53,7 @@ export default function MyPostDetail({post}:{post:PostData}) {
                 </CarouselContent>
                 {/* <CarouselPrevious className="left-2" /> */}
                 {/* <CarouselNext className="right-2" /> */}
-        </Carousel>
+        </Carousel>}
 
         <Separator className="mt-5 col-span-2 h-1" />
         <div className="col-span-2 p-6 mt-4 rounded-lg h-[20%] ">

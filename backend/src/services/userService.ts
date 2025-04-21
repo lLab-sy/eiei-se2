@@ -23,13 +23,16 @@ class UserService {
             throw new Error("Error in service layer: " + (err as Error).message);
         }
     }
-    async getUserById(id:string){
-        try{
+    async getUserById(id: string) {
+        try {
+            const getUser = await userRepository.getUserByID(id);
 
-            const getUser = await userRepository.getUserByID(id)
-            
-            return getUser
-        }catch(err){
+            if (getUser.profileImage) {
+                getUser.profileImage = await cloudService.getSignedUrlImageCloud(getUser.profileImage);
+            }
+
+            return getUser;
+        } catch (err) {
             console.error("Error in service layer:", err);
             throw new Error("Error in service layer: " + (err as Error).message);
         }
@@ -61,17 +64,27 @@ class UserService {
 
     async searchProductionProfessional(searchReq: searchReqDTO): Promise<PaginatedResponseDTO<ProductionProfessionalDtO>> {
         try {
-            const searchModel: searchReqModel = searchReq
-            const results = await ProductionProfessionalRespository.searchProductionProfessional(searchModel)
+            const searchModel: searchReqModel = searchReq;
+            const results = await ProductionProfessionalRespository.searchProductionProfessional(searchModel);
+
+            const dataWithSignedUrls = await Promise.all(
+                results.data.map(async (professional: ProductionProfessionalDtO) => {
+                    if (professional.profileImage) {
+                        professional.profileImage = await cloudService.getSignedUrlImageCloud(professional.profileImage);
+                    }
+                    return professional;
+                })
+            );
+
             const response: PaginatedResponseDTO<ProductionProfessionalDtO> = {
-                data: results.data,
+                data: dataWithSignedUrls,
                 meta: {
                     page: searchModel.page,
                     limit: searchModel.limit,
                     totalItems: results.totalItems,
-                    totalPages: Math.ceil(results.totalItems / searchModel.limit)
-                } as PaginationMetaDTO
-            }
+                    totalPages: Math.ceil(results.totalItems / searchModel.limit),
+                } as PaginationMetaDTO,
+            };
             return response;
         } catch (error) {
             throw new Error("Error in service layer when search Production Professional: " + (error as Error).message);

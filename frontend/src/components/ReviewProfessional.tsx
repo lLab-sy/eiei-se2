@@ -64,7 +64,7 @@ export default function ReviewProfessional({ id }: { id: string }) {
     return sum
   };
   const allSum = calculateAllSum(reviewData)
-  console.log("allSum", allSum)
+  // console.log("allSum", allSum)
   const calculateAvgRating = (ratingCounter : ratingCounterInterface) => {
     const avg =
       (ratingCounter["5"] * 5 +
@@ -86,7 +86,7 @@ export default function ReviewProfessional({ id }: { id: string }) {
     );
   };
   const percentageRating = calculatePercentage(ratingCounter);
-  console.log("percentage", percentageRating);
+  // console.log("percentage", percentageRating);
   const {data : session, status} = useSession()
   const [allReviews, setAllReviews] = useState<Array<reviewInterface>>([])
   useEffect(() => {
@@ -94,11 +94,11 @@ export default function ReviewProfessional({ id }: { id: string }) {
       return;
     }
     const fetchReviews = async (id: string) => {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/users/reviews/${id}`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/users/reviews/${id}`;
 
       const reviewResponse = await axios.get(apiUrl);
       // const reviewData = await reviewResponse.data
-      console.log("ReviewResponse", reviewResponse);
+      // console.log("ReviewResponse", reviewResponse);
       const newReviewData = reviewResponse?.data?.data
       setReviewData(newReviewData ?? []);
       const allReviewArray :Array<reviewInterface> = []
@@ -113,8 +113,8 @@ export default function ReviewProfessional({ id }: { id: string }) {
     fetchReviews(id);
 
   }, []);
-  console.log("reviewData", reviewData);
-  console.log('allReview', allReviews)
+  // console.log("reviewData", reviewData);
+  // console.log('allReview', allReviews)
   const groupOnClick = (rating: number) => {
     setRatingState(rating)
     if(rating === 0){

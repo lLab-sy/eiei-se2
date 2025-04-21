@@ -1,6 +1,6 @@
 'use client'
 import PostHistoryList from "@/components/PostHistoryList";
-import { PostDataHistory} from "../../../../interface";
+// import { PostDataHistory} from "../../../../interface";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import getHistoryPost from "@/libs/getHistoryPosts";
@@ -25,32 +25,32 @@ import { useSession } from "next-auth/react";
 
 
 export default function HistoryPostPage(){
-  const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
-  const {data:session,status} = useSession()
-  const token = session?.user?.token ?? ''
-  const role = session?.user?.role ?? ''
-  const userName = session?.user?.username ?? ''
+  // const [postHistoryResponse,setPostHistoryResponse]= useState<PostDataHistory[]|null>(null)
+  // const {data:session,status} = useSession()
+  // const token = session?.user?.token ?? ''
+  // const role = session?.user?.role ?? ''
+  // const userName = session?.user?.username ?? ''
   
-  useEffect(()=>{
-      const fetchData=async()=>{
-          const response= await getHistoryPosts(token)
-          setPostHistoryResponse(response.data.data)
-      }
-      fetchData()
-  },[])
+  // useEffect(()=>{
+  //     const fetchData=async()=>{
+  //         const response= await getHistoryPosts(token)
+  //         setPostHistoryResponse(response.data.data)
+  //     }
+  //     fetchData()
+  // },[])
   
  
 
-  if(!postHistoryResponse){
-    return <>Loading</>
-  } 
+  // if(!postHistoryResponse){
+  //   return <>Loading</>
+  // } 
 
   return (
     <div className="pt-10 min-h">
 
-      {/* Project History */}
-      {/* <h2 className="text-2xl font-bold text-center my-4">Post-History</h2> */}
-      <PostHistoryList postLists={postHistoryResponse} userName={userName} role={role}/>
+       {/* Project History */}
+       {/* <h2 className="text-2xl font-bold text-center my-4">Post-History</h2> */}
+       {/*<PostHistoryList postLists={postHistoryResponse} userName={userName} role={role}/>*/}
     
     </div>
   );

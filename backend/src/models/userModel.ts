@@ -12,26 +12,28 @@ export interface IUser extends Document {
   lastName?: string;
   phoneNumber?: string;
   gender?: "Male" | "Female" | "Non-Binary" | "Other";
-  bankAccount?: IBankAccount;
+  //bankAccount?: IBankAccount;
   profileImage?: string;
+  omiseCustomerId?: string;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
   url? : string;
 }
 
-export interface IBankAccount extends Document {
-  bankName?: string;
-  accountHolderName?: string;
-  accountNumber?: string;
-}
+// export interface IBankAccount extends Document {
+//   bankName?: string;
+//   accountHolderName?: string;
+//   accountNumber?: string;
+// }
 
 // Producer-specific fields
 export interface IProducer extends IUser {
   company?: string;
-  paymentType?: "qrCode" | "creditDebit";
-  nameOnCard?: string; //for Credit/Debit
-  cardNumber?: string; //for Credit/Debit
+  cardIds?: string[];
+  // paymentType?: "qrCode" | "creditDebit";
+  // nameOnCard?: string; //for Credit/Debit
+  // cardNumber?: string; //for Credit/Debit
 }
 
 // review
@@ -42,6 +44,35 @@ export interface Rating {
   createdAt?: Date;
 } 
 
+export interface IBankAccount {
+  recipientId: string;
+  bankLastDigits: string;
+  brand: string;
+  name?: string;
+}
+
+const bankAccountSchema = new Schema({
+  recipientId: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  bankLastDigits: {
+    type: String,
+    required: true,
+    match: /^\d{4}$/, // ตรวจสอบว่าเป็นเลข 4 หลัก
+  },
+  brand: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    trim: true,
+  },
+}, { _id: false }); // ไม่ต้องสร้าง _id แยกสำหรับ subdocument นี้
+
+
 // ProductionProfessional-specific fields
 export interface IProductionProfessional extends IUser {
   occupation?: string;
@@ -49,13 +80,14 @@ export interface IProductionProfessional extends IUser {
   skill?: string[]; // Array of skills (e.g., ['Cameraman', 'Lighting', 'Editing'])
   experience?: number; // Years of experience
   rating?: Array<Rating>;
+  //bankAccount?: IBankAccount;
 }
 
-export const BankAccountSchema = new Schema<IBankAccount>({
-  bankName: { type: String,},
-  accountHolderName: { type: String,},
-  accountNumber: { type: String,},
-});
+// export const BankAccountSchema = new Schema<IBankAccount>({
+//   bankName: { type: String,},
+//   accountHolderName: { type: String,},
+//   accountNumber: { type: String,},
+// });
 
 // User Schema Definition
 export const userSchema = new Schema<IUser>({
@@ -113,10 +145,13 @@ export const userSchema = new Schema<IUser>({
     type: String,
     enum: ["Male", "Female", "Non-Binary", "Other"],
   },
-  bankAccount: {
-    type: BankAccountSchema,
-  },
+  // bankAccount: {
+  //   type: BankAccountSchema,
+  // },
   profileImage: {
+    type: String,
+  },
+  omiseCustomerId: {
     type: String,
   },
   resetPasswordToken: String,
@@ -137,16 +172,19 @@ export const producerSchema = new Schema<IProducer>({
     type: String,
     trim: true,
   },
-  paymentType: {
-    type: String,
-    enum: ["qrCode", "creditDebit"],
-  },
-  nameOnCard: {
-    type: String,
-  },
-  cardNumber: {
-    type: String,
-  },
+  cardIds: {
+    type: [String],
+  }
+  // paymentType: {
+  //   type: String,
+  //   enum: ["qrCode", "creditDebit"],
+  // },
+  // nameOnCard: {
+  //   type: String,
+  // },
+  // cardNumber: {
+  //   type: String,
+  // },
 });
 
 export const Producer = User.discriminator<IProducer>("producer", producerSchema); // <-- Discriminator
@@ -187,6 +225,10 @@ export const productionProfessionalSchema = new Schema<IProductionProfessional>(
       default: Date.now, // Automatically sets the current timestamp when the review is created
     },
   }],
+  // bankAccount: {
+  //   type: bankAccountSchema,
+  //   required: false,
+  // },
 });
 
 // for full-text search

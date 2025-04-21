@@ -6,7 +6,7 @@ export default async function getPostParticipantCandidate(
   token?: string,
 ) {
   try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/v1/posts/getPostParticipant/${postId}`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/v1/posts/getPostParticipant/${postId}`;
     if (!token) {
       throw new Error("No authentication token found.");
     }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { SetStateAction, Dispatch, useEffect, useState } from "react";
@@ -39,11 +40,11 @@ const formSchema = z.object({
 });
 
 // Fallback mock data
-const mockProductionProfList = [
-  { label: "Klein Swatee - Cameraman", value: "67b1a81ded193cb7b3dd94bb" },
-  { label: "Maggeline Brent - Lighting", value: "67b1a81ded193cb7b3dd94b2" },
-  { label: "Johny Stafrod - Prop Master", value: "67b1a81ded193ab7b3dd94bb" },
-  { label: "Czesky Wolfenmacht - Director", value: "67b1a81d28193cb7b3dd94bb" },
+const mockProductionProfList:PostParticipant[] = [
+  { label: "Klein Swatee - Cameraman", value: "67b1a81ded193cb7b3dd94bb", isReview:true, id:"x"},
+  { label: "Maggeline Brent - Lighting", value: "67b1a81ded193cb7b3dd94b2", isReview:true  , id:"y"},
+  { label: "Johny Stafrod - Prop Master", value: "67b1a81ded193ab7b3dd94bb" , isReview:true , id:"z"},
+  { label: "Czesky Wolfenmacht - Director", value: "67b1a81d28193cb7b3dd94bb", isReview:true , id:"a" },
 ];
 
 interface ReviewSubmissionFormProps {
@@ -93,7 +94,7 @@ const ReviewSubmissionForm = ({
     if (role === "producer" && !loading) {
       setLoading(true);
 
-      getPostParticipants(postId, token)
+      getPostParticipants(postId??"", token)
         .then((response) => {
           if (response.status === "success" && Array.isArray(response.data)) {
             console.log("API response data:", response.data);

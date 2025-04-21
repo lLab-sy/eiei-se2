@@ -14,58 +14,59 @@ import OfferHistoryMinimal from "@/components/OfferHistoryMinimal";
 import { OfferHistoryMinimal2 } from "@/components/OfferHistoryMinimal2";
 import getOfferHistory from "@/libs/getOffersHistory";
 import getUser from "@/libs/getUser";
+import {useRouter } from "next/navigation";
 
-const mockOfferHistory: OfferHistoryData[] = [
-    {
-      roleName: "Lead Actor",
-      price: 5000,
-      offeredBy: 1,
-      createdAt: "2024-02-17T10:30:00Z",
-      detail: "Experienced actor with multiple awards."
-    },
-    {
-      roleName: "Supporting Actor",
-      price: 3000,
-      offeredBy: 0,
-      createdAt: "2024-02-16T15:45:00Z",
-      detail: "Trained in theater and on-screen performances."
-    },
-    {
-      roleName: "Cinematographer",
-      price: 7000,
-      offeredBy: 1,
-      createdAt: "2024-02-15T12:00:00Z",
-      detail: "Expert in lighting and camera work for films."
-    },
-    {
-      roleName: "Director",
-      price: 10000,
-      offeredBy: 0,
-      createdAt: "2024-02-14T09:20:00Z",
-      detail: "Award-winning director with 15 years of experience."
-    },
-    {
-      roleName: "Editor",
-      price: 4000,
-      offeredBy: 0,
-      createdAt: "2024-02-13T18:10:00Z",
-      detail: "Specialized in post-production and visual effects."
-    },
-    {
-      roleName: "Sound Designer",
-      price: 3500,
-      offeredBy: 0,
-      createdAt: "2024-02-12T14:30:00Z",
-      detail: "Proficient in Foley and sound mixing."
-    },
-    {
-      roleName: "Production Assistant",
-      price: 2000,
-      offeredBy: 1,
-      createdAt: "2024-02-11T16:50:00Z",
-      detail: "Energetic and organized for on-set coordination."
-    }
-  ];
+// const mockOfferHistory: OfferHistoryData[] = [
+//     {
+//       roleName: "Lead Actor",
+//       price: 5000,
+//       offeredBy: 1,
+//       createdAt: "2024-02-17T10:30:00Z",
+//       detail: "Experienced actor with multiple awards."
+//     },
+//     {
+//       roleName: "Supporting Actor",
+//       price: 3000,
+//       offeredBy: 0,
+//       createdAt: "2024-02-16T15:45:00Z",
+//       detail: "Trained in theater and on-screen performances."
+//     },
+//     {
+//       roleName: "Cinematographer",
+//       price: 7000,
+//       offeredBy: 1,
+//       createdAt: "2024-02-15T12:00:00Z",
+//       detail: "Expert in lighting and camera work for films."
+//     },
+//     {
+//       roleName: "Director",
+//       price: 10000,
+//       offeredBy: 0,
+//       createdAt: "2024-02-14T09:20:00Z",
+//       detail: "Award-winning director with 15 years of experience."
+//     },
+//     {
+//       roleName: "Editor",
+//       price: 4000,
+//       offeredBy: 0,
+//       createdAt: "2024-02-13T18:10:00Z",
+//       detail: "Specialized in post-production and visual effects."
+//     },
+//     {
+//       roleName: "Sound Designer",
+//       price: 3500,
+//       offeredBy: 0,
+//       createdAt: "2024-02-12T14:30:00Z",
+//       detail: "Proficient in Foley and sound mixing."
+//     },
+//     {
+//       roleName: "Production Assistant",
+//       price: 2000,
+//       offeredBy: 1,
+//       createdAt: "2024-02-11T16:50:00Z",
+//       detail: "Energetic and organized for on-set coordination."
+//     }
+//   ];
   export default function CreateOfferPage({
     params,
   }: {
@@ -108,6 +109,11 @@ const mockOfferHistory: OfferHistoryData[] = [
         </div>
       );
     }
+
+    const router= useRouter();
+    if(pid==userID || userData?.role=="producer"){
+        router.push('/')
+    }
   
     useEffect(() => {
       const fetchData = async () => {
@@ -122,11 +128,16 @@ const mockOfferHistory: OfferHistoryData[] = [
             // responseOffer= await getOfferHistory(token,pid); 
           } else if (userRole === "production professional") {
             response = await getPostById(pid, token); // ดึงโพสต์ตาม pid
+            console.log(response)
+            if (!response) {
+              console.log("Invalid access")
+              router.push('/')
+            }
             userResponse = await getUser(userID);
             // responseOffer= await getOfferHistory(token,userID); 
           }
           setUserData(userResponse)
-          console.log("respons",response)
+          // console.log("respons",response)
           if (response) {
             const posts =
               userRole === "producer" ? response : [response];
@@ -179,7 +190,7 @@ const mockOfferHistory: OfferHistoryData[] = [
               className="cursor-pointer hover:text-mainblue transition-colors"
               onClick={() => setShowOfferHistory(true)}
             /> */}
-            <OfferHistoryMinimal2 productionProfessionalName={pid} offerHistoryDatas={mockOfferHistory}/>
+            {/* <OfferHistoryMinimal2 productionProfessionalName={pid} offerHistoryDatas={mockOfferHistory}/> */}
 
           </CardHeader>
 
@@ -213,11 +224,11 @@ const mockOfferHistory: OfferHistoryData[] = [
             
       {showOfferHistory && (
         <div  className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <OfferHistoryMinimal
+        {/* <OfferHistoryMinimal
           productionProfessionalName={pid}
           offerHistoryDatas={mockOfferHistory}
           onCloseWindow={() => setShowOfferHistory(false)}
-        />
+        /> */}
         </div>
       )}
     </div>

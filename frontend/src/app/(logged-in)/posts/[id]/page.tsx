@@ -39,6 +39,7 @@ const PostDetail = () => {
   const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
 
   const { data: session } = useSession();
+ 
 
   if(!session){
     const handleSendOffer = () => {
@@ -238,7 +239,7 @@ const PostDetail = () => {
               </span>
             </div>
           </div>
-          <p className="text-main-gery break-words whitespace-normal">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
+          <p className="text-maingrey break-words whitespace-normal">&nbsp;&nbsp;&nbsp;&nbsp;{PostInfo.postDescription}</p>
 
           {/* Project Detail Section */}
           <div className="place-content-center grid grid-cols-1 gap-3">
@@ -298,15 +299,20 @@ const PostDetail = () => {
 
           {/* Contact Button */}
           <div className="grid grid-cols-2 gap-4">
-            <a
-              href={`/create-offer/${id}`}
-              className="bg-blue-600 text-white text-center py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
-            >
-              Send Offer
-            </a>
+            {role === "production professional" && (
+              <a
+                href={`/create-offer/${id}`}
+                className="bg-blue-600 text-white text-center py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
+              >
+                Send Offer
+              </a>
+            )}
+
             <a
               href={`/producer/${ownerResponse._id}`}
-              className="bg-blue-600 text-white text-center py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
+              className={`bg-blue-600 text-white text-center py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 ${
+                role === "producer" ? "col-span-2" : ""
+              }`}
             >
               View Producer Profile
             </a>

@@ -1161,8 +1161,162 @@ class PostRepository {
             throw new Error('Error change participant status in repository: ' + error);
         }
     }
-    
-  
+
+    public async sumLatestCandidateOffers(userId: string, postId: string): Promise<number> {
+        try {
+            const post = await Post.findById(postId);
+            if(!post || (post.userID.toString() !== userId)){
+                throw new Error("You don't have permission to access this post");
+            }
+            const pipeline: PipelineStage[] = [
+                {
+                  $match: {
+                    _id: new ObjectId(postId)
+                  }
+                },
+                {
+                  $unwind: {
+                    path: '$participants',
+                    preserveNullAndEmptyArrays: true // Keeps post even if no participants
+                  }
+                },
+                {
+                  $addFields: {
+                    isCandidate: {
+                      $cond: [{ $eq: ['$participants.status', 'candidate'] }, true, false]
+                    }
+                  }
+                },
+                {
+                  $addFields: {
+                    sortedOffers: {
+                      $cond: [
+                        {
+                          $and: [
+                            '$isCandidate',
+                            { $gt: [{ $size: '$participants.offer' }, 0] }
+                          ]
+                        },
+                        {
+                          $sortArray: {
+                            input: '$participants.offer',
+                            sortBy: { createdAt: -1 }
+                          }
+                        },
+                        []
+                      ]
+                    }
+                  }
+                },
+                {
+                  $addFields: {
+                    latestOffer: { $arrayElemAt: ['$sortedOffers', 0] }
+                  }
+                },
+                {
+                  $addFields: {
+                    offerPrice: {
+                      $cond: [
+                        '$isCandidate',
+                        {
+                          $cond: [
+                            { $gt: [{ $size: '$sortedOffers' }, 0] },
+                            '$latestOffer.price',
+                            0
+                          ]
+                        },
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  $group: {
+                    _id: null,
+                    totalOfferSum: { $sum: '$offerPrice' }
+                  }
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    totalOfferSum: 1
+                  }
+                }
+              ];
+      
+          const result = await Post.aggregate(pipeline);
+      
+          return result.length > 0 ? result[0].totalOfferSum : 0;
+        } catch (error) {
+          console.error('Error calculating latest candidate offers:', error);
+          throw new Error('Error calculating total latest offers for candidates');
+        }
+      }
+
+      public async getOneCandidatePrice(postId: string, professionalId: string): Promise<number> {
+        try {
+          const post = await Post.findById(postId);
+          if (!post) {
+            throw new Error("This post does not exist");
+          }
+      
+          const pipeline: PipelineStage[] = [
+            {
+              $match: { _id: new ObjectId(postId) }
+            },
+            {
+              $unwind: '$participants'
+            },
+            {
+              $match: {
+                'participants.userID': new ObjectId(professionalId),
+                'participants.status': 'candidate'
+              }
+            },
+            {
+              $addFields: {
+                sortedOffers: {
+                  $cond: [
+                    { $gt: [{ $size: '$participants.offer' }, 0] },
+                    {
+                      $sortArray: {
+                        input: '$participants.offer',
+                        sortBy: { createdAt: -1 }
+                      }
+                    },
+                    []
+                  ]
+                }
+              }
+            },
+            {
+              $addFields: {
+                latestOffer: { $arrayElemAt: ['$sortedOffers', 0] }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                price: {
+                  $cond: [
+                    { $gt: [{ $size: '$sortedOffers' }, 0] },
+                    '$latestOffer.price',
+                    0
+                  ]
+                }
+              }
+            }
+          ];
+      
+          const result = await Post.aggregate(pipeline);
+          return result.length > 0 ? result[0].price : 0;
+        } catch (error) {
+          console.error('Error retrieving candidate price:', error);
+          throw new Error('Error retrieving candidate price');
+        }
+      }
+      
+      
 }
 
 

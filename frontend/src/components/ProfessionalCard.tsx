@@ -25,7 +25,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProp> = ({
 }) => {
     return (
     <div className="flex flex-col bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-        <img src={imageUrl == '' ? 'image/logo.png' : imageUrl} alt={title} className="w-full h-48 object-cover" />
+        <img src={imageUrl.length === 0 ? 'image/logo-preview.webp' : imageUrl.replace(/\.(jpg|png)$/, ".webp")} alt={title} className="w-full h-48 object-cover" />
         <div className="flex flex-col flex-1 p-4">
         <h2 className="text-lg font-bold text-gray-800">{title}</h2>
 

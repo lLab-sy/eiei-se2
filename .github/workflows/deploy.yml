@@ -1,0 +1,85 @@
+name: Build and Deploy Frontend to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      FRONTEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/eiei-frontend
+      BACKEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/eiei-backend
+      MONGO_SEED_IMAGE: ${{ secrets.DOCKER_USERNAME }}/eiei-db-seed
+      MONGO_USER: ${{ secrets.MONGO_USER }}
+      MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+      MONGO_PORT: ${{ secrets.MONGO_PORT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Create frontend .env.local
+        run: |
+          echo "${{ secrets.FRONTEND_ENV }}" > ./frontend/.env.local
+      
+      - name: Create backend .env
+        run: |
+          echo "${{ secrets.BACKEND_ENV }}" > ./backend/.env
+
+      - name: Build and push frontend image
+        run: |
+          docker buildx build --platform linux/amd64 -t $FRONTEND_IMAGE:latest ./frontend
+          docker push $FRONTEND_IMAGE:latest
+      
+      - name: Build and push backend image
+        run: |
+          docker buildx build --platform linux/amd64 -t $BACKEND_IMAGE:latest ./backend
+          docker push $BACKEND_IMAGE:latest
+      
+      - name: Build and push MongoDB seed image
+        run: |
+          docker buildx build --platform linux/amd64 -t $MONGO_SEED_IMAGE:latest ./init-data
+          docker push $MONGO_SEED_IMAGE:latest
+
+      - name: Prepare SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ec2_key.pem
+          chmod 600 ec2_key.pem
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            sudo docker stop frontend || true && sudo docker rm frontend || true
+            sudo docker stop backend || true && sudo docker rm backend || true
+            sudo docker stop mongodb-eiei || true && sudo docker rm mongodb-eiei || true
+            sudo docker rm mongo-seed || true
+            sudo docker pull $FRONTEND_IMAGE:latest
+            sudo docker pull $BACKEND_IMAGE:latest
+            sudo docker pull $MONGO_SEED_IMAGE:latest
+
+            sudo docker network create my-network || true
+
+            sudo docker run -d --name mongodb-eiei \
+              -p $MONGO_PORT:27017 \
+              --network my-network \
+              -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
+              -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
+              -e MONGO_INITDB_DATABASE=eiei \
+              mongo:8.0
+            
+            sudo docker run -d --name mongo-seed \
+              --network my-network \
+              -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
+              -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
+              -e MONGO_HOST=mongodb-eiei \
+              $MONGO_SEED_IMAGE:latest
+            
+            sudo docker run -d -p 3000:3000 --platform linux/amd64 --name frontend --network my-network $FRONTEND_IMAGE:latest
+            sudo docker run -d -p 1000:1000 --platform linux/amd64 --name backend --network my-network $BACKEND_IMAGE:latest
+          EOF

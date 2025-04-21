@@ -107,7 +107,7 @@ export default function ProducerWorkingCard({
         onClick={() => setOpen(true)}
       >
         <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Offer {offer.id}</h3>
+        {/* <h3 className="text-lg font-medium">Offer {offer.id}</h3> */}
         <span className={`font-semibold ${
                offerStatus === "Rejected" ? "text-mainred-light" : 
                offerStatus === "Pending" ? "text-mainyellow" : 
@@ -116,36 +116,47 @@ export default function ProducerWorkingCard({
         </div>
         <div className="flex items-center text-sm text-gray-500 mt-1 space-x-2">
           <Calendar size={14} />
-          <span>{offer.date.toString()}</span>
+          <span>{new Date(offer.date).toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",})}</span>
         </div>
         <div className="mt-2 text-right text-lg font-semibold">{offer.amount} THB</div>
     </Card>
 
     {/* Popup Modal */}
-    <Dialog open={open} onOpenChange={setOpen}>
+    {/* marking */}
+    <Dialog open={open} onOpenChange={setOpen}> 
         <DialogContent className="max-w-lg p-0 rounded-lg border shadow-lg overflow-hidden" >
-          
-          <div className="bg-blue-700 text-white p-4">
-            <h2 className="text-lg font-bold">Offer {offer.postName}</h2>
-            <p className="text-sm">Role: {offer.role}</p>
-          </div>
-          <div className="p-4">
-            <div className="flex items-center space-x-2">
-            <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden">
-              <img 
-                src={offer.professionalImg || "/default-avatar.png"} 
-                alt="Production" 
-                className="w-full h-full object-cover" 
-              />
+          <div className="max-w-lg">
+            <div className="bg-blue-700 text-white p-4 max-w-lg">
+              <h2 className="text-lg font-bold">Offer {offer.postName}</h2>
+              <p className="text-sm">Role: {offer.role}</p>
             </div>
-              <div>
-                <p className="font-semibold">From: {fromWho}</p>
-                <p className="flex items-center gap-2 font-medium"><Star className="h-6 w-6 text-mainyellow fill-current" />{offer.reviews}</p>
+            <div className="p-4">
+              <div className="flex items-center space-x-2">
+              <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden">
+                <img 
+                  src={offer.professionalImg || "/default-avatar.png"} 
+                  alt="Production" 
+                  className="w-full h-full object-cover" 
+                />
               </div>
-            </div>
-            <hr className="my-3" />
+                <div>
+                  <p className="font-semibold">From: {fromWho}</p>
+                  <p className="flex items-center gap-2 font-medium"><Star className="h-6 w-6 text-mainyellow fill-current" />{offer.reviews}</p>
+                </div>
+              </div>
+              <hr className="my-3" />
             <p className="mt-2"><strong>Offered Price:</strong> <span className="font-bold">{offer.amount} THB</span></p>
-            <p><strong>Start Date:</strong> {offer.startDate.toString()}</p>
+            <p><strong>Start Date:</strong> {new Date(offer.startDate).toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",})}</p>
             <p><strong>Status:</strong> <span className={`font-semibold ${
                 offer.status === "Rejected" ? "text-mainred-light" : 
                 offer.status === "Pending" ? "text-mainyellow" : 
@@ -154,6 +165,7 @@ export default function ProducerWorkingCard({
             <p className="mt-2"><strong>Description</strong></p>
             <div className="mt-1 p-3 bg-gray-100 border rounded-md text-sm">
               {offer.description}
+            </div>
             </div>
           </div>
           <div className="flex justify-between p-4">
@@ -171,7 +183,6 @@ export default function ProducerWorkingCard({
                 Confirm Offer
               </Button>}
           </div>
-
           <DialogHeader>
             <DialogTitle>
               <VisuallyHidden>Confirm Offer</VisuallyHidden>

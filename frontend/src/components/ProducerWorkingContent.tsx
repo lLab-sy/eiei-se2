@@ -13,10 +13,12 @@ interface IOfferData {
 
 export default function ProducerWorkingContent({
     postID,
+    postName,
     participants,
     mapRole,
 }: {
     postID: string;
+    postName:string;
     participants: Participant[];
     mapRole: PostRolesResponse[];
 }) {
@@ -58,12 +60,13 @@ export default function ProducerWorkingContent({
     useEffect(() => {
         const newRoleMap = new Map<string, OfferData[]>();
 
-        participants.forEach((p) => {
-            fetchProfessionalData(p.participantID);
-            p.offer.forEach((o) => {
-                const existingOffers = newRoleMap.get(o.role) || [];
+        participants.forEach((p:Participant) => {
+            fetchProfessionalData(p.participantID??"");
+            p.offer.forEach((o:OfferData) => {
+                const offerRole=o.role??"" //Must Contain o.role but I still can't find better sol
+                const existingOffers = newRoleMap.get(offerRole) || [];
                 existingOffers.push(o);
-                newRoleMap.set(o.role, existingOffers);
+                newRoleMap.set(offerRole, existingOffers);
             });
         });
 
@@ -81,15 +84,18 @@ export default function ProducerWorkingContent({
         setSelectedProfessional("");
 
         const newNameMap = new Map<string, OfferData[]>();
-
+        
         participants.forEach((p) => {
-            p.offer.forEach((o) => {
-                if (o.role === roleID) {
-                    const existingOffers = newNameMap.get(p.participantID) || [];
-                    existingOffers.push(o);
-                    newNameMap.set(p.participantID, existingOffers);
-                }
-            });
+            const pid=p.participantID??""
+            if(pid){
+                p.offer.forEach((o:OfferData) => {
+                    if (o.role === roleID) {
+                        const existingOffers = newNameMap.get(pid) || [];
+                        existingOffers.push(o);
+                        newNameMap.set(pid, existingOffers);
+                    }
+                });
+            }
         });
 
         setNameMap(newNameMap); // Update nameMap state
@@ -193,9 +199,9 @@ export default function ProducerWorkingContent({
                         status: offer.status,
                         date: offer.data.createdAt,
                         amount: offer.data.price.toString(),
-                        role: mapRoles.get(offer.data.role) || "",
+                        role: mapRoles.get(offer.data.role??"") || "",
                         startDate: offer.data.createdAt,
-                        postName: index.toString(),
+                        postName: postName,
                         description: offer.data.reason,
                         productionName: professionalMap.get(selectedProfessional)?.username || "",
                         productionID: professionalMap.get(selectedProfessional)?._id || "",
