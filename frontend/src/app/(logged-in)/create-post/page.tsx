@@ -196,7 +196,7 @@ export default function CreatePostPage() {
       description: "Redirecting you...",
     })
     // TODO: await for API to finish then renavigate
-    // router.push(`/my-post`); 
+    router.push(`/my-post`); 
   }
 
 
