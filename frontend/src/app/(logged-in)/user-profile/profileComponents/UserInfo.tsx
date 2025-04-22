@@ -35,7 +35,7 @@ export default function UserInfo({
   const ProfileName = () => {
     return (
       <div className="mt-5 lg:mt-0 order-2 lg:order-1 text-2xl mb-2 lg:text-xl font-bold flex justify-center items-center">
-        {`${userData.firstName} ${userData.middleName} ${userData.lastName}`}
+        {userData.firstName||userData.lastName ? `${userData.firstName} ${userData.middleName} ${userData.lastName}`:userData.username}
       </div>
     );
   };
