@@ -936,7 +936,7 @@ export default function ProfileEdit({
           {userData && !userData.email ? (
             <div className="mt-2 h-[90%] flex flex-col justify-between">
               <div className="h-[50%] text-xl font-bold ">
-                Your payment card
+                Your book bank
               </div>
               <div className="h-[50%] w-[68%] self-center flex flex-col">
                 <span>
