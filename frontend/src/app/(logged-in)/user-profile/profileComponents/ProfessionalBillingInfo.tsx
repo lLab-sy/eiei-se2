@@ -23,6 +23,7 @@ export default function ProfessionalBillingInfo({
     useEffect(() => {
         if (bankInfo) {
             setBankName(bankOptions.find((option) => option.label === bankInfo.brand)?.brand || "");
+            console.log("bankInfo.brand", bankInfo);
             setAccountHolder(bankInfo.name || "");
             setAccountNumber(bankInfo.number || "");
             setLastDigits(bankInfo.bankLastDigits || "");
@@ -75,16 +76,14 @@ export default function ProfessionalBillingInfo({
     };
 
     const bankOptions = [
-        { brand: "kbank", label: "Kasikorn Bank" }, // Matches Omise's "kbank"
+        { brand: "kbank", label: "Kasikornbank" }, // Matches Omise's "kbank"
         { brand: "scb", label: "Siam Commercial Bank" }, // Matches Omise's "scb"
         { brand: "bbl", label: "Bangkok Bank" }, // Matches Omise's "bbl"
-        { brand: "ktb", label: "Krung Thai Bank" }, // Matches Omise's "ktb"
+        { brand: "ktb", label: "Krungthai Bank" }, // Matches Omise's "ktb"
         { brand: "bay", label: "Bank of Ayudhya (Krungsri)" }, // Matches Omise's "bay"
-        { brand: "gsb", label: "Government Savings Bank (Aomsin)" }, // Matches Omise's "gsb"
-        { brand: "tmb", label: "TMBThanachart Bank" }, // Matches Omise's "tmb"
-        { brand: "uob", label: "United Overseas Bank (UOB)" }, // Matches Omise's "uob"
-        { brand: "kkp", label: "Kiatnakin Phatra Bank" }, // Matches Omise's "kkp"
-        { brand: "tisco", label: "TISCO Bank" }, // Matches Omise's "tisco"
+        { brand: "gsb", label: "Government Savings Bank" }, // Matches Omise's "gsb"
+        { brand: "uob", label: "United Overseas Bank (Thai)" }, // Matches Omise's "uob"
+        { brand: "tisco", label: "Tisco Bank" }, // Matches Omise's "tisco"
     ];
 
     function handleSubmitBankName(value: string): void {
@@ -103,7 +102,7 @@ export default function ProfessionalBillingInfo({
                 disabled={!isEditing}
             >
                 <option value="" disabled={!bankName}>
-                    {bankName ? bankOptions.find((option) => option.brand === bankName)?.label || "Choose Bank" : "Choose Bank"}
+                    {bankName ? bankOptions.find((option) => option.brand === bankName)?.label : "Choose Bank"}
                 </option>
                 {bankOptions.map((option) => (
                     <option key={option.brand} value={option.label}>
