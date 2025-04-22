@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Award } from "lucide-react";
+import { UserData } from "../../interface";
+import getUser from "@/libs/getUser";
 
 interface ProfessionalCardProp {
   title: string;
@@ -23,6 +25,20 @@ const ProfessionalCard: React.FC<ProfessionalCardProp> = ({
   experience,
   id,
 }) => {
+    const [dataResponse, setDataResponse] = useState<UserData | null>(null);
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const responseData = await getUser(id);
+          setDataResponse(responseData);
+        } catch (error) {
+          console.log("User Not Found");
+        }
+      };
+      fetchData();
+    }, [id]);
+    
     return (
     <div className="flex flex-col bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
         <img src={imageUrl.length === 0 ? 'image/logo-preview.webp' : imageUrl.replace(/\.(jpg|png)$/, ".webp")} alt={title} className="w-full h-48 object-cover" />

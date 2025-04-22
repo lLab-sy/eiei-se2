@@ -160,6 +160,10 @@ export const userSchema = new Schema<IUser>({
     type: Date,
     default: Date.now,
   },
+  url: {
+    type: String,
+  }
+
 },{ discriminatorKey: "role", timestamps: true } // <-- Discriminator Key
 );
 

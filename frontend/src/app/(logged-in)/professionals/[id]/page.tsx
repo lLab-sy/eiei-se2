@@ -11,6 +11,7 @@ import getUser from "@/libs/getUser";
 import ReviewCard from "@/components/ReviewCard";
 import getReviewProfesstional from "@/libs/getReviewProfesstional";
 import ReviewProfessional from "@/components/ReviewProfessional";
+import { set } from "react-hook-form";
 
 const ProfessionalDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,8 @@ const ProfessionalDetail = () => {
           try{
             responseData = await getUser(id);
             setDataResponse(responseData);
+            
+            console.log("test", responseData);
           }catch(error){
             console.log("User Not Found");
           }
@@ -61,7 +64,7 @@ const ProfessionalDetail = () => {
     email: dataResponse.email || "N/A",
     phoneNumber: dataResponse.phoneNumber || "N/A",
     gender: dataResponse.gender || "N/A",
-    profileImage: dataResponse.profileImage || 'image/logo-preview.webp',
+    imageUrl: dataResponse.url || '/image/logo-preview.webp',
     description: dataResponse.description || "",
     occupation: dataResponse.occupation || "",
     skill: dataResponse.skill || [],
@@ -84,12 +87,12 @@ const ProfessionalDetail = () => {
                     <div className="w-full flex justify-center">
                        <Carousel className="w-full">
                               <CarouselContent>
-                              {(ProfessionalInfo.profileImage && ProfessionalInfo.profileImage.length != 0) ? (
+                              {(ProfessionalInfo.imageUrl && ProfessionalInfo.imageUrl.length != 0) ? (
 
-                              <CarouselItem key={ProfessionalInfo.profileImage} className="flex justify-center">
+                              <CarouselItem key={ProfessionalInfo.imageUrl} className="flex justify-center">
                                 <Card className="relative w-full aspect-video">
                                   <Image
-                                    src={ProfessionalInfo.profileImage}//imgSrc}
+                                    src={ProfessionalInfo.imageUrl}//imgSrc}
                                     alt="Project Image"
                                     // width={300}
                                     // height={300}
