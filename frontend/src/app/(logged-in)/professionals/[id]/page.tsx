@@ -25,8 +25,7 @@ const ProfessionalDetail = () => {
           var responseReviewProf;
           try{
             responseData = await getUser(id);
-            responseData.user.imageUrl = responseData.url;
-            setDataResponse(responseData.user);
+            setDataResponse(responseData);
             
             console.log("test", responseData);
           }catch(error){
@@ -65,7 +64,7 @@ const ProfessionalDetail = () => {
     email: dataResponse.email || "N/A",
     phoneNumber: dataResponse.phoneNumber || "N/A",
     gender: dataResponse.gender || "N/A",
-    imageUrl: dataResponse.imageUrl || '/image/logo-preview.webp',
+    imageUrl: dataResponse.url || '/image/logo-preview.webp',
     description: dataResponse.description || "",
     occupation: dataResponse.occupation || "",
     skill: dataResponse.skill || [],

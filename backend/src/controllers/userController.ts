@@ -40,18 +40,8 @@ class UserController {
                 return;
             }
             const user = await userService.getUserById(username)
-            if(user?.profileImage){
-                const signedUrl = await cloudService.getSignedUrlImageCloud(user.profileImage);
-                const updatedUserWithSignedURL = {
-                    user,
-                    url: signedUrl
-                }
-                sendResponse(res, 'success', updatedUserWithSignedURL, "Successfully get User")
-            }else{
-                sendResponse(res, 'success', user, "Successfully get User")
-            }
-            
-            
+            sendResponse(res, 'success', user, "Successfully get User")
+            //console.log("user", user)
         }catch(err){
             console.log(err)
             sendResponse(res, 'error', 'Failed to get User')

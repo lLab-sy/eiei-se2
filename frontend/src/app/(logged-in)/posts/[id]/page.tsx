@@ -177,6 +177,7 @@ const PostDetail = () => {
   };
   console.log("dataReview: ",dataReviews)
   console.log("post data", PostInfo)
+  console.log("owner data", ownerResponse)
 
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">

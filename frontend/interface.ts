@@ -117,6 +117,7 @@ export interface UserData{
     avgRating: number;
     description?: string;
     imageUrl?: string;
+    url: string;
 }
 
 // export interface PostDataHistory {
@@ -160,6 +161,7 @@ export interface Professional{
     description?: string;
     imageUrl?: string;
     profileImage: string;
+    url: string;
 }
 
 export interface MetaData{

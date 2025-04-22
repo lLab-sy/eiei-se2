@@ -26,6 +26,11 @@ class UserService {
     async getUserById(id: string) {
         try {
             const getUser = await userRepository.getUserByID(id);
+            if(getUser.profileImage){
+                const signedUrl = await cloudService.getSignedUrlImageCloud(getUser.profileImage);
+                getUser.url = signedUrl;
+            }
+            console.log("getUser", getUser);
             return getUser;
         } catch (err) {
             console.error("Error in service layer:", err);
