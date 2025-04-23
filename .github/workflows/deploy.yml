@@ -59,6 +59,7 @@ jobs:
             sudo docker stop backend || true && sudo docker rm backend || true
             sudo docker stop mongodb-eiei || true && sudo docker rm mongodb-eiei || true
             sudo docker rm mongo-seed || true
+            sudo docker system prune -a -f
             sudo docker pull llab/eiei-frontend:latest
             sudo docker pull llab/eiei-backend:latest
             sudo docker pull llab/eiei-db-seed:latest
