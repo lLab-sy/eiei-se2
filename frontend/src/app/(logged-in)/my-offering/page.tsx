@@ -129,7 +129,7 @@ export default function OfferPage() {
                       role={getRoleById(post.postProjectRoles || [])}
                       mediaType={getMediaNameById(post.postMediaType)}
                       id={post.id!}
-                      link={`http://localhost:3000/my-offering/${post.id}`}
+                      link={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/my-offering/${post.id}`}
                     />
                   </Suspense>
               ))

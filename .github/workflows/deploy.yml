@@ -26,11 +26,11 @@ jobs:
 
       - name: Create frontend .env.local
         run: |
-          echo "${{ secrets.FRONTEND_ENV }}" > ./frontend/.env.local
-      
+          echo "${{ secrets.FRONTEND_ENV }}" | base64 -d > ./frontend/.env.local
+
       - name: Create backend .env
         run: |
-          echo "${{ secrets.BACKEND_ENV }}" > ./backend/.env
+          echo "${{ secrets.BACKEND_ENV }}" | base64 -d > ./backend/.env
 
       - name: Build and push frontend image
         run: |
@@ -49,8 +49,8 @@ jobs:
 
       - name: Prepare SSH key
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ec2_key.pem
-          chmod 600 ec2_key.pem
+          echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
+          chmod 400 ec2_key.pem
 
       - name: Deploy to EC2
         run: |
@@ -59,27 +59,27 @@ jobs:
             sudo docker stop backend || true && sudo docker rm backend || true
             sudo docker stop mongodb-eiei || true && sudo docker rm mongodb-eiei || true
             sudo docker rm mongo-seed || true
-            sudo docker pull $FRONTEND_IMAGE:latest
-            sudo docker pull $BACKEND_IMAGE:latest
-            sudo docker pull $MONGO_SEED_IMAGE:latest
+            sudo docker pull llab/eiei-frontend:latest
+            sudo docker pull llab/eiei-backend:latest
+            sudo docker pull llab/eiei-db-seed:latest
 
             sudo docker network create my-network || true
 
             sudo docker run -d --name mongodb-eiei \
-              -p $MONGO_PORT:27017 \
+              -p 7007:27017 \
               --network my-network \
-              -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
-              -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
+              -e MONGO_INITDB_ROOT_USERNAME=root \
+              -e MONGO_INITDB_ROOT_PASSWORD=rootpassword \
               -e MONGO_INITDB_DATABASE=eiei \
               mongo:8.0
             
             sudo docker run -d --name mongo-seed \
               --network my-network \
-              -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USER \
-              -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD \
+              -e MONGO_USER=root \
+              -e MONGO_PASSWORD=rootpassword \
               -e MONGO_HOST=mongodb-eiei \
-              $MONGO_SEED_IMAGE:latest
+              llab/eiei-db-seed:latest
             
-            sudo docker run -d -p 3000:3000 --platform linux/amd64 --name frontend --network my-network $FRONTEND_IMAGE:latest
-            sudo docker run -d -p 1000:1000 --platform linux/amd64 --name backend --network my-network $BACKEND_IMAGE:latest
+            sudo docker run -d -p 3000:3000 --platform linux/amd64 --name frontend --network my-network llab/eiei-frontend:latest
+            sudo docker run -d -p 1000:1000 --platform linux/amd64 --name backend --network my-network llab/eiei-backend:latest
           EOF
