@@ -385,7 +385,7 @@ export default function CreatePostPage() {
                     priority
                     placeholder= "empty"/>
               ):(
-                <Image src="/image/logo.png"
+                <Image src="/image/logo.webp"
                 alt="Post Image Here" 
                 width={parent.innerWidth}
                 height={parent.innerHeight}
@@ -426,8 +426,8 @@ export default function CreatePostPage() {
                         )
                       )
                     ):(
-                        <CarouselItem key={"/image/logo.png"} className="pt-1">
-                          <Image src="/image/logo.png"
+                        <CarouselItem key={"/image/logo.webp"} className="pt-1">
+                          <Image src="/image/logo.webp"
                             alt="Post Image Here" 
                             width={parent.innerWidth}
                             height={parent.innerHeight}
