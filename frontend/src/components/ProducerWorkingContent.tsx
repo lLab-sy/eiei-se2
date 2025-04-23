@@ -206,7 +206,7 @@ export default function ProducerWorkingContent({
                         productionName: professionalMap.get(selectedProfessional)?.username || "",
                         productionID: professionalMap.get(selectedProfessional)?._id || "",
                         reviews: professionalMap.get(selectedProfessional)?.avgRating || 0,
-                        professionalImg: professionalMap.get(selectedProfessional)?.imageUrl || "/image/logo-preview.png",
+                        professionalImg: professionalMap.get(selectedProfessional)?.url || "/image/logo-preview.png",
                         offeredBy: Number(offer.data.offeredBy)
                     }}
                     onStatusChange={handleStatusChange}                 

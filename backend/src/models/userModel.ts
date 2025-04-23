@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 // Common user fields
 // Interface for User Document: require are name, password, role; which user must input at registration.
 export interface IUser extends Document {
+  _id:mongoose.Types.ObjectId;
   username: string;
   password: string;
   role: "producer" | "production professional" | "admin";
@@ -160,6 +161,10 @@ export const userSchema = new Schema<IUser>({
     type: Date,
     default: Date.now,
   },
+  url: {
+    type: String,
+  }
+
 },{ discriminatorKey: "role", timestamps: true } // <-- Discriminator Key
 );
 

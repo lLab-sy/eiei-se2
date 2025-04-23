@@ -133,7 +133,7 @@ class transferController {
             sendResponse(res, 'success', bankAccounts, "Successfully retrieved bank accounts");
         } catch (err) {
             console.log(err);
-            sendResponse(res, 'error', 'Failed to get bank accounts');
+            sendResponse(res, 'error', null,'Failed to get bank accounts');
         }
     }
 
@@ -145,7 +145,7 @@ class transferController {
             sendResponse(res, 'success', transactions, "Successfully retrieved transfer transactions");
         } catch (err) {
             console.error(err);
-            sendResponse(res, 'error', 'Failed to retrieve transfer transactions');
+            sendResponse(res, 'error', null,'Failed to retrieve transfer transactions');
         }
     }
 }

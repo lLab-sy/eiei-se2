@@ -11,6 +11,7 @@ import getUser from "@/libs/getUser";
 import ReviewCard from "@/components/ReviewCard";
 import getReviewProfesstional from "@/libs/getReviewProfesstional";
 import ReviewProfessional from "@/components/ReviewProfessional";
+import { set } from "react-hook-form";
 
 const ProfessionalDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,8 @@ const ProfessionalDetail = () => {
           try{
             responseData = await getUser(id);
             setDataResponse(responseData);
+            
+            console.log("test", responseData);
           }catch(error){
             console.log("User Not Found");
           }
@@ -53,7 +56,7 @@ const ProfessionalDetail = () => {
       })
       dataResponse.avgRating = dataResponse.rating.length ? Math.ceil((sum / dataResponse.rating.length) * 10) / 10 : 0.0;
   }
-
+  console.log("DATA RESPONSE",dataResponse)
   const ProfessionalInfo = {
     id: dataResponse._id,
     firstName: dataResponse.firstName || "N/A",
@@ -61,7 +64,7 @@ const ProfessionalDetail = () => {
     email: dataResponse.email || "N/A",
     phoneNumber: dataResponse.phoneNumber || "N/A",
     gender: dataResponse.gender || "N/A",
-    profileImage: dataResponse.profileImage || 'image/logo-preview.webp',
+    imageUrl: dataResponse.url || '/image/logo-preview.webp',
     description: dataResponse.description || "",
     occupation: dataResponse.occupation || "",
     skill: dataResponse.skill || [],
@@ -70,7 +73,7 @@ const ProfessionalDetail = () => {
     avgRating: dataResponse.avgRating || 0.0,
     username: dataResponse.username,
   };
-
+  console.log(ProfessionalInfo)
   return (
     <div className="flex bg-mainblue-light justify-center min-h-screen py-12 px-4">
       <Card className="w-full max-w-3xl shadow-lg rounded-2xl bg-white p-8">
@@ -84,12 +87,12 @@ const ProfessionalDetail = () => {
                     <div className="w-full flex justify-center">
                        <Carousel className="w-full">
                               <CarouselContent>
-                              {(ProfessionalInfo.profileImage && ProfessionalInfo.profileImage.length != 0) ? (
+                              {(ProfessionalInfo.imageUrl && ProfessionalInfo.imageUrl.length != 0) ? (
 
-                              <CarouselItem key={ProfessionalInfo.profileImage} className="flex justify-center">
+                              <CarouselItem key={ProfessionalInfo.imageUrl} className="flex justify-center">
                                 <Card className="relative w-full aspect-video">
                                   <Image
-                                    src={ProfessionalInfo.profileImage}//imgSrc}
+                                    src={ProfessionalInfo.imageUrl}//imgSrc}
                                     alt="Project Image"
                                     // width={300}
                                     // height={300}

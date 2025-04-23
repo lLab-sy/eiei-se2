@@ -18,6 +18,8 @@ const ProducerProfile = () => {
     const fetchData = async () => {
       try {
         const responseData = await getUser(id);
+        //responseData.user.imageUrl = responseData.url;
+        console.log(responseData);
         setDataResponse(responseData);
       } catch (error) {
         console.log("User Not Found");
@@ -40,7 +42,7 @@ const ProducerProfile = () => {
     phoneNumber: dataResponse.phoneNumber || "N/A",
     gender: dataResponse.gender || "N/A",
     email: dataResponse.email || "N/A",
-    imageUrl: dataResponse.imageUrl || "/image/logo.png",
+    url: dataResponse.url || "/image/logo.png",
   };
 
   return (
@@ -57,7 +59,7 @@ const ProducerProfile = () => {
               <CarouselContent>
                 <CarouselItem className="flex justify-center">
                   <Image
-                    src={ProducerInfo.imageUrl}
+                    src={ProducerInfo.url}
                     alt={`${ProducerInfo.firstName} ${ProducerInfo.lastName}`}
                     width={300}
                     height={300}
