@@ -1,23 +1,4 @@
-"use client";
-
-import { use } from "react";
-import PostSelect from "@/components/PostSelect";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { OfferHistoryData, PostData, UserData } from "../../../../../interface";
-import { useEffect, useState } from "react";
-import OfferInformation from "@/components/OfferInformation";
-import getPostUser from "@/libs/getPostsUser";
-import getPostById from "@/libs/getPostById";
-import { useSession } from "next-auth/react";
-import { FaHistory } from "react-icons/fa";
-import OfferHistoryMinimal from "@/components/OfferHistoryMinimal";
-import { OfferHistoryMinimal2 } from "@/components/OfferHistoryMinimal2";
-import getOfferHistory from "@/libs/getOffersHistory";
-import getUser from "@/libs/getUser";
-import {useRouter } from "next/navigation";
 import CreateOfferPanel from "@/components/CreateOfferPanel";
-
- 
   export default function CreateOfferPage({
     params,
   }: {
