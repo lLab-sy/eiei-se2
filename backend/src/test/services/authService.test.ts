@@ -1,11 +1,11 @@
 import authService from '../../services/authService';
 import userRepository from '../../repositories/userRepository';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 // Mock external dependencies
 jest.mock('../../repositories/userRepository');
-jest.mock('bcrypt');
+jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 
 describe('AuthService', () => {
