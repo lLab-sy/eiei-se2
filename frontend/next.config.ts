@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '**.amazonaws.com', pathname: '/**' },
       { protocol: 'https', hostname: 'drive.google.com', pathname: '/**' },
-      { protocol: 'http', hostname: '18.204.219.224', pathname: '/**' },
+      { protocol: 'http', hostname: '3.87.182.59', pathname: '/**' },
     ],
     imageSizes: [16, 32, 48, 64, 128, 256, 512],
     deviceSizes: [640, 750, 1080, 1920],
